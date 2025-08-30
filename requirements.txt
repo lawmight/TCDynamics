@@ -3,3 +3,6 @@
 # azure-monitor-opentelemetry
 
 azure-functions
+
+# Email functionality is built into Python standard library
+# No additional dependencies needed for smtplib, email.mime

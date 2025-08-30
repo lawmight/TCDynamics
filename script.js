@@ -12,7 +12,6 @@ function initializeWebsite() {
     updateProgress();
     setupEventListeners();
     setupSmoothScrolling();
-    setupFormHandling();
     animateOnScroll();
 }
 
