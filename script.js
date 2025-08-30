@@ -166,7 +166,7 @@ async function handleContactSubmit(e) {
         };
         
         // Send to Azure Function
-        const response = await fetch('/api/ContactForm', {
+        const response = await fetch('https://YOUR_FUNCTION_APP_NAME.azurewebsites.net/api/ContactForm', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
