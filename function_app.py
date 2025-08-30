@@ -1,8 +1,60 @@
 import azure.functions as func
 import logging
 import json
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import os
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+
+def send_email_notification(name, email, message):
+    """Send email notification using Zoho SMTP"""
+    try:
+        # Zoho SMTP settings
+        smtp_server = "smtp.zoho.com"
+        smtp_port = 587
+        sender_email = os.environ.get("ZOHO_EMAIL")  # Your Zoho email
+        sender_password = os.environ.get("ZOHO_PASSWORD")  # Your Zoho app password
+        
+        if not sender_email or not sender_password:
+            logging.error("Zoho email credentials not configured")
+            return False
+        
+        # Create message
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = sender_email  # Send to yourself
+        msg['Subject'] = f"Nouveau message de contact - {name}"
+        
+        # Email body
+        body = f"""
+        Nouveau message de contact reçu sur TCDynamics :
+        
+        Nom: {name}
+        Email: {email}
+        Message: {message}
+        
+        ---
+        Envoyé automatiquement depuis le formulaire de contact.
+        """
+        
+        msg.attach(MIMEText(body, 'plain'))
+        
+        # Send email
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        text = msg.as_string()
+        server.sendmail(sender_email, sender_email, text)
+        server.quit()
+        
+        logging.info(f"Email notification sent for contact from {name}")
+        return True
+        
+    except Exception as e:
+        logging.error(f"Failed to send email notification: {str(e)}")
+        return False
 
 @app.route(route="ContactForm")
 def ContactForm(req: func.HttpRequest) -> func.HttpResponse:
@@ -42,12 +94,10 @@ def ContactForm(req: func.HttpRequest) -> func.HttpResponse:
         # Log the contact form submission
         logging.info(f'Contact form submitted by {name} ({email}): {message[:100]}...')
         
-        # Here you would typically:
-        # 1. Save to database
-        # 2. Send email notification
-        # 3. Send confirmation email to user
+        # Send email notification
+        email_sent = send_email_notification(name, email, message)
         
-        # For now, just return success response
+        # Return success response
         return func.HttpResponse(
             json.dumps({
                 "success": True,
