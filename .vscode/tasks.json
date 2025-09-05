@@ -28,6 +28,88 @@
 			"options": {
 				"cwd": "${workspaceFolder}/TCDynamics"
 			}
+		},
+		{
+			"label": "Deploy to Azure Functions",
+			"type": "func",
+			"command": "deploy",
+			"problemMatcher": "$func-deploy",
+			"dependsOn": "pip install (functions)",
+			"options": {
+				"cwd": "${workspaceFolder}/TCDynamics"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"label": "Deploy Frontend to OVHcloud",
+			"type": "shell",
+			"command": "echo 'Deploying frontend files to OVHcloud...' && echo 'Please upload these files to your OVHcloud hosting:' && echo '  - index.html' && echo '  - style.css' && echo '  - script.js' && echo '  - README.md'",
+			"windows": {
+				"command": "echo 'Deploying frontend files to OVHcloud...' && echo 'Please upload these files to your OVHcloud hosting:' && echo '  - index.html' && echo '  - style.css' && echo '  - script.js' && echo '  - README.md'"
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": false
+			},
+			"group": "build"
+		},
+		{
+			"label": "Full Deployment (Backend + Frontend)",
+			"dependsOrder": "sequence",
+			"dependsOn": [
+				"Deploy to Azure Functions",
+				"Deploy Frontend to OVHcloud"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			}
+		},
+		{
+			"label": "Test Local Development",
+			"type": "shell",
+			"command": "python -m http.server 8000",
+			"windows": {
+				"command": "python -m http.server 8000"
+			},
+			"options": {
+				"cwd": "${workspaceFolder}/TCDynamics"
+			},
+			"isBackground": true,
+			"problemMatcher": [],
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": false
+			},
+			"group": "test"
+		},
+		{
+			"label": "Git: Commit and Push",
+			"type": "shell",
+			"command": "git add . && git commit -m \"Auto-deploy: $(date)\" && git push",
+			"windows": {
+				"command": "git add . && git commit -m \"Auto-deploy: %date% %time%\" && git push"
+			},
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": false
+			}
 		}
 	]
 }
