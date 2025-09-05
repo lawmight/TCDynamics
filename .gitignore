@@ -21,41 +21,28 @@ wheels/
 *.egg
 MANIFEST
 
-# Azure Functions
+# Environment variables
+.env
 local.settings.json
-.azure/
 
-# Virtual Environment
-venv/
-env/
-ENV/
+# Azure Functions
+bin/
+obj/
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
 # OS
 .DS_Store
 Thumbs.db
 
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
 # Logs
 *.log
-logs/
-
-# Environment variables
-.env
-.env.local
-.env.production
-
-# Node modules (if you add any frontend build tools)
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Temporary files
-*.tmp
-*.temp
