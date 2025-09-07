@@ -86,7 +86,8 @@ def sanitize_input(text: str) -> str:
 def validate_email_address(email: str) -> bool:
     """Validate email address format"""
     try:
-        validate_email(email)
+        # Use check_deliverability=False to avoid checking if domain accepts email
+        validate_email(email, check_deliverability=False)
         return True
     except EmailNotValidError:
         log_performance_metric('validation_failures')
@@ -260,7 +261,7 @@ def ContactForm(req: func.HttpRequest) -> func.HttpResponse:
             status_code=400,
             mimetype="application/json"
         )
-            except Exception as e:
+    except Exception as e:
         request_duration = time.time() - request_start_time
         logging.error(f'Error processing contact form: {str(e)} (took {request_duration:.2f}s)')
         return func.HttpResponse(
