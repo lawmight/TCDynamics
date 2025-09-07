@@ -3,7 +3,7 @@ azure-functions
 
 # Security & Validation
 python-dotenv==1.0.0
-email-validator==2.1.0
+email-validator==2.2.0
 bleach==6.1.0
 
 # Testing
@@ -15,7 +15,7 @@ azure-monitor-opentelemetry==1.2.0
 
 # Database & Storage
 azure-cosmos==4.5.1
-azure-storage-table==12.4.4
+azure-data-tables==12.4.4
 
 # Caching & Performance
 redis==5.0.1
