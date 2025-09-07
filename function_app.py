@@ -14,6 +14,8 @@ import time
 import hashlib
 import uuid
 from database import db_manager, ContactSubmission
+from gamification import gamification_engine, UserProgress
+from code_executor import code_execution_service
 
 # Load environment variables
 load_dotenv()
@@ -379,4 +381,241 @@ def admin_dashboard(req: func.HttpRequest) -> func.HttpResponse:
             }),
             status_code=500,
             mimetype="application/json"
+        )
+
+@app.route(route="api/execute-code", methods=["POST", "OPTIONS"])
+def execute_code(req: func.HttpRequest) -> func.HttpResponse:
+    """Execute Python code safely"""
+    # Handle CORS preflight requests
+    if req.method == "OPTIONS":
+        return func.HttpResponse(
+            "",
+            status_code=200,
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type"
+            }
+        )
+    
+    try:
+        req_body = req.get_json()
+        code = req_body.get('code', '').strip()
+        inputs = req_body.get('inputs', '').strip()
+        user_id = req_body.get('user_id', 'anonymous')
+        
+        if not code:
+            return func.HttpResponse(
+                json.dumps({
+                    "success": False,
+                    "error": "No code provided",
+                    "output": ""
+                }),
+                status_code=400,
+                mimetype="application/json",
+                headers={"Access-Control-Allow-Origin": "*"}
+            )
+        
+        # Execute code
+        result = code_execution_service.execute_code(code, inputs, user_id)
+        
+        return func.HttpResponse(
+            json.dumps(result),
+            status_code=200,
+            mimetype="application/json",
+            headers={"Access-Control-Allow-Origin": "*"}
+        )
+        
+    except Exception as e:
+        logging.error(f"Code execution error: {str(e)}")
+        return func.HttpResponse(
+            json.dumps({
+                "success": False,
+                "error": f"Execution failed: {str(e)}",
+                "output": ""
+            }),
+            status_code=500,
+            mimetype="application/json",
+            headers={"Access-Control-Allow-Origin": "*"}
+        )
+
+@app.route(route="api/code-examples", methods=["GET"])
+def get_code_examples(req: func.HttpRequest) -> func.HttpResponse:
+    """Get example Python code"""
+    try:
+        examples = code_execution_service.get_code_examples()
+        
+        return func.HttpResponse(
+            json.dumps({
+                "success": True,
+                "examples": examples
+            }),
+            status_code=200,
+            mimetype="application/json",
+            headers={"Access-Control-Allow-Origin": "*"}
+        )
+        
+    except Exception as e:
+        logging.error(f"Code examples error: {str(e)}")
+        return func.HttpResponse(
+            json.dumps({
+                "success": False,
+                "error": str(e)
+            }),
+            status_code=500,
+            mimetype="application/json",
+            headers={"Access-Control-Allow-Origin": "*"}
+        )
+
+@app.route(route="api/progress", methods=["POST", "GET", "OPTIONS"])
+def handle_progress(req: func.HttpRequest) -> func.HttpResponse:
+    """Handle user progress updates and retrieval"""
+    # Handle CORS preflight requests
+    if req.method == "OPTIONS":
+        return func.HttpResponse(
+            "",
+            status_code=200,
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type"
+            }
+        )
+    
+    try:
+        if req.method == "GET":
+            # Get user progress
+            user_id = req.params.get('user_id', 'anonymous')
+            
+            # In a real implementation, you'd fetch from database
+            # For now, return mock data
+            progress_data = {
+                "user_id": user_id,
+                "completed_days": [1, 2, 3],
+                "total_points": 30,
+                "level": 1,
+                "streak": 3,
+                "achievements": ["first_day"],
+                "time_spent": 60
+            }
+            
+            return func.HttpResponse(
+                json.dumps({
+                    "success": True,
+                    "progress": progress_data
+                }),
+                status_code=200,
+                mimetype="application/json",
+                headers={"Access-Control-Allow-Origin": "*"}
+            )
+        
+        elif req.method == "POST":
+            # Update user progress
+            req_body = req.get_json()
+            user_id = req_body.get('user_id', 'anonymous')
+            day_number = req_body.get('day', 1)
+            time_spent = req_body.get('time_spent', 0)
+            
+            # Create user progress object
+            user_progress = UserProgress(
+                user_id=user_id,
+                completed_days=[1, 2, 3],  # Mock data
+                total_points=30,
+                level=1,
+                streak=3,
+                last_activity=datetime.now().isoformat(),
+                achievements=["first_day"],
+                time_spent=60
+            )
+            
+            # Update progress
+            result = gamification_engine.update_progress(user_progress, day_number, time_spent)
+            
+            return func.HttpResponse(
+                json.dumps({
+                    "success": True,
+                    "result": result
+                }),
+                status_code=200,
+                mimetype="application/json",
+                headers={"Access-Control-Allow-Origin": "*"}
+            )
+    
+    except Exception as e:
+        logging.error(f"Progress handling error: {str(e)}")
+        return func.HttpResponse(
+            json.dumps({
+                "success": False,
+                "error": str(e)
+            }),
+            status_code=500,
+            mimetype="application/json",
+            headers={"Access-Control-Allow-Origin": "*"}
+        )
+
+@app.route(route="api/achievements", methods=["GET"])
+def get_achievements(req: func.HttpRequest) -> func.HttpResponse:
+    """Get available achievements"""
+    try:
+        achievements = gamification_engine.achievements
+        
+        return func.HttpResponse(
+            json.dumps({
+                "success": True,
+                "achievements": [
+                    {
+                        "id": achievement.id,
+                        "name": achievement.name,
+                        "description": achievement.description,
+                        "icon": achievement.icon,
+                        "points": achievement.points,
+                        "type": achievement.type.value
+                    }
+                    for achievement in achievements
+                ]
+            }),
+            status_code=200,
+            mimetype="application/json",
+            headers={"Access-Control-Allow-Origin": "*"}
+        )
+        
+    except Exception as e:
+        logging.error(f"Achievements error: {str(e)}")
+        return func.HttpResponse(
+            json.dumps({
+                "success": False,
+                "error": str(e)
+            }),
+            status_code=500,
+            mimetype="application/json",
+            headers={"Access-Control-Allow-Origin": "*"}
+        )
+
+@app.route(route="api/leaderboard", methods=["GET"])
+def get_leaderboard(req: func.HttpRequest) -> func.HttpResponse:
+    """Get leaderboard data"""
+    try:
+        limit = int(req.params.get('limit', 10))
+        leaderboard = gamification_engine.get_leaderboard(limit)
+        
+        return func.HttpResponse(
+            json.dumps({
+                "success": True,
+                "leaderboard": leaderboard
+            }),
+            status_code=200,
+            mimetype="application/json",
+            headers={"Access-Control-Allow-Origin": "*"}
+        )
+        
+    except Exception as e:
+        logging.error(f"Leaderboard error: {str(e)}")
+        return func.HttpResponse(
+            json.dumps({
+                "success": False,
+                "error": str(e)
+            }),
+            status_code=500,
+            mimetype="application/json",
+            headers={"Access-Control-Allow-Origin": "*"}
         )
