@@ -16,6 +16,10 @@ import uuid
 from database import db_manager, ContactSubmission
 from gamification import gamification_engine, UserProgress
 from code_executor import code_execution_service
+from ai_personalization import ai_personalization_engine
+from enhanced_security import enhanced_security_executor
+from push_notifications import push_notification_service
+from learning_analytics import learning_analytics_engine
 
 # Load environment variables
 load_dotenv()
