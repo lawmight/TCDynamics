@@ -5,37 +5,37 @@
 @layer base {
   :root {
     /* Prime Intellect Inspired Dark Theme */
-    --background: 10 10 10;
-    --foreground: 250 250 250;
-    --card: 15 15 15;
-    --card-foreground: 250 250 250;
-    --popover: 15 15 15;
-    --popover-foreground: 250 250 250;
-    --primary: 14 165 233; /* sky-500 */
-    --primary-foreground: 255 255 255;
-    --primary-glow: 56 189 248; /* sky-400 */
-    --secondary: 39 39 42;
-    --secondary-foreground: 250 250 250;
-    --muted: 39 39 42;
-    --muted-foreground: 163 163 163;
-    --accent: 39 39 42;
-    --accent-foreground: 250 250 250;
-    --destructive: 239 68 68;
-    --destructive-foreground: 250 250 250;
-    --border: 39 39 42;
-    --input: 39 39 42;
-    --ring: 14 165 233;
-    --chart-1: 14 165 233;
-    --chart-2: 34 197 94;
-    --chart-3: 251 146 60;
-    --chart-4: 168 85 247;
-    --chart-5: 236 72 153;
+    --background: 0deg 0% 4%;
+    --foreground: 0deg 0% 98%;
+    --card: 0deg 0% 6%;
+    --card-foreground: 0deg 0% 98%;
+    --popover: 0deg 0% 6%;
+    --popover-foreground: 0deg 0% 98%;
+    --primary: 200deg 95% 48%; /* sky-500 */
+    --primary-foreground: 0deg 0% 100%;
+    --primary-glow: 200deg 95% 60%; /* sky-400 */
+    --secondary: 0deg 0% 16%;
+    --secondary-foreground: 0deg 0% 98%;
+    --muted: 0deg 0% 16%;
+    --muted-foreground: 0deg 0% 64%;
+    --accent: 0deg 0% 16%;
+    --accent-foreground: 0deg 0% 98%;
+    --destructive: 0deg 84% 60%;
+    --destructive-foreground: 0deg 0% 98%;
+    --border: 0deg 0% 16%;
+    --input: 0deg 0% 16%;
+    --ring: 200deg 95% 48%;
+    --chart-1: 200deg 95% 48%;
+    --chart-2: 142deg 76% 45%;
+    --chart-3: 25deg 95% 61%;
+    --chart-4: 262deg 83% 58%;
+    --chart-5: 330deg 81% 60%;
     --radius: 0.75rem;
 
     /* Custom Design Tokens */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
     --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--muted)));
-    --gradient-hero: linear-gradient(135deg, hsl(10, 10%, 6%) 0%, hsl(210, 15%, 8%) 50%, hsl(220, 20%, 10%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(0deg 0% 6%) 0%, hsl(0deg 0% 8%) 50%, hsl(0deg 0% 10%) 100%);
     --gradient-card: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
     
     /* Shadows */
@@ -51,30 +51,30 @@
   }
 
   .dark {
-    --background: 10 10 10;
-    --foreground: 250 250 250;
-    --card: 15 15 15;
-    --card-foreground: 250 250 250;
-    --popover: 15 15 15;
-    --popover-foreground: 250 250 250;
-    --primary: 14 165 233;
-    --primary-foreground: 255 255 255;
-    --secondary: 39 39 42;
-    --secondary-foreground: 250 250 250;
-    --muted: 39 39 42;
-    --muted-foreground: 163 163 163;
-    --accent: 39 39 42;
-    --accent-foreground: 250 250 250;
-    --destructive: 239 68 68;
-    --destructive-foreground: 250 250 250;
-    --border: 39 39 42;
-    --input: 39 39 42;
-    --ring: 14 165 233;
-    --chart-1: 14 165 233;
-    --chart-2: 34 197 94;
-    --chart-3: 251 146 60;
-    --chart-4: 168 85 247;
-    --chart-5: 236 72 153;
+    --background: 0deg 0% 4%;
+    --foreground: 0deg 0% 98%;
+    --card: 0deg 0% 6%;
+    --card-foreground: 0deg 0% 98%;
+    --popover: 0deg 0% 6%;
+    --popover-foreground: 0deg 0% 98%;
+    --primary: 200deg 95% 48%;
+    --primary-foreground: 0deg 0% 100%;
+    --secondary: 0deg 0% 16%;
+    --secondary-foreground: 0deg 0% 98%;
+    --muted: 0deg 0% 16%;
+    --muted-foreground: 0deg 0% 64%;
+    --accent: 0deg 0% 16%;
+    --accent-foreground: 0deg 0% 98%;
+    --destructive: 0deg 84% 60%;
+    --destructive-foreground: 0deg 0% 98%;
+    --border: 0deg 0% 16%;
+    --input: 0deg 0% 16%;
+    --ring: 200deg 95% 48%;
+    --chart-1: 200deg 95% 48%;
+    --chart-2: 142deg 76% 45%;
+    --chart-3: 25deg 95% 61%;
+    --chart-4: 262deg 83% 58%;
+    --chart-5: 330deg 81% 60%;
   }
 }
 
