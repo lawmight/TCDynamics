@@ -117,18 +117,21 @@ def send_email_notification(name: str, email: str, message: str) -> bool:
         msg = MIMEMultipart()
         msg['From'] = sender_email
         msg['To'] = sender_email  # Send to yourself
-        msg['Subject'] = f"Nouveau message de contact - {name}"
+        msg['Subject'] = f"WorkFlowAI - Nouveau contact commercial - {name}"
         
         # Email body
         body = f"""
-        Nouveau message de contact reçu sur TCDynamics :
+        🚀 NOUVEAU CONTACT COMMERCIAL - WorkFlowAI
         
         Nom: {name}
         Email: {email}
         Message: {message}
         
+        📍 Cible: Entreprises de Montigny-le-Bretonneux et Guyancourt
+        🎯 Service: Automatisation IA pour entreprises
+        
         ---
-        Envoyé automatiquement depuis le formulaire de contact.
+        Envoyé automatiquement depuis le formulaire de contact WorkFlowAI.
         """
         
         msg.attach(MIMEText(body, 'plain'))
@@ -186,7 +189,7 @@ def ContactForm(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse(
                 json.dumps({
                     "success": False,
-                    "message": "Tous les champs sont requis (nom, email, message)."
+                    "message": "Tous les champs sont requis pour votre demande WorkFlowAI."
                 }),
                 status_code=400,
                 mimetype="application/json"
@@ -247,7 +250,7 @@ def ContactForm(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(
             json.dumps({
                 "success": True,
-                "message": "Merci pour votre message ! Je vous répondrai bientôt."
+                "message": "Merci pour votre intérêt pour WorkFlowAI ! Nous vous contacterons rapidement pour discuter de l'automatisation de votre entreprise."
             }),
             status_code=200,
             mimetype="application/json",
@@ -623,3 +626,191 @@ def get_leaderboard(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
             headers={"Access-Control-Allow-Origin": "*"}
         )
+
+@app.route(route="api/workflowai-contact", methods=["POST", "OPTIONS"])
+def workflowai_contact(req: func.HttpRequest) -> func.HttpResponse:
+    """WorkFlowAI specific contact form for business inquiries"""
+    # Handle CORS preflight requests
+    if req.method == "OPTIONS":
+        return func.HttpResponse(
+            "",
+            status_code=200,
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type"
+            }
+        )
+    
+    try:
+        req_body = req.get_json()
+        
+        # Extract WorkFlowAI specific fields
+        company_name = req_body.get('company_name', '').strip()
+        contact_name = req_body.get('contact_name', '').strip()
+        email = req_body.get('email', '').strip()
+        phone = req_body.get('phone', '').strip()
+        company_size = req_body.get('company_size', '').strip()
+        industry = req_body.get('industry', '').strip()
+        location = req_body.get('location', '').strip()
+        message = req_body.get('message', '').strip()
+        budget_range = req_body.get('budget_range', '').strip()
+        timeline = req_body.get('timeline', '').strip()
+        
+        # Validate required fields
+        if not contact_name or not email or not company_name:
+            return func.HttpResponse(
+                json.dumps({
+                    "success": False,
+                    "message": "Nom, email et nom de l'entreprise sont requis."
+                }),
+                status_code=400,
+                mimetype="application/json"
+            )
+        
+        # Sanitize inputs
+        company_name = sanitize_input(company_name)
+        contact_name = sanitize_input(contact_name)
+        email = sanitize_input(email)
+        phone = sanitize_input(phone)
+        company_size = sanitize_input(company_size)
+        industry = sanitize_input(industry)
+        location = sanitize_input(location)
+        message = sanitize_input(message)
+        budget_range = sanitize_input(budget_range)
+        timeline = sanitize_input(timeline)
+        
+        # Validate email format
+        if not validate_email_address(email):
+            return func.HttpResponse(
+                json.dumps({
+                    "success": False,
+                    "message": "Veuillez fournir une adresse email valide."
+                }),
+                status_code=400,
+                mimetype="application/json"
+            )
+        
+        # Rate limiting check
+        client_id = get_client_identifier(req)
+        if is_rate_limited(client_id, max_requests=3, window_minutes=30):  # Stricter for business inquiries
+            return func.HttpResponse(
+                json.dumps({
+                    "success": False,
+                    "message": "Trop de demandes. Veuillez réessayer dans 30 minutes."
+                }),
+                status_code=429,
+                mimetype="application/json"
+            )
+        
+        # Create enhanced email notification for WorkFlowAI
+        email_sent = send_workflowai_notification(
+            company_name, contact_name, email, phone, company_size, 
+            industry, location, message, budget_range, timeline
+        )
+        
+        # Log the business inquiry
+        logging.info(f'WorkFlowAI business inquiry from {contact_name} at {company_name} ({email})')
+        
+        # Return success response
+        return func.HttpResponse(
+            json.dumps({
+                "success": True,
+                "message": "Merci pour votre intérêt pour WorkFlowAI ! Notre équipe commerciale vous contactera dans les 24h pour discuter de l'automatisation de votre entreprise."
+            }),
+            status_code=200,
+            mimetype="application/json",
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type"
+            }
+        )
+        
+    except Exception as e:
+        logging.error(f'WorkFlowAI contact form error: {str(e)}')
+        return func.HttpResponse(
+            json.dumps({
+                "success": False,
+                "message": "Une erreur s'est produite. Veuillez réessayer ou nous contacter directement."
+            }),
+            status_code=500,
+            mimetype="application/json",
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type"
+            }
+        )
+
+def send_workflowai_notification(company_name: str, contact_name: str, email: str, 
+                                phone: str, company_size: str, industry: str, 
+                                location: str, message: str, budget_range: str, 
+                                timeline: str) -> bool:
+    """Send enhanced email notification for WorkFlowAI business inquiries"""
+    start_time = time.time()
+    try:
+        # Zoho SMTP settings
+        smtp_server = "smtp.zoho.com"
+        smtp_port = 587
+        sender_email = os.environ.get("ZOHO_EMAIL")
+        sender_password = os.environ.get("ZOHO_PASSWORD")
+        
+        if not sender_email or not sender_password:
+            logging.error("Zoho email credentials not configured")
+            return False
+        
+        # Create message
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = sender_email
+        msg['Subject'] = f"🚀 WorkFlowAI - NOUVELLE DEMANDE COMMERCIALE - {company_name}"
+        
+        # Enhanced email body for business inquiries
+        body = f"""
+🚀 NOUVELLE DEMANDE COMMERCIALE - WorkFlowAI
+
+📊 INFORMATIONS ENTREPRISE:
+• Entreprise: {company_name}
+• Contact: {contact_name}
+• Email: {email}
+• Téléphone: {phone or 'Non fourni'}
+• Taille: {company_size or 'Non spécifiée'}
+• Secteur: {industry or 'Non spécifié'}
+• Localisation: {location or 'Non spécifiée'}
+
+💰 INFORMATIONS COMMERCIALES:
+• Budget: {budget_range or 'Non spécifié'}
+• Délai: {timeline or 'Non spécifié'}
+
+💬 MESSAGE:
+{message}
+
+📍 CIBLE: Entreprises de Montigny-le-Bretonneux et Guyancourt
+🎯 SERVICE: Automatisation IA pour entreprises
+⏰ PRIORITÉ: HAUTE - Répondre dans les 24h
+
+---
+Envoyé automatiquement depuis le formulaire WorkFlowAI.
+        """
+        
+        msg.attach(MIMEText(body, 'plain'))
+        
+        # Send email
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        text = msg.as_string()
+        server.sendmail(sender_email, sender_email, text)
+        server.quit()
+        
+        elapsed_time = time.time() - start_time
+        logging.info(f"WorkFlowAI business inquiry email sent for {company_name} (took {elapsed_time:.2f}s)")
+        log_performance_metric('successful_emails')
+        return True
+        
+    except Exception as e:
+        elapsed_time = time.time() - start_time
+        logging.error(f"Failed to send WorkFlowAI notification: {str(e)} (took {elapsed_time:.2f}s)")
+        log_performance_metric('failed_emails')
+        return False
