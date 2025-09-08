@@ -21,11 +21,37 @@ A personal website documenting a 30-day Python learning journey with interactive
 
 ## 🛠️ Technology Stack
 
-- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
+- **Frontend**: React/TypeScript, Vite, Tailwind CSS, ShadCN UI
 - **Backend**: Python, Azure Functions
+- **Database**: Azure Cosmos DB
+- **AI Integration**: NIA AI Service via Model Context Protocol (MCP)
+- **Hosting**: OVHcloud (Frontend), Azure (Backend)
+- **Email**: Zoho Mail
 - **Styling**: Custom CSS with CSS Grid and Flexbox
 - **Animations**: CSS animations and JavaScript Intersection Observer
 - **Form Handling**: Fetch API with async/await
+
+## 🤖 AI Integration (MCP)
+
+TCDynamics includes advanced AI integration through the Model Context Protocol (MCP):
+
+- **NIA AI Service**: Integrated AI assistant with your API key (`nk_lrzAv0SQJE3FNfS2yV52Y0XlnZ7WeI5p`)
+- **Context-Aware Assistance**: AI assistants can understand project structure and provide intelligent help
+- **Code Analysis**: Automatic code analysis and recommendations
+- **Learning Recommendations**: AI-powered personalized learning paths
+- **Project Insights**: Comprehensive project overview and documentation access
+
+### MCP Features
+- Real-time project context for AI assistants
+- Code analysis and optimization suggestions
+- Learning path recommendations
+- Deployment and infrastructure insights
+- Secure API key management
+
+For detailed MCP setup instructions, see [MCP_README.md](MCP_README.md).
+
+### 🔄 Quick MCP Restart
+After closing Cursor, simply double-click `start-mcp.bat` in your project folder to restart the server!
 
 ## 📁 Project Structure
 
