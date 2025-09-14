@@ -1,38 +1,38 @@
-import { useState, useEffect } from "react";
-import { Badge } from "@/components/ui/badge";
-import { WifiOff, Wifi } from "lucide-react";
+import { useState, useEffect } from 'react'
+import { Badge } from '@/components/ui/badge'
+import { WifiOff, Wifi } from 'lucide-react'
 
 const OfflineIndicator = () => {
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [showIndicator, setShowIndicator] = useState(false);
+  const [isOnline, setIsOnline] = useState(navigator.onLine)
+  const [showIndicator, setShowIndicator] = useState(false)
 
   useEffect(() => {
     const handleOnline = () => {
-      setIsOnline(true);
-      setShowIndicator(true);
-      setTimeout(() => setShowIndicator(false), 3000);
-    };
+      setIsOnline(true)
+      setShowIndicator(true)
+      setTimeout(() => setShowIndicator(false), 3000)
+    }
 
     const handleOffline = () => {
-      setIsOnline(false);
-      setShowIndicator(true);
-    };
+      setIsOnline(false)
+      setShowIndicator(true)
+    }
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
 
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
 
-  if (!showIndicator && isOnline) return null;
+  if (!showIndicator && isOnline) return null
 
   return (
     <div className="fixed bottom-4 left-4 z-50 md:bottom-6 md:left-6">
-      <Badge 
-        variant={isOnline ? "default" : "destructive"} 
+      <Badge
+        variant={isOnline ? 'default' : 'destructive'}
         className="flex items-center gap-2 px-4 py-2 shadow-lg backdrop-blur-sm"
       >
         {isOnline ? (
@@ -48,7 +48,7 @@ const OfflineIndicator = () => {
         )}
       </Badge>
     </div>
-  );
-};
+  )
+}
 
-export default OfflineIndicator;
+export default OfflineIndicator
