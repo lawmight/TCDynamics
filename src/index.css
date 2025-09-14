@@ -33,17 +33,34 @@
     --radius: 0.75rem;
 
     /* Custom Design Tokens */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--muted)));
-    --gradient-hero: linear-gradient(135deg, hsl(0deg 0% 6%) 0%, hsl(0deg 0% 8%) 50%, hsl(0deg 0% 10%) 100%);
-    --gradient-card: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
-    
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(var(--primary)),
+      hsl(var(--primary-glow))
+    );
+    --gradient-secondary: linear-gradient(
+      135deg,
+      hsl(var(--secondary)),
+      hsl(var(--muted))
+    );
+    --gradient-hero: linear-gradient(
+      135deg,
+      hsl(0deg 0% 6%) 0%,
+      hsl(0deg 0% 8%) 50%,
+      hsl(0deg 0% 10%) 100%
+    );
+    --gradient-card: linear-gradient(
+      135deg,
+      hsl(var(--card)) 0%,
+      hsl(var(--muted)) 100%
+    );
+
     /* Shadows */
     --shadow-primary: 0 10px 30px -10px hsl(var(--primary) / 0.3);
     --shadow-glow: 0 0 40px hsl(var(--primary-glow) / 0.2);
     --shadow-button: 0 4px 20px hsl(var(--primary) / 0.4);
     --shadow-elegant: 0 20px 60px -10px hsl(0 0% 0% / 0.3);
-    
+
     /* Animation Variables */
     --transition-smooth: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -97,13 +114,20 @@ body {
 }
 
 /* Allow text selection for content areas */
-p, span, div[role="textbox"], textarea, input, [role="article"] {
+p,
+span,
+div[role='textbox'],
+textarea,
+input,
+[role='article'] {
   -webkit-user-select: text;
   user-select: text;
 }
 
 /* Improve touch targets */
-button, a, [role="button"] {
+button,
+a,
+[role='button'] {
   min-height: 44px;
   min-width: 44px;
 }
@@ -120,17 +144,17 @@ button, a, [role="button"] {
   html {
     font-size: 16px;
   }
-  
+
   h1 {
     font-size: 2rem;
     line-height: 1.2;
   }
-  
+
   h2 {
     font-size: 1.75rem;
     line-height: 1.3;
   }
-  
+
   h3 {
     font-size: 1.5rem;
     line-height: 1.4;
@@ -204,12 +228,24 @@ button, a, [role="button"] {
   animation: fadeInUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
-.stagger-fade > *:nth-child(1) { animation-delay: 0.1s; }
-.stagger-fade > *:nth-child(2) { animation-delay: 0.2s; }
-.stagger-fade > *:nth-child(3) { animation-delay: 0.3s; }
-.stagger-fade > *:nth-child(4) { animation-delay: 0.4s; }
-.stagger-fade > *:nth-child(5) { animation-delay: 0.5s; }
-.stagger-fade > *:nth-child(6) { animation-delay: 0.6s; }
+.stagger-fade > *:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.stagger-fade > *:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.stagger-fade > *:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.stagger-fade > *:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.stagger-fade > *:nth-child(5) {
+  animation-delay: 0.5s;
+}
+.stagger-fade > *:nth-child(6) {
+  animation-delay: 0.6s;
+}
 
 /* Floating Animation */
 .animate-float {
@@ -263,7 +299,8 @@ html {
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -281,7 +318,8 @@ html {
 }
 
 @keyframes pulse-subtle {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
@@ -298,11 +336,11 @@ html {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  
+
   .parallax-slow {
     transform: none !important;
   }
-  
+
   .button-hover-scale:hover {
     transform: none;
   }

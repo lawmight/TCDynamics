@@ -1,0 +1,251 @@
+/* Styles minimaux pour les tests - simule les classes Tailwind */
+
+/* Couleurs de base */
+:root {
+  --primary: 200deg 95% 48%;
+  --primary-glow: 200deg 95% 60%;
+  --foreground: 0deg 0% 98%;
+  --muted-foreground: 0deg 0% 64%;
+  --background: 0deg 0% 4%;
+}
+
+/* Classes utilisées dans les composants */
+.text-gradient {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary)),
+    hsl(var(--primary-glow))
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: hsl(var(--primary));
+}
+
+.text-primary {
+  color: hsl(var(--primary));
+}
+.text-primary-glow {
+  color: hsl(var(--primary-glow));
+}
+.text-foreground {
+  color: hsl(var(--foreground));
+}
+.text-muted-foreground {
+  color: hsl(var(--muted-foreground));
+}
+.text-5xl {
+  font-size: 3rem;
+}
+.text-7xl {
+  font-size: 4.5rem;
+}
+.text-xl {
+  font-size: 1.25rem;
+}
+.text-2xl {
+  font-size: 1.5rem;
+}
+.text-lg {
+  font-size: 1.125rem;
+}
+.text-sm {
+  font-size: 0.875rem;
+}
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+.font-semibold {
+  font-weight: 600;
+}
+.font-medium {
+  font-weight: 500;
+}
+.font-mono {
+  font-family: 'Monaco', 'Menlo', monospace;
+}
+
+.leading-relaxed {
+  line-height: 1.625;
+}
+.leading-tight {
+  line-height: 1.25;
+}
+.leading-none {
+  line-height: 1;
+}
+
+/* Animations */
+.fade-in-up {
+  opacity: 1;
+  transform: translateY(0);
+}
+.fade-in-up-delay {
+  opacity: 1;
+  transform: translateY(0);
+}
+.animate-pulse {
+  animation: none;
+}
+
+/* Layout */
+.grid {
+  display: grid;
+}
+.flex {
+  display: flex;
+}
+.inline-flex {
+  display: inline-flex;
+}
+.block {
+  display: block;
+}
+.inline-block {
+  display: inline-block;
+}
+
+.items-center {
+  align-items: center;
+}
+.items-start {
+  align-items: flex-start;
+}
+.justify-center {
+  justify-content: center;
+}
+.justify-between {
+  justify-content: space-between;
+}
+
+.space-y-8 > * + * {
+  margin-top: 2rem;
+}
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+.space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+.gap-16 {
+  gap: 4rem;
+}
+.gap-12 {
+  gap: 3rem;
+}
+.gap-6 {
+  gap: 1.5rem;
+}
+.gap-4 {
+  gap: 1rem;
+}
+.gap-3 {
+  gap: 0.75rem;
+}
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.px-6 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+.py-20 {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+.py-32 {
+  padding-top: 8rem;
+  padding-bottom: 8rem;
+}
+.p-6 {
+  padding: 1.5rem;
+}
+.p-4 {
+  padding: 1rem;
+}
+.p-2 {
+  padding: 0.5rem;
+}
+
+/* Bordures et arrière-plans */
+.border {
+  border: 1px solid hsl(0 0% 16%);
+}
+.border-primary {
+  border-color: hsl(var(--primary));
+}
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+.rounded-full {
+  border-radius: 9999px;
+}
+
+.bg-primary {
+  background-color: hsl(var(--primary));
+}
+.bg-card {
+  background-color: hsl(0 0% 6%);
+}
+
+/* Responsive */
+.lg\\:text-7xl {
+  font-size: 4.5rem;
+}
+.lg\\:text-2xl {
+  font-size: 1.5rem;
+}
+.lg\\:py-32 {
+  padding-top: 8rem;
+  padding-bottom: 8rem;
+}
+.md\\:text-5xl {
+  font-size: 3rem;
+}
+
+/* Utilitaires */
+.relative {
+  position: relative;
+}
+.absolute {
+  position: absolute;
+}
+.inset-0 {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+.w-full {
+  width: 100%;
+}
+.h-full {
+  height: 100%;
+}
+.max-w-lg {
+  max-width: 32rem;
+}
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+.mb-4 {
+  margin-bottom: 1rem;
+}
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+/* États hover et focus */
+.hover\\:border-primary\\:40:hover {
+  border-color: hsl(var(--primary) / 0.4);
+}
