@@ -13,6 +13,9 @@ const createTransporter = () => {
     tls: {
       rejectUnauthorized: false,
     },
+    // Configuration spécifique pour Zoho Mail
+    connectionTimeout: 60000,
+    greetingTimeout: 30000,
   })
 }
 
