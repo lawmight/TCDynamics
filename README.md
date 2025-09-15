@@ -42,6 +42,7 @@ TCDynamics WorkFlowAI est une plateforme d'automatisation basée sur l'intellige
 - Accessibilité WCAG 2.1 AA
 
 ### Backend
+
 - API RESTful sécurisée
 - Rate limiting et protection DDoS
 - Système d'emailing avec templates
@@ -50,6 +51,7 @@ TCDynamics WorkFlowAI est une plateforme d'automatisation basée sur l'intellige
 ## 🛠️ Technologies
 
 ### Frontend
+
 - **Framework**: React 18.3 + TypeScript
 - **Build Tool**: Vite 7.1
 - **Styling**: TailwindCSS + Radix UI
@@ -57,6 +59,7 @@ TCDynamics WorkFlowAI est une plateforme d'automatisation basée sur l'intellige
 - **Routing**: React Router v6
 
 ### Backend
+
 - **Runtime**: Node.js + Express
 - **Security**: Helmet, CORS, Rate Limiting
 - **Email**: Nodemailer (Zoho Mail)
@@ -65,23 +68,27 @@ TCDynamics WorkFlowAI est une plateforme d'automatisation basée sur l'intellige
 ## 📦 Installation
 
 ### Prérequis
+
 - Node.js 18+ et npm 9+
 - Git
 
 ### Étapes d'installation
 
 1. **Cloner le repository**
+
 ```bash
 git clone https://github.com/TCDynamics/TCDynamics.git
 cd TCDynamics
 ```
 
 2. **Installer les dépendances Frontend**
+
 ```bash
 npm install
 ```
 
 3. **Installer les dépendances Backend**
+
 ```bash
 cd backend
 npm install
@@ -93,12 +100,14 @@ cd ..
 ### Variables d'Environnement
 
 1. **Frontend** : Copier et configurer `.env`
+
 ```bash
 cp env.example .env
 # Éditer .env avec vos valeurs
 ```
 
 2. **Backend** : Copier et configurer `backend/.env`
+
 ```bash
 cp backend/env.example backend/.env
 # Éditer backend/.env avec vos valeurs
@@ -107,11 +116,12 @@ cp backend/env.example backend/.env
 ### Configuration Email (Zoho Mail)
 
 Dans `backend/.env`, configurez :
+
 ```env
 EMAIL_HOST=smtp.zoho.eu
 EMAIL_PORT=465
-EMAIL_USER=votre-email@domaine.fr
-EMAIL_PASS=votre-mot-de-passe-app
+EMAIL_USER=contact@workflowai.fr
+EMAIL_PASS=gsdSk4MQk3ck
 ```
 
 ## 💻 Développement
@@ -119,12 +129,14 @@ EMAIL_PASS=votre-mot-de-passe-app
 ### Démarrer en mode développement
 
 **Terminal 1 - Frontend:**
+
 ```bash
 npm run dev
 # Accessible sur http://localhost:8080
 ```
 
 **Terminal 2 - Backend:**
+
 ```bash
 cd backend
 npm run dev
@@ -134,6 +146,7 @@ npm run dev
 ### Scripts Disponibles
 
 #### Frontend
+
 - `npm run dev` - Serveur de développement
 - `npm run build` - Build de production
 - `npm run test` - Lancer les tests
@@ -141,12 +154,14 @@ npm run dev
 - `npm run format` - Formater le code
 
 #### Backend
+
 - `npm run start` - Démarrer le serveur
 - `npm run dev` - Mode développement avec nodemon
 
 ## 🧪 Tests
 
 ### Lancer les tests
+
 ```bash
 # Tests unitaires
 npm run test
@@ -160,6 +175,7 @@ node test-integration.js
 ```
 
 ### Coverage actuel
+
 - Frontend: ~15% (en cours d'amélioration)
 - Backend: Tests d'intégration disponibles
 
@@ -177,6 +193,7 @@ npm run build
 ### Déploiement sur OVHcloud
 
 1. **Préparer le serveur**
+
 ```bash
 # Sur le serveur OVH
 git clone https://github.com/TCDynamics/TCDynamics.git
@@ -185,25 +202,18 @@ npm install --production
 ```
 
 2. **Configuration Nginx**
+
 ```nginx
 server {
     listen 80;
     server_name tcdynamics.fr www.tcdynamics.fr;
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> 270a784 (Add CI/CD pipeline, Docker configuration, and testing infrastructure)
     # Frontend
     location / {
         root /var/www/tcdynamics/dist;
         try_files $uri $uri/ /index.html;
     }
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> 270a784 (Add CI/CD pipeline, Docker configuration, and testing infrastructure)
     # Backend API
     location /api {
         proxy_pass http://localhost:3001;
@@ -217,6 +227,7 @@ server {
 ```
 
 3. **Démarrer avec PM2**
+
 ```bash
 # Installer PM2
 npm install -g pm2
@@ -233,6 +244,7 @@ pm2 startup
 ## 🔒 Sécurité
 
 ### Mesures Implémentées
+
 - ✅ Helmet.js pour les headers de sécurité
 - ✅ Rate limiting (5 req/15min par IP)
 - ✅ Validation des entrées avec Joi
@@ -241,6 +253,7 @@ pm2 startup
 - ✅ HTTPS en production
 
 ### Audit de Sécurité
+
 ```bash
 # Vérifier les vulnérabilités
 npm audit
@@ -252,29 +265,28 @@ npm audit fix
 ## 📊 Monitoring
 
 ### Logs
-<<<<<<< HEAD
-Les logs sont disponibles dans la console. En production, utilisez PM2 :
-=======
 
 Les logs sont disponibles dans la console. En production, utilisez PM2 :
 
->>>>>>> 270a784 (Add CI/CD pipeline, Docker configuration, and testing infrastructure)
 ```bash
 pm2 logs tcdynamics-api
 ```
 
 ### Métriques
+
 - Endpoint de santé : `GET /health`
 - Test API : `GET /api/test`
 
 ## 🤝 Support
 
 ### Contact
+
 - **Email**: contact@tcdynamics.fr
 - **Téléphone**: Support local à Montigny-le-Bretonneux
 - **GitHub Issues**: [Signaler un bug](https://github.com/TCDynamics/TCDynamics/issues)
 
 ### Équipe
+
 - Développement et maintenance par TCDynamics
 - Support entreprise disponible
 
