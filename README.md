@@ -35,6 +35,7 @@ TCDynamics WorkFlowAI est une plateforme d'automatisation basée sur l'intellige
 ## ✨ Fonctionnalités
 
 ### Frontend
+
 - Interface moderne et responsive (mobile-first)
 - Progressive Web App (PWA) avec support offline
 - Animations fluides et design élégant
@@ -188,13 +189,21 @@ npm install --production
 server {
     listen 80;
     server_name tcdynamics.fr www.tcdynamics.fr;
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> 270a784 (Add CI/CD pipeline, Docker configuration, and testing infrastructure)
     # Frontend
     location / {
         root /var/www/tcdynamics/dist;
         try_files $uri $uri/ /index.html;
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> 270a784 (Add CI/CD pipeline, Docker configuration, and testing infrastructure)
     # Backend API
     location /api {
         proxy_pass http://localhost:3001;
@@ -243,7 +252,13 @@ npm audit fix
 ## 📊 Monitoring
 
 ### Logs
+<<<<<<< HEAD
 Les logs sont disponibles dans la console. En production, utilisez PM2 :
+=======
+
+Les logs sont disponibles dans la console. En production, utilisez PM2 :
+
+>>>>>>> 270a784 (Add CI/CD pipeline, Docker configuration, and testing infrastructure)
 ```bash
 pm2 logs tcdynamics-api
 ```
