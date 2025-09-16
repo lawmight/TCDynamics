@@ -1,6 +1,7 @@
 const express = require('express')
 const { logger } = require('../utils/logger')
 const { asyncHandler } = require('../middleware/errorHandler')
+const { apiKeyAuth, optionalApiKeyAuth } = require('../middleware/auth')
 
 const router = express.Router()
 
@@ -121,7 +122,7 @@ const updateMemoryUsage = () => {
  *                   type: object
  *                   description: Performance metrics
  */
-router.get('/metrics', asyncHandler(async (req, res) => {
+router.get('/metrics', optionalApiKeyAuth, asyncHandler(async (req, res) => {
   updateMemoryUsage()
 
   const uptime = Math.floor((Date.now() - metrics.startTime) / 1000)
@@ -157,7 +158,7 @@ router.get('/metrics', asyncHandler(async (req, res) => {
  *             schema:
  *               type: string
  */
-router.get('/metrics/prometheus', asyncHandler(async (req, res) => {
+router.get('/metrics/prometheus', optionalApiKeyAuth, asyncHandler(async (req, res) => {
   updateMemoryUsage()
 
   const uptime = Math.floor((Date.now() - metrics.startTime) / 1000)
@@ -225,7 +226,7 @@ tcdynamics_requests_by_status_total{status="${status}"} ${count}
  *       200:
  *         description: Detailed health status
  */
-router.get('/health/detailed', asyncHandler(async (req, res) => {
+router.get('/health/detailed', optionalApiKeyAuth, asyncHandler(async (req, res) => {
   updateMemoryUsage()
 
   const health = {
@@ -289,7 +290,7 @@ router.get('/health/detailed', asyncHandler(async (req, res) => {
  *       200:
  *         description: Metrics reset successfully
  */
-router.post('/metrics/reset', asyncHandler(async (req, res) => {
+router.post('/metrics/reset', apiKeyAuth, asyncHandler(async (req, res) => {
   // Reset metrics
   metrics = {
     startTime: Date.now(),

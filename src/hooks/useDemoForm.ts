@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { getCsrfToken } from '../utils/csrf'
 
 interface DemoData {
   firstName: string
@@ -26,13 +27,18 @@ export const useDemoForm = () => {
     setResponse(null)
 
     try {
-      const response = await fetch('http://localhost:3001/api/demo', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      })
+      const csrfToken = await getCsrfToken()
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/demo`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrfToken,
+          },
+          body: JSON.stringify(data),
+        }
+      )
 
       const result: DemoResponse = await response.json()
       setResponse(result)
