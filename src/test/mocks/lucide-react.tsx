@@ -42,3 +42,12 @@ export const Calendar = mockIcon
 export const Wrench = mockIcon
 export const HeadphonesIcon = mockIcon
 export const Gift = mockIcon
+<<<<<<< Current (Your changes)
+=======
+export const Brain = mockIcon
+export const Zap = mockIcon
+export const Lock = mockIcon
+export const Globe = mockIcon
+export const TrendingUp = mockIcon
+export const Bot = mockIcon
+>>>>>>> Incoming (Background Agent changes)

@@ -120,8 +120,8 @@ Dans `backend/.env`, configurez :
 ```env
 EMAIL_HOST=smtp.zoho.eu
 EMAIL_PORT=465
-EMAIL_USER=contact@workflowai.fr
-EMAIL_PASS=gsdSk4MQk3ck
+EMAIL_USER=your-email@zoho.com
+EMAIL_PASS=your-zoho-app-password
 ```
 
 ## 💻 Développement
