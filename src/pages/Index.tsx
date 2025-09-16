@@ -1,16 +1,16 @@
-import Hero from "@/components/Hero";
-import Features from "@/components/Features";
-import HowItWorks from "@/components/HowItWorks";
-import LocalAdvantages from "@/components/LocalAdvantages";
-import SocialProof from "@/components/SocialProof";
-import Pricing from "@/components/Pricing";
-import FAQ from "@/components/FAQ";
-import Contact from "@/components/Contact";
+import Hero from '@/components/Hero'
+import Features from '@/components/Features'
+import HowItWorks from '@/components/HowItWorks'
+import LocalAdvantages from '@/components/LocalAdvantages'
+import SocialProof from '@/components/SocialProof'
+import Pricing from '@/components/Pricing'
+import FAQ from '@/components/FAQ'
+import Contact from '@/components/Contact'
 
 const Index = () => {
   return (
-    <main>
-      <section id="hero">
+    <main id="main">
+      <section id="hero" aria-label="Présentation WorkFlowAI">
         <Hero />
       </section>
       <section id="features">
@@ -35,7 +35,7 @@ const Index = () => {
         <Contact />
       </section>
     </main>
-  );
-};
+  )
+}
 
-export default Index;
+export default Index

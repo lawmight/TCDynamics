@@ -1,71 +1,74 @@
-const CACHE_NAME = 'workflowai-v1';
+const CACHE_NAME = 'workflowai-v1'
 const urlsToCache = [
   '/',
   '/manifest.json',
   '/placeholder.svg',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'
-];
+  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
+]
 
 // Install event - cache resources
-self.addEventListener('install', (event) => {
+self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Cache ouvert');
-        return cache.addAll(urlsToCache);
-      })
-  );
-  self.skipWaiting();
-});
+    caches.open(CACHE_NAME).then(cache => {
+      console.log('Cache ouvert')
+      return cache.addAll(urlsToCache)
+    })
+  )
+  self.skipWaiting()
+})
 
 // Fetch event - serve from cache when offline
-self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
+    caches
+      .match(event.request)
+      .then(response => {
         // Return cached version or fetch from network
         if (response) {
-          return response;
+          return response
         }
-        return fetch(event.request).then((response) => {
+        return fetch(event.request).then(response => {
           // Don't cache non-successful responses
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response;
+          if (
+            !response ||
+            response.status !== 200 ||
+            response.type !== 'basic'
+          ) {
+            return response
           }
 
           // Clone the response
-          const responseToCache = response.clone();
+          const responseToCache = response.clone()
 
-          caches.open(CACHE_NAME)
-            .then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseToCache)
+          })
 
-          return response;
-        });
+          return response
+        })
       })
       .catch(() => {
         // Return offline page for navigation requests
         if (event.request.destination === 'document') {
-          return caches.match('/');
+          return caches.match('/')
         }
       })
-  );
-});
+  )
+})
 
 // Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
+    caches.keys().then(cacheNames => {
       return Promise.all(
-        cacheNames.map((cacheName) => {
+        cacheNames.map(cacheName => {
           if (cacheName !== CACHE_NAME) {
-            console.log('Suppression du cache ancien:', cacheName);
-            return caches.delete(cacheName);
+            console.log('Suppression du cache ancien:', cacheName)
+            return caches.delete(cacheName)
           }
         })
-      );
+      )
     })
-  );
-  self.clients.claim();
-});
+  )
+  self.clients.claim()
+})

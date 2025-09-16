@@ -1,214 +1,307 @@
-# TCDynamics - 30 Days of Python Learning Journey
+# 🚀 TCDynamics - WorkFlowAI
 
-A personal website documenting a 30-day Python learning journey with interactive progress tracking, contact forms, and a modern responsive design.
+> Solution d'automatisation intelligente pour les entreprises françaises
 
-## 🚀 Features
+[![React](https://img.shields.io/badge/React-18.3-blue.svg)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue.svg)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
+[![License](https://img.shields.io/badge/License-Proprietary-red.svg)]()
+
+## 📋 Table des Matières
+
+- [À Propos](#-à-propos)
+- [Fonctionnalités](#-fonctionnalités)
+- [Technologies](#-technologies)
+- [Installation](#-installation)
+- [Configuration](#-configuration)
+- [Développement](#-développement)
+- [Tests](#-tests)
+- [Déploiement](#-déploiement)
+- [Sécurité](#-sécurité)
+- [Support](#-support)
+
+## 🎯 À Propos
+
+TCDynamics WorkFlowAI est une plateforme d'automatisation basée sur l'intelligence artificielle, spécialement conçue pour les TPE/PME françaises. Notre solution permet d'automatiser les processus métier, de traiter les documents intelligemment et d'améliorer le service client avec des chatbots IA.
+
+### 🏆 Avantages Clés
+
+- **🤖 IA Documentaire** : Traitement automatique de factures et contrats avec 99.7% de précision
+- **💬 Service Client IA** : Chatbots intelligents disponibles 24/7
+- **📊 Analytics Métier** : Tableaux de bord en temps réel avec prédictions IA
+- **🔒 Conformité RGPD** : Hébergement en France, sécurité bancaire
+- **⚡ Performance** : Économisez 10h par semaine grâce à l'automatisation
+
+## ✨ Fonctionnalités
 
 ### Frontend
-- **Modern Responsive Design**: Beautiful gradient backgrounds and smooth animations
-- **Interactive Progress Tracking**: Real-time progress bar showing learning journey completion
-- **Expandable Day Cards**: Click to reveal detailed learning experiences for each day
-- **Contact Form**: Fully functional contact form with Azure Functions backend
-- **Newsletter Signup**: Email subscription for learning updates
-- **Smooth Scrolling Navigation**: Professional navigation experience
-- **Mobile-First Design**: Optimized for all device sizes
 
-### Backend (Azure Functions)
-- **Contact Form Processing**: Handles form submissions with validation
-- **JSON API Responses**: Structured responses with success/error handling
-- **Input Validation**: Email format and required field validation
-- **Error Handling**: Comprehensive error management and logging
+- Interface moderne et responsive (mobile-first)
+- Progressive Web App (PWA) avec support offline
+- Animations fluides et design élégant
+- Accessibilité WCAG 2.1 AA
 
-## 🛠️ Technology Stack
+### Backend
 
-- **Frontend**: React/TypeScript, Vite, Tailwind CSS, ShadCN UI
-- **Backend**: Python, Azure Functions
-- **Database**: Azure Cosmos DB
-- **AI Integration**: NIA AI Service via Model Context Protocol (MCP)
-- **Hosting**: OVHcloud (Frontend), Azure (Backend)
-- **Email**: Zoho Mail
-- **Styling**: Custom CSS with CSS Grid and Flexbox
-- **Animations**: CSS animations and JavaScript Intersection Observer
-- **Form Handling**: Fetch API with async/await
+- API RESTful sécurisée
+- Rate limiting et protection DDoS
+- Système d'emailing avec templates
+- Validation des données avec Joi
 
-## 🤖 AI Integration (MCP)
+## 🛠️ Technologies
 
-TCDynamics includes advanced AI integration through the Model Context Protocol (MCP):
+### Frontend
 
-- **NIA AI Service**: Integrated AI assistant with your API key (`nk_lrzAv0SQJE3FNfS2yV52Y0XlnZ7WeI5p`)
-- **Context-Aware Assistance**: AI assistants can understand project structure and provide intelligent help
-- **Code Analysis**: Automatic code analysis and recommendations
-- **Learning Recommendations**: AI-powered personalized learning paths
-- **Project Insights**: Comprehensive project overview and documentation access
+- **Framework**: React 18.3 + TypeScript
+- **Build Tool**: Vite 7.1
+- **Styling**: TailwindCSS + Radix UI
+- **State Management**: TanStack Query
+- **Routing**: React Router v6
 
-### MCP Features
-- Real-time project context for AI assistants
-- Code analysis and optimization suggestions
-- Learning path recommendations
-- Deployment and infrastructure insights
-- Secure API key management
+### Backend
 
-For detailed MCP setup instructions, see [MCP_README.md](MCP_README.md).
+- **Runtime**: Node.js + Express
+- **Security**: Helmet, CORS, Rate Limiting
+- **Email**: Nodemailer (Zoho Mail)
+- **Validation**: Joi
 
-### 🔄 Quick MCP Restart
-After closing Cursor, simply double-click `start-mcp.bat` in your project folder to restart the server!
+## 📦 Installation
 
-## 📁 Project Structure
+### Prérequis
 
-```
-TCDynamics/
-├── function_app.py          # Azure Functions backend
-├── host.json               # Azure Functions configuration
-├── local.settings.json     # Local development settings
-├── requirements.txt        # Python dependencies
-├── index.html             # Main website page
-├── style.css              # Complete styling
-├── script.js              # Interactive functionality
-└── __pycache__/           # Python cache
+- Node.js 18+ et npm 9+
+- Git
+
+### Étapes d'installation
+
+1. **Cloner le repository**
+
+```bash
+git clone https://github.com/TCDynamics/TCDynamics.git
+cd TCDynamics
 ```
 
-## 🚀 Getting Started
+2. **Installer les dépendances Frontend**
 
-### Prerequisites
-- Python 3.8+
-- Azure Functions Core Tools
-- Modern web browser
+```bash
+npm install
+```
 
-### Installation
+3. **Installer les dépendances Backend**
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd TCDynamics
-   ```
+```bash
+cd backend
+npm install
+cd ..
+```
 
-2. **Install Python dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+## ⚙️ Configuration
 
-3. **Start Azure Functions locally**
-   ```bash
-   func start
-   ```
+### Variables d'Environnement
 
-4. **Open the website**
-   - Navigate to `TCDynamics/index.html` in your browser
-   - Or serve it using a local server:
-     ```bash
-     python -m http.server 8000
-     ```
-   - Then visit `http://localhost:8000`
+1. **Frontend** : Copier et configurer `.env`
 
-## 📝 Usage
+```bash
+cp env.example .env
+# Éditer .env avec vos valeurs
+```
 
-### Website Features
+2. **Backend** : Copier et configurer `backend/.env`
 
-1. **Progress Tracking**
-   - The progress bar automatically updates based on completed days
-   - Current day is displayed prominently
-   - Visual indicators show completion status
+```bash
+cp backend/env.example backend/.env
+# Éditer backend/.env avec vos valeurs
+```
 
-2. **Day Cards**
-   - Click "Voir mon expérience" to expand day details
-   - Each day shows learning objectives and personal experiences
-   - Status badges indicate completion (Terminé/À venir)
+### Configuration Email (Zoho Mail)
 
-3. **Contact Form**
-   - Fill out the contact form with name, email, and message
-   - Form validates input and sends to Azure Function
-   - Success/error messages are displayed
+Dans `backend/.env`, configurez :
 
-4. **Newsletter Signup**
-   - Subscribe to receive learning journey updates
-   - Email validation ensures proper format
+```env
+EMAIL_HOST=smtp.zoho.eu
+EMAIL_PORT=465
+EMAIL_USER=contact@workflowai.fr
+EMAIL_PASS=gsdSk4MQk3ck
+```
 
-### Backend API
+## 💻 Développement
 
-The Azure Function provides a REST API endpoint:
+### Démarrer en mode développement
 
-**POST /api/ContactForm**
-- **Content-Type**: `application/json`
-- **Body**:
-  ```json
-  {
-    "name": "John Doe",
-    "email": "john@example.com",
-    "message": "Your message here"
-  }
-  ```
-- **Response**:
-  ```json
-  {
-    "success": true,
-    "message": "Merci pour votre message ! Je vous répondrai bientôt."
-  }
-  ```
+**Terminal 1 - Frontend:**
 
-## 🎨 Customization
+```bash
+npm run dev
+# Accessible sur http://localhost:8080
+```
 
-### Styling
-- Modify `style.css` to change colors, fonts, and layout
-- The design uses CSS custom properties for easy theming
-- Responsive breakpoints are defined for mobile optimization
+**Terminal 2 - Backend:**
 
-### Content
-- Update day cards in `index.html` with your learning experiences
-- Modify the 30-day curriculum to match your learning path
-- Add your own code snippets and project examples
+```bash
+cd backend
+npm run dev
+# API sur http://localhost:3001
+```
 
-### Functionality
-- Extend `script.js` with additional interactive features
-- Modify the Azure Function to add email sending or database storage
-- Add authentication or additional API endpoints
+### Scripts Disponibles
 
-## 🔧 Development
+#### Frontend
 
-### Adding New Days
-1. Copy an existing day card structure in `index.html`
-2. Update the day number, title, and description
-3. Add your learning content in the expandable sections
-4. Update the progress tracking in `script.js` if needed
+- `npm run dev` - Serveur de développement
+- `npm run build` - Build de production
+- `npm run test` - Lancer les tests
+- `npm run lint` - Vérifier le code
+- `npm run format` - Formater le code
 
-### Extending the Backend
-1. Add new Azure Functions in `function_app.py`
-2. Update `requirements.txt` for new dependencies
-3. Test locally with `func start`
+#### Backend
 
-## 📱 Browser Support
+- `npm run start` - Démarrer le serveur
+- `npm run dev` - Mode développement avec nodemon
 
-- Chrome 60+
-- Firefox 55+
-- Safari 12+
-- Edge 79+
+## 🧪 Tests
 
-## 🤝 Contributing
+### Lancer les tests
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+```bash
+# Tests unitaires
+npm run test
+
+# Tests avec interface
+npm run test:ui
+
+# Tests d'intégration backend
+cd backend
+node test-integration.js
+```
+
+### Coverage actuel
+
+- Frontend: ~15% (en cours d'amélioration)
+- Backend: Tests d'intégration disponibles
+
+## 🚀 Déploiement
+
+### Build de Production
+
+```bash
+# Build frontend
+npm run build
+
+# Les fichiers sont générés dans ./dist
+```
+
+### Déploiement sur OVHcloud
+
+1. **Préparer le serveur**
+
+```bash
+# Sur le serveur OVH
+git clone https://github.com/TCDynamics/TCDynamics.git
+cd TCDynamics
+npm install --production
+```
+
+2. **Configuration Nginx**
+
+```nginx
+server {
+    listen 80;
+    server_name tcdynamics.fr www.tcdynamics.fr;
+
+    # Frontend
+    location / {
+        root /var/www/tcdynamics/dist;
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Backend API
+    location /api {
+        proxy_pass http://localhost:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+3. **Démarrer avec PM2**
+
+```bash
+# Installer PM2
+npm install -g pm2
+
+# Démarrer le backend
+cd backend
+pm2 start src/server.js --name tcdynamics-api
+
+# Sauvegarder la configuration
+pm2 save
+pm2 startup
+```
+
+## 🔒 Sécurité
+
+### Mesures Implémentées
+
+- ✅ Helmet.js pour les headers de sécurité
+- ✅ Rate limiting (5 req/15min par IP)
+- ✅ Validation des entrées avec Joi
+- ✅ CORS configuré
+- ✅ Variables sensibles en .env
+- ✅ HTTPS en production
+
+### Audit de Sécurité
+
+```bash
+# Vérifier les vulnérabilités
+npm audit
+
+# Corriger automatiquement
+npm audit fix
+```
+
+## 📊 Monitoring
+
+### Logs
+
+Les logs sont disponibles dans la console. En production, utilisez PM2 :
+
+```bash
+pm2 logs tcdynamics-api
+```
+
+### Métriques
+
+- Endpoint de santé : `GET /health`
+- Test API : `GET /api/test`
+
+## 🤝 Support
+
+### Contact
+
+- **Email**: contact@tcdynamics.fr
+- **Téléphone**: Support local à Montigny-le-Bretonneux
+- **GitHub Issues**: [Signaler un bug](https://github.com/TCDynamics/TCDynamics/issues)
+
+### Équipe
+
+- Développement et maintenance par TCDynamics
+- Support entreprise disponible
 
 ## 📄 License
 
-This project is open source and available under the [MIT License](LICENSE).
+Copyright © 2024 TCDynamics. Tous droits réservés.
 
-## 🎯 Future Enhancements
-
-- [ ] Database integration for storing contact form submissions
-- [ ] Email notification system
-- [ ] User authentication and personal dashboards
-- [ ] Blog functionality for detailed posts
-- [ ] Code syntax highlighting for Python examples
-- [ ] Dark mode toggle
-- [ ] Social media sharing
-- [ ] Analytics and progress statistics
-
-## 📞 Support
-
-For questions or support, please use the contact form on the website or open an issue in the repository.
+Ce logiciel est propriétaire et confidentiel. Toute reproduction ou distribution non autorisée est strictement interdite.
 
 ---
 
-**Happy Learning! 🐍✨**
+<div align="center">
+  <p>Fait avec ❤️ en France 🇫🇷</p>
+  <p>
+    <a href="https://tcdynamics.fr">Site Web</a> •
+    <a href="https://github.com/TCDynamics">GitHub</a>
+  </p>
+</div>

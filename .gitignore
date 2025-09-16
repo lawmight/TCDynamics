@@ -46,12 +46,4 @@ htmlcov/
 
 # Logs
 *.log
-
-# Dependencies
-node_modules/
-
-# MCP Server logs (optional - remove if you want to track server logs)
-*.mcp.log
-
-# Local MCP configurations (if you have any sensitive local configs)
-local.mcp.json
+node_modules

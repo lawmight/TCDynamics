@@ -1,48 +1,88 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, Link, Settings, TrendingUp } from "lucide-react";
+import { Card, CardContent } from '@/components/ui/card'
+import { ArrowRight, Link, Settings, TrendingUp } from 'lucide-react'
 
 const HowItWorks = () => {
   const steps = [
     {
-      number: "01",
+      number: '01',
       icon: Link,
-      title: "Connectez vos outils",
-      description: "Intégrez facilement vos emails, documents et systèmes existants en quelques clics.",
-      details: ["Emails Outlook/Gmail", "Documents PDF/Word", "CRM et ERP", "APIs personnalisées"]
+      title: 'Connectez vos outils',
+      description:
+        'Intégrez facilement vos emails, documents et systèmes existants en quelques clics.',
+      details: [
+        'Emails Outlook/Gmail',
+        'Documents PDF/Word',
+        'CRM et ERP',
+        'APIs personnalisées',
+      ],
     },
     {
-      number: "02", 
+      number: '02',
       icon: Settings,
       title: "Configurez l'IA",
-      description: "Personnalisez vos workflows automatisés selon vos besoins métier spécifiques.",
-      details: ["Règles intelligentes", "Templates personnalisés", "Validation humaine", "Notifications"]
+      description:
+        'Personnalisez vos workflows automatisés selon vos besoins métier spécifiques.',
+      details: [
+        'Règles intelligentes',
+        'Templates personnalisés',
+        'Validation humaine',
+        'Notifications',
+      ],
     },
     {
-      number: "03",
+      number: '03',
       icon: TrendingUp,
-      title: "Automatisez et économisez",
-      description: "Profitez des résultats en temps réel et libérez votre équipe des tâches répétitives.",
-      details: ["Gain de temps 75%", "ROI positif 3 mois", "Monitoring 24/7", "Support français"]
-    }
-  ];
+      title: 'Automatisez et économisez',
+      description:
+        'Profitez des résultats en temps réel et libérez votre équipe des tâches répétitives.',
+      details: [
+        'Gain de temps 75%',
+        'ROI positif 3 mois',
+        'Monitoring 24/7',
+        'Support français',
+      ],
+    },
+  ]
 
   return (
     <section className="relative py-24 bg-background overflow-hidden">
       {/* Network Background */}
       <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 20% 50%, hsl(var(--primary)) 0%, transparent 50%),
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `radial-gradient(circle at 20% 50%, hsl(var(--primary)) 0%, transparent 50%),
                            radial-gradient(circle at 80% 20%, hsl(var(--primary)) 0%, transparent 50%),
                            radial-gradient(circle at 40% 80%, hsl(var(--primary)) 0%, transparent 50%)`,
-        }}>
-          <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          }}
+        >
+          <svg
+            className="absolute inset-0 w-full h-full"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <defs>
-              <pattern id="network-how" width="60" height="60" patternUnits="userSpaceOnUse">
-                <circle cx="30" cy="30" r="1.5" fill="currentColor" opacity="0.3"/>
-                <path d="M30,30 L60,0 M30,30 L60,60 M30,30 L0,60" stroke="currentColor" strokeWidth="0.5" opacity="0.2"/>
+              <pattern
+                id="network-how"
+                width="60"
+                height="60"
+                patternUnits="userSpaceOnUse"
+              >
+                <circle
+                  cx="30"
+                  cy="30"
+                  r="1.5"
+                  fill="currentColor"
+                  opacity="0.3"
+                />
+                <path
+                  d="M30,30 L60,0 M30,30 L60,60 M30,30 L0,60"
+                  stroke="currentColor"
+                  strokeWidth="0.5"
+                  opacity="0.2"
+                />
               </pattern>
             </defs>
-            <rect width="100%" height="100%" fill="url(#network-how)"/>
+            <rect width="100%" height="100%" fill="url(#network-how)" />
           </svg>
         </div>
       </div>
@@ -59,9 +99,13 @@ const HowItWorks = () => {
 
         <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {steps.map((step, index) => {
-            const IconComponent = step.icon;
+            const IconComponent = step.icon
             return (
-              <div key={index} className="relative fade-in-up" style={{ animationDelay: `${index * 0.2}s` }}>
+              <div
+                key={index}
+                className="relative fade-in-up"
+                style={{ animationDelay: `${index * 0.2}s` }}
+              >
                 <Card className="h-full bg-card/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-all duration-300 group hover:scale-105">
                   <CardContent className="p-8">
                     {/* Step Number */}
@@ -87,9 +131,14 @@ const HowItWorks = () => {
                     {/* Details */}
                     <ul className="space-y-2">
                       {step.details.map((detail, detailIndex) => (
-                        <li key={detailIndex} className="flex items-center text-sm font-mono">
+                        <li
+                          key={detailIndex}
+                          className="flex items-center text-sm font-mono"
+                        >
                           <div className="w-1.5 h-1.5 bg-primary rounded-full mr-3 flex-shrink-0" />
-                          <span className="text-muted-foreground">{detail}</span>
+                          <span className="text-muted-foreground">
+                            {detail}
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -105,22 +154,27 @@ const HowItWorks = () => {
                   </div>
                 )}
               </div>
-            );
+            )
           })}
         </div>
 
         {/* Bottom CTA */}
-        <div className="text-center mt-16 fade-in-up" style={{ animationDelay: "0.6s" }}>
+        <div
+          className="text-center mt-16 fade-in-up"
+          style={{ animationDelay: '0.6s' }}
+        >
           <p className="text-lg text-muted-foreground font-mono mb-6">
             Prêt à automatiser votre entreprise ?
           </p>
           <div className="inline-flex items-center px-6 py-3 bg-primary/10 rounded-full border border-primary/20">
-            <span className="text-primary font-mono font-medium">Démarrez en moins de 5 minutes</span>
+            <span className="text-primary font-mono font-medium">
+              Démarrez en moins de 5 minutes
+            </span>
           </div>
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default HowItWorks;
+export default HowItWorks
