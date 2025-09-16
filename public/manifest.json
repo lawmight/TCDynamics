@@ -17,7 +17,7 @@
       "purpose": "any maskable"
     },
     {
-      "src": "/placeholder.svg", 
+      "src": "/placeholder.svg",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
@@ -43,7 +43,7 @@
       "url": "/#pricing",
       "icons": [
         {
-          "src": "/placeholder.svg", 
+          "src": "/placeholder.svg",
           "sizes": "96x96",
           "type": "image/svg+xml"
         }
