@@ -155,23 +155,14 @@ def ContactForm(req: func.HttpRequest) -> func.HttpResponse:
     
     # Handle CORS preflight requests
     if req.method == "OPTIONS":
-        allowed_origins = os.environ.get('ALLOWED_ORIGINS', '*').split(',')
-        origin = req.headers.get('Origin', '*')
-        
-        # Check if origin is allowed
-        if origin in allowed_origins or '*' in allowed_origins:
-            cors_origin = origin
-        else:
-            cors_origin = allowed_origins[0] if allowed_origins else '*'
-            
+        allowed_origins = os.environ.get("ALLOWED_ORIGINS", "*")
         return func.HttpResponse(
             "",
             status_code=200,
             headers={
-                "Access-Control-Allow-Origin": cors_origin,
+                "Access-Control-Allow-Origin": allowed_origins,
                 "Access-Control-Allow-Methods": "POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type",
-                "Access-Control-Allow-Credentials": "true"
+                "Access-Control-Allow-Headers": "Content-Type"
             }
         )
     
@@ -247,10 +238,7 @@ def ContactForm(req: func.HttpRequest) -> func.HttpResponse:
             logging.warning("Failed to save submission to database")
         
         # Return success response with CORS headers
-        allowed_origins = os.environ.get('ALLOWED_ORIGINS', '*').split(',')
-        origin = req.headers.get('Origin', '*')
-        cors_origin = origin if (origin in allowed_origins or '*' in allowed_origins) else allowed_origins[0]
-        
+        allowed_origins = os.environ.get("ALLOWED_ORIGINS", "*")
         return func.HttpResponse(
             json.dumps({
                 "success": True,
@@ -259,10 +247,9 @@ def ContactForm(req: func.HttpRequest) -> func.HttpResponse:
             status_code=200,
             mimetype="application/json",
             headers={
-                "Access-Control-Allow-Origin": cors_origin,
+                "Access-Control-Allow-Origin": allowed_origins,
                 "Access-Control-Allow-Methods": "POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type",
-                "Access-Control-Allow-Credentials": "true"
+                "Access-Control-Allow-Headers": "Content-Type"
             }
         )
         
@@ -286,7 +273,7 @@ def ContactForm(req: func.HttpRequest) -> func.HttpResponse:
             status_code=500,
             mimetype="application/json",
             headers={
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": os.environ.get("ALLOWED_ORIGINS", "*"),
                 "Access-Control-Allow-Methods": "POST, OPTIONS",
                 "Access-Control-Allow-Headers": "Content-Type"
             }
@@ -316,7 +303,7 @@ def health_check(req: func.HttpRequest) -> func.HttpResponse:
             status_code=200,
             mimetype="application/json",
             headers={
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": os.environ.get("ALLOWED_ORIGINS", "*"),
                 "Cache-Control": "no-cache"
             }
         )
@@ -379,7 +366,7 @@ def admin_dashboard(req: func.HttpRequest) -> func.HttpResponse:
             status_code=200,
             mimetype="application/json",
             headers={
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": os.environ.get("ALLOWED_ORIGINS", "*"),
                 "Cache-Control": "no-cache"
             }
         )

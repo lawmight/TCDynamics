@@ -18,30 +18,18 @@ const { logger, logRequest, logSecurityEvent, logPerformance, logError, addReque
 // Import des middlewares d'erreur
 const { errorHandler, notFoundHandler, collectMetrics } = require('./middleware/errorHandler')
 
+// Import du middleware CSRF
+const { csrfToken, csrfProtection } = require('./middleware/csrf')
+
 const app = express()
 const PORT = process.env.PORT || 3001
 
 // Middleware de base
 app.use(addRequestId)
 app.use(helmetConfig)
-
-// CORS configuration with multiple origins support
-const allowedOrigins = process.env.ALLOWED_ORIGINS 
-  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
-  : ['http://localhost:8080', 'http://localhost:3000']
-
 app.use(
   cors({
-    origin: function(origin, callback) {
-      // Allow requests with no origin (mobile apps, Postman, etc)
-      if (!origin) return callback(null, true)
-      
-      if (allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true)
-      } else {
-        callback(new Error('Not allowed by CORS'))
-      }
-    },
+    origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : (process.env.FRONTEND_URL || 'http://localhost:8080'),
     credentials: true,
   })
 )
@@ -50,6 +38,10 @@ app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 app.use(collectMetrics)
 app.use(validateIP)
+
+// CSRF protection middleware
+app.use(csrfToken)
+app.use(csrfProtection)
 
 /**
  * @swagger
@@ -78,6 +70,13 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     environment: process.env.NODE_ENV,
+  })
+})
+
+// CSRF token endpoint for frontend
+app.get('/api/csrf-token', (req, res) => {
+  res.json({
+    csrfToken: res.locals.csrfToken
   })
 })
 
@@ -164,7 +163,6 @@ process.on('SIGINT', () => {
   logger.info('🛑 Signal SIGINT reçu, arrêt gracieux du serveur')
   process.exit(0)
 })
-<<<<<<< Current (Your changes)
 
 // Gestion des erreurs non capturées
 process.on('uncaughtException', (error) => {
@@ -176,5 +174,3 @@ process.on('unhandledRejection', (reason, promise) => {
   logger.error('Rejet de promesse non géré', { reason, promise })
   process.exit(1)
 })
-=======
->>>>>>> Incoming (Background Agent changes)
