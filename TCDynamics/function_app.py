@@ -155,13 +155,23 @@ def ContactForm(req: func.HttpRequest) -> func.HttpResponse:
     
     # Handle CORS preflight requests
     if req.method == "OPTIONS":
+        allowed_origins = os.environ.get('ALLOWED_ORIGINS', '*').split(',')
+        origin = req.headers.get('Origin', '*')
+        
+        # Check if origin is allowed
+        if origin in allowed_origins or '*' in allowed_origins:
+            cors_origin = origin
+        else:
+            cors_origin = allowed_origins[0] if allowed_origins else '*'
+            
         return func.HttpResponse(
             "",
             status_code=200,
             headers={
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": cors_origin,
                 "Access-Control-Allow-Methods": "POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type"
+                "Access-Control-Allow-Headers": "Content-Type",
+                "Access-Control-Allow-Credentials": "true"
             }
         )
     
@@ -237,6 +247,10 @@ def ContactForm(req: func.HttpRequest) -> func.HttpResponse:
             logging.warning("Failed to save submission to database")
         
         # Return success response with CORS headers
+        allowed_origins = os.environ.get('ALLOWED_ORIGINS', '*').split(',')
+        origin = req.headers.get('Origin', '*')
+        cors_origin = origin if (origin in allowed_origins or '*' in allowed_origins) else allowed_origins[0]
+        
         return func.HttpResponse(
             json.dumps({
                 "success": True,
@@ -245,9 +259,10 @@ def ContactForm(req: func.HttpRequest) -> func.HttpResponse:
             status_code=200,
             mimetype="application/json",
             headers={
-                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Origin": cors_origin,
                 "Access-Control-Allow-Methods": "POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type"
+                "Access-Control-Allow-Headers": "Content-Type",
+                "Access-Control-Allow-Credentials": "true"
             }
         )
         

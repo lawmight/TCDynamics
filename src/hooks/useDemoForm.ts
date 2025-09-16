@@ -13,7 +13,6 @@ interface DemoData {
 interface DemoResponse {
   success: boolean
   message: string
-  messageId?: string
   errors?: string[]
 }
 
@@ -26,7 +25,8 @@ export const useDemoForm = () => {
     setResponse(null)
 
     try {
-      const response = await fetch('http://localhost:3001/api/demo', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+      const response = await fetch(`${apiUrl}/api/demo`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
