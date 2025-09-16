@@ -20,6 +20,14 @@ Object.defineProperty(window.HTMLImageElement.prototype, 'src', {
   },
 })
 
+// Mock IntersectionObserver
+global.IntersectionObserver = class IntersectionObserver {
+  constructor() {}
+  disconnect() {}
+  observe() {}
+  unobserve() {}
+}
+
 // Cleanup after each test
 afterEach(() => {
   cleanup()

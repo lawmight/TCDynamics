@@ -42,12 +42,19 @@ export const Calendar = mockIcon
 export const Wrench = mockIcon
 export const HeadphonesIcon = mockIcon
 export const Gift = mockIcon
-<<<<<<< Current (Your changes)
-=======
 export const Brain = mockIcon
 export const Zap = mockIcon
 export const Lock = mockIcon
 export const Globe = mockIcon
 export const TrendingUp = mockIcon
 export const Bot = mockIcon
->>>>>>> Incoming (Background Agent changes)
+export const Send = mockIcon
+export const Loader2 = mockIcon
+export const User = mockIcon
+export const AlertCircle = mockIcon
+export const Upload = mockIcon
+export const Link = mockIcon
+export const Settings = mockIcon
+export const GraduationCap = mockIcon
+export const Flag = mockIcon
+export const Eye = mockIcon
