@@ -24,7 +24,7 @@ class Monitoring {
    */
   async init() {
     if (!this.enabled || !this.dsn) {
-      console.log('🔍 Monitoring désactivé')
+      // Monitoring disabled in production
       return
     }
 
@@ -54,9 +54,9 @@ class Monitoring {
         }
       })
 
-      console.log('🔍 Monitoring initialisé')
+      // Monitoring initialized
     } catch (error) {
-      console.error('Erreur lors de l\'initialisation du monitoring:', error)
+      // Error initializing monitoring
     }
   }
 
@@ -64,7 +64,7 @@ class Monitoring {
    * Capturer une erreur
    */
   captureError(error: Error, context?: ErrorContext) {
-    console.error('Error captured:', error, context)
+    // Error captured for monitoring
 
     if (!this.enabled) return
 
@@ -95,7 +95,7 @@ class Monitoring {
    * Capturer un message
    */
   captureMessage(message: string, level: 'info' | 'warning' | 'error' = 'info') {
-    console.log(`[${level.toUpperCase()}]`, message)
+    // Message captured for monitoring
 
     if (!this.enabled) return
 
@@ -122,7 +122,7 @@ class Monitoring {
 
       // Log en dev
       if (import.meta.env.DEV) {
-        console.log(`⏱️ ${name}: ${duration.toFixed(2)}ms`)
+        // Performance metric: ${name}: ${duration.toFixed(2)}ms
       }
     }
 
@@ -154,7 +154,7 @@ class Monitoring {
 
   private logMetric(name: string, value: number) {
     if (import.meta.env.DEV) {
-      console.log(`📊 Web Vital - ${name}: ${value.toFixed(2)}`)
+      // Web Vital metric: ${name}: ${value.toFixed(2)}
     }
 
     // Envoyer à Sentry si disponible

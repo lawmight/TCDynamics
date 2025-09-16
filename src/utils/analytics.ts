@@ -25,7 +25,7 @@ class Analytics {
    */
   init() {
     if (!this.enabled) {
-      console.log('📊 Analytics désactivés')
+      // Analytics disabled
       return
     }
 
@@ -37,7 +37,7 @@ class Analytics {
       _paq.push(['enableLinkTracking'])
       
       if (this.debug) {
-        console.log('📊 Analytics initialisés (mode debug)')
+        // Analytics initialized in debug mode
       }
     }
   }
@@ -49,7 +49,7 @@ class Analytics {
     if (!this.enabled) return
 
     if (this.debug) {
-      console.log('📊 Event:', { category, action, label, value })
+      // Analytics event tracked: { category, action, label, value }
     }
 
     // Envoyer à Matomo ou autre solution
@@ -86,7 +86,7 @@ class Analytics {
    */
   trackError(error: Error, context?: string) {
     if (this.debug) {
-      console.error('❌ Error tracked:', error, context)
+      // Error tracked for analytics
     }
 
     this.trackEvent({

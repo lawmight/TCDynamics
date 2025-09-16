@@ -2,10 +2,19 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"type": "func",
+			"type": "shell",
 			"label": "func: host start",
-			"command": "host start",
-			"problemMatcher": "$func-python-watch",
+			"command": "func host start",
+			"windows": {
+				"command": "func host start"
+			},
+			"osx": {
+				"command": "func host start"
+			},
+			"linux": {
+				"command": "func host start"
+			},
+			"problemMatcher": [],
 			"isBackground": true,
 			"dependsOn": "pip install (functions)",
 			"options": {
@@ -31,9 +40,18 @@
 		},
 		{
 			"label": "Deploy to Azure Functions",
-			"type": "func",
-			"command": "deploy",
-			"problemMatcher": "$func-deploy",
+			"type": "shell",
+			"command": "func azure functionapp publish func-tcdynamics-contact",
+			"windows": {
+				"command": "func azure functionapp publish func-tcdynamics-contact"
+			},
+			"osx": {
+				"command": "func azure functionapp publish func-tcdynamics-contact"
+			},
+			"linux": {
+				"command": "func azure functionapp publish func-tcdynamics-contact"
+			},
+			"problemMatcher": [],
 			"dependsOn": "pip install (functions)",
 			"options": {
 				"cwd": "${workspaceFolder}/TCDynamics"
