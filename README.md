@@ -120,9 +120,17 @@ Dans `backend/.env`, configurez :
 ```env
 EMAIL_HOST=smtp.zoho.eu
 EMAIL_PORT=465
-EMAIL_USER=your-email@zoho.com
-EMAIL_PASS=your-zoho-app-password
+<<<<<<< Current (Your changes)
+EMAIL_USER=contact@tcdynamics.fr
+EMAIL_PASS=gsdSk4MQk3ck
+=======
+EMAIL_USER=contact@tcdynamics.fr
+EMAIL_PASS=gsdSk4MQk3ck
+>>>>>>> Incoming (Background Agent changes)
 ```
+
+**⚠️ IMPORTANT**: Utilisez un mot de passe d'application Zoho, pas votre mot de passe principal.
+[Guide Zoho App Password](https://www.zoho.com/mail/help/two-factor-authentication.html#alink3)
 
 ## 💻 Développement
 
