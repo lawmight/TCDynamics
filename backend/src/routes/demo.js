@@ -5,7 +5,69 @@ const { formRateLimit } = require('../middleware/security')
 
 const router = express.Router()
 
-// Route pour le formulaire de démo
+/**
+ * @swagger
+ * /api/demo:
+ *   post:
+ *     summary: Demander une démonstration
+ *     description: Permet aux utilisateurs de demander une démonstration de WorkFlowAI
+ *     tags:
+ *       - Demo
+ *     security:
+ *       - ApiKeyAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/DemoRequest'
+ *           example:
+ *             firstName: "Jean"
+ *             lastName: "Dupont"
+ *             email: "jean.dupont@example.com"
+ *             phone: "+33123456789"
+ *             company: "Entreprise XYZ"
+ *             employees: "11-50"
+ *             needs: "Nous avons besoin d'automatiser notre traitement de factures et de contrats."
+ *     responses:
+ *       200:
+ *         description: Demande de démonstration enregistrée
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ *             example:
+ *               success: true
+ *               message: "Votre demande de démonstration a été enregistrée. Notre équipe vous contactera dans les 2 heures."
+ *               messageId: "1234567890@example.com"
+ *       400:
+ *         description: Données invalides
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: "Données invalides"
+ *       429:
+ *         description: Trop de requêtes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: "Trop de requêtes. Veuillez réessayer plus tard."
+ *       500:
+ *         description: Erreur serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: "Une erreur est survenue lors de l'enregistrement de votre demande."
+ */
 router.post(
   '/demo',
   formRateLimit,
