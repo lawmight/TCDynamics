@@ -120,7 +120,7 @@ You are WorkFlowAI assistant. Provide a brief, helpful response to: How can AI h
         $tokensUsed = $response.usage.total_tokens
         $freeTotalTokens += $tokensUsed
 
-        Write-Host "   ✅ Free call $i`: $tokensUsed tokens used" -ForegroundColor Green
+        Write-Host "   ✅ Free call ${i}: ${tokensUsed} tokens used" -ForegroundColor Green
 
     } catch {
         Write-Host "   ❌ Free call $i failed: $($_.Exception.Message)" -ForegroundColor Red
