@@ -60,11 +60,28 @@ describe('Button Component', () => {
     expect(handleClick).not.toHaveBeenCalled()
   })
 
-  it('should show disabled state', () => {
-    render(<Button disabled>Disabled</Button>)
+  it('should show loading state with aria-busy attribute', () => {
+    render(<Button loading>Loading</Button>)
 
     const button = screen.getByRole('button')
     expect(button).toBeDisabled()
+    expect(button).toHaveAttribute('aria-busy', 'true')
+  })
+
+  it('should be disabled when loading is true', () => {
+    const handleClick = vi.fn()
+    render(
+      <Button loading onClick={handleClick}>
+        Loading Button
+      </Button>
+    )
+
+    const button = screen.getByRole('button')
+    expect(button).toBeDisabled()
+    expect(button).toHaveAttribute('aria-busy', 'true')
+
+    fireEvent.click(button)
+    expect(handleClick).not.toHaveBeenCalled()
   })
 
   it('should be accessible', () => {
@@ -72,6 +89,7 @@ describe('Button Component', () => {
 
     const button = screen.getByRole('button')
     expect(button).toBeInTheDocument()
+    expect(button).toHaveAttribute('type', 'button')
   })
 
   it('should accept custom className', () => {
