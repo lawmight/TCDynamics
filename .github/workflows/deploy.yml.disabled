@@ -1,0 +1,113 @@
+name: Deploy TCDynamics
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: |
+        cd TCDynamics
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Validate Python syntax
+      run: |
+        cd TCDynamics
+        python -m py_compile function_app.py
+        python -m py_compile database.py
+    
+    - name: Test Azure Function locally
+      run: |
+        cd TCDynamics
+        python -c "import function_app; print('Function app imports successfully')"
+
+  deploy-azure-functions:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Deploy to Azure Functions
+      uses: Azure/functions-action@v1
+      with:
+        app-name: 'tcdynamics-api'
+        package: './TCDynamics'
+        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+    
+    - name: Set Zoho Email Environment Variables
+      run: |
+        az functionapp config appsettings set --name tcdynamics-api --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --settings ZOHO_EMAIL=${{ secrets.ZOHO_EMAIL }} ZOHO_PASSWORD=${{ secrets.ZOHO_PASSWORD }} ALLOWED_ORIGINS=${{ secrets.ALLOWED_ORIGINS }} ADMIN_KEY=${{ secrets.ADMIN_KEY }}
+
+  deploy-frontend:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Create deployment package
+      run: |
+        mkdir frontend-deploy
+        cp TCDynamics/TCDynamics/index.html frontend-deploy/ 2>/dev/null || echo "index.html not found in TCDynamics/TCDynamics/"
+        cp TCDynamics/TCDynamics/style.css frontend-deploy/ 2>/dev/null || echo "style.css not found in TCDynamics/TCDynamics/"
+        cp TCDynamics/TCDynamics/script.js frontend-deploy/ 2>/dev/null || echo "script.js not found in TCDynamics/TCDynamics/"
+        cp TCDynamics/README.md frontend-deploy/ 2>/dev/null || echo "README.md not found in TCDynamics/"
+        ls -la frontend-deploy/
+    
+    - name: Upload frontend files
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-files
+        path: frontend-deploy/
+    
+    - name: Notify deployment ready
+      run: |
+        echo "🎉 Frontend files ready for OVHcloud deployment!"
+        echo "📁 Files to upload to OVHcloud:"
+        echo "  - index.html"
+        echo "  - style.css"
+        echo "  - script.js"
+        echo "  - README.md"
+        echo ""
+        echo "📧 Backend deployed to Azure Functions"
+        echo "🌐 Update your domain to point to OVHcloud hosting"
+
+  notify:
+    needs: [deploy-azure-functions, deploy-frontend]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Deployment Summary
+      run: |
+        echo "🚀 TCDynamics Deployment Complete!"
+        echo ""
+        echo "✅ Backend: Azure Functions deployed"
+        echo "📁 Frontend: Files ready for OVHcloud"
+        echo ""
+        echo "📋 Next steps:"
+        echo "1. Upload frontend files to OVHcloud"
+        echo "2. Configure Zoho email in Azure Function"
+        echo "3. Test contact form functionality"
+        echo "4. Update API endpoint URL if needed"
