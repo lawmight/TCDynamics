@@ -70,6 +70,11 @@ export interface DocumentProcessingResponse {
   error?: string
 }
 
+// Azure Vision API Types
+interface AzureVisionLine {
+  text: string
+}
+
 export interface ContactFormData {
   name: string
   email: string
@@ -317,7 +322,7 @@ export class AzureVisionService {
       if (result.status === 'succeeded') {
         const extractedText =
           result.analyzeResult?.readResults?.[0]?.lines
-            ?.map((line: any) => line.text)
+            ?.map((line: AzureVisionLine) => line.text)
             ?.join(' ') || 'Aucun texte extrait'
 
         return {
