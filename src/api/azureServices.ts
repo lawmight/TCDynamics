@@ -60,7 +60,6 @@ export interface ChatResponse {
 
 export interface DocumentProcessingRequest {
   imageData: string
-  fileName: string
   documentId: string
 }
 
@@ -164,8 +163,8 @@ export class AzureOpenAIService {
         "Désolé, je n'ai pas pu générer une réponse appropriée."
 
       // Store conversation in Cosmos DB (non-blocking)
-      this.storeConversation(sessionId, message, aiResponse).catch(error => {
-        console.warn('Failed to store conversation:', error)
+      this.storeConversation(sessionId, message, aiResponse).catch(() => {
+        // Silently handle conversation storage failures in production
       })
 
       return {
@@ -211,22 +210,22 @@ export class AzureOpenAIService {
   }
 
   private async storeConversation(
-    sessionId: string,
-    userMessage: string,
-    aiResponse: string
+    _sessionId: string, // eslint-disable-line @typescript-eslint/no-unused-vars
+    _userMessage: string, // eslint-disable-line @typescript-eslint/no-unused-vars
+    _aiResponse: string // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<void> {
     try {
-      const conversation = {
-        id: `${sessionId}_${Date.now()}`,
-        sessionId,
-        userMessage,
-        aiResponse,
-        timestamp: new Date().toISOString(),
-        userId: 'anonymous',
-      }
-
+      // Conversation object creation (commented out as not currently used)
+      // const conversation = {
+      //   id: `${sessionId}_${Date.now()}`,
+      //   sessionId,
+      //   userMessage,
+      //   aiResponse,
+      //   timestamp: new Date().toISOString(),
+      //   userId: 'anonymous',
+      // }
       // Store in Cosmos DB (this would normally call your Azure Function)
-      console.log('Storing conversation:', conversation)
+      // console.log('Storing conversation:', conversation)
     } catch (error) {
       console.error('Failed to store conversation:', error)
     }
@@ -251,8 +250,7 @@ export class AzureVisionService {
   }
 
   async processDocument(
-    imageData: string,
-    _fileName: string // eslint-disable-line @typescript-eslint/no-unused-vars
+    imageData: string
   ): Promise<DocumentProcessingResponse> {
     try {
       const url = `${this.endpoint}/vision/v3.2/read/analyze`
@@ -473,8 +471,8 @@ export const chatAPI = {
 }
 
 export const visionAPI = {
-  processDocument: (imageData: string, fileName: string) =>
-    visionService.processDocument(imageData, fileName),
+  processDocument: (imageData: string) =>
+    visionService.processDocument(imageData),
 }
 
 export const contactAPI = {

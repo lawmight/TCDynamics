@@ -60,7 +60,6 @@ export interface ChatResponse {
 
 export interface DocumentProcessingRequest {
   imageData: string
-  fileName: string
   documentId: string
 }
 
@@ -251,8 +250,7 @@ export class AzureVisionService {
   }
 
   async processDocument(
-    imageData: string,
-    _fileName: string
+    imageData: string
   ): Promise<DocumentProcessingResponse> {
     try {
       const url = `${this.endpoint}/vision/v3.2/read/analyze`
@@ -473,8 +471,8 @@ export const chatAPI = {
 }
 
 export const visionAPI = {
-  processDocument: (imageData: string, fileName: string) =>
-    visionService.processDocument(imageData, fileName),
+  processDocument: (imageData: string) =>
+    visionService.processDocument(imageData),
 }
 
 export const contactAPI = {
