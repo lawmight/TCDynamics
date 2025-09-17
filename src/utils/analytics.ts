@@ -10,6 +10,15 @@ interface AnalyticsEvent {
   value?: number
 }
 
+// Matomo Analytics Types
+interface MatomoTracker {
+  push: (args: (string | number | undefined)[]) => void
+}
+
+interface WindowWithMatomo extends Window {
+  _paq?: MatomoTracker[]
+}
+
 class Analytics {
   private enabled: boolean = false
   private debug: boolean = false
@@ -31,7 +40,8 @@ class Analytics {
 
     // Configuration Matomo (exemple)
     if (typeof window !== 'undefined') {
-      const _paq = ((window as any)._paq = (window as any)._paq || [])
+      const matomoWindow = window as WindowWithMatomo
+      const _paq = (matomoWindow._paq = matomoWindow._paq || [])
       _paq.push(['disableCookies']) // RGPD: Pas de cookies par défaut
       _paq.push(['trackPageView'])
       _paq.push(['enableLinkTracking'])
@@ -53,8 +63,11 @@ class Analytics {
     }
 
     // Envoyer à Matomo ou autre solution
-    if (typeof window !== 'undefined' && (window as any)._paq) {
-      ;(window as any)._paq.push(['trackEvent', category, action, label, value])
+    if (typeof window !== 'undefined') {
+      const matomoWindow = window as WindowWithMatomo
+      if (matomoWindow._paq) {
+        matomoWindow._paq.push(['trackEvent', category, action, label, value])
+      }
     }
   }
 

@@ -3,11 +3,30 @@
  * Configuration pour Sentry ou solution équivalente
  */
 
+import React from 'react'
+
+// Sentry Types
+interface SentryScope {
+  setTag: (key: string, value: string) => void
+  setUser: (user: { id: string }) => void
+  setExtra: (key: string, value: unknown) => void
+}
+
+interface SentryInstance {
+  withScope: (callback: (scope: SentryScope) => void) => void
+  captureException: (error: Error) => void
+  captureMessage: (message: string, level?: string, context?: Record<string, unknown>) => void
+}
+
+interface WindowWithSentry extends Window {
+  Sentry?: SentryInstance
+}
+
 interface ErrorContext {
   user?: string
   component?: string
   action?: string
-  extra?: Record<string, any>
+  extra?: Record<string, unknown>
 }
 
 class Monitoring {
@@ -69,10 +88,12 @@ class Monitoring {
     if (!this.enabled) return
 
     // Si Sentry est chargé
-    if (typeof window !== 'undefined' && (window as any).Sentry) {
-      const Sentry = (window as any).Sentry
+    if (typeof window !== 'undefined') {
+      const sentryWindow = window as WindowWithSentry
+      if (sentryWindow.Sentry) {
+        const Sentry = sentryWindow.Sentry
 
-      Sentry.withScope((scope: any) => {
+        Sentry.withScope((scope: SentryScope) => {
         if (context?.component) {
           scope.setTag('component', context.component)
         }
@@ -102,8 +123,11 @@ class Monitoring {
 
     if (!this.enabled) return
 
-    if (typeof window !== 'undefined' && (window as any).Sentry) {
-      ;(window as any).Sentry.captureMessage(message, level)
+    if (typeof window !== 'undefined') {
+      const sentryWindow = window as WindowWithSentry
+      if (sentryWindow.Sentry) {
+        sentryWindow.Sentry.captureMessage(message, level)
+      }
     }
   }
 
@@ -155,16 +179,19 @@ class Monitoring {
     })
   }
 
-  private logMetric(name: string, value: number) {
+  logMetric(name: string, value: number) {
     if (import.meta.env.DEV) {
       // // console.log(`📊 Web Vital - ${name}: ${value.toFixed(2)}`)
     }
 
     // Envoyer à Sentry si disponible
-    if (typeof window !== 'undefined' && (window as any).Sentry) {
-      ;(window as any).Sentry.captureMessage(`WebVital:${name}`, 'info', {
-        extra: { value },
-      })
+    if (typeof window !== 'undefined') {
+      const sentryWindow = window as WindowWithSentry
+      if (sentryWindow.Sentry) {
+        sentryWindow.Sentry.captureMessage(`WebVital:${name}`, 'info', {
+          extra: { value },
+        })
+      }
     }
   }
 }
@@ -172,7 +199,6 @@ class Monitoring {
 export const monitoring = new Monitoring()
 
 // React Error Boundary pour capturer les erreurs
-import React from 'react'
 
 interface ErrorBoundaryState {
   hasError: boolean

@@ -53,15 +53,25 @@ export const unregisterServiceWorker = async (): Promise<void> => {
   }
 }
 
+// PWA Install Prompt Types
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: ReadonlyArray<string>
+  readonly userChoice: Promise<{
+    outcome: 'accepted' | 'dismissed'
+    platform: string
+  }>
+  prompt(): Promise<void>
+}
+
 // PWA Install Prompt Handler
-let deferredPrompt: any = null
+let deferredPrompt: BeforeInstallPromptEvent | null = null
 
 export const setupInstallPrompt = (): void => {
-  window.addEventListener('beforeinstallprompt', e => {
+  window.addEventListener('beforeinstallprompt', (e: Event) => {
     // Prevent the mini-infobar from appearing on mobile
     e.preventDefault()
     // Stash the event so it can be triggered later
-    deferredPrompt = e
+    deferredPrompt = e as BeforeInstallPromptEvent
 
     // // console.log('📱 PWA install prompt available');
   })
