@@ -1,80 +1,81 @@
-import { useState, useRef, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Send, Bot, User, Loader2 } from "lucide-react";
-import { chatAPI } from "@/api/azureServices";
+import { useState, useRef, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Badge } from '@/components/ui/badge'
+import { MessageCircle, Send, Bot, User, Loader2 } from 'lucide-react'
+import { chatAPI } from '@/api/azureServices'
 
 interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
+  id: string
+  role: 'user' | 'assistant'
+  content: string
+  timestamp: Date
 }
 
 const AIChatbot = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState(false)
+  const [messages, setMessages] = useState<Message[]>([])
+  const [input, setInput] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    scrollToBottom()
+  }, [messages])
 
   const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
       content: input.trim(),
-      timestamp: new Date()
-    };
+      timestamp: new Date(),
+    }
 
-    setMessages(prev => [...prev, userMessage]);
-    setInput("");
-    setIsLoading(true);
+    setMessages(prev => [...prev, userMessage])
+    setInput('')
+    setIsLoading(true)
 
     try {
-      const sessionId = 'workFlowAI-session-' + Date.now();
-      const response = await chatAPI.sendMessage(userMessage.content, sessionId);
+      const sessionId = 'workFlowAI-session-' + Date.now()
+      const response = await chatAPI.sendMessage(userMessage.content, sessionId)
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: response.response,
-        timestamp: new Date()
-      };
+        timestamp: new Date(),
+      }
 
-      setMessages(prev => [...prev, assistantMessage]);
+      setMessages(prev => [...prev, assistantMessage])
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Error sending message:', error)
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: "Une erreur s'est produite. Veuillez vérifier votre connexion et réessayer.",
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorMessage]);
+        content:
+          "Une erreur s'est produite. Veuillez vérifier votre connexion et réessayer.",
+        timestamp: new Date(),
+      }
+      setMessages(prev => [...prev, errorMessage])
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
+      e.preventDefault()
+      sendMessage()
     }
-  };
+  }
 
   return (
     <>
@@ -85,7 +86,11 @@ const AIChatbot = () => {
           size="lg"
           className="rounded-full w-16 h-16 shadow-lg hover:shadow-xl transition-all duration-300 bg-primary hover:bg-primary/90"
         >
-          {isOpen ? <MessageCircle className="w-6 h-6" /> : <Bot className="w-6 h-6" />}
+          {isOpen ? (
+            <MessageCircle className="w-6 h-6" />
+          ) : (
+            <Bot className="w-6 h-6" />
+          )}
         </Button>
       </div>
 
@@ -100,7 +105,9 @@ const AIChatbot = () => {
                     <Bot className="w-4 h-4 text-primary" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg font-mono">WorkFlowAI Assistant</CardTitle>
+                    <CardTitle className="text-lg font-mono">
+                      WorkFlowAI Assistant
+                    </CardTitle>
                     <Badge variant="secondary" className="text-xs font-mono">
                       IA Active
                     </Badge>
@@ -123,12 +130,16 @@ const AIChatbot = () => {
                 {messages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
                     <Bot className="w-12 h-12 mb-4 text-primary/50" />
-                    <p className="font-mono text-sm mb-2">Bonjour! Je suis votre assistant IA</p>
-                    <p className="text-xs font-mono">Comment puis-je vous aider avec WorkFlowAI ?</p>
+                    <p className="font-mono text-sm mb-2">
+                      Bonjour! Je suis votre assistant IA
+                    </p>
+                    <p className="text-xs font-mono">
+                      Comment puis-je vous aider avec WorkFlowAI ?
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {messages.map((message) => (
+                    {messages.map(message => (
                       <div
                         key={message.id}
                         className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -174,7 +185,7 @@ const AIChatbot = () => {
                 <div className="flex gap-2">
                   <Input
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                    onChange={e => setInput(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Posez votre question..."
                     className="flex-1 font-mono text-sm"
@@ -198,7 +209,7 @@ const AIChatbot = () => {
         </div>
       )}
     </>
-  );
-};
+  )
+}
 
-export default AIChatbot;
+export default AIChatbot

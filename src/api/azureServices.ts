@@ -38,7 +38,7 @@ const validateConfig = () => {
     return false;
   }
 
-  console.log('✅ Azure services configuration validated');
+  // console.log('✅ Azure services configuration validated');
   return true;
 };
 
@@ -201,7 +201,7 @@ export class AzureOpenAIService {
       };
 
       // Store in Cosmos DB (this would normally call your Azure Function)
-      console.log('Storing conversation:', conversation);
+      // console.log('Storing conversation:', conversation);
     } catch (error) {
       console.error('Failed to store conversation:', error);
     }
@@ -335,8 +335,8 @@ export class AzureContactService {
 
   constructor() {
     // This should be the URL of your deployed Azure Function
-    // For local development, it would be something like http://localhost:7071
-    this.functionUrl = import.meta.env.VITE_AZURE_FUNCTIONS_URL || 'https://your-function-app.azurewebsites.net/api';
+    // For local development, it would be something like process.env.API_URL || 'http://localhost:7071'
+    this.functionUrl = import.meta.env.VITE_AZURE_FUNCTIONS_URL || 'process.env.API_URL || 'https://your-function-app.azurewebsites.net/api'';
   }
 
   async submitContactForm(data: ContactFormData): Promise<ContactResponse> {

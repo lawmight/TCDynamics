@@ -1,33 +1,42 @@
-import { useState, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Upload, FileText, Loader2, CheckCircle, AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { visionAPI } from "@/api/azureServices";
+import { useState, useRef } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import {
+  Upload,
+  FileText,
+  Loader2,
+  CheckCircle,
+  AlertCircle,
+} from 'lucide-react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { visionAPI } from '@/api/azureServices'
 
 interface ProcessedDocument {
-  id: string;
-  fileName: string;
-  extractedText: string;
-  confidence: number;
-  status: 'processing' | 'completed' | 'error';
-  timestamp: Date;
+  id: string
+  fileName: string
+  extractedText: string
+  confidence: number
+  status: 'processing' | 'completed' | 'error'
+  timestamp: Date
 }
 
 const DocumentProcessor = () => {
-  const [documents, setDocuments] = useState<ProcessedDocument[]>([]);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [documents, setDocuments] = useState<ProcessedDocument[]>([])
+  const [isProcessing, setIsProcessing] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const files = event.target.files
+    if (!files || files.length === 0) return
 
-    setIsProcessing(true);
+    setIsProcessing(true)
 
     for (const file of Array.from(files)) {
-      const documentId = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+      const documentId =
+        Date.now().toString() + Math.random().toString(36).substr(2, 9)
 
       // Create processing document
       const processingDoc: ProcessedDocument = {
@@ -36,87 +45,96 @@ const DocumentProcessor = () => {
         extractedText: '',
         confidence: 0,
         status: 'processing',
-        timestamp: new Date()
-      };
+        timestamp: new Date(),
+      }
 
-      setDocuments(prev => [...prev, processingDoc]);
+      setDocuments(prev => [...prev, processingDoc])
 
       try {
         // Convert file to base64
-        const base64String = await fileToBase64(file);
+        const base64String = await fileToBase64(file)
 
         // Send to Azure AI Vision API
-        const result = await visionAPI.processDocument(base64String, file.name);
+        const result = await visionAPI.processDocument(base64String, file.name)
 
         // Update document with results
-        setDocuments(prev => prev.map(doc =>
-          doc.id === documentId
-            ? {
-                ...doc,
-                extractedText: result.extractedText || 'Erreur lors de l\'extraction du texte',
-                confidence: result.confidence || 0,
-                status: result.success ? 'completed' : 'error'
-              }
-            : doc
-        ));
-
+        setDocuments(prev =>
+          prev.map(doc =>
+            doc.id === documentId
+              ? {
+                  ...doc,
+                  extractedText:
+                    result.extractedText ||
+                    "Erreur lors de l'extraction du texte",
+                  confidence: result.confidence || 0,
+                  status: result.success ? 'completed' : 'error',
+                }
+              : doc
+          )
+        )
       } catch (error) {
-        console.error('Error processing document:', error);
-        setDocuments(prev => prev.map(doc =>
-          doc.id === documentId
-            ? { ...doc, status: 'error', extractedText: 'Erreur lors du traitement du document' }
-            : doc
-        ));
+        console.error('Error processing document:', error)
+        setDocuments(prev =>
+          prev.map(doc =>
+            doc.id === documentId
+              ? {
+                  ...doc,
+                  status: 'error',
+                  extractedText: 'Erreur lors du traitement du document',
+                }
+              : doc
+          )
+        )
       }
     }
 
-    setIsProcessing(false);
-  };
+    setIsProcessing(false)
+  }
 
   const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
       reader.onload = () => {
-        const base64 = reader.result as string;
-        resolve(base64.split(',')[1]); // Remove data:image/jpeg;base64, prefix
-      };
-      reader.onerror = error => reject(error);
-    });
-  };
+        const base64 = reader.result as string
+        resolve(base64.split(',')[1]) // Remove data:image/jpeg;base64, prefix
+      }
+      reader.onerror = error => reject(error)
+    })
+  }
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'processing':
-        return <Loader2 className="w-4 h-4 animate-spin text-primary" />;
+        return <Loader2 className="w-4 h-4 animate-spin text-primary" />
       case 'completed':
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
+        return <CheckCircle className="w-4 h-4 text-green-500" />
       case 'error':
-        return <AlertCircle className="w-4 h-4 text-red-500" />;
+        return <AlertCircle className="w-4 h-4 text-red-500" />
       default:
-        return null;
+        return null
     }
-  };
+  }
 
   const getStatusBadge = (status: string) => {
     const variants = {
       processing: 'secondary',
       completed: 'default',
-      error: 'destructive'
-    } as const;
+      error: 'destructive',
+    } as const
 
     const labels = {
       processing: 'Traitement',
       completed: 'Terminé',
-      error: 'Erreur'
-    };
+      error: 'Erreur',
+    }
 
     return (
       <Badge variant={variants[status as keyof typeof variants]}>
         {labels[status as keyof typeof labels]}
       </Badge>
-    );
-  };
+    )
+  }
 
   return (
     <Card className="w-full">
@@ -126,7 +144,9 @@ const DocumentProcessor = () => {
             <FileText className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <CardTitle className="text-xl font-mono">Traitement de Documents IA</CardTitle>
+            <CardTitle className="text-xl font-mono">
+              Traitement de Documents IA
+            </CardTitle>
             <p className="text-muted-foreground font-mono text-sm">
               Analysez automatiquement vos factures, contrats et documents
             </p>
@@ -180,17 +200,21 @@ const DocumentProcessor = () => {
         {/* Processing Status */}
         {documents.length > 0 && (
           <div className="space-y-4">
-            <h3 className="text-lg font-mono font-semibold">Documents traités</h3>
+            <h3 className="text-lg font-mono font-semibold">
+              Documents traités
+            </h3>
 
             <div className="space-y-3">
-              {documents.map((doc) => (
+              {documents.map(doc => (
                 <Card key={doc.id} className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3 flex-1">
                       {getStatusIcon(doc.status)}
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="font-mono text-sm font-medium">{doc.fileName}</span>
+                          <span className="font-mono text-sm font-medium">
+                            {doc.fileName}
+                          </span>
                           {getStatusBadge(doc.status)}
                         </div>
 
@@ -200,8 +224,7 @@ const DocumentProcessor = () => {
                               <p className="text-sm font-mono whitespace-pre-wrap">
                                 {doc.extractedText.length > 300
                                   ? `${doc.extractedText.substring(0, 300)}...`
-                                  : doc.extractedText
-                                }
+                                  : doc.extractedText}
                               </p>
                             </div>
                             {doc.confidence > 0 && (
@@ -218,7 +241,8 @@ const DocumentProcessor = () => {
                           <Alert>
                             <AlertCircle className="h-4 w-4" />
                             <AlertDescription className="text-sm">
-                              {doc.extractedText || 'Erreur lors du traitement du document'}
+                              {doc.extractedText ||
+                                'Erreur lors du traitement du document'}
                             </AlertDescription>
                           </Alert>
                         )}
@@ -251,7 +275,7 @@ const DocumentProcessor = () => {
         </div>
       </CardContent>
     </Card>
-  );
-};
+  )
+}
 
-export default DocumentProcessor;
+export default DocumentProcessor

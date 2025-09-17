@@ -31,11 +31,11 @@ class Analytics {
 
     // Configuration Matomo (exemple)
     if (typeof window !== 'undefined') {
-      const _paq = (window as any)._paq = (window as any)._paq || []
+      const _paq = ((window as any)._paq = (window as any)._paq || [])
       _paq.push(['disableCookies']) // RGPD: Pas de cookies par défaut
       _paq.push(['trackPageView'])
       _paq.push(['enableLinkTracking'])
-      
+
       if (this.debug) {
         // Analytics initialized in debug mode
       }
@@ -54,7 +54,7 @@ class Analytics {
 
     // Envoyer à Matomo ou autre solution
     if (typeof window !== 'undefined' && (window as any)._paq) {
-      (window as any)._paq.push(['trackEvent', category, action, label, value])
+      ;(window as any)._paq.push(['trackEvent', category, action, label, value])
     }
   }
 
@@ -65,7 +65,7 @@ class Analytics {
     this.trackEvent({
       category: 'Conversion',
       action: type,
-      label: new Date().toISOString()
+      label: new Date().toISOString(),
     })
   }
 
@@ -77,7 +77,7 @@ class Analytics {
       category: 'Engagement',
       action: 'TimeOnPage',
       label: page,
-      value: seconds
+      value: seconds,
     })
   }
 
@@ -92,7 +92,7 @@ class Analytics {
     this.trackEvent({
       category: 'Error',
       action: error.name,
-      label: context || error.message
+      label: context || error.message,
     })
   }
 
@@ -100,7 +100,7 @@ class Analytics {
    * Obtenir le consentement RGPD
    */
   requestConsent(): Promise<boolean> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       // Implémenter la logique de consentement RGPD
       // Pour l'instant, on retourne false par défaut
       resolve(false)
@@ -121,7 +121,7 @@ export function usePageTracking(pageName: string) {
     analytics.trackEvent({
       category: 'Navigation',
       action: 'PageView',
-      label: pageName
+      label: pageName,
     })
 
     // Track time on page when leaving
@@ -138,22 +138,22 @@ export function useEventTracking() {
       analytics.trackEvent({
         category: 'Interaction',
         action: 'Click',
-        label: element
+        label: element,
       })
     },
     trackFormSubmit: (formName: string) => {
       analytics.trackEvent({
         category: 'Form',
         action: 'Submit',
-        label: formName
+        label: formName,
       })
     },
     trackScroll: (percentage: number) => {
       analytics.trackEvent({
         category: 'Engagement',
         action: 'Scroll',
-        value: percentage
+        value: percentage,
       })
-    }
+    },
   }
 }

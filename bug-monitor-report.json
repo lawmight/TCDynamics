@@ -1,0 +1,320 @@
+{
+  "timestamp": "2025-09-17T20:34:21.899Z",
+  "totalBugs": 51,
+  "criticalBugs": 1,
+  "bugsByType": {
+    "test-failure": 50,
+    "build-failure": 1
+  },
+  "bugsBySeverity": {
+    "high": 50,
+    "critical": 1
+  },
+  "bugs": [
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/__tests__/AIChatbot.test.tsx\u001b[2m [ src/components/__tests__/AIChatbot.test.tsx ]\u001b[22m",
+      "line": 3899,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/__tests__/AIDemo.test.tsx\u001b[2m [ src/components/__tests__/AIDemo.test.tsx ]\u001b[22m",
+      "line": 3919,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/__tests__/Contact.test.tsx\u001b[2m [ src/components/__tests__/Contact.test.tsx ]\u001b[22m",
+      "line": 3939,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/hooks/__tests__/useDemoForm.test.ts\u001b[2m [ src/hooks/__tests__/useDemoForm.test.ts ]\u001b[22m",
+      "line": 3940,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/__tests__/Contact.test.tsx\u001b[2m [ TCDynamics/src/components/__tests__/Contact.test.tsx ]\u001b[22m",
+      "line": 3941,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/__tests__/DocumentProcessor.test.tsx\u001b[2m [ src/components/__tests__/DocumentProcessor.test.tsx ]\u001b[22m",
+      "line": 3961,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/__tests__/DocumentProcessor.test.tsx\u001b[2m [ TCDynamics/src/components/__tests__/DocumentProcessor.test.tsx ]\u001b[22m",
+      "line": 3962,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/hooks/__tests__/useContactForm.test.ts\u001b[2m [ src/hooks/__tests__/useContactForm.test.ts ]\u001b[22m",
+      "line": 3983,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/__tests__/AIChatbot.test.tsx\u001b[2m [ TCDynamics/src/components/__tests__/AIChatbot.test.tsx ]\u001b[22m",
+      "line": 4003,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/__tests__/AIDemo.test.tsx\u001b[2m [ TCDynamics/src/components/__tests__/AIDemo.test.tsx ]\u001b[22m",
+      "line": 4023,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/__tests__/HowItWorks.test.tsx\u001b[2m > \u001b[22mHowItWorks Component\u001b[2m > \u001b[22mshould display the three main steps",
+      "line": 4046,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/__tests__/HowItWorks.test.tsx\u001b[2m > \u001b[22mHowItWorks Component\u001b[2m > \u001b[22mshould show step descriptions",
+      "line": 4215,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/__tests__/HowItWorks.test.tsx\u001b[2m > \u001b[22mHowItWorks Component\u001b[2m > \u001b[22mshould be accessible",
+      "line": 4384,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/__tests__/LocalAdvantages.test.tsx\u001b[2m > \u001b[22mLocalAdvantages Component\u001b[2m > \u001b[22mshould display key advantages",
+      "line": 4688,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/__tests__/LocalAdvantages.test.tsx\u001b[2m > \u001b[22mLocalAdvantages Component\u001b[2m > \u001b[22mshould show French hosting benefits",
+      "line": 4852,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/__tests__/LocalAdvantages.test.tsx\u001b[2m > \u001b[22mLocalAdvantages Component\u001b[2m > \u001b[22mshould display contact information",
+      "line": 5016,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/__tests__/LocalAdvantages.test.tsx\u001b[2m > \u001b[22mLocalAdvantages Component\u001b[2m > \u001b[22mshould have proper accessibility",
+      "line": 5180,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/__tests__/LocalAdvantages.test.tsx\u001b[2m > \u001b[22mLocalAdvantages Component\u001b[2m > \u001b[22mshould display security badges",
+      "line": 5629,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/__tests__/LocalAdvantages.test.tsx\u001b[2m > \u001b[22mLocalAdvantages Component\u001b[2m > \u001b[22mshould show compliance information",
+      "line": 5812,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/ui/__tests__/animated-counter.test.tsx\u001b[2m > \u001b[22mAnimatedCounter Component\u001b[2m > \u001b[22mshould render with initial value",
+      "line": 5976,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/ui/__tests__/animated-counter.test.tsx\u001b[2m > \u001b[22mAnimatedCounter Component\u001b[2m > \u001b[22mshould handle large numbers",
+      "line": 6003,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/ui/__tests__/animated-counter.test.tsx\u001b[2m > \u001b[22mAnimatedCounter Component\u001b[2m > \u001b[22mshould accept custom className",
+      "line": 6030,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/ui/__tests__/animated-counter.test.tsx\u001b[2m > \u001b[22mAnimatedCounter Component\u001b[2m > \u001b[22mshould handle decimal numbers",
+      "line": 6057,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/ui/__tests__/animated-counter.test.tsx\u001b[2m > \u001b[22mAnimatedCounter Component\u001b[2m > \u001b[22mshould be accessible",
+      "line": 6084,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/ui/__tests__/animated-counter.test.tsx\u001b[2m > \u001b[22mAnimatedCounter Component\u001b[2m > \u001b[22mshould format currency values",
+      "line": 6113,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/ui/__tests__/animated-counter.test.tsx\u001b[2m > \u001b[22mAnimatedCounter Component\u001b[2m > \u001b[22mshould handle percentage values",
+      "line": 6141,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/ui/__tests__/button.test.tsx\u001b[2m > \u001b[22mButton Component\u001b[2m > \u001b[22mshould show loading state",
+      "line": 6169,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m src/components/ui/__tests__/button.test.tsx\u001b[2m > \u001b[22mButton Component\u001b[2m > \u001b[22mshould be accessible",
+      "line": 6186,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/__tests__/HowItWorks.test.tsx\u001b[2m > \u001b[22mHowItWorks Component\u001b[2m > \u001b[22mshould display the three main steps",
+      "line": 6203,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/__tests__/HowItWorks.test.tsx\u001b[2m > \u001b[22mHowItWorks Component\u001b[2m > \u001b[22mshould show step descriptions",
+      "line": 6372,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/__tests__/HowItWorks.test.tsx\u001b[2m > \u001b[22mHowItWorks Component\u001b[2m > \u001b[22mshould be accessible",
+      "line": 6541,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/__tests__/LocalAdvantages.test.tsx\u001b[2m > \u001b[22mLocalAdvantages Component\u001b[2m > \u001b[22mshould display key advantages",
+      "line": 6845,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/__tests__/LocalAdvantages.test.tsx\u001b[2m > \u001b[22mLocalAdvantages Component\u001b[2m > \u001b[22mshould show French hosting benefits",
+      "line": 7009,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/__tests__/LocalAdvantages.test.tsx\u001b[2m > \u001b[22mLocalAdvantages Component\u001b[2m > \u001b[22mshould display contact information",
+      "line": 7173,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/__tests__/LocalAdvantages.test.tsx\u001b[2m > \u001b[22mLocalAdvantages Component\u001b[2m > \u001b[22mshould have proper accessibility",
+      "line": 7337,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/__tests__/LocalAdvantages.test.tsx\u001b[2m > \u001b[22mLocalAdvantages Component\u001b[2m > \u001b[22mshould display security badges",
+      "line": 7786,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/__tests__/LocalAdvantages.test.tsx\u001b[2m > \u001b[22mLocalAdvantages Component\u001b[2m > \u001b[22mshould show compliance information",
+      "line": 7969,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/hooks/__tests__/useContactForm.test.ts\u001b[2m > \u001b[22museContactForm\u001b[2m > \u001b[22mshould submit form successfully",
+      "line": 8133,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/hooks/__tests__/useContactForm.test.ts\u001b[2m > \u001b[22museContactForm\u001b[2m > \u001b[22mshould handle validation errors",
+      "line": 8156,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/hooks/__tests__/useDemoForm.test.ts\u001b[2m > \u001b[22museDemoForm\u001b[2m > \u001b[22mshould submit demo form successfully",
+      "line": 8182,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/hooks/__tests__/useDemoForm.test.ts\u001b[2m > \u001b[22museDemoForm\u001b[2m > \u001b[22mshould handle server validation errors",
+      "line": 8205,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/ui/__tests__/animated-counter.test.tsx\u001b[2m > \u001b[22mAnimatedCounter Component\u001b[2m > \u001b[22mshould render with initial value",
+      "line": 8231,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/ui/__tests__/animated-counter.test.tsx\u001b[2m > \u001b[22mAnimatedCounter Component\u001b[2m > \u001b[22mshould handle large numbers",
+      "line": 8258,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/ui/__tests__/animated-counter.test.tsx\u001b[2m > \u001b[22mAnimatedCounter Component\u001b[2m > \u001b[22mshould accept custom className",
+      "line": 8285,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/ui/__tests__/animated-counter.test.tsx\u001b[2m > \u001b[22mAnimatedCounter Component\u001b[2m > \u001b[22mshould handle decimal numbers",
+      "line": 8312,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/ui/__tests__/animated-counter.test.tsx\u001b[2m > \u001b[22mAnimatedCounter Component\u001b[2m > \u001b[22mshould be accessible",
+      "line": 8339,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/ui/__tests__/animated-counter.test.tsx\u001b[2m > \u001b[22mAnimatedCounter Component\u001b[2m > \u001b[22mshould format currency values",
+      "line": 8368,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/ui/__tests__/animated-counter.test.tsx\u001b[2m > \u001b[22mAnimatedCounter Component\u001b[2m > \u001b[22mshould handle percentage values",
+      "line": 8396,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/ui/__tests__/button.test.tsx\u001b[2m > \u001b[22mButton Component\u001b[2m > \u001b[22mshould show loading state",
+      "line": 8424,
+      "severity": "high"
+    },
+    {
+      "type": "test-failure",
+      "message": "\u001b[41m\u001b[1m FAIL \u001b[22m\u001b[49m TCDynamics/src/components/ui/__tests__/button.test.tsx\u001b[2m > \u001b[22mButton Component\u001b[2m > \u001b[22mshould be accessible",
+      "line": 8441,
+      "severity": "high"
+    },
+    {
+      "type": "build-failure",
+      "message": "Build process failed",
+      "severity": "critical"
+    }
+  ]
+}

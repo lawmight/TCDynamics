@@ -79,7 +79,7 @@ router.post(
 
     // Vérifier la connexion
     await transporter.verify()
-    console.log('✅ Serveur email Zoho prêt - contact@workflowai.fr')
+    // console.log('✅ Serveur email Zoho prêt - contact@workflowai.fr')
 
     // Préparer l'email
     const emailData = emailTemplates.contact({
@@ -98,7 +98,7 @@ router.post(
       ...emailData,
     })
 
-    console.log('�� Email envoyé:', info.messageId)
+    // console.log('�� Email envoyé:', info.messageId)
 
     // Réponse de succès
     res.status(200).json({

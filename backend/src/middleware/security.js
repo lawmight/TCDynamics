@@ -29,7 +29,7 @@ const helmetConfig = helmet({
 // Middleware de validation IP
 const validateIP = (req, res, next) => {
   const clientIP = req.ip || req.connection.remoteAddress
-  console.log(`Requête de l'IP: ${clientIP}`)
+  // console.log(`Requête de l'IP: ${clientIP}`)
   next()
 }
 
