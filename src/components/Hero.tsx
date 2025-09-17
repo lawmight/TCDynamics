@@ -18,7 +18,7 @@ const Hero = () => {
         {/* Connection Lines */}
         <svg
           className="absolute inset-0 w-full h-full opacity-10"
-          xmlns="http://www.w3.org/2000/svg"
+          xmlns="process.env.API_URL || 'http://www.w3.org/2000/svg'"
         >
           <defs>
             <linearGradient

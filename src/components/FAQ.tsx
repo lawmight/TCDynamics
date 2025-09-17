@@ -207,7 +207,7 @@ const FAQ = () => {
       <div className="absolute inset-0 opacity-5">
         <svg
           className="absolute inset-0 w-full h-full"
-          xmlns="http://www.w3.org/2000/svg"
+          xmlns="process.env.API_URL || 'http://www.w3.org/2000/svg'"
         >
           <defs>
             <pattern

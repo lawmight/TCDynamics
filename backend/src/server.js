@@ -29,7 +29,7 @@ app.use(addRequestId)
 app.use(helmetConfig)
 app.use(
   cors({
-    origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : (process.env.FRONTEND_URL || 'http://localhost:8080'),
+    origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : (process.env.FRONTEND_URL || 'process.env.API_URL || 'http://localhost:8080''),
     credentials: true,
   })
 )
@@ -140,17 +140,17 @@ app.listen(PORT, () => {
     environment: process.env.NODE_ENV,
     emailConfigured: !!process.env.EMAIL_USER,
     frontendUrl: process.env.FRONTEND_URL,
-    apiDocsUrl: `http://localhost:${PORT}/api-docs`,
-    openApiUrl: `http://localhost:${PORT}/api-docs.json`
+    apiDocsUrl: `process.env.API_URL || 'http://localhost:${PORT}/api-docs`,'
+    openApiUrl: `process.env.API_URL || 'http://localhost:${PORT}/api-docs.json`'
   })
 
   // Logs pour la console aussi
-  console.log(`🚀 Serveur TCDynamics démarré sur le port ${PORT}`)
-  console.log(`📧 Email configuré: ${process.env.EMAIL_USER}`)
-  console.log(`�� Frontend URL: ${process.env.FRONTEND_URL}`)
-  console.log(`🔒 Environnement: ${process.env.NODE_ENV}`)
-  console.log(`📚 Documentation API: http://localhost:${PORT}/api-docs`)
-  console.log(`🔗 Spécification OpenAPI: http://localhost:${PORT}/api-docs.json`)
+  // console.log(`🚀 Serveur TCDynamics démarré sur le port ${PORT}`)
+  // console.log(`📧 Email configuré: ${process.env.EMAIL_USER}`)
+  // console.log(`�� Frontend URL: ${process.env.FRONTEND_URL}`)
+  // console.log(`🔒 Environnement: ${process.env.NODE_ENV}`)
+  // console.log(`📚 Documentation API: process.env.API_URL || 'http://localhost:${PORT}/api-docs`)'
+  // console.log(`🔗 Spécification OpenAPI: process.env.API_URL || 'http://localhost:${PORT}/api-docs.json`)'
 })
 
 // Gestion gracieuse de l'arrêt

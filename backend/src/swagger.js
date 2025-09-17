@@ -11,7 +11,7 @@ const swaggerDefinition = {
     contact: {
       name: 'TCDynamics Support',
       email: 'contact@tcdynamics.fr',
-      url: 'https://tcdynamics.fr'
+      url: 'process.env.API_URL || 'process.env.API_URL || 'https://tcdynamics.fr'''
     },
     license: {
       name: 'Propriétaire',
@@ -20,11 +20,11 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: 'http://localhost:3001',
+      url: 'process.env.API_URL || 'http://localhost:3001'',
       description: 'Serveur de développement'
     },
     {
-      url: 'https://api.tcdynamics.fr',
+      url: 'process.env.API_URL || 'https://api.tcdynamics.fr'',
       description: 'Serveur de production'
     }
   ],
