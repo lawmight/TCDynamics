@@ -313,3 +313,4 @@ Ce logiciel est propriétaire et confidentiel. Toute reproduction ou distributio
     <a href="https://github.com/TCDynamics">GitHub</a>
   </p>
 </div>
+# Test trigger
