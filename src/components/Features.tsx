@@ -79,7 +79,7 @@ const Features = () => {
         {/* Subtle connection lines */}
         <svg
           className="absolute inset-0 w-full h-full opacity-5"
-          xmlns="process.env.API_URL || 'http://www.w3.org/2000/svg'"
+          xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
             <linearGradient
