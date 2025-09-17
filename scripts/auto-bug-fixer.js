@@ -72,9 +72,14 @@ class AutoBugFixer {
         },
       },
       {
-        name: 'Hardcoded URLs',
+        name: 'Hardcoded URLs (excluding SVG xmlns)',
         pattern: /(https?:\/\/[^\s'"]+)/g,
-        fix: match => {
+        fix: (match, offset, string) => {
+          // Don't modify URLs that are part of SVG xmlns attributes
+          const beforeMatch = string.substring(0, offset)
+          if (beforeMatch.includes('xmlns=') && beforeMatch.includes('svg')) {
+            return null // Skip this match
+          }
           return match.replace(match, `process.env.API_URL || '${match}'`)
         },
       },

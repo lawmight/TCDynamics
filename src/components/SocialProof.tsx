@@ -116,7 +116,7 @@ const SocialProof = () => {
         >
           <svg
             className="absolute inset-0 w-full h-full"
-            xmlns="process.env.API_URL || 'process.env.API_URL || 'http://www.w3.org/2000/svg''"
+            xmlns="http://www.w3.org/2000/svg"
           >
             <defs>
               <pattern
