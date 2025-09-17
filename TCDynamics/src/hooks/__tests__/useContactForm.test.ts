@@ -1,0 +1,78 @@
+import { renderHook, act } from '@testing-library/react'
+import { vi } from 'vitest'
+import { useContactForm } from '../useContactForm'
+
+// Mock fetch
+global.fetch = vi.fn()
+
+describe('useContactForm', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('should submit form successfully', async () => {
+    const mockResponse = {
+      success: true,
+      message: 'Message envoyé avec succès',
+    }
+
+    ;(fetch as any).mockResolvedValueOnce({
+      json: async () => mockResponse,
+    })
+
+    const { result } = renderHook(() => useContactForm())
+
+    await act(async () => {
+      await result.current.submitForm({
+        name: 'Test User',
+        email: 'test@example.com',
+        message: 'Test message',
+      })
+    })
+
+    expect(result.current.response).toEqual(mockResponse)
+    expect(result.current.isSubmitting).toBe(false)
+  })
+
+  it('should handle errors', async () => {
+    ;(fetch as any).mockRejectedValueOnce(new Error('Network error'))
+
+    const { result } = renderHook(() => useContactForm())
+
+    await act(async () => {
+      await result.current.submitForm({
+        name: 'Test User',
+        email: 'test@example.com',
+        message: 'Test message',
+      })
+    })
+
+    expect(result.current.response?.success).toBe(false)
+    expect(result.current.response?.message).toContain('Erreur de connexion')
+  })
+
+  it('should handle validation errors', async () => {
+    const mockResponse = {
+      success: false,
+      message: 'Données invalides',
+      errors: ['Email requis', 'Message trop court'],
+    }
+
+    ;(fetch as any).mockResolvedValueOnce({
+      json: async () => mockResponse,
+    })
+
+    const { result } = renderHook(() => useContactForm())
+
+    await act(async () => {
+      await result.current.submitForm({
+        name: 'Test User',
+        email: 'test@example.com',
+        message: 'Test message',
+      })
+    })
+
+    expect(result.current.response).toEqual(mockResponse)
+    expect(result.current.isSubmitting).toBe(false)
+  })
+})
