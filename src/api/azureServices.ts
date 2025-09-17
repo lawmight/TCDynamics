@@ -226,7 +226,7 @@ export class AzureOpenAIService {
       }
 
       // Store in Cosmos DB (this would normally call your Azure Function)
-      console.log('Storing conversation:', conversation);
+      console.log('Storing conversation:', conversation)
     } catch (error) {
       console.error('Failed to store conversation:', error)
     }
@@ -252,7 +252,7 @@ export class AzureVisionService {
 
   async processDocument(
     imageData: string,
-    _fileName: string
+    _fileName: string // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<DocumentProcessingResponse> {
     try {
       const url = `${this.endpoint}/vision/v3.2/read/analyze`
