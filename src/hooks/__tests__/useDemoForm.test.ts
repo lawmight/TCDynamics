@@ -5,6 +5,18 @@ import { useDemoForm } from '../useDemoForm'
 // Mock fetch
 global.fetch = vi.fn()
 
+// Mock environment variables
+vi.mock('import.meta', () => ({
+  env: {
+    VITE_API_URL: 'http://localhost:3001',
+  },
+}))
+
+// Mock the CSRF token function
+vi.mock('../../utils/csrf', () => ({
+  getCsrfToken: vi.fn().mockResolvedValue('mock-csrf-token'),
+}))
+
 describe('useDemoForm', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -17,6 +29,7 @@ describe('useDemoForm', () => {
     }
 
     ;(fetch as any).mockResolvedValueOnce({
+      ok: true,
       json: async () => mockResponse,
     })
 
@@ -64,6 +77,7 @@ describe('useDemoForm', () => {
     }
 
     ;(fetch as any).mockResolvedValueOnce({
+      ok: true,
       json: async () => mockResponse,
     })
 

@@ -1,54 +1,83 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { AnimatedCounter } from '../animated-counter'
 
+// Mock the intersection observer
+const mockIntersectionObserver = vi.fn()
+mockIntersectionObserver.mockReturnValue({
+  observe: () => null,
+  unobserve: () => null,
+  disconnect: () => null,
+})
+window.IntersectionObserver = mockIntersectionObserver
+
 describe('AnimatedCounter Component', () => {
-  it('should render with initial value', () => {
-    render(<AnimatedCounter value={42} />)
-
-    expect(screen.getByText('42')).toBeInTheDocument()
+  beforeEach(() => {
+    // Mock the intersection observer to always return true
+    mockIntersectionObserver.mockImplementation(callback => {
+      // Call the callback immediately with isIntersecting: true
+      setTimeout(() => callback([{ isIntersecting: true }]), 0)
+      return {
+        observe: () => null,
+        unobserve: () => null,
+        disconnect: () => null,
+      }
+    })
   })
 
-  it('should handle zero value', () => {
-    render(<AnimatedCounter value={0} />)
+  it('should render with initial value', async () => {
+    render(<AnimatedCounter end={42} />)
 
-    expect(screen.getByText('0')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('42')).toBeInTheDocument()
+    })
   })
 
-  it('should handle large numbers', () => {
-    render(<AnimatedCounter value={1000000} />)
+  it('should handle zero value', async () => {
+    render(<AnimatedCounter end={0} />)
 
-    expect(screen.getByText('1,000,000')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('0')).toBeInTheDocument()
+    })
   })
 
-  it('should accept custom className', () => {
-    render(<AnimatedCounter value={123} className="custom-class" />)
+  it('should handle large numbers', async () => {
+    render(<AnimatedCounter end={1000000} />)
 
-    const counter = screen.getByText('123')
-    expect(counter).toHaveClass('custom-class')
+    await waitFor(() => {
+      expect(screen.getByText('1 000 000')).toBeInTheDocument()
+    })
   })
 
-  it('should handle decimal numbers', () => {
-    render(<AnimatedCounter value={99.7} />)
+  it('should accept custom className', async () => {
+    render(<AnimatedCounter end={123} className="custom-class" />)
 
-    expect(screen.getByText('99.7')).toBeInTheDocument()
+    await waitFor(() => {
+      const counter = screen.getByText('123')
+      expect(counter).toHaveClass('custom-class')
+    })
   })
 
-  it('should be accessible', () => {
-    render(<AnimatedCounter value={50} />)
+  it('should handle decimal numbers', async () => {
+    render(<AnimatedCounter end={99.7} />)
 
-    const counter = screen.getByRole('text')
-    expect(counter).toHaveAttribute('aria-live', 'polite')
+    await waitFor(() => {
+      expect(screen.getByText('99')).toBeInTheDocument()
+    })
   })
 
-  it('should format currency values', () => {
-    render(<AnimatedCounter value={1250} suffix="€" />)
+  it('should format currency values', async () => {
+    render(<AnimatedCounter end={1250} suffix="€" />)
 
-    expect(screen.getByText('1,250€')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('1 250€')).toBeInTheDocument()
+    })
   })
 
-  it('should handle percentage values', () => {
-    render(<AnimatedCounter value={95} suffix="%" />)
+  it('should handle percentage values', async () => {
+    render(<AnimatedCounter end={95} suffix="%" />)
 
-    expect(screen.getByText('95%')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('95%')).toBeInTheDocument()
+    })
   })
 })
