@@ -23,16 +23,10 @@
       "description": "$BlobTrigger_description",
       "name": "Azure Blob Storage trigger",
       "language": "C#",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "blob",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "connection",
-        "path"
-      ],
+      "userPrompt": ["connection", "path"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
@@ -61,16 +55,10 @@
       "description": "$BlobTrigger_description",
       "name": "Azure Blob Storage trigger",
       "language": "Custom",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "blob",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "connection",
-        "path"
-      ],
+      "userPrompt": ["connection", "path"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
@@ -103,16 +91,10 @@
       "description": "$BlobTrigger_description",
       "name": "Azure Blob Storage trigger",
       "language": "JavaScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "blob",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "connection",
-        "path"
-      ],
+      "userPrompt": ["connection", "path"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
@@ -145,16 +127,10 @@
       "description": "$BlobTrigger_description",
       "name": "Azure Blob Storage trigger",
       "language": "PowerShell",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "blob",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "connection",
-        "path"
-      ],
+      "userPrompt": ["connection", "path"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
@@ -188,19 +164,11 @@
       "description": "$BlobTrigger_description",
       "name": "Azure Blob Storage trigger",
       "language": "Python",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "blob",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "connection",
-        "path"
-      ],
-      "filters": [
-        "Python3"
-      ],
+      "userPrompt": ["connection", "path"],
+      "filters": ["Python3"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
@@ -233,16 +201,10 @@
       "description": "$BlobTrigger_description",
       "name": "Azure Blob Storage trigger",
       "language": "TypeScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "blob",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "connection",
-        "path"
-      ],
+      "userPrompt": ["connection", "path"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
@@ -276,10 +238,7 @@
       "description": "$CosmosDBTrigger_description",
       "name": "Azure Cosmos DB trigger",
       "language": "C#",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "cosmosDB",
       "enabledInTryMode": false,
       "userPrompt": [
@@ -320,10 +279,7 @@
       "description": "$CosmosDBTrigger_description",
       "name": "Azure Cosmos DB trigger",
       "language": "Custom",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "cosmosDB",
       "enabledInTryMode": false,
       "userPrompt": [
@@ -367,10 +323,7 @@
       "description": "$CosmosDBTrigger_description",
       "name": "Azure Cosmos DB trigger",
       "language": "JavaScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "cosmosDB",
       "enabledInTryMode": false,
       "userPrompt": [
@@ -414,10 +367,7 @@
       "description": "$CosmosDBTrigger_description",
       "name": "Azure Cosmos DB trigger",
       "language": "PowerShell",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "cosmosDB",
       "enabledInTryMode": false,
       "userPrompt": [
@@ -462,10 +412,7 @@
       "description": "$CosmosDBTrigger_description",
       "name": "Azure Cosmos DB trigger",
       "language": "Python",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "cosmosDB",
       "enabledInTryMode": false,
       "userPrompt": [
@@ -481,9 +428,7 @@
           "version": "3.0.5"
         }
       ],
-      "filters": [
-        "Python3"
-      ]
+      "filters": ["Python3"]
     }
   },
   {
@@ -512,10 +457,7 @@
       "description": "$CosmosDBTrigger_description",
       "name": "Azure Cosmos DB trigger",
       "language": "TypeScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "cosmosDB",
       "enabledInTryMode": false,
       "userPrompt": [
@@ -553,10 +495,7 @@
       "description": "$DurableFunctionsActivity_description",
       "name": "Durable Functions activity",
       "language": "C#",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_durableFunctions"
-      ],
+      "category": ["$temp_category_core", "$temp_category_durableFunctions"],
       "categoryStyle": "other",
       "enabledInTryMode": false,
       "userPrompt": [],
@@ -588,10 +527,7 @@
       "description": "$DurableFunctionsActivity_description",
       "name": "Durable Functions activity",
       "language": "JavaScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_durableFunctions"
-      ],
+      "category": ["$temp_category_core", "$temp_category_durableFunctions"],
       "categoryStyle": "other",
       "enabledInTryMode": false,
       "userPrompt": [],
@@ -623,10 +559,7 @@
       "description": "$DurableFunctionsActivity_description",
       "name": "Durable Functions activity",
       "language": "TypeScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_durableFunctions"
-      ],
+      "category": ["$temp_category_core", "$temp_category_durableFunctions"],
       "categoryStyle": "other",
       "enabledInTryMode": false,
       "userPrompt": [],
@@ -652,10 +585,7 @@
           "type": "httpTrigger",
           "direction": "in",
           "route": "orchestrators/{functionName}",
-          "methods": [
-            "post",
-            "get"
-          ]
+          "methods": ["post", "get"]
         },
         {
           "name": "$return",
@@ -674,10 +604,7 @@
       "description": "$DurableFunctionsHttpStart_description",
       "name": "Durable Functions HTTP starter",
       "language": "C#",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_durableFunctions"
-      ],
+      "category": ["$temp_category_core", "$temp_category_durableFunctions"],
       "categoryStyle": "other",
       "enabledInTryMode": false,
       "userPrompt": [],
@@ -703,10 +630,7 @@
           "type": "httpTrigger",
           "direction": "in",
           "route": "orchestrators/{functionName}",
-          "methods": [
-            "post",
-            "get"
-          ]
+          "methods": ["post", "get"]
         },
         {
           "name": "$return",
@@ -725,15 +649,10 @@
       "description": "$DurableFunctionsHttpStart_description",
       "name": "Durable Functions HTTP starter",
       "language": "JavaScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_durableFunctions"
-      ],
+      "category": ["$temp_category_core", "$temp_category_durableFunctions"],
       "categoryStyle": "other",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "authLevel"
-      ],
+      "userPrompt": ["authLevel"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
@@ -756,10 +675,7 @@
           "type": "httpTrigger",
           "direction": "in",
           "route": "orchestrators/{functionName}",
-          "methods": [
-            "post",
-            "get"
-          ]
+          "methods": ["post", "get"]
         },
         {
           "name": "$return",
@@ -778,15 +694,10 @@
       "description": "$DurableFunctionsHttpStart_description",
       "name": "Durable Functions HTTP starter",
       "language": "TypeScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_durableFunctions"
-      ],
+      "category": ["$temp_category_core", "$temp_category_durableFunctions"],
       "categoryStyle": "other",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "authLevel"
-      ],
+      "userPrompt": ["authLevel"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
@@ -815,10 +726,7 @@
       "description": "$DurableFunctionsOrchestrator_description",
       "name": "Durable Functions orchestrator",
       "language": "C#",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_durableFunctions"
-      ],
+      "category": ["$temp_category_core", "$temp_category_durableFunctions"],
       "categoryStyle": "other",
       "enabledInTryMode": false,
       "userPrompt": [],
@@ -850,10 +758,7 @@
       "description": "$DurableFunctionsOrchestrator_description",
       "name": "Durable Functions orchestrator",
       "language": "JavaScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_durableFunctions"
-      ],
+      "category": ["$temp_category_core", "$temp_category_durableFunctions"],
       "categoryStyle": "other",
       "enabledInTryMode": false,
       "userPrompt": [],
@@ -885,10 +790,7 @@
       "description": "$DurableFunctionsOrchestrator_description",
       "name": "Durable Functions orchestrator",
       "language": "TypeScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_durableFunctions"
-      ],
+      "category": ["$temp_category_core", "$temp_category_durableFunctions"],
       "categoryStyle": "other",
       "enabledInTryMode": false,
       "userPrompt": [],
@@ -921,10 +823,7 @@
       "description": "$EventGridTrigger_description",
       "name": "Azure Event Grid trigger",
       "language": "C#",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "eventGrid",
       "enabledInTryMode": false,
       "userPrompt": [],
@@ -954,10 +853,7 @@
       "description": "$EventGridTrigger_description",
       "name": "Azure Event Grid trigger",
       "language": "Custom",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "eventGrid",
       "enabledInTryMode": false,
       "userPrompt": [],
@@ -990,10 +886,7 @@
       "description": "$EventGridTrigger_description",
       "name": "Azure Event Grid trigger",
       "language": "JavaScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "eventGrid",
       "enabledInTryMode": false,
       "userPrompt": [],
@@ -1026,10 +919,7 @@
       "description": "$EventGridTrigger_description",
       "name": "Azure Event Grid trigger",
       "language": "PowerShell",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "eventGrid",
       "enabledInTryMode": false,
       "userPrompt": [],
@@ -1063,10 +953,7 @@
       "description": "$EventGridTrigger_description",
       "name": "Azure Event Grid trigger",
       "language": "Python",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "eventGrid",
       "enabledInTryMode": false,
       "userPrompt": [],
@@ -1099,10 +986,7 @@
       "description": "$EventGridTrigger_description",
       "name": "Azure Event Grid trigger",
       "language": "TypeScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "eventGrid",
       "enabledInTryMode": false,
       "userPrompt": [],
@@ -1139,17 +1023,10 @@
       "description": "$EventHubTrigger_description",
       "name": "Azure Event Hub trigger",
       "language": "C#",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "eventHub",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "eventHubName",
-        "consumerGroup"
-      ],
+      "userPrompt": ["connection", "eventHubName", "consumerGroup"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
@@ -1180,17 +1057,10 @@
       "description": "$EventHubTrigger_description",
       "name": "Azure Event Hub trigger",
       "language": "Custom",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "eventHub",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "eventHubName",
-        "consumerGroup"
-      ],
+      "userPrompt": ["connection", "eventHubName", "consumerGroup"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
@@ -1225,17 +1095,10 @@
       "description": "$EventHubTrigger_description",
       "name": "Azure Event Hub trigger",
       "language": "JavaScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "eventHub",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "eventHubName",
-        "consumerGroup"
-      ],
+      "userPrompt": ["connection", "eventHubName", "consumerGroup"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
@@ -1269,17 +1132,10 @@
       "description": "$EventHubTrigger_description",
       "name": "Azure Event Hub trigger",
       "language": "PowerShell",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "eventHub",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "eventHubName",
-        "consumerGroup"
-      ],
+      "userPrompt": ["connection", "eventHubName", "consumerGroup"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
@@ -1314,17 +1170,10 @@
       "description": "$EventHubTrigger_description",
       "name": "Azure Event Hub trigger",
       "language": "Python",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "eventHub",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "eventHubName",
-        "consumerGroup"
-      ],
+      "userPrompt": ["connection", "eventHubName", "consumerGroup"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
@@ -1359,17 +1208,10 @@
       "description": "$EventHubTrigger_description",
       "name": "Azure Event Hub trigger",
       "language": "TypeScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "eventHub",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "eventHubName",
-        "consumerGroup"
-      ],
+      "userPrompt": ["connection", "eventHubName", "consumerGroup"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
@@ -1393,10 +1235,7 @@
           "name": "req",
           "type": "httpTrigger",
           "direction": "in",
-          "methods": [
-            "get",
-            "post"
-          ]
+          "methods": ["get", "post"]
         },
         {
           "name": "$return",
@@ -1410,15 +1249,10 @@
       "description": "$HttpTrigger_description",
       "name": "HTTP trigger",
       "language": "C#",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_api"
-      ],
+      "category": ["$temp_category_core", "$temp_category_api"],
       "categoryStyle": "http",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "authLevel"
-      ]
+      "userPrompt": ["authLevel"]
     }
   },
   {
@@ -1432,10 +1266,7 @@
           "type": "httpTrigger",
           "direction": "in",
           "name": "req",
-          "methods": [
-            "get",
-            "post"
-          ]
+          "methods": ["get", "post"]
         },
         {
           "type": "http",
@@ -1450,15 +1281,10 @@
       "name": "HTTP trigger",
       "trigger": "HttpTrigger",
       "language": "Custom",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_api"
-      ],
+      "category": ["$temp_category_core", "$temp_category_api"],
       "categoryStyle": "http",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "authLevel"
-      ]
+      "userPrompt": ["authLevel"]
     }
   },
   {
@@ -1475,10 +1301,7 @@
           "type": "httpTrigger",
           "direction": "in",
           "name": "req",
-          "methods": [
-            "get",
-            "post"
-          ]
+          "methods": ["get", "post"]
         },
         {
           "type": "http",
@@ -1493,15 +1316,10 @@
       "name": "HTTP trigger",
       "language": "JavaScript",
       "trigger": "HttpTrigger",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_api"
-      ],
+      "category": ["$temp_category_core", "$temp_category_api"],
       "categoryStyle": "http",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "authLevel"
-      ]
+      "userPrompt": ["authLevel"]
     }
   },
   {
@@ -1518,10 +1336,7 @@
           "type": "httpTrigger",
           "direction": "in",
           "name": "Request",
-          "methods": [
-            "get",
-            "post"
-          ]
+          "methods": ["get", "post"]
         },
         {
           "type": "http",
@@ -1536,15 +1351,10 @@
       "name": "HTTP trigger",
       "language": "PowerShell",
       "trigger": "HttpTrigger",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_api"
-      ],
+      "category": ["$temp_category_core", "$temp_category_api"],
       "categoryStyle": "http",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "authLevel"
-      ]
+      "userPrompt": ["authLevel"]
     }
   },
   {
@@ -1562,10 +1372,7 @@
           "type": "httpTrigger",
           "direction": "in",
           "name": "req",
-          "methods": [
-            "get",
-            "post"
-          ]
+          "methods": ["get", "post"]
         },
         {
           "type": "http",
@@ -1580,18 +1387,11 @@
       "name": "HTTP trigger",
       "language": "Python",
       "trigger": "HttpTrigger",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_api"
-      ],
+      "category": ["$temp_category_core", "$temp_category_api"],
       "categoryStyle": "http",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "authLevel"
-      ],
-      "filters": [
-        "Python3"
-      ]
+      "userPrompt": ["authLevel"],
+      "filters": ["Python3"]
     }
   },
   {
@@ -1608,10 +1408,7 @@
           "type": "httpTrigger",
           "direction": "in",
           "name": "req",
-          "methods": [
-            "get",
-            "post"
-          ]
+          "methods": ["get", "post"]
         },
         {
           "type": "http",
@@ -1626,15 +1423,10 @@
       "name": "HTTP trigger",
       "language": "TypeScript",
       "trigger": "HttpTrigger",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_api"
-      ],
+      "category": ["$temp_category_core", "$temp_category_api"],
       "categoryStyle": "http",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "authLevel"
-      ]
+      "userPrompt": ["authLevel"]
     }
   },
   {
@@ -1661,16 +1453,10 @@
       "description": "$IoTHubTrigger_description",
       "name": "IoT Hub (Event Hub)",
       "language": "C#",
-      "category": [
-        "$temp_category_IoTHub"
-      ],
+      "category": ["$temp_category_IoTHub"],
       "categoryStyle": "iot",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "path",
-        "consumerGroup"
-      ],
+      "userPrompt": ["connection", "path", "consumerGroup"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
@@ -1701,16 +1487,10 @@
       "description": "$IoTHubTrigger_description",
       "name": "IoT Hub (Event Hub)",
       "language": "Custom",
-      "category": [
-        "$temp_category_IoTHub"
-      ],
+      "category": ["$temp_category_IoTHub"],
       "categoryStyle": "iot",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "path",
-        "consumerGroup"
-      ],
+      "userPrompt": ["connection", "path", "consumerGroup"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
@@ -1745,16 +1525,10 @@
       "description": "$IoTHubTrigger_description",
       "name": "IoT Hub (Event Hub)",
       "language": "JavaScript",
-      "category": [
-        "$temp_category_IoTHub"
-      ],
+      "category": ["$temp_category_IoTHub"],
       "categoryStyle": "iot",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "path",
-        "consumerGroup"
-      ],
+      "userPrompt": ["connection", "path", "consumerGroup"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
@@ -1788,16 +1562,10 @@
       "description": "$IoTHubTrigger_description",
       "name": "IoT Hub (Event Hub)",
       "language": "PowerShell",
-      "category": [
-        "$temp_category_IoTHub"
-      ],
+      "category": ["$temp_category_IoTHub"],
       "categoryStyle": "iot",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "path",
-        "consumerGroup"
-      ],
+      "userPrompt": ["connection", "path", "consumerGroup"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
@@ -1832,16 +1600,10 @@
       "description": "$IoTHubTrigger_description",
       "name": "IoT Hub (Event Hub)",
       "language": "TypeScript",
-      "category": [
-        "$temp_category_IoTHub"
-      ],
+      "category": ["$temp_category_IoTHub"],
       "categoryStyle": "iot",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "path",
-        "consumerGroup"
-      ],
+      "userPrompt": ["connection", "path", "consumerGroup"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
@@ -1874,16 +1636,10 @@
       "description": "$QueueTrigger_description",
       "name": "Azure Queue Storage trigger",
       "language": "C#",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "queue",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "connection",
-        "queueName"
-      ],
+      "userPrompt": ["connection", "queueName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
@@ -1912,16 +1668,10 @@
       "description": "$QueueTrigger_description",
       "name": "Azure Queue Storage trigger",
       "language": "Custom",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "queue",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "connection",
-        "queueName"
-      ],
+      "userPrompt": ["connection", "queueName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
@@ -1954,16 +1704,10 @@
       "description": "$QueueTrigger_description",
       "name": "Azure Queue Storage trigger",
       "language": "JavaScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "queue",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "connection",
-        "queueName"
-      ],
+      "userPrompt": ["connection", "queueName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
@@ -1996,16 +1740,10 @@
       "description": "$QueueTrigger_description",
       "name": "Azure Queue Storage trigger",
       "language": "PowerShell",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "queue",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "connection",
-        "queueName"
-      ],
+      "userPrompt": ["connection", "queueName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
@@ -2039,19 +1777,11 @@
       "description": "$QueueTrigger_description",
       "name": "Azure Queue Storage trigger",
       "language": "Python",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "queue",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "connection",
-        "queueName"
-      ],
-      "filters": [
-        "Python3"
-      ],
+      "userPrompt": ["connection", "queueName"],
+      "filters": ["Python3"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
@@ -2084,16 +1814,10 @@
       "description": "$QueueTrigger_description",
       "name": "Azure Queue Storage trigger",
       "language": "TypeScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "queue",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "connection",
-        "queueName"
-      ],
+      "userPrompt": ["connection", "queueName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
@@ -2126,16 +1850,10 @@
       "description": "$RabbitMQTrigger_description",
       "name": "RabbitMQ trigger",
       "language": "C#",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "RabbitMQ",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "connectionStringSetting",
-        "queueName"
-      ],
+      "userPrompt": ["connectionStringSetting", "queueName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.RabbitMQ",
@@ -2164,16 +1882,10 @@
       "description": "$RabbitMQTrigger_description",
       "name": "RabbitMQ trigger",
       "language": "Custom",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "RabbitMQ",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "connectionStringSetting",
-        "queueName"
-      ],
+      "userPrompt": ["connectionStringSetting", "queueName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.RabbitMQ",
@@ -2206,16 +1918,10 @@
       "description": "$RabbitMQTrigger_description",
       "name": "RabbitMQ trigger",
       "language": "JavaScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "RabbitMQ",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "connectionStringSetting",
-        "queueName"
-      ],
+      "userPrompt": ["connectionStringSetting", "queueName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.RabbitMQ",
@@ -2248,16 +1954,10 @@
       "description": "$RabbitMQTrigger_description",
       "name": "RabbitMQ trigger",
       "language": "Powershell",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "RabbitMQ",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "connectionStringSetting",
-        "queueName"
-      ],
+      "userPrompt": ["connectionStringSetting", "queueName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.RabbitMQ",
@@ -2291,16 +1991,10 @@
       "description": "$RabbitMQTrigger_description",
       "name": "RabbitMQ trigger",
       "language": "Python",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "RabbitMQ",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "connectionStringSetting",
-        "queueName"
-      ],
+      "userPrompt": ["connectionStringSetting", "queueName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.RabbitMQ",
@@ -2333,16 +2027,10 @@
       "description": "$RabbitMQTrigger_description",
       "name": "RabbitMQ trigger",
       "language": "TypeScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "RabbitMQ",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "connectionStringSetting",
-        "queueName"
-      ],
+      "userPrompt": ["connectionStringSetting", "queueName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.RabbitMQ",
@@ -2381,17 +2069,10 @@
       "description": "$SendGrid_description",
       "name": "SendGrid",
       "language": "C#",
-      "category": [
-        "$temp_category_samples",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_samples", "$temp_category_dataProcessing"],
       "categoryStyle": "other",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "to",
-        "from",
-        "apiKey"
-      ],
+      "userPrompt": ["to", "from", "apiKey"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.SendGrid",
@@ -2433,19 +2114,10 @@
       "description": "$SendGrid_description",
       "name": "SendGrid",
       "language": "Custom",
-      "category": [
-        "$temp_category_samples",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_samples", "$temp_category_dataProcessing"],
       "categoryStyle": "other",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "to",
-        "from",
-        "subject",
-        "text",
-        "apiKey"
-      ],
+      "userPrompt": ["to", "from", "subject", "text", "apiKey"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.SendGrid",
@@ -2490,19 +2162,10 @@
       "description": "$SendGrid_description",
       "name": "SendGrid",
       "language": "JavaScript",
-      "category": [
-        "$temp_category_samples",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_samples", "$temp_category_dataProcessing"],
       "categoryStyle": "other",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "to",
-        "from",
-        "subject",
-        "text",
-        "apiKey"
-      ],
+      "userPrompt": ["to", "from", "subject", "text", "apiKey"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.SendGrid",
@@ -2547,19 +2210,10 @@
       "description": "$SendGrid_description",
       "name": "SendGrid",
       "language": "PowerShell",
-      "category": [
-        "$temp_category_samples",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_samples", "$temp_category_dataProcessing"],
       "categoryStyle": "other",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "to",
-        "from",
-        "subject",
-        "text",
-        "apiKey"
-      ],
+      "userPrompt": ["to", "from", "subject", "text", "apiKey"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.SendGrid",
@@ -2604,19 +2258,10 @@
       "description": "$SendGrid_description",
       "name": "SendGrid",
       "language": "TypeScript",
-      "category": [
-        "$temp_category_samples",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_samples", "$temp_category_dataProcessing"],
       "categoryStyle": "other",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "to",
-        "from",
-        "subject",
-        "text",
-        "apiKey"
-      ],
+      "userPrompt": ["to", "from", "subject", "text", "apiKey"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.SendGrid",
@@ -2652,16 +2297,10 @@
       "description": "$ServiceBusQueueTrigger_description",
       "name": "Azure Service Bus Queue trigger",
       "language": "C#",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "serviceBus",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "queueName"
-      ],
+      "userPrompt": ["connection", "queueName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
@@ -2690,16 +2329,10 @@
       "description": "$ServiceBusQueueTrigger_description",
       "name": "Azure Service Bus Queue trigger",
       "language": "Custom",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "serviceBus",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "queueName"
-      ],
+      "userPrompt": ["connection", "queueName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
@@ -2731,16 +2364,10 @@
       "description": "$ServiceBusQueueTrigger_description",
       "name": "Azure Service Bus Queue trigger",
       "language": "JavaScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "serviceBus",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "queueName"
-      ],
+      "userPrompt": ["connection", "queueName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
@@ -2772,16 +2399,10 @@
       "description": "$ServiceBusQueueTrigger_description",
       "name": "Azure Service Bus Queue trigger",
       "language": "PowerShell",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "serviceBus",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "queueName"
-      ],
+      "userPrompt": ["connection", "queueName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
@@ -2814,16 +2435,10 @@
       "description": "$ServiceBusQueueTrigger_description",
       "name": "Azure Service Bus Queue trigger",
       "language": "Python",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "serviceBus",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "queueName"
-      ],
+      "userPrompt": ["connection", "queueName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
@@ -2855,16 +2470,10 @@
       "description": "$ServiceBusQueueTrigger_description",
       "name": "Azure Service Bus Queue trigger",
       "language": "TypeScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "serviceBus",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "queueName"
-      ],
+      "userPrompt": ["connection", "queueName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
@@ -2897,17 +2506,10 @@
       "description": "$ServiceBusTopicTrigger_description",
       "name": "Azure Service Bus Topic trigger",
       "language": "C#",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "serviceBus",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "topicName",
-        "subscriptionName"
-      ],
+      "userPrompt": ["connection", "topicName", "subscriptionName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
@@ -2937,17 +2539,10 @@
       "description": "$ServiceBusTopicTrigger_description",
       "name": "Azure Service Bus Topic trigger",
       "language": "Custom",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "serviceBus",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "topicName",
-        "subscriptionName"
-      ],
+      "userPrompt": ["connection", "topicName", "subscriptionName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
@@ -2980,17 +2575,10 @@
       "description": "$ServiceBusTopicTrigger_description",
       "name": "Azure Service Bus Topic trigger",
       "language": "JavaScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "serviceBus",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "topicName",
-        "subscriptionName"
-      ],
+      "userPrompt": ["connection", "topicName", "subscriptionName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
@@ -3023,17 +2611,10 @@
       "description": "$ServiceBusTopicTrigger_description",
       "name": "Azure Service Bus Topic trigger",
       "language": "PowerShell",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "serviceBus",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "topicName",
-        "subscriptionName"
-      ],
+      "userPrompt": ["connection", "topicName", "subscriptionName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
@@ -3068,17 +2649,10 @@
       "description": "$ServiceBusTopicTrigger_description",
       "name": "Azure Service Bus Topic trigger",
       "language": "Python",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "serviceBus",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "topicName",
-        "subscriptionName"
-      ],
+      "userPrompt": ["connection", "topicName", "subscriptionName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
@@ -3111,17 +2685,10 @@
       "description": "$ServiceBusTopicTrigger_description",
       "name": "Azure Service Bus Topic trigger",
       "language": "TypeScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "serviceBus",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "connection",
-        "topicName",
-        "subscriptionName"
-      ],
+      "userPrompt": ["connection", "topicName", "subscriptionName"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
@@ -3144,9 +2711,7 @@
           "authLevel": "anonymous",
           "type": "httpTrigger",
           "direction": "in",
-          "methods": [
-            "post"
-          ],
+          "methods": ["post"],
           "name": "req",
           "route": "negotiate"
         },
@@ -3169,17 +2734,10 @@
       "description": "$signalRConnectionInfoNegotiate_description",
       "name": "SignalR negotiate HTTP trigger",
       "language": "C#",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_api"
-      ],
+      "category": ["$temp_category_core", "$temp_category_api"],
       "categoryStyle": "other",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "hubName",
-        "connectionStringSetting",
-        "route"
-      ],
+      "userPrompt": ["hubName", "connectionStringSetting", "route"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.SignalRService",
@@ -3199,9 +2757,7 @@
           "authLevel": "anonymous",
           "type": "httpTrigger",
           "direction": "in",
-          "methods": [
-            "post"
-          ],
+          "methods": ["post"],
           "name": "req",
           "route": "negotiate"
         },
@@ -3224,17 +2780,10 @@
       "description": "$signalRConnectionInfoNegotiate_description",
       "name": "SignalR negotiate HTTP trigger",
       "language": "Custom",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_api"
-      ],
+      "category": ["$temp_category_core", "$temp_category_api"],
       "categoryStyle": "other",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "hubName",
-        "connectionStringSetting",
-        "route"
-      ],
+      "userPrompt": ["hubName", "connectionStringSetting", "route"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.SignalRService",
@@ -3257,9 +2806,7 @@
           "authLevel": "anonymous",
           "type": "httpTrigger",
           "direction": "in",
-          "methods": [
-            "post"
-          ],
+          "methods": ["post"],
           "name": "req",
           "route": "negotiate"
         },
@@ -3282,17 +2829,10 @@
       "description": "$signalRConnectionInfoNegotiate_description",
       "name": "SignalR negotiate HTTP trigger",
       "language": "JavaScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_api"
-      ],
+      "category": ["$temp_category_core", "$temp_category_api"],
       "categoryStyle": "other",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "hubName",
-        "connectionStringSetting",
-        "route"
-      ],
+      "userPrompt": ["hubName", "connectionStringSetting", "route"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.SignalRService",
@@ -3315,9 +2855,7 @@
           "authLevel": "anonymous",
           "type": "httpTrigger",
           "direction": "in",
-          "methods": [
-            "post"
-          ],
+          "methods": ["post"],
           "name": "Request",
           "route": "negotiate"
         },
@@ -3340,17 +2878,10 @@
       "description": "$signalRConnectionInfoNegotiate_description",
       "name": "SignalR negotiate HTTP trigger",
       "language": "PowerShell",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_api"
-      ],
+      "category": ["$temp_category_core", "$temp_category_api"],
       "categoryStyle": "other",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "hubName",
-        "connectionStringSetting",
-        "route"
-      ],
+      "userPrompt": ["hubName", "connectionStringSetting", "route"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.SignalRService",
@@ -3373,9 +2904,7 @@
           "authLevel": "anonymous",
           "type": "httpTrigger",
           "direction": "in",
-          "methods": [
-            "post"
-          ],
+          "methods": ["post"],
           "name": "req",
           "route": "negotiate"
         },
@@ -3398,17 +2927,10 @@
       "description": "$signalRConnectionInfoNegotiate_description",
       "name": "SignalR negotiate HTTP trigger",
       "language": "TypeScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_api"
-      ],
+      "category": ["$temp_category_core", "$temp_category_api"],
       "categoryStyle": "other",
       "enabledInTryMode": false,
-      "userPrompt": [
-        "hubName",
-        "connectionStringSetting",
-        "route"
-      ],
+      "userPrompt": ["hubName", "connectionStringSetting", "route"],
       "extensions": [
         {
           "id": "Microsoft.Azure.WebJobs.Extensions.SignalRService",
@@ -3440,15 +2962,10 @@
       "description": "$TimerTrigger_description",
       "name": "Timer trigger",
       "language": "C#",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "timer",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "schedule"
-      ]
+      "userPrompt": ["schedule"]
     }
   },
   {
@@ -3470,15 +2987,10 @@
       "description": "$TimerTrigger_description",
       "name": "Timer trigger",
       "language": "Custom",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "timer",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "schedule"
-      ]
+      "userPrompt": ["schedule"]
     }
   },
   {
@@ -3504,15 +3016,10 @@
       "description": "$TimerTrigger_description",
       "name": "Timer trigger",
       "language": "JavaScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "timer",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "schedule"
-      ]
+      "userPrompt": ["schedule"]
     }
   },
   {
@@ -3538,15 +3045,10 @@
       "description": "$TimerTrigger_description",
       "name": "Timer trigger",
       "language": "PowerShell",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "timer",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "schedule"
-      ]
+      "userPrompt": ["schedule"]
     }
   },
   {
@@ -3573,18 +3075,11 @@
       "description": "$TimerTrigger_description",
       "name": "Timer trigger",
       "language": "Python",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "timer",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "schedule"
-      ],
-      "filters": [
-        "Python3"
-      ]
+      "userPrompt": ["schedule"],
+      "filters": ["Python3"]
     }
   },
   {
@@ -3609,15 +3104,10 @@
       "description": "$TimerTrigger_description",
       "name": "Timer trigger",
       "language": "TypeScript",
-      "category": [
-        "$temp_category_core",
-        "$temp_category_dataProcessing"
-      ],
+      "category": ["$temp_category_core", "$temp_category_dataProcessing"],
       "categoryStyle": "timer",
       "enabledInTryMode": true,
-      "userPrompt": [
-        "schedule"
-      ]
+      "userPrompt": ["schedule"]
     }
   }
 ]

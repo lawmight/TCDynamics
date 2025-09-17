@@ -5,9 +5,10 @@ const { logger } = require('../utils/logger')
  * Validates API key from Authorization header or X-API-Key header
  */
 const apiKeyAuth = (req, res, next) => {
-  const apiKey = req.headers['x-api-key'] || 
-                 req.headers['authorization']?.replace('Bearer ', '') ||
-                 req.query.apiKey
+  const apiKey =
+    req.headers['x-api-key'] ||
+    req.headers['authorization']?.replace('Bearer ', '') ||
+    req.query.apiKey
 
   const validApiKey = process.env.API_KEY || process.env.ADMIN_KEY
 
@@ -15,11 +16,11 @@ const apiKeyAuth = (req, res, next) => {
     logger.warn('API authentication attempted but no API key configured', {
       ip: req.ip,
       userAgent: req.get('User-Agent'),
-      requestId: req.headers['x-request-id']
+      requestId: req.headers['x-request-id'],
     })
     return res.status(500).json({
       success: false,
-      message: 'API authentication not configured'
+      message: 'API authentication not configured',
     })
   }
 
@@ -27,11 +28,11 @@ const apiKeyAuth = (req, res, next) => {
     logger.warn('API authentication failed: No API key provided', {
       ip: req.ip,
       userAgent: req.get('User-Agent'),
-      requestId: req.headers['x-request-id']
+      requestId: req.headers['x-request-id'],
     })
     return res.status(401).json({
       success: false,
-      message: 'API key required'
+      message: 'API key required',
     })
   }
 
@@ -39,18 +40,18 @@ const apiKeyAuth = (req, res, next) => {
     logger.warn('API authentication failed: Invalid API key', {
       ip: req.ip,
       userAgent: req.get('User-Agent'),
-      requestId: req.headers['x-request-id']
+      requestId: req.headers['x-request-id'],
     })
     return res.status(401).json({
       success: false,
-      message: 'Invalid API key'
+      message: 'Invalid API key',
     })
   }
 
   logger.info('API authentication successful', {
     ip: req.ip,
     userAgent: req.get('User-Agent'),
-    requestId: req.headers['x-request-id']
+    requestId: req.headers['x-request-id'],
   })
 
   next()
@@ -61,9 +62,10 @@ const apiKeyAuth = (req, res, next) => {
  * Validates API key if provided, but doesn't require it
  */
 const optionalApiKeyAuth = (req, res, next) => {
-  const apiKey = req.headers['x-api-key'] || 
-                 req.headers['authorization']?.replace('Bearer ', '') ||
-                 req.query.apiKey
+  const apiKey =
+    req.headers['x-api-key'] ||
+    req.headers['authorization']?.replace('Bearer ', '') ||
+    req.query.apiKey
 
   const validApiKey = process.env.API_KEY || process.env.ADMIN_KEY
 
@@ -71,21 +73,21 @@ const optionalApiKeyAuth = (req, res, next) => {
     logger.warn('Optional API authentication failed: Invalid API key', {
       ip: req.ip,
       userAgent: req.get('User-Agent'),
-      requestId: req.headers['x-request-id']
+      requestId: req.headers['x-request-id'],
     })
     return res.status(401).json({
       success: false,
-      message: 'Invalid API key'
+      message: 'Invalid API key',
     })
   }
 
   // Add authentication status to request
   req.authenticated = !!(apiKey && validApiKey && apiKey === validApiKey)
-  
+
   next()
 }
 
 module.exports = {
   apiKeyAuth,
-  optionalApiKeyAuth
+  optionalApiKeyAuth,
 }

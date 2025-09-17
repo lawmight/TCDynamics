@@ -1,84 +1,84 @@
 #!/usr/bin/env node
 
-import fs from 'fs';
-import path from 'path';
+import fs from 'fs'
+import path from 'path'
 
-console.log('🔍 Verifying BugBots setup...');
+console.log('🔍 Verifying BugBots setup...')
 
 const checks = [
   {
     name: 'GitHub Actions workflow',
     path: '.github/workflows/auto-bug-fix.yml',
-    required: true
+    required: true,
   },
   {
     name: 'CodeQL workflow',
     path: '.github/workflows/codeql.yml',
-    required: true
+    required: true,
   },
   {
     name: 'Dependabot configuration',
     path: '.github/dependabot.yml',
-    required: true
+    required: true,
   },
   {
     name: 'Auto bug fixer script',
     path: 'scripts/auto-bug-fixer.js',
-    required: true
+    required: true,
   },
   {
     name: 'Bug monitor script',
     path: 'scripts/bug-monitor.js',
-    required: true
+    required: true,
   },
   {
     name: 'ESLint configuration',
     path: '.eslintrc.js',
-    required: false
+    required: false,
   },
   {
     name: 'Prettier configuration',
     path: '.prettierrc',
-    required: false
-  }
-];
+    required: false,
+  },
+]
 
-let allGood = true;
+let allGood = true
 
 checks.forEach(check => {
   if (fs.existsSync(check.path)) {
-    console.log(`✅ ${check.name}: Found`);
+    console.log(`✅ ${check.name}: Found`)
   } else {
     if (check.required) {
-      console.log(`❌ ${check.name}: Missing (required)`);
-      allGood = false;
+      console.log(`❌ ${check.name}: Missing (required)`)
+      allGood = false
     } else {
-      console.log(`⚠️  ${check.name}: Missing (optional)`);
+      console.log(`⚠️  ${check.name}: Missing (optional)`)
     }
   }
-});
+})
 
 // Check package.json scripts
-const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-const requiredScripts = ['bug-fix', 'bug-monitor'];
+const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
+const requiredScripts = ['bug-fix', 'bug-monitor']
 
 requiredScripts.forEach(script => {
   if (packageJson.scripts && packageJson.scripts[script]) {
-    console.log(`✅ Package script '${script}': Found`);
+    console.log(`✅ Package script '${script}': Found`)
   } else {
-    console.log(`❌ Package script '${script}': Missing`);
-    allGood = false;
+    console.log(`❌ Package script '${script}': Missing`)
+    allGood = false
   }
-});
+})
 
 if (allGood) {
-  console.log('\n🎉 BugBots setup verification passed!');
-  console.log('\nNext steps:');
-  console.log('1. Copy .env.bugbots to .env and configure your tokens');
-  console.log('2. Run: npm run bug-fix:dry');
-  console.log('3. Run: npm run bug-monitor');
+  console.log('\n🎉 BugBots setup verification passed!')
+  console.log('\nNext steps:')
+  console.log('1. Copy .env.bugbots to .env and configure your tokens')
+  console.log('2. Run: npm run bug-fix:dry')
+  console.log('3. Run: npm run bug-monitor')
 } else {
-  console.log('\n❌ BugBots setup verification failed!');
-  console.log('Please check the missing components above.');
-  process.exit(1);
+  console.log('\n❌ BugBots setup verification failed!')
+  console.log('Please check the missing components above.')
+  process.exit(1)
 }

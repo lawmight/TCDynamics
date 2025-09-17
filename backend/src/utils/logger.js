@@ -9,7 +9,7 @@ const customLevels = {
     info: 2,
     http: 3,
     debug: 4,
-    security: 5
+    security: 5,
   },
   colors: {
     error: 'red',
@@ -17,8 +17,8 @@ const customLevels = {
     info: 'green',
     http: 'magenta',
     debug: 'blue',
-    security: 'red'
-  }
+    security: 'red',
+  },
 }
 
 // Ajouter les couleurs à winston
@@ -27,11 +27,11 @@ winston.addColors(customLevels.colors)
 // Format personnalisé pour les logs
 const customFormat = winston.format.combine(
   winston.format.timestamp({
-    format: 'YYYY-MM-DD HH:mm:ss'
+    format: 'YYYY-MM-DD HH:mm:ss',
   }),
   winston.format.errors({ stack: true }),
   winston.format.json(),
-  winston.format.printf((info) => {
+  winston.format.printf(info => {
     const { timestamp, level, message, ...meta } = info
 
     // Structure du log
@@ -39,12 +39,14 @@ const customFormat = winston.format.combine(
       timestamp,
       level: level.toUpperCase(),
       message,
-      ...meta
+      ...meta,
     }
 
     // En développement, ajouter des couleurs
     if (process.env.NODE_ENV !== 'production') {
-      return winston.format.colorize().colorize(level, JSON.stringify(logEntry, null, 2))
+      return winston.format
+        .colorize()
+        .colorize(level, JSON.stringify(logEntry, null, 2))
     }
 
     return JSON.stringify(logEntry)
@@ -58,19 +60,22 @@ const transports = []
 transports.push(
   new winston.transports.Console({
     level: process.env.LOG_LEVEL || 'info',
-    format: process.env.NODE_ENV === 'production'
-      ? winston.format.combine(
-          winston.format.timestamp(),
-          winston.format.json()
-        )
-      : winston.format.combine(
-          winston.format.colorize(),
-          winston.format.simple(),
-          winston.format.printf(({ level, message, timestamp, ...meta }) => {
-            const metaStr = Object.keys(meta).length ? `\n${JSON.stringify(meta, null, 2)}` : ''
-            return `${timestamp} [${level}]: ${message}${metaStr}`
-          })
-        )
+    format:
+      process.env.NODE_ENV === 'production'
+        ? winston.format.combine(
+            winston.format.timestamp(),
+            winston.format.json()
+          )
+        : winston.format.combine(
+            winston.format.colorize(),
+            winston.format.simple(),
+            winston.format.printf(({ level, message, timestamp, ...meta }) => {
+              const metaStr = Object.keys(meta).length
+                ? `\n${JSON.stringify(meta, null, 2)}`
+                : ''
+              return `${timestamp} [${level}]: ${message}${metaStr}`
+            })
+          ),
   })
 )
 
@@ -81,7 +86,7 @@ transports.push(
     level: 'error',
     format: customFormat,
     maxsize: 5242880, // 5MB
-    maxFiles: 5
+    maxFiles: 5,
   })
 )
 
@@ -93,7 +98,7 @@ if (process.env.NODE_ENV === 'production') {
       level: 'info',
       format: customFormat,
       maxsize: 10485760, // 10MB
-      maxFiles: 10
+      maxFiles: 10,
     })
   )
 }
@@ -105,7 +110,7 @@ transports.push(
     level: 'security',
     format: customFormat,
     maxsize: 2097152, // 2MB
-    maxFiles: 3
+    maxFiles: 3,
   })
 )
 
@@ -115,14 +120,14 @@ const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
   format: customFormat,
   transports,
-  exitOnError: false
+  exitOnError: false,
 })
 
 // Gestionnaire d'erreurs non capturées
 logger.exceptions.handle(
   new winston.transports.File({
     filename: path.join(__dirname, '../logs/exceptions.log'),
-    format: customFormat
+    format: customFormat,
   })
 )
 
@@ -130,7 +135,7 @@ logger.exceptions.handle(
 logger.rejections.handle(
   new winston.transports.File({
     filename: path.join(__dirname, '../logs/rejections.log'),
-    format: customFormat
+    format: customFormat,
   })
 )
 
@@ -144,12 +149,12 @@ const logRequest = (req, res, next) => {
     url: req.url,
     ip: req.ip || req.connection.remoteAddress,
     userAgent: req.get('User-Agent'),
-    requestId: req.headers['x-request-id'] || 'unknown'
+    requestId: req.headers['x-request-id'] || 'unknown',
   })
 
   // Intercepter la réponse pour logger les métriques
   const originalSend = res.send
-  res.send = function(body) {
+  res.send = function (body) {
     const duration = Date.now() - start
 
     logger.http('Réponse envoyée', {
@@ -157,8 +162,12 @@ const logRequest = (req, res, next) => {
       url: req.url,
       statusCode: res.statusCode,
       duration: `${duration}ms`,
-      size: Buffer.isBuffer(body) ? body.length : (typeof body === 'string' ? Buffer.byteLength(body, 'utf8') : 0),
-      requestId: req.headers['x-request-id'] || 'unknown'
+      size: Buffer.isBuffer(body)
+        ? body.length
+        : typeof body === 'string'
+          ? Buffer.byteLength(body, 'utf8')
+          : 0,
+      requestId: req.headers['x-request-id'] || 'unknown',
     })
 
     originalSend.call(this, body)
@@ -170,7 +179,7 @@ const logRequest = (req, res, next) => {
 const logSecurityEvent = (event, details) => {
   logger.security(`Événement de sécurité: ${event}`, {
     timestamp: new Date().toISOString(),
-    ...details
+    ...details,
   })
 }
 
@@ -178,7 +187,7 @@ const logPerformance = (operation, duration, metadata = {}) => {
   logger.info(`Performance: ${operation}`, {
     operation,
     duration: `${duration}ms`,
-    ...metadata
+    ...metadata,
   })
 }
 
@@ -187,16 +196,18 @@ const logError = (error, context = {}) => {
     error: {
       message: error.message,
       stack: error.stack,
-      name: error.name
+      name: error.name,
     },
     context,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   })
 }
 
 // Middleware pour ajouter un ID de requête
 const addRequestId = (req, res, next) => {
-  req.headers['x-request-id'] = req.headers['x-request-id'] || `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+  req.headers['x-request-id'] =
+    req.headers['x-request-id'] ||
+    `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
   res.setHeader('X-Request-ID', req.headers['x-request-id'])
   next()
 }
@@ -207,5 +218,5 @@ module.exports = {
   logSecurityEvent,
   logPerformance,
   logError,
-  addRequestId
+  addRequestId,
 }

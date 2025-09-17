@@ -82,7 +82,7 @@ router.post(
 
       // Vérifier la connexion
       await transporter.verify()
-      // console.log('✅ Serveur email Zoho prêt pour la démo - contact@workflowai.fr')
+      // // console.log('✅ Serveur email Zoho prêt pour la démo - contact@workflowai.fr')
 
       // Préparer l'email
       const emailData = emailTemplates.demo({
@@ -103,7 +103,7 @@ router.post(
         ...emailData,
       })
 
-      // console.log('�� Email de démo envoyé:', info.messageId)
+      // // console.log('�� Email de démo envoyé:', info.messageId)
 
       // Réponse de succès
       res.status(200).json({

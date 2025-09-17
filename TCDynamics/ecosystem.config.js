@@ -12,11 +12,11 @@ module.exports = {
       exec_mode: 'cluster', // Mode cluster pour la scalabilité
       env: {
         NODE_ENV: 'development',
-        PORT: 3001
+        PORT: 3001,
       },
       env_production: {
         NODE_ENV: 'production',
-        PORT: 3001
+        PORT: 3001,
       },
       error_file: './logs/err.log',
       out_file: './logs/out.log',
@@ -35,9 +35,9 @@ module.exports = {
       // Health check
       health_check: {
         interval: 30000,
-        path: '/health'
-      }
-    }
+        path: '/health',
+      },
+    },
   ],
 
   // Configuration de déploiement
@@ -49,11 +49,12 @@ module.exports = {
       repo: 'git@github.com:TCDynamics/TCDynamics.git',
       path: '/var/www/tcdynamics',
       'pre-deploy-local': '',
-      'post-deploy': 'npm install && cd backend && npm install && pm2 reload ecosystem.config.js --env production',
+      'post-deploy':
+        'npm install && cd backend && npm install && pm2 reload ecosystem.config.js --env production',
       'pre-setup': '',
       env: {
-        NODE_ENV: 'production'
-      }
-    }
-  }
+        NODE_ENV: 'production',
+      },
+    },
+  },
 }

@@ -11,6 +11,7 @@ The MCP integration provides AI assistants and IDEs with contextual information 
 ### MCP Configuration (`.mcp.json`)
 
 The MCP configuration defines:
+
 - **NIA Service**: AI service integration with your API key
 - **Project Information**: Comprehensive project metadata
 - **Tools**: Available MCP tools for project interaction
@@ -24,6 +25,7 @@ Your NIA API key (`nk_lrzAv0SQJE3FNfS2yV52Y0XlnZ7WeI5p`) is securely configured 
 ## Available Tools
 
 ### 1. Project Overview
+
 ```json
 {
   "name": "project_overview",
@@ -35,6 +37,7 @@ Your NIA API key (`nk_lrzAv0SQJE3FNfS2yV52Y0XlnZ7WeI5p`) is securely configured 
 ```
 
 ### 2. Code Analysis
+
 ```json
 {
   "name": "code_analysis",
@@ -47,6 +50,7 @@ Your NIA API key (`nk_lrzAv0SQJE3FNfS2yV52Y0XlnZ7WeI5p`) is securely configured 
 ```
 
 ### 3. Learning Recommendations
+
 ```json
 {
   "name": "learning_recommendations",
@@ -60,6 +64,7 @@ Your NIA API key (`nk_lrzAv0SQJE3FNfS2yV52Y0XlnZ7WeI5p`) is securely configured 
 ```
 
 ### 4. Deployment Information
+
 ```json
 {
   "name": "deployment_info",
@@ -73,21 +78,25 @@ Your NIA API key (`nk_lrzAv0SQJE3FNfS2yV52Y0XlnZ7WeI5p`) is securely configured 
 ## Available Resources
 
 ### 1. Project README
+
 - **URI**: `project://readme`
 - **Description**: Main project documentation and setup instructions
 - **Type**: Markdown
 
 ### 2. System Architecture
+
 - **URI**: `project://architecture`
 - **Description**: Detailed system architecture and component descriptions
 - **Type**: JSON
 
 ### 3. API Documentation
+
 - **URI**: `project://apis`
 - **Description**: Complete API endpoints and usage documentation
 - **Type**: JSON
 
 ### 4. Learning Content Database
+
 - **URI**: `project://learning_content`
 - **Description**: Structured learning content and curriculum data
 - **Type**: JSON
@@ -95,12 +104,15 @@ Your NIA API key (`nk_lrzAv0SQJE3FNfS2yV52Y0XlnZ7WeI5p`) is securely configured 
 ## Setup Instructions
 
 ### 1. Install Dependencies
+
 ```bash
 npm install
 ```
 
 ### 2. Environment Configuration
+
 The NIA API key is already configured in the MCP server. For additional environment variables, create a `.env` file:
+
 ```bash
 # MCP Configuration
 NIA_API_KEY=nk_lrzAv0SQJE3FNfS2yV52Y0XlnZ7WeI5p
@@ -114,6 +126,7 @@ MCP_PORT=3001
 ### 3. Start MCP Server
 
 #### Option A: Using provided scripts (Recommended)
+
 ```bash
 # Double-click these files or run from command line:
 
@@ -125,6 +138,7 @@ start-mcp.bat
 ```
 
 #### Option B: Manual start
+
 ```bash
 # Using npm script
 npm run mcp:start
@@ -134,13 +148,16 @@ node nia-mcp-server.js
 ```
 
 #### Option C: For development (keeps terminal open)
+
 ```powershell
 # PowerShell/Command Prompt
 node nia-mcp-server.js
 ```
 
 ### 4. Verify Server is Running
+
 The server will display:
+
 ```
 NIA MCP Server started successfully
 ```
@@ -152,17 +169,20 @@ If you see this message, the server is ready to accept connections from Cursor!
 ### Quick Restart Methods:
 
 #### Method 1: Double-click the batch file (Easiest)
+
 1. Navigate to your project folder: `C:\Users\Tomco\OneDrive\Documents\Projects`
 2. Double-click `start-mcp.bat`
 3. Wait for "MCP Server started successfully!" message
 4. Open Cursor - it should auto-connect
 
 #### Method 2: Use PowerShell script
+
 1. Right-click `Start-MCP.ps1` in File Explorer
 2. Select "Run with PowerShell"
 3. Follow the on-screen instructions
 
 #### Method 3: Manual command line
+
 ```powershell
 # Open PowerShell/Command Prompt in project directory
 cd "C:\Users\Tomco\OneDrive\Documents\Projects"
@@ -172,24 +192,31 @@ node nia-mcp-server.js
 ### Troubleshooting Common Issues:
 
 #### ❌ "node is not recognized"
+
 **Solution:**
+
 1. Reinstall Node.js: `winget install OpenJS.NodeJS.LTS`
 2. Or restart your computer to refresh PATH
 3. Or use full path: `"C:\Program Files\nodejs\node.exe" nia-mcp-server.js`
 
 #### ❌ Server starts but Cursor doesn't connect
+
 **Solution:**
+
 1. Check that `.mcp.json` exists in your project root
 2. Verify the path in Cursor MCP settings points to the correct location
 3. Restart Cursor after starting the MCP server
 
 #### ❌ "Port already in use" error
+
 **Solution:**
+
 1. Close any existing Node.js processes
 2. Check Task Manager for "node.exe" processes
 3. Wait 30 seconds and try again
 
 #### 🔍 Verify Server is Running:
+
 ```powershell
 # Check for Node.js processes
 tasklist /FI "IMAGENAME eq node.exe"
@@ -201,10 +228,12 @@ netstat -ano | findstr :3001
 ## Integration with AI Assistants
 
 ### Claude Desktop
+
 To integrate with Claude Desktop:
 
 1. **Install Claude Desktop** (if not already installed)
 2. **Configure MCP**: Add the following to your Claude Desktop configuration:
+
 ```json
 {
   "mcpServers": {
@@ -220,6 +249,7 @@ To integrate with Claude Desktop:
 ```
 
 ### Cursor IDE
+
 For Cursor IDE integration:
 
 1. **Open Cursor Settings**
@@ -230,7 +260,9 @@ For Cursor IDE integration:
    - Environment: `{"NIA_API_KEY": "nk_lrzAv0SQJE3FNfS2yV52Y0XlnZ7WeI5p"}`
 
 ### Other MCP-Compatible Tools
+
 The MCP server can be integrated with any MCP-compatible AI assistant or IDE by:
+
 1. Pointing to the `nia-mcp-server.js` file
 2. Providing the NIA API key as an environment variable
 3. Configuring the server to start with the MCP client
@@ -238,6 +270,7 @@ The MCP server can be integrated with any MCP-compatible AI assistant or IDE by:
 ## Usage Examples
 
 ### Getting Project Overview
+
 ```javascript
 // Via MCP tool call
 {
@@ -249,6 +282,7 @@ The MCP server can be integrated with any MCP-compatible AI assistant or IDE by:
 ```
 
 ### Analyzing Code Files
+
 ```javascript
 {
   "tool": "code_analysis",
@@ -260,6 +294,7 @@ The MCP server can be integrated with any MCP-compatible AI assistant or IDE by:
 ```
 
 ### Getting Learning Recommendations
+
 ```javascript
 {
   "tool": "learning_recommendations",
@@ -272,6 +307,7 @@ The MCP server can be integrated with any MCP-compatible AI assistant or IDE by:
 ```
 
 ### Accessing Resources
+
 ```javascript
 // Read project README
 {
@@ -311,7 +347,9 @@ The MCP server can be integrated with any MCP-compatible AI assistant or IDE by:
    - Verify JSON parameters are correctly formatted
 
 ### Debug Mode
+
 Enable debug logging by setting the environment variable:
+
 ```bash
 DEBUG=mcp:* npm run mcp:start
 ```
@@ -327,6 +365,7 @@ To add new tools or resources:
 3. **Update Configuration**: Modify `.mcp.json` to include the new tool/resource
 
 ### Testing
+
 ```bash
 # Run tests
 npm test

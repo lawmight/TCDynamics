@@ -13,10 +13,21 @@ const monitoringRoutes = require('./routes/monitoring')
 const { swaggerUi, swaggerSpec, swaggerUiOptions } = require('./swagger')
 
 // Import du système de logging
-const { logger, logRequest, logSecurityEvent, logPerformance, logError, addRequestId } = require('./utils/logger')
+const {
+  logger,
+  logRequest,
+  logSecurityEvent,
+  logPerformance,
+  logError,
+  addRequestId,
+} = require('./utils/logger')
 
 // Import des middlewares d'erreur
-const { errorHandler, notFoundHandler, collectMetrics } = require('./middleware/errorHandler')
+const {
+  errorHandler,
+  notFoundHandler,
+  collectMetrics,
+} = require('./middleware/errorHandler')
 
 // Import du middleware CSRF
 const { csrfToken, csrfProtection } = require('./middleware/csrf')
@@ -29,7 +40,9 @@ app.use(addRequestId)
 app.use(helmetConfig)
 app.use(
   cors({
-    origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : (process.env.FRONTEND_URL || 'process.env.API_URL || 'http://localhost:8080''),
+    origin: process.env.ALLOWED_ORIGINS
+      ? process.env.ALLOWED_ORIGINS.split(',')
+      : process.env.FRONTEND_URL || 'http://localhost:8080',
     credentials: true,
   })
 )
@@ -76,7 +89,7 @@ app.get('/health', (req, res) => {
 // CSRF token endpoint for frontend
 app.get('/api/csrf-token', (req, res) => {
   res.json({
-    csrfToken: res.locals.csrfToken
+    csrfToken: res.locals.csrfToken,
   })
 })
 
@@ -121,7 +134,11 @@ app.get('/api/test', (req, res) => {
 })
 
 // Documentation Swagger
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerUiOptions))
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, swaggerUiOptions)
+)
 app.get('/api-docs.json', (req, res) => {
   res.setHeader('Content-Type', 'application/json')
   res.send(swaggerSpec)
@@ -140,17 +157,17 @@ app.listen(PORT, () => {
     environment: process.env.NODE_ENV,
     emailConfigured: !!process.env.EMAIL_USER,
     frontendUrl: process.env.FRONTEND_URL,
-    apiDocsUrl: `process.env.API_URL || 'http://localhost:${PORT}/api-docs`,'
-    openApiUrl: `process.env.API_URL || 'http://localhost:${PORT}/api-docs.json`'
+    apiDocsUrl: `http://localhost:${PORT}/api-docs`,
+    openApiUrl: `http://localhost:${PORT}/api-docs.json`,
   })
 
   // Logs pour la console aussi
-  // console.log(`🚀 Serveur TCDynamics démarré sur le port ${PORT}`)
-  // console.log(`📧 Email configuré: ${process.env.EMAIL_USER}`)
-  // console.log(`�� Frontend URL: ${process.env.FRONTEND_URL}`)
-  // console.log(`🔒 Environnement: ${process.env.NODE_ENV}`)
-  // console.log(`📚 Documentation API: process.env.API_URL || 'http://localhost:${PORT}/api-docs`)'
-  // console.log(`🔗 Spécification OpenAPI: process.env.API_URL || 'http://localhost:${PORT}/api-docs.json`)'
+  // // console.log(`🚀 Serveur TCDynamics démarré sur le port ${PORT}`)
+  // // console.log(`📧 Email configuré: ${process.env.EMAIL_USER}`)
+  // // console.log(`�� Frontend URL: ${process.env.FRONTEND_URL}`)
+  // // console.log(`🔒 Environnement: ${process.env.NODE_ENV}`)
+  // // console.log(`📚 Documentation API: process.env.API_URL || 'process.env.API_URL || 'http://localhost:${PORT}/api-docs`)''
+  // // console.log(`🔗 Spécification OpenAPI: process.env.API_URL || 'process.env.API_URL || 'http://localhost:${PORT}/api-docs.json`)''
 })
 
 // Gestion gracieuse de l'arrêt
@@ -165,8 +182,11 @@ process.on('SIGINT', () => {
 })
 
 // Gestion des erreurs non capturées
-process.on('uncaughtException', (error) => {
-  logger.error('Exception non capturée', { error: error.message, stack: error.stack })
+process.on('uncaughtException', error => {
+  logger.error('Exception non capturée', {
+    error: error.message,
+    stack: error.stack,
+  })
   process.exit(1)
 })
 

@@ -14,6 +14,7 @@ BugBots is a comprehensive system for automatically detecting, monitoring, and f
 ## Quick Start
 
 ### 1. Run Bug Detection
+
 ```bash
 # Scan for bugs (dry run)
 npm run bug-fix:dry
@@ -23,6 +24,7 @@ npm run bug-fix:apply
 ```
 
 ### 2. Monitor Bugs
+
 ```bash
 # Run bug monitoring
 npm run bug-monitor
@@ -32,6 +34,7 @@ npm run bug-monitor:issues
 ```
 
 ### 3. Manual Fixes
+
 ```bash
 # Fix linting issues
 npm run lint:fix
@@ -43,6 +46,7 @@ npm run format
 ## Configuration
 
 ### Environment Variables
+
 Copy .env.bugbots to .env and configure:
 
 - GITHUB_TOKEN: Your GitHub personal access token
@@ -51,6 +55,7 @@ Copy .env.bugbots to .env and configure:
 - SLACK_WEBHOOK_URL: Slack webhook for notifications (optional)
 
 ### GitHub Actions
+
 The following workflows are automatically set up:
 
 - **Auto Bug Fix**: Runs daily and on push/PR
@@ -60,6 +65,7 @@ The following workflows are automatically set up:
 ## Bug Types Detected
 
 ### Code Quality Issues
+
 - Unused imports and variables
 - Missing semicolons
 - Console.log statements
@@ -67,16 +73,19 @@ The following workflows are automatically set up:
 - Hardcoded URLs and values
 
 ### TypeScript Issues
+
 - Type errors
 - Missing type annotations
 - Unused interfaces
 
 ### Security Issues
+
 - Vulnerable dependencies
 - Hardcoded secrets
 - Insecure patterns
 
 ### Test Issues
+
 - Failing tests
 - Missing test coverage
 - Test configuration problems
@@ -104,13 +113,16 @@ Some issues require manual attention:
 ## GitHub Integration
 
 ### Automatic Issue Creation
+
 BugBots automatically creates GitHub issues for:
+
 - Critical bugs
 - Security vulnerabilities
 - Build failures
 - Test failures
 
 ### Labels Applied
+
 - ug: General bug reports
 - utomated: Auto-generated issues
 - security: Security-related issues
@@ -120,6 +132,7 @@ BugBots automatically creates GitHub issues for:
 ## Slack Integration
 
 Configure Slack webhook to receive:
+
 - Daily bug reports
 - Critical issue alerts
 - Security vulnerability notifications
@@ -137,15 +150,15 @@ Configure Slack webhook to receive:
 
 ### Common Issues
 
-**Scripts not found**: Make sure to run 
+**Scripts not found**: Make sure to run
 pm install after setup
-**Permission denied**: Run chmod +x scripts/*.js
+**Permission denied**: Run chmod +x scripts/\*.js
 **GitHub API errors**: Check your GitHub token permissions
 **Slack notifications not working**: Verify webhook URL
 
 ### Getting Help
 
-1. Check the generated bug reports in ug-*-report.json
+1. Check the generated bug reports in ug-\*-report.json
 2. Review GitHub Actions logs
 3. Check environment variables
 4. Verify file permissions
@@ -153,17 +166,21 @@ pm install after setup
 ## Advanced Usage
 
 ### Custom Bug Patterns
+
 Edit scripts/auto-bug-fixer.js to add custom bug detection patterns.
 
 ### Custom Notifications
+
 Modify scripts/bug-monitor.js to add custom notification channels.
 
 ### Integration with CI/CD
+
 The GitHub Actions workflows integrate with your existing CI/CD pipeline.
 
 ## Contributing
 
 To improve BugBots:
+
 1. Add new bug detection patterns
 2. Improve auto-fix capabilities
 3. Add new notification channels
@@ -171,4 +188,4 @@ To improve BugBots:
 
 ---
 
-*BugBots - Making bug fixing effortless* 🐛🤖
+_BugBots - Making bug fixing effortless_ 🐛🤖

@@ -3,6 +3,7 @@
 ## ✅ **Pre-Deployment Security & Configuration**
 
 ### **1. Environment Variables Setup**
+
 - [ ] Copy `env.example` to `.env`
 - [ ] Set real Zoho email credentials (`ZOHO_EMAIL`, `ZOHO_PASSWORD`)
 - [ ] Configure database connection string (Cosmos DB or Table Storage)
@@ -10,18 +11,22 @@
 - [ ] Set Application Insights connection string for monitoring
 
 ### **2. Database Configuration**
+
 **Choose one option:**
 
 **Option A: Azure Cosmos DB (Recommended)**
+
 - [ ] Create Cosmos DB account in Azure Portal
 - [ ] Create database named "TCDynamics"
 - [ ] Set `COSMOS_CONNECTION_STRING` in environment
 
 **Option B: Azure Table Storage (Cost-effective)**
+
 - [ ] Create Storage Account in Azure Portal
 - [ ] Set `AZURE_STORAGE_CONNECTION_STRING` in environment
 
 ### **3. Azure Functions Configuration**
+
 - [ ] Create Function App in Azure Portal
 - [ ] Set Runtime: Python 3.9+
 - [ ] Configure all environment variables in Function App settings
@@ -30,12 +35,14 @@
 ## 🔧 **Deployment Steps**
 
 ### **1. Using VS Code (Recommended)**
+
 1. Install Azure Functions extension
 2. Right-click on Function App → Deploy to Function App
 3. Select your Azure Function App
 4. Wait for deployment completion
 
 ### **2. Using Azure CLI**
+
 ```bash
 # Login and deploy
 az login
@@ -43,17 +50,20 @@ func azure functionapp publish <your-function-app-name>
 ```
 
 ### **3. Using GitHub Actions (Automated)**
+
 - Already configured in `.github/workflows/`
 - Push to main branch triggers automatic deployment
 
 ## 🧪 **Post-Deployment Testing**
 
 ### **1. Health Check**
+
 ```bash
 curl https://<your-app-name>.azurewebsites.net/api/health
 ```
 
 ### **2. Contact Form Test**
+
 ```bash
 curl -X POST https://<your-app-name>.azurewebsites.net/api/ContactForm \
   -H "Content-Type: application/json" \
@@ -61,6 +71,7 @@ curl -X POST https://<your-app-name>.azurewebsites.net/api/ContactForm \
 ```
 
 ### **3. Admin Dashboard Test**
+
 ```bash
 curl -H "Authorization: Bearer YOUR_ADMIN_KEY" \
   https://<your-app-name>.azurewebsites.net/api/admin/dashboard
@@ -69,17 +80,20 @@ curl -H "Authorization: Bearer YOUR_ADMIN_KEY" \
 ## 📊 **Monitoring & Maintenance**
 
 ### **1. Set Up Monitoring**
+
 - [ ] Configure Application Insights alerts
 - [ ] Set up email notifications for errors
 - [ ] Monitor performance metrics via `/api/health`
 
 ### **2. Regular Maintenance**
+
 - [ ] Review logs weekly via Azure Portal
 - [ ] Check database storage usage monthly
 - [ ] Update dependencies quarterly
 - [ ] Rotate admin keys annually
 
 ### **3. Performance Monitoring**
+
 - [ ] Monitor response times via Application Insights
 - [ ] Check rate limiting effectiveness
 - [ ] Review database query performance
@@ -88,17 +102,20 @@ curl -H "Authorization: Bearer YOUR_ADMIN_KEY" \
 ## 🛡️ **Security Hardening**
 
 ### **1. Access Control**
+
 - [ ] Restrict CORS to your domain only (change from `*`)
 - [ ] Use strong admin keys (32+ characters, random)
 - [ ] Enable HTTPS only in Function App settings
 - [ ] Configure custom domain with SSL certificate
 
 ### **2. Rate Limiting Tuning**
+
 - [ ] Adjust rate limits based on actual usage
 - [ ] Monitor for abuse patterns
 - [ ] Consider IP whitelisting for admin endpoints
 
 ### **3. Data Protection**
+
 - [ ] Ensure database encryption at rest
 - [ ] Configure backup retention policies
 - [ ] Implement data retention policies (GDPR compliance)
@@ -106,11 +123,13 @@ curl -H "Authorization: Bearer YOUR_ADMIN_KEY" \
 ## 🔄 **Continuous Deployment**
 
 ### **1. GitHub Actions Workflow**
+
 - Already configured for automatic deployment
 - Triggers on push to main branch
 - Includes testing and security checks
 
 ### **2. Manual Deployment Options**
+
 - VS Code Azure Functions extension
 - Azure CLI: `func azure functionapp publish`
 - Azure Portal deployment center
@@ -118,11 +137,13 @@ curl -H "Authorization: Bearer YOUR_ADMIN_KEY" \
 ## 📈 **Scaling Considerations**
 
 ### **1. Function App Scaling**
+
 - [ ] Configure consumption plan limits
 - [ ] Monitor concurrent executions
 - [ ] Set up auto-scaling rules if needed
 
 ### **2. Database Scaling**
+
 - [ ] Monitor request units (Cosmos DB) or storage (Tables)
 - [ ] Set up auto-scaling policies
 - [ ] Plan for data archiving strategy
@@ -130,12 +151,14 @@ curl -H "Authorization: Bearer YOUR_ADMIN_KEY" \
 ## 🚨 **Troubleshooting**
 
 ### **Common Issues**
+
 1. **Email not sending**: Check Zoho credentials and SMTP settings
 2. **Database connection fails**: Verify connection strings and firewall rules
 3. **Rate limiting too aggressive**: Adjust limits in `function_app.py`
 4. **CORS errors**: Update allowed origins in function responses
 
 ### **Debugging Tools**
+
 - Application Insights logs
 - Function App log stream
 - VS Code Azure Functions extension
