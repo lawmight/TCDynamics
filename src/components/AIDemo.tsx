@@ -53,7 +53,7 @@ const AIDemo = () => {
         {/* Connection Lines */}
         <svg
           className="absolute inset-0 w-full h-full opacity-10"
-          xmlns="process.env.API_URL || 'process.env.API_URL || 'http://www.w3.org/2000/svg''"
+          xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
             <linearGradient
