@@ -85,21 +85,25 @@ VITE_AZURE_FUNCTIONS_URL=https://your-function-app.azurewebsites.net/api
 ## 🧪 Testing Your Setup
 
 ### Test Azure OpenAI
+
 ```bash
 # The AI chatbot should work in your browser
 ```
 
 ### Test Azure Vision
+
 ```bash
 # Upload a document in the Document Processor component
 ```
 
 ### Test Contact Form
+
 ```bash
 # Submit the contact form - should send email via Azure Functions
 ```
 
 ### Test Azure Functions
+
 ```bash
 # Visit: https://your-function-app.azurewebsites.net/api/health
 ```
@@ -114,15 +118,18 @@ VITE_AZURE_FUNCTIONS_URL=https://your-function-app.azurewebsites.net/api
 ## 🚨 Common Issues
 
 ### CORS Errors
+
 - Check that your domain is in the `allowedOrigins` in `host.json`
 - Update Azure Functions CORS settings in the portal
 
 ### API Key Errors
+
 - Verify keys are not expired
 - Check that endpoints match your Azure resources
 - Ensure proper permissions are set
 
 ### Email Not Sending
+
 - Verify Zoho credentials
 - Check spam folder
 - Ensure app password is correct
@@ -130,6 +137,7 @@ VITE_AZURE_FUNCTIONS_URL=https://your-function-app.azurewebsites.net/api
 ## 📞 Need Help?
 
 If you encounter issues:
+
 1. Check the browser console for errors
 2. Verify all environment variables are set
 3. Test Azure services individually
@@ -137,7 +145,7 @@ If you encounter issues:
 
 ## 🔄 Environment Files Summary
 
-- `.env` - Frontend environment variables (VITE_ prefix for Vite)
+- `.env` - Frontend environment variables (VITE\_ prefix for Vite)
 - `local.settings.json` - Azure Functions local development
 - `host.json` - Azure Functions configuration (CORS, etc.)
 - Environment variables in Azure Portal - Production settings

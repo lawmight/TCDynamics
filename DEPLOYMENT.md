@@ -7,7 +7,7 @@ This guide explains how to use your existing VS Code CI/CD setup to deploy your 
 ✅ **VS Code Azure Functions CI/CD** - Already configured  
 ✅ **Python virtual environment** - Already set up  
 ✅ **Local development tasks** - Already working  
-✅ **GitHub repository** - Ready to push  
+✅ **GitHub repository** - Ready to push
 
 ## 🎯 **Complete CI/CD Pipeline**
 
@@ -20,23 +20,28 @@ Your VS Code now has enhanced tasks for complete deployment:
 3. **Choose from these options**:
 
 #### **🔄 Full Deployment (Backend + Frontend)**
+
 - Deploys Azure Functions backend
 - Prepares frontend files for OVHcloud
 - Runs all necessary steps automatically
 
 #### **⚡ Deploy to Azure Functions**
+
 - Only deploys the backend API
 - Updates your Function App automatically
 
 #### **🌐 Deploy Frontend to OVHcloud**
+
 - Shows you exactly which files to upload
 - Provides step-by-step instructions
 
 #### **🧪 Test Local Development**
+
 - Starts local server for testing
 - Runs on `http://localhost:8000`
 
 #### **📤 Git: Commit and Push**
+
 - Automatically commits and pushes changes
 - Triggers GitHub Actions if configured
 
@@ -152,16 +157,19 @@ ZOHO_PASSWORD = "your-app-password"
 ## 🧪 **Testing Your Deployment**
 
 ### **1. Test Frontend**
+
 - Visit your OVHcloud domain
 - Check all styling and animations
 - Test navigation and interactions
 
 ### **2. Test Backend**
+
 - Fill out the contact form
 - Check if you receive email notifications
 - Verify error handling
 
 ### **3. Test Integration**
+
 - Submit contact form from your website
 - Confirm email is sent via Zoho
 - Check Azure Function logs
@@ -171,6 +179,7 @@ ZOHO_PASSWORD = "your-app-password"
 ### **Automatic Updates**
 
 Every time you push to GitHub:
+
 1. ✅ Code is tested
 2. ✅ Backend is deployed to Azure
 3. ✅ Frontend files are prepared
@@ -179,6 +188,7 @@ Every time you push to GitHub:
 ### **Manual Updates**
 
 Using VS Code tasks:
+
 1. ✅ Make your changes
 2. ✅ Run "Full Deployment" task
 3. ✅ Everything is updated automatically
@@ -186,16 +196,19 @@ Using VS Code tasks:
 ## 🛠️ **Troubleshooting**
 
 ### **Azure Functions Issues**
+
 - Check Function App logs in Azure Portal
 - Verify environment variables are set
 - Test function locally with VS Code
 
 ### **Frontend Issues**
+
 - Check browser console for errors
 - Verify file paths in OVHcloud
 - Test locally with `python -m http.server 8000`
 
 ### **Email Issues**
+
 - Verify Zoho credentials in Azure
 - Check Zoho app password is correct
 - Test SMTP settings

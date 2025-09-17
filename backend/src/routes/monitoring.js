@@ -12,18 +12,18 @@ let metrics = {
     total: 0,
     byMethod: {},
     byStatus: {},
-    byEndpoint: {}
+    byEndpoint: {},
   },
   errors: {
     total: 0,
     byType: {},
-    recent: []
+    recent: [],
   },
   performance: {
     averageResponseTime: 0,
     slowestEndpoints: [],
-    memoryUsage: {}
-  }
+    memoryUsage: {},
+  },
 }
 
 // Middleware to collect request metrics
@@ -31,21 +31,25 @@ const collectMetrics = (req, res, next) => {
   const start = Date.now()
   const originalSend = res.send
 
-  res.send = function(body) {
+  res.send = function (body) {
     const duration = Date.now() - start
 
     // Update metrics
     metrics.requests.total++
-    metrics.requests.byMethod[req.method] = (metrics.requests.byMethod[req.method] || 0) + 1
-    metrics.requests.byStatus[res.statusCode] = (metrics.requests.byStatus[res.statusCode] || 0) + 1
+    metrics.requests.byMethod[req.method] =
+      (metrics.requests.byMethod[req.method] || 0) + 1
+    metrics.requests.byStatus[res.statusCode] =
+      (metrics.requests.byStatus[res.statusCode] || 0) + 1
 
     const endpoint = `${req.method} ${req.route?.path || req.path}`
-    metrics.requests.byEndpoint[endpoint] = (metrics.requests.byEndpoint[endpoint] || 0) + 1
+    metrics.requests.byEndpoint[endpoint] =
+      (metrics.requests.byEndpoint[endpoint] || 0) + 1
 
     // Update performance metrics
     const currentAvg = metrics.performance.averageResponseTime
     const totalRequests = metrics.requests.total
-    metrics.performance.averageResponseTime = ((currentAvg * (totalRequests - 1)) + duration) / totalRequests
+    metrics.performance.averageResponseTime =
+      (currentAvg * (totalRequests - 1) + duration) / totalRequests
 
     // Track slowest endpoints
     updateSlowestEndpoints(endpoint, duration)
@@ -76,7 +80,7 @@ const collectErrorMetrics = (error, req) => {
     message: error.message,
     endpoint: `${req.method} ${req.path}`,
     timestamp: new Date().toISOString(),
-    ip: req.ip
+    ip: req.ip,
   })
   metrics.errors.recent = metrics.errors.recent.slice(0, 50)
 }
@@ -89,7 +93,7 @@ const updateMemoryUsage = () => {
     heapTotal: Math.round(memUsage.heapTotal / 1024 / 1024), // MB
     heapUsed: Math.round(memUsage.heapUsed / 1024 / 1024), // MB
     external: Math.round(memUsage.external / 1024 / 1024), // MB
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   }
 }
 
@@ -122,25 +126,29 @@ const updateMemoryUsage = () => {
  *                   type: object
  *                   description: Performance metrics
  */
-router.get('/metrics', optionalApiKeyAuth, asyncHandler(async (req, res) => {
-  updateMemoryUsage()
+router.get(
+  '/metrics',
+  optionalApiKeyAuth,
+  asyncHandler(async (req, res) => {
+    updateMemoryUsage()
 
-  const uptime = Math.floor((Date.now() - metrics.startTime) / 1000)
+    const uptime = Math.floor((Date.now() - metrics.startTime) / 1000)
 
-  res.json({
-    uptime,
-    timestamp: new Date().toISOString(),
-    requests: metrics.requests,
-    errors: metrics.errors,
-    performance: metrics.performance,
-    system: {
-      nodeVersion: process.version,
-      platform: process.platform,
-      architecture: process.arch,
-      pid: process.pid
-    }
+    res.json({
+      uptime,
+      timestamp: new Date().toISOString(),
+      requests: metrics.requests,
+      errors: metrics.errors,
+      performance: metrics.performance,
+      system: {
+        nodeVersion: process.version,
+        platform: process.platform,
+        architecture: process.arch,
+        pid: process.pid,
+      },
+    })
   })
-}))
+)
 
 /**
  * @swagger
@@ -158,13 +166,16 @@ router.get('/metrics', optionalApiKeyAuth, asyncHandler(async (req, res) => {
  *             schema:
  *               type: string
  */
-router.get('/metrics/prometheus', optionalApiKeyAuth, asyncHandler(async (req, res) => {
-  updateMemoryUsage()
+router.get(
+  '/metrics/prometheus',
+  optionalApiKeyAuth,
+  asyncHandler(async (req, res) => {
+    updateMemoryUsage()
 
-  const uptime = Math.floor((Date.now() - metrics.startTime) / 1000)
-  const memUsage = metrics.performance.memoryUsage
+    const uptime = Math.floor((Date.now() - metrics.startTime) / 1000)
+    const memUsage = metrics.performance.memoryUsage
 
-  let prometheusMetrics = `# HELP tcdynamics_uptime_seconds Application uptime in seconds
+    let prometheusMetrics = `# HELP tcdynamics_uptime_seconds Application uptime in seconds
 # TYPE tcdynamics_uptime_seconds gauge
 tcdynamics_uptime_seconds ${uptime}
 
@@ -194,25 +205,26 @@ tcdynamics_memory_usage_heap_total ${memUsage.heapTotal || 0}
 
 `
 
-  // Add method-specific metrics
-  Object.entries(metrics.requests.byMethod).forEach(([method, count]) => {
-    prometheusMetrics += `# HELP tcdynamics_requests_by_method_total Requests by HTTP method
+    // Add method-specific metrics
+    Object.entries(metrics.requests.byMethod).forEach(([method, count]) => {
+      prometheusMetrics += `# HELP tcdynamics_requests_by_method_total Requests by HTTP method
 # TYPE tcdynamics_requests_by_method_total counter
 tcdynamics_requests_by_method_total{method="${method}"} ${count}
 `
-  })
+    })
 
-  // Add status-specific metrics
-  Object.entries(metrics.requests.byStatus).forEach(([status, count]) => {
-    prometheusMetrics += `# HELP tcdynamics_requests_by_status_total Requests by HTTP status
+    // Add status-specific metrics
+    Object.entries(metrics.requests.byStatus).forEach(([status, count]) => {
+      prometheusMetrics += `# HELP tcdynamics_requests_by_status_total Requests by HTTP status
 # TYPE tcdynamics_requests_by_status_total counter
 tcdynamics_requests_by_status_total{status="${status}"} ${count}
 `
-  })
+    })
 
-  res.setHeader('Content-Type', 'text/plain; charset=utf-8')
-  res.send(prometheusMetrics)
-}))
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+    res.send(prometheusMetrics)
+  })
+)
 
 /**
  * @swagger
@@ -226,57 +238,66 @@ tcdynamics_requests_by_status_total{status="${status}"} ${count}
  *       200:
  *         description: Detailed health status
  */
-router.get('/health/detailed', optionalApiKeyAuth, asyncHandler(async (req, res) => {
-  updateMemoryUsage()
+router.get(
+  '/health/detailed',
+  optionalApiKeyAuth,
+  asyncHandler(async (req, res) => {
+    updateMemoryUsage()
 
-  const health = {
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    uptime: Math.floor((Date.now() - metrics.startTime) / 1000),
-    version: process.env.npm_package_version || '1.0.0',
-    environment: process.env.NODE_ENV || 'development',
-    services: {
-      database: 'unknown', // Would need actual DB check
-      redis: 'unknown',    // Would need actual Redis check
-      email: process.env.EMAIL_USER ? 'configured' : 'not_configured'
-    },
-    metrics: {
-      totalRequests: metrics.requests.total,
-      totalErrors: metrics.errors.total,
-      averageResponseTime: Math.round(metrics.performance.averageResponseTime),
-      memoryUsage: metrics.performance.memoryUsage
-    },
-    system: {
-      nodeVersion: process.version,
-      platform: process.platform,
-      architecture: process.arch,
-      cpuCount: require('os').cpus().length,
-      totalMemory: Math.round(require('os').totalmem() / 1024 / 1024 / 1024), // GB
-      freeMemory: Math.round(require('os').freemem() / 1024 / 1024 / 1024)   // GB
+    const health = {
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      uptime: Math.floor((Date.now() - metrics.startTime) / 1000),
+      version: process.env.npm_package_version || '1.0.0',
+      environment: process.env.NODE_ENV || 'development',
+      services: {
+        database: 'unknown', // Would need actual DB check
+        redis: 'unknown', // Would need actual Redis check
+        email: process.env.EMAIL_USER ? 'configured' : 'not_configured',
+      },
+      metrics: {
+        totalRequests: metrics.requests.total,
+        totalErrors: metrics.errors.total,
+        averageResponseTime: Math.round(
+          metrics.performance.averageResponseTime
+        ),
+        memoryUsage: metrics.performance.memoryUsage,
+      },
+      system: {
+        nodeVersion: process.version,
+        platform: process.platform,
+        architecture: process.arch,
+        cpuCount: require('os').cpus().length,
+        totalMemory: Math.round(require('os').totalmem() / 1024 / 1024 / 1024), // GB
+        freeMemory: Math.round(require('os').freemem() / 1024 / 1024 / 1024), // GB
+      },
     }
-  }
 
-  // Check if there are recent errors
-  const recentErrors = metrics.errors.recent.filter(error => {
-    const errorTime = new Date(error.timestamp).getTime()
-    const fiveMinutesAgo = Date.now() - (5 * 60 * 1000)
-    return errorTime > fiveMinutesAgo
+    // Check if there are recent errors
+    const recentErrors = metrics.errors.recent.filter(error => {
+      const errorTime = new Date(error.timestamp).getTime()
+      const fiveMinutesAgo = Date.now() - 5 * 60 * 1000
+      return errorTime > fiveMinutesAgo
+    })
+
+    if (recentErrors.length > 0) {
+      health.status = 'degraded'
+      health.recentErrors = recentErrors.length
+    }
+
+    // Check memory usage
+    const memUsagePercent =
+      (metrics.performance.memoryUsage.heapUsed /
+        metrics.performance.memoryUsage.heapTotal) *
+      100
+    if (memUsagePercent > 90) {
+      health.status = 'warning'
+      health.memoryWarning = `High memory usage: ${memUsagePercent.toFixed(1)}%`
+    }
+
+    res.json(health)
   })
-
-  if (recentErrors.length > 0) {
-    health.status = 'degraded'
-    health.recentErrors = recentErrors.length
-  }
-
-  // Check memory usage
-  const memUsagePercent = (metrics.performance.memoryUsage.heapUsed / metrics.performance.memoryUsage.heapTotal) * 100
-  if (memUsagePercent > 90) {
-    health.status = 'warning'
-    health.memoryWarning = `High memory usage: ${memUsagePercent.toFixed(1)}%`
-  }
-
-  res.json(health)
-}))
+)
 
 /**
  * @swagger
@@ -290,43 +311,47 @@ router.get('/health/detailed', optionalApiKeyAuth, asyncHandler(async (req, res)
  *       200:
  *         description: Metrics reset successfully
  */
-router.post('/metrics/reset', apiKeyAuth, asyncHandler(async (req, res) => {
-  // Reset metrics
-  metrics = {
-    startTime: Date.now(),
-    requests: {
-      total: 0,
-      byMethod: {},
-      byStatus: {},
-      byEndpoint: {}
-    },
-    errors: {
-      total: 0,
-      byType: {},
-      recent: []
-    },
-    performance: {
-      averageResponseTime: 0,
-      slowestEndpoints: [],
-      memoryUsage: {}
+router.post(
+  '/metrics/reset',
+  apiKeyAuth,
+  asyncHandler(async (req, res) => {
+    // Reset metrics
+    metrics = {
+      startTime: Date.now(),
+      requests: {
+        total: 0,
+        byMethod: {},
+        byStatus: {},
+        byEndpoint: {},
+      },
+      errors: {
+        total: 0,
+        byType: {},
+        recent: [],
+      },
+      performance: {
+        averageResponseTime: 0,
+        slowestEndpoints: [],
+        memoryUsage: {},
+      },
     }
-  }
 
-  logger.info('Metrics reset requested', {
-    ip: req.ip,
-    userAgent: req.get('User-Agent'),
-    requestId: req.headers['x-request-id']
-  })
+    logger.info('Metrics reset requested', {
+      ip: req.ip,
+      userAgent: req.get('User-Agent'),
+      requestId: req.headers['x-request-id'],
+    })
 
-  res.json({
-    success: true,
-    message: 'Metrics reset successfully',
-    timestamp: new Date().toISOString()
+    res.json({
+      success: true,
+      message: 'Metrics reset successfully',
+      timestamp: new Date().toISOString(),
+    })
   })
-}))
+)
 
 module.exports = {
   router,
   collectMetrics,
-  collectErrorMetrics
+  collectErrorMetrics,
 }

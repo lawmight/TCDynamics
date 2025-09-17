@@ -8,7 +8,7 @@ export const registerServiceWorker = async (): Promise<void> => {
         scope: '/',
       })
 
-      // console.log('✅ Service Worker registered successfully:', registration.scope);
+      // // console.log('✅ Service Worker registered successfully:', registration.scope);
 
       // Handle service worker updates
       registration.addEventListener('updatefound', () => {
@@ -20,15 +20,15 @@ export const registerServiceWorker = async (): Promise<void> => {
               navigator.serviceWorker.controller
             ) {
               // New content is available, notify user
-              // console.log('🔄 New content is available and will be used when all tabs for this page are closed.');
+              // // console.log('🔄 New content is available and will be used when all tabs for this page are closed.');
             }
           })
         }
       })
 
       // Handle messages from service worker
-      navigator.serviceWorker.addEventListener('message', event => {
-        // console.log('📨 Message from service worker:', event.data);
+      navigator.serviceWorker.addEventListener('message', _event => {
+        // // console.log('📨 Message from service worker:', event.data);
       })
     } catch (error) {
       console.error('❌ Service Worker registration failed:', error)
@@ -44,7 +44,7 @@ export const unregisterServiceWorker = async (): Promise<void> => {
       const registration = await navigator.serviceWorker.ready
       const result = await registration.unregister()
       if (result) {
-        // console.log('✅ Service Worker unregistered successfully');
+        // // console.log('✅ Service Worker unregistered successfully');
       }
     } catch (error) {
       console.error('❌ Service Worker unregistration failed:', error)
@@ -62,11 +62,11 @@ export const setupInstallPrompt = (): void => {
     // Stash the event so it can be triggered later
     deferredPrompt = e
 
-    // console.log('📱 PWA install prompt available');
+    // // console.log('📱 PWA install prompt available');
   })
 
   window.addEventListener('appinstalled', () => {
-    // console.log('✅ PWA installed successfully');
+    // // console.log('✅ PWA installed successfully');
     deferredPrompt = null
   })
 }
@@ -83,7 +83,7 @@ export const triggerInstallPrompt = async (): Promise<boolean> => {
   // Wait for the user to respond to the prompt
   const { outcome } = await deferredPrompt.userChoice
 
-  // console.log(`📱 User response to install prompt: ${outcome}`);
+  // // console.log(`📱 User response to install prompt: ${outcome}`);
 
   // Clear the deferred prompt
   deferredPrompt = null

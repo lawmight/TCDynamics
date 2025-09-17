@@ -28,7 +28,7 @@ export const useDemoForm = () => {
     try {
       const csrfToken = await getCsrfToken()
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL || 'process.env.API_URL || 'http://localhost:3001''}/api/demo`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/demo`,
         {
           method: 'POST',
           headers: {

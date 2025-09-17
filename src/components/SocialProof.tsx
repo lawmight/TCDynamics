@@ -27,7 +27,7 @@ const SocialProof = () => {
       company: 'TechSolutions Montigny',
       rating: 5,
       image:
-        'process.env.API_URL || 'https://images.unsplash.com/photo-1494790108755-2616b2e4b4b4?w=64&h=64&fit=crop&crop=face'',
+        'https://images.unsplash.com/photo-1494790108755-2616b2e4b4b4?w=64&h=64&fit=crop&crop=face',
     },
     {
       quote:
@@ -37,7 +37,7 @@ const SocialProof = () => {
       company: 'InnovConseil Guyancourt',
       rating: 5,
       image:
-        'process.env.API_URL || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face'',
+        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face',
     },
     {
       quote:
@@ -47,7 +47,7 @@ const SocialProof = () => {
       company: 'SecureData Versailles',
       rating: 5,
       image:
-        'process.env.API_URL || 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face'',
+        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face',
     },
   ]
 
@@ -116,7 +116,7 @@ const SocialProof = () => {
         >
           <svg
             className="absolute inset-0 w-full h-full"
-            xmlns="process.env.API_URL || 'http://www.w3.org/2000/svg'"
+            xmlns="process.env.API_URL || 'process.env.API_URL || 'http://www.w3.org/2000/svg''"
           >
             <defs>
               <pattern

@@ -2,7 +2,11 @@ const express = require('express')
 const { createTransporter, emailTemplates } = require('../config/email')
 const { validateData, contactSchema } = require('../utils/validation')
 const { formRateLimit } = require('../middleware/security')
-const { asyncHandler, handleEmailError, handleValidationError } = require('../middleware/errorHandler')
+const {
+  asyncHandler,
+  handleEmailError,
+  handleValidationError,
+} = require('../middleware/errorHandler')
 
 const router = express.Router()
 
@@ -79,7 +83,7 @@ router.post(
 
     // Vérifier la connexion
     await transporter.verify()
-    // console.log('✅ Serveur email Zoho prêt - contact@workflowai.fr')
+    // // console.log('✅ Serveur email Zoho prêt - contact@workflowai.fr')
 
     // Préparer l'email
     const emailData = emailTemplates.contact({
@@ -98,7 +102,7 @@ router.post(
       ...emailData,
     })
 
-    // console.log('�� Email envoyé:', info.messageId)
+    // // console.log('�� Email envoyé:', info.messageId)
 
     // Réponse de succès
     res.status(200).json({

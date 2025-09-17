@@ -3,14 +3,14 @@ const urlsToCache = [
   '/',
   '/manifest.json',
   '/placeholder.svg',
-  'process.env.API_URL || 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'',
+  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
 ]
 
 // Install event - cache resources
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      // console.log('Cache ouvert')
+      // // console.log('Cache ouvert')
       return cache.addAll(urlsToCache)
     })
   )
@@ -63,7 +63,7 @@ self.addEventListener('activate', event => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheName !== CACHE_NAME) {
-            // console.log('Suppression du cache ancien:', cacheName)
+            // // console.log('Suppression du cache ancien:', cacheName)
             return caches.delete(cacheName)
           }
         })

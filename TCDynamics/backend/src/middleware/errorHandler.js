@@ -60,7 +60,7 @@ const formatErrorResponse = (error, req) => {
     message: error.message || 'Une erreur est survenue',
     timestamp: new Date().toISOString(),
     path: req.path,
-    method: req.method
+    method: req.method,
   }
 
   // Add additional details in development
@@ -68,7 +68,7 @@ const formatErrorResponse = (error, req) => {
     baseResponse.error = {
       name: error.name,
       stack: error.stack,
-      ...(error.field && { field: error.field })
+      ...(error.field && { field: error.field }),
     }
   }
 
@@ -92,7 +92,7 @@ const errorHandler = (error, req, res, next) => {
     body: req.method !== 'GET' ? req.body : undefined,
     query: req.query,
     params: req.params,
-    headers: isDevelopment ? req.headers : undefined
+    headers: isDevelopment ? req.headers : undefined,
   })
 
   // Determine status code
@@ -106,7 +106,7 @@ const errorHandler = (error, req, res, next) => {
 }
 
 // Async error wrapper
-const asyncHandler = (fn) => (req, res, next) => {
+const asyncHandler = fn => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch(next)
 }
 
@@ -117,7 +117,7 @@ const notFoundHandler = (req, res, next) => {
 }
 
 // Validation error handler for Joi
-const handleValidationError = (error) => {
+const handleValidationError = error => {
   if (error.isJoi) {
     const field = error.details[0].path.join('.')
     const message = error.details[0].message
@@ -127,14 +127,17 @@ const handleValidationError = (error) => {
 }
 
 // Database error handler
-const handleDatabaseError = (error) => {
-  if (error.code === '23505') { // Unique constraint violation
+const handleDatabaseError = error => {
+  if (error.code === '23505') {
+    // Unique constraint violation
     return new ConflictError('Un enregistrement avec ces données existe déjà')
   }
-  if (error.code === '23503') { // Foreign key constraint violation
+  if (error.code === '23503') {
+    // Foreign key constraint violation
     return new NotFoundError('Référence introuvable')
   }
-  if (error.code === '23502') { // Not null constraint violation
+  if (error.code === '23502') {
+    // Not null constraint violation
     return new ValidationError('Champ requis manquant')
   }
 
@@ -144,9 +147,9 @@ const handleDatabaseError = (error) => {
 }
 
 // Email error handler
-const handleEmailError = (error) => {
+const handleEmailError = error => {
   console.error('Email service error:', error)
-  return new Error('Erreur lors de l\'envoi de l\'email')
+  return new Error("Erreur lors de l'envoi de l'email")
 }
 
 module.exports = {
@@ -161,5 +164,5 @@ module.exports = {
   notFoundHandler,
   handleValidationError,
   handleDatabaseError,
-  handleEmailError
+  handleEmailError,
 }

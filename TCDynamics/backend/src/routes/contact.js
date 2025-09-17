@@ -2,7 +2,11 @@ const express = require('express')
 const { createTransporter, emailTemplates } = require('../config/email')
 const { validateData, contactSchema } = require('../utils/validation')
 const { formRateLimit } = require('../middleware/security')
-const { asyncHandler, handleEmailError, handleValidationError } = require('../middleware/errorHandler')
+const {
+  asyncHandler,
+  handleEmailError,
+  handleValidationError,
+} = require('../middleware/errorHandler')
 
 const router = express.Router()
 
