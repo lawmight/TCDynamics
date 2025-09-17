@@ -27,8 +27,9 @@ export const registerServiceWorker = async (): Promise<void> => {
       })
 
       // Handle messages from service worker
-      navigator.serviceWorker.addEventListener('message', _event => {
-        // // console.log('📨 Message from service worker:', event.data);
+      navigator.serviceWorker.addEventListener('message', () => {
+        // Log messages from service worker for debugging (commented out for production)
+        // console.log('📨 Message from service worker:', event.data)
       })
     } catch (error) {
       console.error('❌ Service Worker registration failed:', error)
