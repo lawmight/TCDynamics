@@ -1,3 +1,0 @@
-# TCDynamics
-
-personal website

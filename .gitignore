@@ -28,6 +28,7 @@ local.settings.json
 # Azure Functions
 bin/
 obj/
+AzureFunctionsTools/
 
 # IDE
 .vscode/
