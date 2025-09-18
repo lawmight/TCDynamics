@@ -58,3 +58,5 @@ export const Settings = mockIcon
 export const GraduationCap = mockIcon
 export const Flag = mockIcon
 export const Eye = mockIcon
+export const Menu = mockIcon
+export const Star = mockIcon
