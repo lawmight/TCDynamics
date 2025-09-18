@@ -34,14 +34,14 @@ describe('LocalAdvantages Component', () => {
   it('should display security badges', () => {
     render(<LocalAdvantages />)
 
-    expect(screen.getAllByText(/ISO 27001/i)[0]).toBeInTheDocument()
-    expect(screen.getByText(/RGPD/i)).toBeInTheDocument()
+    expect(screen.getAllByText(/ISO 27001/i).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/RGPD/i).length).toBeGreaterThan(0)
   })
 
   it('should show compliance information', () => {
     render(<LocalAdvantages />)
 
-    expect(screen.getByText(/RGPD/i)).toBeInTheDocument()
+    expect(screen.getAllByText(/RGPD/i).length).toBeGreaterThan(0)
     expect(screen.getByText(/Données en France/i)).toBeInTheDocument()
   })
 })

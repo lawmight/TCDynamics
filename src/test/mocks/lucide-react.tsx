@@ -1,5 +1,11 @@
 // Mock pour toutes les icônes Lucide utilisées dans l'app
-const mockIcon = ({ size = 24, className = '', ...props }: any) => (
+interface MockIconProps {
+  size?: number
+  className?: string
+  [key: string]: unknown
+}
+
+const mockIcon = ({ size = 24, className = '', ...props }: MockIconProps) => (
   <svg
     width={size}
     height={size}

@@ -1,0 +1,64 @@
+# NIA Indexing Exclusions
+# Based on .gitignore with additional binary exclusions
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Environment variables
+.env
+local.settings.json
+
+# Azure Functions
+bin/
+obj/
+
+# Large binary directories to exclude
+AzureFunctionsTools/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.cursor/
+.husky/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+node_modules
+.env.bugbots
+
+# Additional binary files
+*.dll
+*.exe
+*.pdb

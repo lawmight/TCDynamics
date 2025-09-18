@@ -21,7 +21,18 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
-          ui: ['@radix-ui/react-dialog'],
+          ui: [
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-label',
+            '@radix-ui/react-scroll-area',
+            '@radix-ui/react-slot',
+            '@radix-ui/react-tabs',
+            '@radix-ui/react-toast',
+            '@radix-ui/react-tooltip',
+          ],
+          query: ['@tanstack/react-query'],
+          icons: ['lucide-react'],
+          utils: ['clsx', 'tailwind-merge', 'class-variance-authority'],
         },
       },
     },
@@ -29,10 +40,31 @@ export default defineConfig(({ mode }) => ({
       compress: {
         drop_console: mode === 'production',
         drop_debugger: mode === 'production',
+        pure_funcs:
+          mode === 'production'
+            ? ['console.log', 'console.info', 'console.debug', 'console.warn']
+            : [],
       },
     },
+    sourcemap: mode === 'development',
+    reportCompressedSize: false, // Disable gzip size reporting for faster builds
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'lucide-react'],
+    include: [
+      'react',
+      'react-dom',
+      'lucide-react',
+      '@tanstack/react-query',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-label',
+      '@radix-ui/react-scroll-area',
+      '@radix-ui/react-slot',
+      '@radix-ui/react-tabs',
+      '@radix-ui/react-toast',
+      '@radix-ui/react-tooltip',
+      'clsx',
+      'tailwind-merge',
+      'class-variance-authority',
+    ],
   },
 }))

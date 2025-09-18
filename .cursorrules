@@ -1,0 +1,31 @@
+# Cursor Rules for TCDynamics Project
+# This file contains project-specific rules and startup configurations
+
+# NIA MCP Integration
+# The NIA MCP server should be running for optimal AI assistance
+# Auto-start options:
+# 1. Run: .\setup-auto-start.ps1 (Windows login auto-start)
+# 2. Use: .\start-mcp-silent.bat (silent background start)
+# 3. Add: cursor-mcp-config.json to .vscode/tasks.json (Cursor auto-start)
+
+# Project Structure
+- /src: React/TypeScript frontend
+- /backend: Node.js backend API
+- /TCDynamics: Python Azure Functions
+- /TCDynamics-Functions: Additional Azure Functions
+
+# Coding Standards
+- Use TypeScript for frontend components
+- Use Python for Azure Functions
+- Follow existing code patterns and naming conventions
+- Keep components modular and reusable
+
+# Development Workflow
+1. Start MCP server: .\start-mcp-background.ps1
+2. Use AI assistance for code analysis and suggestions
+3. Test changes thoroughly before committing
+4. Follow existing commit message patterns
+
+# File Exclusions (for AI analysis)
+- Exclude: AzureFunctionsTools/, .venv/, node_modules/
+- Focus on: Source code, configurations, documentation

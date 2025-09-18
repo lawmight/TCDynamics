@@ -13,6 +13,9 @@ export default tseslint.config(
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+      parserOptions: {
+        projectService: true,
+      },
     },
     plugins: {
       'react-hooks': reactHooks,
@@ -29,9 +32,17 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-vars': 'error',
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-expressions': 'error',
+      '@typescript-eslint/prefer-nullish-coalescing': 'off', // Requires type info
+      '@typescript-eslint/prefer-optional-chain': 'error',
+      '@typescript-eslint/no-non-null-assertion': 'warn',
       'no-console': 'warn',
       'prefer-const': 'error',
       'no-var': 'error',
+      'no-duplicate-imports': 'error',
+      'no-unused-expressions': 'error',
+      'prefer-template': 'error',
+      'object-shorthand': 'error',
+      'prefer-arrow-callback': 'error',
     },
   }
 )
