@@ -77,7 +77,7 @@ TCDynamics WorkFlowAI est une plateforme d'automatisation basée sur l'intellige
 1. **Cloner le repository**
 
 ```bash
-git clone https://github.com/TCDynamics/TCDynamics.git
+git clone <repository-url>
 cd TCDynamics
 ```
 
@@ -113,19 +113,18 @@ cp backend/env.example backend/.env
 # Éditer backend/.env avec vos valeurs
 ```
 
-### Configuration Email (Zoho Mail)
+### Configuration Email
 
 Dans `backend/.env`, configurez :
 
 ```env
-EMAIL_HOST=smtp.zoho.eu
+EMAIL_HOST=your-smtp-host
 EMAIL_PORT=465
-EMAIL_USER=contact@tcdynamics.fr
-EMAIL_PASS=your-zoho-app-password-here
+EMAIL_USER=your-email@domain.com
+EMAIL_PASS=your-app-password
 ```
 
-**⚠️ IMPORTANT**: Utilisez un mot de passe d'application Zoho, pas votre mot de passe principal.
-[Guide Zoho App Password](https://www.zoho.com/mail/help/two-factor-authentication.html#alink3)
+**⚠️ IMPORTANT**: Utilisez un mot de passe d'application, pas votre mot de passe principal.
 
 ## 💻 Développement
 
@@ -198,8 +197,8 @@ npm run build
 1. **Préparer le serveur**
 
 ```bash
-# Sur le serveur OVH
-git clone https://github.com/TCDynamics/TCDynamics.git
+# Sur votre serveur
+git clone <repository-url>
 cd TCDynamics
 npm install --production
 ```
@@ -209,11 +208,11 @@ npm install --production
 ```nginx
 server {
     listen 80;
-    server_name tcdynamics.fr www.tcdynamics.fr;
+    server_name your-domain.com www.your-domain.com;
 
     # Frontend
     location / {
-        root /var/www/tcdynamics/dist;
+        root /var/www/your-app/dist;
         try_files $uri $uri/ /index.html;
     }
 
@@ -237,7 +236,7 @@ npm install -g pm2
 
 # Démarrer le backend
 cd backend
-pm2 start src/server.js --name tcdynamics-api
+pm2 start src/server.js --name your-app-api
 
 # Sauvegarder la configuration
 pm2 save
@@ -272,7 +271,7 @@ npm audit fix
 Les logs sont disponibles dans la console. En production, utilisez PM2 :
 
 ```bash
-pm2 logs tcdynamics-api
+pm2 logs your-app-api
 ```
 
 ### Métriques
@@ -284,18 +283,18 @@ pm2 logs tcdynamics-api
 
 ### Contact
 
-- **Email**: contact@tcdynamics.fr
-- **Téléphone**: Support local à Montigny-le-Bretonneux
-- **GitHub Issues**: [Signaler un bug](https://github.com/TCDynamics/TCDynamics/issues)
+- **Email**: your-email@domain.com
+- **Support**: Support local disponible
+- **Issues**: Utilisez le système d'issues de votre repository
 
 ### Équipe
 
-- Développement et maintenance par TCDynamics
+- Développement et maintenance par votre équipe
 - Support entreprise disponible
 
 ## 📄 License
 
-Copyright © 2024 TCDynamics. Tous droits réservés.
+Copyright © 2024 Your Company. Tous droits réservés.
 
 Ce logiciel est propriétaire et confidentiel. Toute reproduction ou distribution non autorisée est strictement interdite.
 
@@ -304,8 +303,8 @@ Ce logiciel est propriétaire et confidentiel. Toute reproduction ou distributio
 <div align="center">
   <p>Fait avec ❤️ en France 🇫🇷</p>
   <p>
-    <a href="https://tcdynamics.fr">Site Web</a> •
-    <a href="https://github.com/TCDynamics">GitHub</a>
+    <a href="https://your-website.com">Site Web</a> •
+    <a href="https://github.com/your-org">GitHub</a>
   </p>
 </div>
 # Test trigger
