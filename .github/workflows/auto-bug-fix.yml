@@ -125,7 +125,7 @@ jobs:
 
       - name: Create GitHub Issue for complex bugs
         if: steps.analyze.outputs.ts_issues > 0 || steps.analyze.outputs.test_failures > 0 || steps.analyze.outputs.security_issues > 0
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const fs = require('fs');
