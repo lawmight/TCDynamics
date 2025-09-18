@@ -1,8 +1,9 @@
 require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
+const compression = require('compression')
 const morgan = require('morgan')
-const { helmetConfig, validateIP } = require('./middleware/security')
+const { helmetConfig, validateIP, sanitizeInput } = require('./middleware/security')
 
 // Import des routes
 const contactRoutes = require('./routes/contact')
@@ -38,6 +39,16 @@ const PORT = process.env.PORT || 3001
 // Middleware de base
 app.use(addRequestId)
 app.use(helmetConfig)
+app.use(compression({
+  level: 6,
+  threshold: 1024, // Only compress responses > 1KB
+  filter: (req, res) => {
+    if (req.headers['x-no-compression']) {
+      return false
+    }
+    return compression.filter(req, res)
+  }
+}))
 app.use(
   cors({
     origin: process.env.ALLOWED_ORIGINS
@@ -47,10 +58,17 @@ app.use(
   })
 )
 app.use(morgan('combined'))
-app.use(express.json({ limit: '10mb' }))
+app.use(express.json({ 
+  limit: '10mb',
+  verify: (req, res, buf) => {
+    // Store raw body for webhook verification if needed
+    req.rawBody = buf
+  }
+}))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 app.use(collectMetrics)
 app.use(validateIP)
+app.use(sanitizeInput)
 
 // CSRF protection middleware
 app.use(csrfToken)

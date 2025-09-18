@@ -27,6 +27,12 @@ services:
       start_period: 30s
     networks:
       - tcdynamics-network
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
 
   # Backend API - Node.js avec PM2
   backend:
@@ -42,6 +48,7 @@ services:
       - PORT=3001
       - LOG_LEVEL=info
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost}
+      - NODE_OPTIONS=--max-old-space-size=512
     env_file:
       - ./backend/.env
     volumes:
@@ -59,6 +66,14 @@ services:
     depends_on:
       - postgres
       - redis
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
 
   # Base de données PostgreSQL
   postgres:

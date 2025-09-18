@@ -48,8 +48,6 @@ describe('useToast Hook', () => {
       })
     })
 
-    const initialLength = result.current.toasts.length
-
     act(() => {
       result.current.dismiss('test-toast')
     })

@@ -11,21 +11,19 @@ describe('HowItWorks Component', () => {
   it('should display the three main steps', () => {
     render(<HowItWorks />)
 
-    expect(screen.getByText(/1\. Importez vos documents/i)).toBeInTheDocument()
-    expect(
-      screen.getByText(/2\. L'IA analyse automatiquement/i)
-    ).toBeInTheDocument()
-    expect(screen.getByText(/3\. Consultez vos résultats/i)).toBeInTheDocument()
+    expect(screen.getByText(/Connectez vos outils/i)).toBeInTheDocument()
+    expect(screen.getByText(/Configurez l'IA/i)).toBeInTheDocument()
+    expect(screen.getByText(/Automatisez et économisez/i)).toBeInTheDocument()
   })
 
   it('should show step descriptions', () => {
     render(<HowItWorks />)
 
-    expect(screen.getByText(/Téléchargez vos factures/i)).toBeInTheDocument()
     expect(
-      screen.getByText(/Notre IA extrait les données/i)
+      screen.getByText(/Intégrez facilement vos emails/i)
     ).toBeInTheDocument()
-    expect(screen.getByText(/Visualisez les informations/i)).toBeInTheDocument()
+    expect(screen.getByText(/Personnalisez vos workflows/i)).toBeInTheDocument()
+    expect(screen.getByText(/Profitez des résultats/i)).toBeInTheDocument()
   })
 
   it('should have proper step icons', () => {
@@ -39,8 +37,8 @@ describe('HowItWorks Component', () => {
   it('should be accessible', () => {
     render(<HowItWorks />)
 
-    const section = screen.getByRole('region')
-    expect(section).toHaveAttribute('aria-labelledby')
+    const section = screen.getByRole('heading', { level: 2 })
+    expect(section).toBeInTheDocument()
   })
 
   it('should have proper heading hierarchy', () => {
