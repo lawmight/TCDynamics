@@ -25,6 +25,7 @@ env:
   AZURE_FUNCTIONAPP_NAME: 'func-tcdynamics-contact'
   AZURE_FUNCTIONAPP_PACKAGE_PATH: './TCDynamics'
   FRONTEND_BUILD_PATH: './dist'
+  AZURE_FUNCTIONAPP_BASE_URL: 'https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net'
 
 jobs:
   # Test Frontend
@@ -60,7 +61,7 @@ jobs:
     - name: Build frontend
       run: npm run build
       env:
-        VITE_AZURE_FUNCTIONS_URL: https://func-tcdynamics-contact.azurewebsites.net/api
+        VITE_AZURE_FUNCTIONS_URL: https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api
         
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
@@ -162,7 +163,7 @@ jobs:
     - name: Verify deployment
       run: |
         echo "Verifying Azure Functions deployment..."
-        curl -f https://${{ env.AZURE_FUNCTIONAPP_NAME }}.azurewebsites.net/api/health || exit 1
+        curl -f ${{ env.AZURE_FUNCTIONAPP_BASE_URL }}/api/health || exit 1
         echo "✅ Azure Functions deployed successfully!"
 
   # Deploy Frontend to OVHcloud
@@ -253,3 +254,4 @@ jobs:
         echo "❌ Deployment failed!"
         echo "Please check the logs and fix any issues before retrying."
         exit 1
+

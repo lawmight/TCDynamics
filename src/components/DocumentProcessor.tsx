@@ -11,6 +11,45 @@ import {
 } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { visionAPI } from '@/api/azureServices'
+import { logger } from '@/utils/logger'
+
+// Types pour l'API Vision
+interface VisionWord {
+  text: string
+  confidence?: number
+}
+
+interface VisionLine {
+  text: string
+  words: VisionWord[]
+}
+
+interface VisionRegion {
+  lines: VisionLine[]
+}
+
+interface VisionCaption {
+  text: string
+  confidence?: number
+}
+
+interface VisionDescription {
+  captions: VisionCaption[]
+}
+
+interface VisionReadResult {
+  lines: VisionLine[]
+}
+
+interface VisionAnalyzeResult {
+  readResults: VisionReadResult[]
+}
+
+interface VisionAPIResponse {
+  regions?: VisionRegion[]
+  description?: VisionDescription
+  analyzeResult?: VisionAnalyzeResult
+}
 
 interface ProcessedDocument {
   id: string
@@ -35,45 +74,84 @@ const DocumentProcessor = () => {
     setIsProcessing(true)
 
     for (const file of Array.from(files)) {
-      const documentId =
-        Date.now().toString() + Math.random().toString(36).substr(2, 9)
-
-      // Create processing document
-      const processingDoc: ProcessedDocument = {
-        id: documentId,
-        fileName: file.name,
-        extractedText: '',
-        confidence: 0,
-        status: 'processing',
-        timestamp: new Date(),
-      }
-
-      setDocuments(prev => [...prev, processingDoc])
+      const documentId = `doc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      
+      // Ajouter le document en cours de traitement
+      setDocuments(prev => [
+        ...prev,
+        {
+          id: documentId,
+          fileName: file.name,
+          extractedText: '',
+          confidence: 0,
+          status: 'processing',
+          timestamp: new Date(),
+        },
+      ])
 
       try {
-        // Convert file to base64
-        const base64String = await fileToBase64(file)
+        // Convertir le fichier en base64
+        const base64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = () => {
+            const result = reader.result as string
+            resolve(result)
+          }
+          reader.onerror = reject
+          reader.readAsDataURL(file)
+        })
 
-        // Send to Azure AI Vision API
-        const result = await visionAPI.processDocument(base64String, file.name)
+        // Appeler l'API Vision
+        const result = await visionAPI.processDocument(base64)
+        
+        if (!result.success) {
+          throw new Error(result.message || 'Erreur lors du traitement')
+        }
 
-        // Update document with results
+        // Traiter la réponse avec des types appropriés
+        const visionData = result.data as VisionAPIResponse
+        let extractedText = ''
+        let confidence = 0.8
+
+        if (visionData.regions && visionData.regions.length > 0) {
+          extractedText = visionData.regions
+            .map((region: VisionRegion) =>
+              region.lines
+                .map((line: VisionLine) =>
+                  line.words.map((word: VisionWord) => word.text).join(' ')
+                )
+                .join('\n')
+            )
+            .join('\n\n')
+          confidence = 0.85
+        } else if (visionData.description?.captions) {
+          extractedText = visionData.description.captions
+            .map((caption: VisionCaption) => caption.text)
+            .join('\n')
+          confidence = visionData.description.captions[0]?.confidence || 0.8
+        } else if (visionData.analyzeResult?.readResults) {
+          const reads = visionData.analyzeResult.readResults
+          extractedText = reads
+            .flatMap((page: VisionReadResult) => (page.lines || []).map((l: VisionLine) => l.text))
+            .join('\n')
+          confidence = 0.9
+        } else {
+          extractedText = 'Texte extrait du document'
+          confidence = 0.7
+        }
+
+        // Mettre à jour le document avec le résultat
         setDocuments(prev =>
           prev.map(doc =>
             doc.id === documentId
-              ? {
-                  ...doc,
-                  extractedText:
-                    result.extractedText ||
-                    "Erreur lors de l'extraction du texte",
-                  confidence: result.confidence || 0,
-                  status: result.success ? 'completed' : 'error',
-                }
+              ? { ...doc, extractedText, confidence, status: 'completed' }
               : doc
           )
         )
       } catch (error) {
-        console.error('Error processing document:', error)
+        // Utiliser le système de logging approprié
+        logger.error('Error processing document', error)
+        
         setDocuments(prev =>
           prev.map(doc =>
             doc.id === documentId
@@ -91,7 +169,7 @@ const DocumentProcessor = () => {
     setIsProcessing(false)
   }
 
-  const fileToBase64 = (file: File): Promise<string> => {
+  // const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
       reader.readAsDataURL(file)

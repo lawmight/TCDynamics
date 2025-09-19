@@ -26,7 +26,6 @@ export const registerServiceWorker = async (): Promise<void> => {
         }
       })
 
-      // Handle messages from service worker
       navigator.serviceWorker.addEventListener('message', () => {
         // Log messages from service worker for debugging (commented out for production)
         // console.log('📨 Message from service worker:', event.data)
@@ -53,21 +52,17 @@ export const unregisterServiceWorker = async (): Promise<void> => {
   }
 }
 
-// PWA Install Prompt Types
+// PWA Installation
 interface BeforeInstallPromptEvent extends Event {
-  readonly platforms: ReadonlyArray<string>
-  readonly userChoice: Promise<{
-    outcome: 'accepted' | 'dismissed'
-    platform: string
-  }>
   prompt(): Promise<void>
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
 }
 
-// PWA Install Prompt Handler
 let deferredPrompt: BeforeInstallPromptEvent | null = null
 
-export const setupInstallPrompt = (): void => {
-  window.addEventListener('beforeinstallprompt', (e: Event) => {
+// Listen for the beforeinstallprompt event
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeinstallprompt', (e) => {
     // Prevent the mini-infobar from appearing on mobile
     e.preventDefault()
     // Stash the event so it can be triggered later
@@ -114,7 +109,7 @@ export const isPWA = (): boolean => {
 export const isServiceWorkerActive = async (): Promise<boolean> => {
   if ('serviceWorker' in navigator) {
     const registration = await navigator.serviceWorker.getRegistration()
-    return registration !== undefined && registration.active !== null
+    return registration?.active !== null
   }
   return false
 }

@@ -1,52 +1,23 @@
 import { useState } from 'react'
-import { getCsrfToken } from '../utils/csrf'
-
-interface DemoData {
-  firstName: string
-  lastName: string
-  email: string
-  phone?: string
-  company: string
-  employees?: string
-  needs?: string
-}
-
-interface DemoResponse {
-  success: boolean
-  message: string
-  errors?: string[]
-}
+import { demoAPI, type DemoFormData, type DemoResponse } from '@/api/azureServices'
 
 export const useDemoForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [response, setResponse] = useState<DemoResponse | null>(null)
 
-  const submitForm = async (data: DemoData): Promise<DemoResponse> => {
+  const submitForm = async (data: DemoFormData): Promise<DemoResponse> => {
     setIsSubmitting(true)
     setResponse(null)
 
     try {
-      const csrfToken = await getCsrfToken()
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/demo`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': csrfToken,
-          },
-          body: JSON.stringify(data),
-        }
-      )
-
-      const result: DemoResponse = await response.json()
+      const result = await demoAPI.submitDemoForm(data)
       setResponse(result)
       return result
-    } catch {
+    } catch (error) {
       const errorResponse: DemoResponse = {
         success: false,
-        message:
-          'Erreur de connexion. Veuillez vérifier votre connexion internet.',
+        message: 'Une erreur est survenue. Veuillez réessayer.',
+        errors: [error instanceof Error ? error.message : 'Erreur inconnue']
       }
       setResponse(errorResponse)
       return errorResponse
@@ -55,10 +26,14 @@ export const useDemoForm = () => {
     }
   }
 
+  const clearResponse = () => {
+    setResponse(null)
+  }
+
   return {
     submitForm,
     isSubmitting,
     response,
-    clearResponse: () => setResponse(null),
+    clearResponse
   }
 }

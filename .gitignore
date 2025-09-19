@@ -23,7 +23,11 @@ MANIFEST
 
 # Environment variables
 .env
+.env.backup
 local.settings.json
+
+# MCP Configuration (contains sensitive tokens)
+.mcp.json
 
 # Azure Functions
 bin/
