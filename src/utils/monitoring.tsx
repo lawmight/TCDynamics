@@ -4,6 +4,7 @@
  */
 
 import React from 'react'
+import { logger } from '@/utils/logger'
 
 // Sentry Types
 interface SentryScope {
@@ -75,7 +76,7 @@ class Monitoring {
 
       // // console.log('🔍 Monitoring initialisé')
     } catch (error) {
-      console.error("Erreur lors de l'initialisation du monitoring:", error)
+      logger.error("Erreur lors de l'initialisation du monitoring", error)
     }
   }
 
@@ -83,7 +84,7 @@ class Monitoring {
    * Capturer une erreur
    */
   captureError(error: Error, context?: ErrorContext) {
-    console.error('Error captured:', error, context)
+    logger.error('Error captured', { error, context })
 
     if (!this.enabled) return
 

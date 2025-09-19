@@ -55,3 +55,4 @@ jobs:
         git add .github/workflows/
         git commit -m "Disable redundant workflows - keep only hybrid deployment" || echo "No changes to commit"
         git push
+

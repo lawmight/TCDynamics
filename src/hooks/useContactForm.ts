@@ -1,51 +1,23 @@
 import { useState } from 'react'
-import { getCsrfToken } from '../utils/csrf'
-
-interface ContactData {
-  name: string
-  email: string
-  phone?: string
-  company?: string
-  message: string
-}
-
-interface ContactResponse {
-  success: boolean
-  message: string
-  messageId?: string
-  errors?: string[]
-}
+import { contactAPI, type ContactFormData, type ContactResponse } from '@/api/azureServices'
 
 export const useContactForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [response, setResponse] = useState<ContactResponse | null>(null)
 
-  const submitForm = async (data: ContactData): Promise<ContactResponse> => {
+  const submitForm = async (data: ContactFormData): Promise<ContactResponse> => {
     setIsSubmitting(true)
     setResponse(null)
 
     try {
-      const csrfToken = await getCsrfToken()
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/contact`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-Token': csrfToken,
-          },
-          body: JSON.stringify(data),
-        }
-      )
-
-      const result: ContactResponse = await response.json()
+      const result = await contactAPI.submitContactForm(data)
       setResponse(result)
       return result
-    } catch {
+    } catch (error) {
       const errorResponse: ContactResponse = {
         success: false,
-        message:
-          'Erreur de connexion. Veuillez vérifier votre connexion internet.',
+        message: 'Une erreur est survenue. Veuillez réessayer.',
+        errors: [error instanceof Error ? error.message : 'Erreur inconnue']
       }
       setResponse(errorResponse)
       return errorResponse
@@ -54,10 +26,14 @@ export const useContactForm = () => {
     }
   }
 
+  const clearResponse = () => {
+    setResponse(null)
+  }
+
   return {
     submitForm,
     isSubmitting,
     response,
-    clearResponse: () => setResponse(null),
+    clearResponse
   }
 }

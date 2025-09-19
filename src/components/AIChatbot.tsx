@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { MessageCircle, Send, Bot, User, Loader2 } from 'lucide-react'
 import { chatAPI } from '@/api/azureServices'
+import { logger } from '@/utils/logger'
 
 interface Message {
   id: string
@@ -44,24 +45,22 @@ const AIChatbot = () => {
     setIsLoading(true)
 
     try {
-      const sessionId = 'workFlowAI-session-' + Date.now()
-      const response = await chatAPI.sendMessage(userMessage.content, sessionId)
+      const data = await chatAPI.sendMessage(userMessage.content, 'web-session')
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: response.response,
+        content: data.message || data.response || 'Réponse reçue du service IA.',
         timestamp: new Date(),
       }
 
       setMessages(prev => [...prev, assistantMessage])
     } catch (error) {
-      console.error('Error sending message:', error)
+      logger.error('Error sending message', error)
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
+        content: 'Désolé, une erreur est survenue. Veuillez réessayer.',
         role: 'assistant',
-        content:
-          "Une erreur s'est produite. Veuillez vérifier votre connexion et réessayer.",
         timestamp: new Date(),
       }
       setMessages(prev => [...prev, errorMessage])
