@@ -38,7 +38,7 @@ export const sanitizeInput = {
    * Sanitize phone numbers (remove non-numeric characters except +)
    */
   phone: (phone: string): string => {
-    return phone.replace(/[^+\d\s\-\(\)]/g, '').trim()
+    return phone.replace(/[^+\d\s\-()]/g, '').trim()
   },
 
   /**
@@ -214,15 +214,195 @@ export const securityHeaders = {
   /**
    * Get security headers for API responses
    */
-  getSecurityHeaders: () => ({
+  getSecurityHeaders: (config?: { strictCSP?: boolean; includeHSTS?: boolean; reportUri?: string }) => ({
+    'Strict-Transport-Security': config?.includeHSTS !== false ? 'max-age=31536000; includeSubDomains; preload' : undefined,
     'X-Content-Type-Options': 'nosniff',
     'X-Frame-Options': 'DENY',
     'X-XSS-Protection': '1; mode=block',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
-    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-    'Content-Security-Policy':
-      "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self';",
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+    'Cross-Origin-Embedder-Policy': 'require-corp',
+    'Cross-Origin-Opener-Policy': 'same-origin',
+    'Cross-Origin-Resource-Policy': 'same-origin',
+    'Expect-CT': 'max-age=86400, enforce',
+    'Content-Security-Policy': config?.strictCSP ? securityHeaders.getStrictCSP(config) : securityHeaders.getStandardCSP(config),
   }),
+
+  /**
+   * Get standard CSP for normal operation
+   */
+  getStandardCSP: (config?: { reportUri?: string; reportTo?: string }) => {
+    const baseCSP = "default-src 'self';"
+    const scriptCSP = "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:;"
+    const styleCSP = "style-src 'self' 'unsafe-inline' https:;"
+    const imgCSP = "img-src 'self' data: https: blob:;"
+    const fontCSP = "font-src 'self' data: https:;"
+    const connectCSP = "connect-src 'self' https://api.tcdynamics.fr wss://api.tcdynamics.fr;"
+    const frameCSP = "frame-ancestors 'none';"
+    const baseURICSP = "base-uri 'self';"
+    const formActionCSP = "form-action 'self';"
+
+    // Add reporting endpoints if configured
+    const reportingCSP = securityHeaders.getReportingCSP(config)
+
+    return `${baseCSP} ${scriptCSP} ${styleCSP} ${imgCSP} ${fontCSP} ${connectCSP} ${frameCSP} ${baseURICSP} ${formActionCSP} ${reportingCSP}`.trim()
+  },
+
+  /**
+   * Get strict CSP for high-security environments
+   */
+  getStrictCSP: (config?: { reportUri?: string; reportTo?: string }) => {
+    const baseCSP = "default-src 'self';"
+    const scriptCSP = "script-src 'self';"
+    const styleCSP = "style-src 'self' https:;"
+    const imgCSP = "img-src 'self' data: https:;"
+    const fontCSP = "font-src 'self' https:;"
+    const connectCSP = "connect-src 'self' https://api.tcdynamics.fr;"
+    const frameCSP = "frame-ancestors 'none';"
+    const baseURICSP = "base-uri 'self';"
+    const formActionCSP = "form-action 'self';"
+    const objectCSP = "object-src 'none';"
+    const mediaCSP = "media-src 'self' data: https:;"
+    const workerCSP = "worker-src 'self' blob:;"
+
+    // Add reporting endpoints if configured
+    const reportingCSP = securityHeaders.getReportingCSP(config)
+
+    return `${baseCSP} ${scriptCSP} ${styleCSP} ${imgCSP} ${fontCSP} ${connectCSP} ${frameCSP} ${baseURICSP} ${formActionCSP} ${objectCSP} ${mediaCSP} ${workerCSP} ${reportingCSP}`.trim()
+  },
+
+  /**
+   * Get CSP reporting directives
+   */
+  getReportingCSP: (config?: { reportUri?: string; reportTo?: string }) => {
+    const directives: string[] = []
+
+    if (config?.reportUri) {
+      directives.push(`report-uri ${config.reportUri}`)
+    }
+
+    if (config?.reportTo) {
+      directives.push(`report-to ${config.reportTo}`)
+    }
+
+    return directives.join(' ')
+  },
+
+  /**
+   * Test CSP policy for violations
+   */
+  testCSP: (cspString: string): { valid: boolean; errors: string[]; warnings: string[] } => {
+    const errors: string[] = []
+    const warnings: string[] = []
+
+    try {
+      // Basic syntax validation
+      const directives = cspString.split(';').map(d => d.trim()).filter(d => d.length > 0)
+
+      // Check for common CSP issues
+      const hasDefaultSrc = directives.some(d => d.startsWith('default-src'))
+      const hasScriptSrc = directives.some(d => d.startsWith('script-src'))
+      const hasStyleSrc = directives.some(d => d.startsWith('style-src'))
+
+      if (!hasDefaultSrc && !hasScriptSrc) {
+        warnings.push('No default-src or script-src directive found - this may block legitimate scripts')
+      }
+
+      if (!hasDefaultSrc && !hasStyleSrc) {
+        warnings.push('No default-src or style-src directive found - this may block legitimate styles')
+      }
+
+      // Check for unsafe directives
+      directives.forEach(directive => {
+        const lowerDirective = directive.toLowerCase()
+        if (lowerDirective.includes("'unsafe-inline'")) {
+          warnings.push(`Directive contains 'unsafe-inline': ${directive}`)
+        }
+        if (lowerDirective.includes("'unsafe-eval'")) {
+          warnings.push(`Directive contains 'unsafe-eval': ${directive}`)
+        }
+        if (lowerDirective.includes('data:')) {
+          warnings.push(`Directive allows data: URIs which can be unsafe: ${directive}`)
+        }
+        if (lowerDirective.includes('http:')) {
+          warnings.push(`Directive allows HTTP (non-HTTPS) resources: ${directive}`)
+        }
+      })
+
+      // Check for missing important directives
+      const hasBaseUri = directives.some(d => d.startsWith('base-uri'))
+      const hasFormAction = directives.some(d => d.startsWith('form-action'))
+      const hasFrameAncestors = directives.some(d => d.startsWith('frame-ancestors'))
+
+      if (!hasBaseUri) {
+        warnings.push('Missing base-uri directive - base tag injection attacks possible')
+      }
+
+      if (!hasFormAction) {
+        warnings.push('Missing form-action directive - form action hijacking possible')
+      }
+
+      if (!hasFrameAncestors) {
+        warnings.push('Missing frame-ancestors directive - clickjacking protection limited')
+      }
+
+      return {
+        valid: errors.length === 0,
+        errors,
+        warnings,
+      }
+    } catch (error) {
+      errors.push(`CSP parsing failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      return {
+        valid: false,
+        errors,
+        warnings,
+      }
+    }
+  },
+
+  /**
+   * Validate security headers configuration
+   */
+  validateHeaders: (headers: Record<string, string>): { valid: boolean; issues: string[] } => {
+    const issues: string[] = []
+
+    // Check for required headers
+    const requiredHeaders = ['Strict-Transport-Security', 'X-Content-Type-Options', 'X-Frame-Options']
+    requiredHeaders.forEach(header => {
+      if (!headers[header]) {
+        issues.push(`Missing required header: ${header}`)
+      }
+    })
+
+    // Check HSTS configuration
+    const hsts = headers['Strict-Transport-Security']
+    if (hsts) {
+      if (!hsts.includes('max-age=')) {
+        issues.push('HSTS missing max-age directive')
+      }
+      if (!hsts.includes('includeSubDomains')) {
+        issues.push('HSTS should include subdomains for better security')
+      }
+    }
+
+    // Check CSP configuration
+    const csp = headers['Content-Security-Policy']
+    if (csp) {
+      const cspTest = securityHeaders.testCSP(csp)
+      issues.push(...cspTest.warnings)
+      if (!cspTest.valid) {
+        issues.push(...cspTest.errors)
+      }
+    } else {
+      issues.push('Missing Content-Security-Policy header')
+    }
+
+    return {
+      valid: issues.length === 0,
+      issues,
+    }
+  },
 
   /**
    * Validate allowed origins for CORS

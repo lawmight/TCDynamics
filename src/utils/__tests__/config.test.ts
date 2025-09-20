@@ -126,8 +126,6 @@ describe('Configuration Management', () => {
 
   describe('Configuration Validation', () => {
     it('should validate required client configuration', async () => {
-      const { config } = await import('../config')
-
       // Mock incomplete configuration
       vi.doMock('../config', () => ({
         config: {
@@ -151,8 +149,6 @@ describe('Configuration Management', () => {
     })
 
     it('should return safe configuration summary', async () => {
-      const { config } = await import('../config')
-
       vi.doMock('../config', () => ({
         config: {
           client: {
@@ -201,8 +197,6 @@ describe('Configuration Management', () => {
 
   describe('Configuration Initialization', () => {
     it('should initialize configuration successfully', async () => {
-      const { config } = await import('../config')
-
       vi.doMock('../config', () => ({
         config: {
           initialize: vi.fn().mockResolvedValue(undefined),
@@ -218,8 +212,6 @@ describe('Configuration Management', () => {
     })
 
     it('should handle initialization errors', async () => {
-      const { config } = await import('../config')
-
       vi.doMock('../config', () => ({
         config: {
           initialize: vi.fn().mockRejectedValue(new Error('Validation failed')),
