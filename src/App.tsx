@@ -4,7 +4,9 @@ import { Toaster as Sonner } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import ErrorBoundary from './components/ErrorBoundary'
 import MobileNavigation from './components/MobileNavigation'
+import StickyHeader from './components/StickyHeader'
 import OfflineIndicator from './components/OfflineIndicator'
 import PerformanceMonitor from './components/PerformanceMonitor'
 
@@ -37,25 +39,40 @@ const PageLoader = () => (
   </div>
 )
 
+// Error handler for the ErrorBoundary
+const handleAppError = (error: Error, errorInfo: any) => {
+  // Report to monitoring service
+  if (typeof window !== 'undefined' && (window as any).performanceMonitor) {
+    (window as any).performanceMonitor.recordMetric('error.app', 1, {
+      error: error.message,
+      componentStack: errorInfo.componentStack,
+      severity: 'high'
+    })
+  }
+}
+
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <MobileNavigation />
-      <OfflineIndicator />
-      <PerformanceMonitor />
-      <BrowserRouter>
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ErrorBoundary onError={handleAppError}>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <MobileNavigation />
+        <StickyHeader />
+        <OfflineIndicator />
+        <PerformanceMonitor />
+        <BrowserRouter>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 )
 
 export default App

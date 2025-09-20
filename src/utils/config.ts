@@ -16,22 +16,64 @@ const clientConfigSchema = z.object({
   VITE_APP_VERSION: z.string().default('1.0.0'),
 
   // Analytics (optional)
-  VITE_GA_TRACKING_ID: z.string().optional(),
-  VITE_HOTJAR_ID: z.string().optional(),
+  VITE_ANALYTICS_GA_TRACKING_ID: z.string().optional(),
+  VITE_ANALYTICS_HOTJAR_ID: z.string().optional(),
 
   // Feature flags
-  VITE_ENABLE_ANALYTICS: z
+  VITE_FEATURE_ENABLE_ANALYTICS: z
     .string()
     .transform(val => val === 'true')
     .default('false'),
-  VITE_ENABLE_DEBUG_LOGGING: z
+  VITE_FEATURE_ENABLE_DEBUG_LOGGING: z
     .string()
     .transform(val => val === 'true')
     .default('false'),
-  VITE_ENABLE_CACHE: z
+  VITE_FEATURE_ENABLE_CACHE: z
     .string()
     .transform(val => val === 'true')
     .default('true'),
+
+  // Cache configuration
+  VITE_CACHE_MAX_SIZE: z
+    .string()
+    .transform(val => parseInt(val, 10))
+    .default('1000'),
+  VITE_CACHE_DEFAULT_TTL: z
+    .string()
+    .transform(val => parseInt(val, 10))
+    .default('300000'), // 5 minutes
+  VITE_CACHE_CLEANUP_INTERVAL: z
+    .string()
+    .transform(val => parseInt(val, 10))
+    .default('300000'), // 5 minutes
+
+  // Performance monitoring
+  VITE_PERFORMANCE_ENABLE_SAMPLING: z
+    .string()
+    .transform(val => val === 'true')
+    .default('true'),
+  VITE_PERFORMANCE_SAMPLE_RATE: z
+    .string()
+    .transform(val => parseFloat(val))
+    .default('0.1'), // 10% sampling
+  VITE_PERFORMANCE_MAX_METRICS: z
+    .string()
+    .transform(val => parseInt(val, 10))
+    .default('1000'),
+
+  // Security
+  VITE_SECURITY_CSP_STRICT: z
+    .string()
+    .transform(val => val === 'true')
+    .default('false'),
+  VITE_SECURITY_RATE_LIMIT_REQUESTS: z
+    .string()
+    .transform(val => parseInt(val, 10))
+    .default('100'),
+  VITE_SECURITY_RATE_LIMIT_WINDOW: z
+    .string()
+    .transform(val => parseInt(val, 10))
+    .default('60000'), // 1 minute
 })
 
 const serverConfigSchema = z.object({
@@ -75,27 +117,106 @@ class ConfigManager {
   }
 
   /**
-   * Initialize configuration from environment variables
+   * Get safe client configuration with defaults
+   */
+  private getSafeClientConfig(): z.infer<typeof clientConfigSchema> {
+    const env = this.loadClientEnvironmentVariables()
+
+    // Apply safe defaults for missing or invalid values
+    return {
+      VITE_AZURE_FUNCTIONS_URL: env.VITE_AZURE_FUNCTIONS_URL || 'https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api',
+      VITE_NODE_ENV: (env.VITE_NODE_ENV as 'development' | 'production' | 'test') || 'development',
+      VITE_APP_VERSION: env.VITE_APP_VERSION || '1.0.0',
+      VITE_ANALYTICS_GA_TRACKING_ID: env.VITE_ANALYTICS_GA_TRACKING_ID,
+      VITE_ANALYTICS_HOTJAR_ID: env.VITE_ANALYTICS_HOTJAR_ID,
+      VITE_FEATURE_ENABLE_ANALYTICS: env.VITE_FEATURE_ENABLE_ANALYTICS === 'true',
+      VITE_FEATURE_ENABLE_DEBUG_LOGGING: env.VITE_FEATURE_ENABLE_DEBUG_LOGGING === 'true',
+      VITE_FEATURE_ENABLE_CACHE: env.VITE_FEATURE_ENABLE_CACHE !== 'false', // Default true
+      VITE_CACHE_MAX_SIZE: Math.max(100, parseInt(env.VITE_CACHE_MAX_SIZE || '1000', 10)),
+      VITE_CACHE_DEFAULT_TTL: Math.max(60000, parseInt(env.VITE_CACHE_DEFAULT_TTL || '300000', 10)), // Min 1 minute
+      VITE_CACHE_CLEANUP_INTERVAL: Math.max(60000, parseInt(env.VITE_CACHE_CLEANUP_INTERVAL || '300000', 10)),
+      VITE_PERFORMANCE_ENABLE_SAMPLING: env.VITE_PERFORMANCE_ENABLE_SAMPLING !== 'false',
+      VITE_PERFORMANCE_SAMPLE_RATE: Math.max(0.01, Math.min(1, parseFloat(env.VITE_PERFORMANCE_SAMPLE_RATE || '0.1'))),
+      VITE_PERFORMANCE_MAX_METRICS: Math.max(100, parseInt(env.VITE_PERFORMANCE_MAX_METRICS || '1000', 10)),
+      VITE_SECURITY_CSP_STRICT: env.VITE_SECURITY_CSP_STRICT === 'true',
+      VITE_SECURITY_RATE_LIMIT_REQUESTS: Math.max(10, parseInt(env.VITE_SECURITY_RATE_LIMIT_REQUESTS || '100', 10)),
+      VITE_SECURITY_RATE_LIMIT_WINDOW: Math.max(10000, parseInt(env.VITE_SECURITY_RATE_LIMIT_WINDOW || '60000', 10)),
+    }
+  }
+
+  /**
+   * Get safe server configuration with defaults
+   */
+  private getSafeServerConfig(): z.infer<typeof serverConfigSchema> {
+    const env = this.loadServerEnvironmentVariables()
+
+    return {
+      AZURE_OPENAI_ENDPOINT: env.AZURE_OPENAI_ENDPOINT,
+      AZURE_OPENAI_KEY: env.AZURE_OPENAI_KEY,
+      AZURE_OPENAI_DEPLOYMENT: env.AZURE_OPENAI_DEPLOYMENT || 'gpt-35-turbo',
+      AZURE_VISION_ENDPOINT: env.AZURE_VISION_ENDPOINT,
+      AZURE_VISION_KEY: env.AZURE_VISION_KEY,
+      ZOHO_EMAIL: env.ZOHO_EMAIL,
+      ZOHO_PASSWORD: env.ZOHO_PASSWORD,
+      COSMOS_CONNECTION_STRING: env.COSMOS_CONNECTION_STRING,
+      ADMIN_KEY: env.ADMIN_KEY,
+      FRONTEND_URL: env.FRONTEND_URL || 'https://tcdynamics.fr',
+      APPLICATIONINSIGHTS_CONNECTION_STRING: env.APPLICATIONINSIGHTS_CONNECTION_STRING,
+      AzureWebJobsStorage: env.AzureWebJobsStorage,
+    }
+  }
+
+  /**
+   * Initialize configuration from environment variables with safe defaults
    */
   async initialize(): Promise<void> {
     if (this.isInitialized) return
 
     try {
-      // Load client-side configuration
-      const clientEnv = this.loadClientEnvironmentVariables()
-      this.clientConfig = clientConfigSchema.parse(clientEnv)
+      // Load and validate client-side configuration with safe defaults
+      const safeClientConfig = this.getSafeClientConfig()
+      const clientValidation = clientConfigSchema.safeParse(safeClientConfig)
 
-      // Load server-side configuration (if available)
-      const serverEnv = this.loadServerEnvironmentVariables()
-      this.serverConfig = serverConfigSchema.parse(serverEnv)
+      if (!clientValidation.success) {
+        console.warn('Client configuration validation failed, using safe defaults:', clientValidation.error.issues)
+        this.clientConfig = safeClientConfig
+      } else {
+        this.clientConfig = clientValidation.data
+      }
+
+      // Load and validate server-side configuration (if available)
+      const safeServerConfig = this.getSafeServerConfig()
+      const serverValidation = serverConfigSchema.safeParse(safeServerConfig)
+
+      if (!serverValidation.success) {
+        console.warn('Server configuration validation failed, using safe defaults:', serverValidation.error.issues)
+        this.serverConfig = safeServerConfig
+      } else {
+        this.serverConfig = serverValidation.data
+      }
 
       this.isInitialized = true
       this.logConfigStatus()
+
+      // Emit config loaded event for other modules
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('configLoaded', { detail: this }))
+      }
     } catch (error) {
       console.error('Configuration initialization failed:', error)
-      throw new Error(
-        `Configuration validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-      )
+
+      // Fallback to safe defaults even if validation completely fails
+      try {
+        this.clientConfig = this.getSafeClientConfig()
+        this.serverConfig = this.getSafeServerConfig()
+        this.isInitialized = true
+        console.warn('Using safe configuration defaults due to initialization failure')
+      } catch (fallbackError) {
+        console.error('Even fallback configuration failed:', fallbackError)
+        throw new Error(
+          `Configuration initialization completely failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        )
+      }
     }
   }
 
@@ -110,11 +231,20 @@ class ConfigManager {
       'VITE_AZURE_FUNCTIONS_URL',
       'VITE_NODE_ENV',
       'VITE_APP_VERSION',
-      'VITE_GA_TRACKING_ID',
-      'VITE_HOTJAR_ID',
-      'VITE_ENABLE_ANALYTICS',
-      'VITE_ENABLE_DEBUG_LOGGING',
-      'VITE_ENABLE_CACHE',
+      'VITE_ANALYTICS_GA_TRACKING_ID',
+      'VITE_ANALYTICS_HOTJAR_ID',
+      'VITE_FEATURE_ENABLE_ANALYTICS',
+      'VITE_FEATURE_ENABLE_DEBUG_LOGGING',
+      'VITE_FEATURE_ENABLE_CACHE',
+      'VITE_CACHE_MAX_SIZE',
+      'VITE_CACHE_DEFAULT_TTL',
+      'VITE_CACHE_CLEANUP_INTERVAL',
+      'VITE_PERFORMANCE_ENABLE_SAMPLING',
+      'VITE_PERFORMANCE_SAMPLE_RATE',
+      'VITE_PERFORMANCE_MAX_METRICS',
+      'VITE_SECURITY_CSP_STRICT',
+      'VITE_SECURITY_RATE_LIMIT_REQUESTS',
+      'VITE_SECURITY_RATE_LIMIT_WINDOW',
     ]
 
     clientVars.forEach(key => {
@@ -168,9 +298,12 @@ class ConfigManager {
         functionsUrl: this.clientConfig.VITE_AZURE_FUNCTIONS_URL
           ? 'configured'
           : 'default',
-        analytics: this.clientConfig.VITE_ENABLE_ANALYTICS,
-        debugLogging: this.clientConfig.VITE_ENABLE_DEBUG_LOGGING,
-        cache: this.clientConfig.VITE_ENABLE_CACHE,
+        analytics: this.clientConfig.VITE_FEATURE_ENABLE_ANALYTICS,
+        debugLogging: this.clientConfig.VITE_FEATURE_ENABLE_DEBUG_LOGGING,
+        cache: this.clientConfig.VITE_FEATURE_ENABLE_CACHE,
+        cacheSize: this.clientConfig.VITE_CACHE_MAX_SIZE,
+        performanceSampling: this.clientConfig.VITE_PERFORMANCE_ENABLE_SAMPLING,
+        securityStrict: this.clientConfig.VITE_SECURITY_CSP_STRICT,
       },
       server: {
         openai: this.serverConfig.AZURE_OPENAI_ENDPOINT
@@ -270,9 +403,11 @@ class ConfigManager {
       version: this.client.VITE_APP_VERSION,
       functionsUrl: this.functionsBaseUrl,
       features: {
-        analytics: this.client.VITE_ENABLE_ANALYTICS,
-        debugLogging: this.client.VITE_ENABLE_DEBUG_LOGGING,
-        cache: this.client.VITE_ENABLE_CACHE,
+        analytics: this.client.VITE_FEATURE_ENABLE_ANALYTICS,
+        debugLogging: this.client.VITE_FEATURE_ENABLE_DEBUG_LOGGING,
+        cache: this.client.VITE_FEATURE_ENABLE_CACHE,
+        performanceSampling: this.client.VITE_PERFORMANCE_ENABLE_SAMPLING,
+        securityStrict: this.client.VITE_SECURITY_CSP_STRICT,
       },
       services: {
         openai: !!this.server.AZURE_OPENAI_ENDPOINT,

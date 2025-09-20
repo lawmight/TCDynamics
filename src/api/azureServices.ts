@@ -17,8 +17,8 @@ const API_CONFIG = {
   timeout: 30000, // 30 seconds
   retries: 3,
   retryDelay: 1000, // 1 second
-  cacheEnabled: config.client.VITE_ENABLE_CACHE,
-  cacheTTL: 300000, // 5 minutes
+  cacheEnabled: config.client.VITE_FEATURE_ENABLE_CACHE,
+  cacheTTL: config.client.VITE_CACHE_DEFAULT_TTL || 300000, // 5 minutes
 } as const
 
 // Get functions base URL from config
@@ -564,7 +564,7 @@ export const healthAPI = {
     ApiResponse<{ status: string; timestamp: string }>
   > {
     try {
-      const response = await apiRequest<ApiResponse>('/health', {
+      await apiRequest<ApiResponse>('/health', {
         method: 'GET',
       })
 

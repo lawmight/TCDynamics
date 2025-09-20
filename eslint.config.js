@@ -33,7 +33,7 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-expressions': 'error',
       '@typescript-eslint/prefer-nullish-coalescing': 'off', // Requires type info
-      '@typescript-eslint/prefer-optional-chain': 'error',
+      '@typescript-eslint/prefer-optional-chain': 'off', // Requires type info
       '@typescript-eslint/no-non-null-assertion': 'warn',
       'no-console': 'warn',
       'prefer-const': 'error',

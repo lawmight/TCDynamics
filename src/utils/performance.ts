@@ -245,29 +245,160 @@ interface CacheEntry<T = any> {
   ttl: number
   accessCount: number
   lastAccessed: number
+  size: number // Size in bytes for memory management
+}
+
+interface CacheConfig {
+  maxSize: number
+  defaultTTL: number
+  cleanupInterval: number
 }
 
 class SmartCache {
   private cache = new Map<string, CacheEntry>()
   private performanceMonitor: PerformanceMonitor
+  private config: CacheConfig
+  private currentSize = 0
+  private lruQueue: string[] = [] // For LRU eviction
 
-  constructor(performanceMonitor: PerformanceMonitor) {
+  constructor(performanceMonitor: PerformanceMonitor, config: CacheConfig) {
     this.performanceMonitor = performanceMonitor
+    this.config = config
+
+    // Start cleanup interval
+    if (typeof window !== 'undefined') {
+      setInterval(() => {
+        this.cleanup()
+      }, this.config.cleanupInterval)
+    }
   }
 
-  set<T>(key: string, data: T, ttlMs: number = 300000): void {
+  /**
+   * Calculate approximate size of data in bytes
+   */
+  private calculateSize(data: any): number {
+    if (typeof data === 'string') {
+      return data.length * 2 // UTF-16 characters
+    }
+    if (typeof data === 'number') {
+      return 8 // 64-bit float
+    }
+    if (typeof data === 'boolean') {
+      return 1
+    }
+    if (data === null || data === undefined) {
+      return 0
+    }
+    if (Array.isArray(data)) {
+      return data.reduce((sum, item) => sum + this.calculateSize(item), 0)
+    }
+    if (typeof data === 'object') {
+      return JSON.stringify(data).length * 2
+    }
+    return 0
+  }
+
+  /**
+   * Add key to front of LRU queue
+   */
+  private addToLRUQueue(key: string): void {
+    this.removeFromLRUQueue(key) // Remove if exists
+    this.lruQueue.unshift(key) // Add to front
+  }
+
+  /**
+   * Remove key from LRU queue
+   */
+  private removeFromLRUQueue(key: string): void {
+    const index = this.lruQueue.indexOf(key)
+    if (index > -1) {
+      this.lruQueue.splice(index, 1)
+    }
+  }
+
+  /**
+   * Evict entries if necessary to make room for new data
+   */
+  private evictIfNecessary(newDataSize: number): void {
+    let targetSize = this.currentSize + newDataSize
+
+    // First, evict expired entries
+    this.evictExpired()
+
+    // Then, if still over limit, evict LRU entries
+    while (targetSize > this.config.maxSize && this.lruQueue.length > 0) {
+      const oldestKey = this.lruQueue.pop()!
+      const entry = this.cache.get(oldestKey)
+      if (entry) {
+        this.currentSize -= entry.size
+        this.cache.delete(oldestKey)
+        this.performanceMonitor.recordMetric('cache.evicted', 0, {
+          key: oldestKey,
+          reason: 'size_limit'
+        })
+      }
+      targetSize = this.currentSize + newDataSize
+    }
+  }
+
+  /**
+   * Evict expired entries
+   */
+  private evictExpired(): void {
+    const now = Date.now()
+    let removed = 0
+
+    for (const [key, entry] of this.cache.entries()) {
+      if (now - entry.timestamp > entry.ttl) {
+        this.currentSize -= entry.size
+        this.cache.delete(key)
+        this.removeFromLRUQueue(key)
+        removed++
+      }
+    }
+
+    if (removed > 0) {
+      this.performanceMonitor.recordMetric('cache.evicted', 0, {
+        count: removed,
+        reason: 'expired'
+      })
+    }
+  }
+
+  set<T>(key: string, data: T, ttlMs: number = this.config.defaultTTL): void {
+    // Calculate size of the data
+    const dataSize = this.calculateSize(data)
+
+    // Check if we need to evict entries (LRU + size-based eviction)
+    this.evictIfNecessary(dataSize)
+
     const entry: CacheEntry<T> = {
       data,
       timestamp: Date.now(),
       ttl: ttlMs,
       accessCount: 0,
       lastAccessed: Date.now(),
+      size: dataSize,
+    }
+
+    // Remove existing entry if present
+    const existing = this.cache.get(key)
+    if (existing) {
+      this.currentSize -= existing.size
+      this.removeFromLRUQueue(key)
     }
 
     this.cache.set(key, entry)
+    this.currentSize += dataSize
+    this.addToLRUQueue(key) // Add to front of LRU queue
 
     // Log cache operation
-    this.performanceMonitor.recordMetric('cache.set', 0, { key, ttl: ttlMs })
+    this.performanceMonitor.recordMetric('cache.set', 0, {
+      key,
+      ttl: ttlMs,
+      size: dataSize,
+      totalSize: this.currentSize
+    })
   }
 
   get<T>(key: string): T | null {
@@ -280,19 +411,23 @@ class SmartCache {
 
     // Check if expired
     if (Date.now() - entry.timestamp > entry.ttl) {
+      this.currentSize -= entry.size
       this.cache.delete(key)
+      this.removeFromLRUQueue(key)
       this.performanceMonitor.recordMetric('cache.expired', 0, { key })
       return null
     }
 
-    // Update access statistics
+    // Update access statistics and LRU position
     entry.accessCount++
     entry.lastAccessed = Date.now()
+    this.addToLRUQueue(key) // Move to front
 
     this.performanceMonitor.recordMetric('cache.hit', 0, {
       key,
       accessCount: entry.accessCount,
       age: Date.now() - entry.timestamp,
+      size: entry.size,
     })
 
     return entry.data
@@ -303,7 +438,9 @@ class SmartCache {
     if (!entry) return false
 
     if (Date.now() - entry.timestamp > entry.ttl) {
+      this.currentSize -= entry.size
       this.cache.delete(key)
+      this.removeFromLRUQueue(key)
       return false
     }
 
@@ -311,18 +448,28 @@ class SmartCache {
   }
 
   delete(key: string): boolean {
+    const entry = this.cache.get(key)
     const deleted = this.cache.delete(key)
-    if (deleted) {
-      this.performanceMonitor.recordMetric('cache.delete', 0, { key })
+    if (deleted && entry) {
+      this.currentSize -= entry.size
+      this.removeFromLRUQueue(key)
+      this.performanceMonitor.recordMetric('cache.delete', 0, {
+        key,
+        size: entry.size
+      })
     }
     return deleted
   }
 
   clear(): void {
     const size = this.cache.size
+    const previousTotalSize = this.currentSize
     this.cache.clear()
+    this.currentSize = 0
+    this.lruQueue = []
     this.performanceMonitor.recordMetric('cache.clear', 0, {
       previousSize: size,
+      previousTotalSize,
     })
   }
 
@@ -332,6 +479,9 @@ class SmartCache {
     totalAccesses: number
     oldestEntry: number
     newestEntry: number
+    totalSize: number
+    maxSize: number
+    utilizationPercent: number
   } {
     const entries = Array.from(this.cache.values())
     const totalAccesses = entries.reduce(
@@ -350,29 +500,70 @@ class SmartCache {
       totalAccesses,
       oldestEntry,
       newestEntry,
+      totalSize: this.currentSize,
+      maxSize: this.config.maxSize,
+      utilizationPercent: this.config.maxSize > 0 ? (this.currentSize / this.config.maxSize) * 100 : 0,
     }
   }
 
   // Cleanup expired entries
   cleanup(): void {
-    const now = Date.now()
-    let removed = 0
+    this.evictExpired()
+  }
 
-    for (const [key, entry] of this.cache.entries()) {
-      if (now - entry.timestamp > entry.ttl) {
-        this.cache.delete(key)
-        removed++
-      }
-    }
+  /**
+   * Get detailed cache metrics for telemetry
+   */
+  getCacheMetrics() {
+    const stats = this.getStats()
+    const entries = Array.from(this.cache.values())
 
-    if (removed > 0) {
-      this.performanceMonitor.recordMetric('cache.cleanup', 0, { removed })
+    return {
+      ...stats,
+      entriesByTTL: entries.reduce((acc, entry) => {
+        const ttlRange = this.getTTlRange(entry.ttl)
+        acc[ttlRange] = (acc[ttlRange] || 0) + 1
+        return acc
+      }, {} as Record<string, number>),
+      averageEntrySize: entries.length > 0 ? entries.reduce((sum, entry) => sum + entry.size, 0) / entries.length : 0,
+      largestEntry: entries.length > 0 ? Math.max(...entries.map(entry => entry.size)) : 0,
+      smallestEntry: entries.length > 0 ? Math.min(...entries.map(entry => entry.size)) : 0,
+      entriesBySize: entries.reduce((acc, entry) => {
+        const sizeRange = this.getSizeRange(entry.size)
+        acc[sizeRange] = (acc[sizeRange] || 0) + 1
+        return acc
+      }, {} as Record<string, number>),
     }
+  }
+
+  /**
+   * Helper to categorize TTL ranges
+   */
+  private getTTlRange(ttl: number): string {
+    if (ttl < 60000) return '< 1min'
+    if (ttl < 300000) return '1-5min'
+    if (ttl < 900000) return '5-15min'
+    if (ttl < 3600000) return '15min-1h'
+    return '> 1h'
+  }
+
+  /**
+   * Helper to categorize size ranges
+   */
+  private getSizeRange(size: number): string {
+    if (size < 100) return '< 100B'
+    if (size < 1024) return '100B-1KB'
+    if (size < 10240) return '1-10KB'
+    if (size < 102400) return '10-100KB'
+    if (size < 1048576) return '100KB-1MB'
+    return '> 1MB'
   }
 }
 
 // ========== RESOURCE POOLING ==========
 
+// TODO: ResourcePool class - currently unused but may be needed for future resource management
+/*
 class ResourcePool<T> {
   private available: T[] = []
   private inUse: Set<T> = new Set()
@@ -441,17 +632,120 @@ class ResourcePool<T> {
     this.inUse.clear()
   }
 }
+*/
 
 // ========== SINGLETON INSTANCES ==========
 
 export const performanceMonitor = new PerformanceMonitor()
-export const smartCache = new SmartCache(performanceMonitor)
 
-// Auto-cleanup cache every 5 minutes
+// Create cache configuration from config module
+const createCacheConfig = (): CacheConfig => ({
+  maxSize: 1000, // Default, will be updated when config is loaded
+  defaultTTL: 300000, // 5 minutes
+  cleanupInterval: 300000, // 5 minutes
+})
+
+// Initialize cache with default config, will be updated when config loads
+export let smartCache = new SmartCache(performanceMonitor, createCacheConfig())
+
+// Update cache configuration when config is available
+const updateCacheConfig = () => {
+  try {
+    // This will be called after config initialization
+    if (typeof window !== 'undefined' && (window as any).config) {
+      const config = (window as any).config
+      const newCacheConfig: CacheConfig = {
+        maxSize: config.client.VITE_CACHE_MAX_SIZE || 1000,
+        defaultTTL: config.client.VITE_CACHE_DEFAULT_TTL || 300000,
+        cleanupInterval: config.client.VITE_CACHE_CLEANUP_INTERVAL || 300000,
+      }
+      smartCache = new SmartCache(performanceMonitor, newCacheConfig)
+
+      // Record cache configuration update
+      performanceMonitor.recordMetric('cache.config.updated', 1, {
+        maxSize: newCacheConfig.maxSize,
+        defaultTTL: newCacheConfig.defaultTTL,
+        cleanupInterval: newCacheConfig.cleanupInterval,
+      })
+    }
+  } catch (error) {
+    console.warn('Failed to update cache configuration:', error)
+    performanceMonitor.recordMetric('cache.config.update_failed', 1, {
+      error: error instanceof Error ? error.message : 'Unknown error',
+    })
+  }
+}
+
+// Auto-update cache config when config loads
 if (typeof window !== 'undefined') {
-  setInterval(() => {
-    smartCache.cleanup()
-  }, 300000) // 5 minutes
+  // Try immediately
+  updateCacheConfig()
+
+  // Listen for config load event
+  window.addEventListener('configLoaded', updateCacheConfig)
+}
+
+// Cache telemetry utilities
+export const cacheTelemetry = {
+  /**
+   * Report cache metrics to monitoring system
+   */
+  reportMetrics: () => {
+    try {
+      const metrics = smartCache.getCacheMetrics()
+      performanceMonitor.recordMetric('cache.stats', 1, metrics)
+    } catch (error) {
+      performanceMonitor.recordMetric('cache.telemetry_error', 1, {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      })
+    }
+  },
+
+  /**
+   * Check cache health and report issues
+   */
+  healthCheck: () => {
+    try {
+      const stats = smartCache.getStats()
+
+      // Check for potential issues
+      const issues: string[] = []
+
+      if (stats.utilizationPercent > 90) {
+        issues.push('High memory utilization')
+      }
+
+      if (stats.hitRate < 50) {
+        issues.push('Low cache hit rate')
+      }
+
+      if (stats.size > stats.maxSize * 0.8) {
+        issues.push('Approaching size limit')
+      }
+
+      if (issues.length > 0) {
+        performanceMonitor.recordMetric('cache.health_issues', issues.length, {
+          issues: issues.join(', '),
+          stats,
+        })
+      }
+
+      return {
+        healthy: issues.length === 0,
+        issues,
+        stats,
+      }
+    } catch (error) {
+      performanceMonitor.recordMetric('cache.health_check_error', 1, {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      })
+      return {
+        healthy: false,
+        issues: ['Health check failed'],
+        stats: null,
+      }
+    }
+  },
 }
 
 // ========== UTILITY FUNCTIONS ==========
