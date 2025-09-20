@@ -1,144 +1,185 @@
-# TCDynamics Environment Variables Setup
+# TCDynamics Environment Configuration Guide
 
-## Quick Setup Guide
+This document outlines all environment variables required for the TCDynamics application.
 
-### 1. Frontend Environment Variables (.env)
+## Quick Start
 
+1. Copy `.env.example` to `.env` (create if it doesn't exist)
+2. Fill in your actual values
+3. Restart your development server
+
+## Environment Variables
+
+### Client-Side Configuration
+These variables are exposed to the browser and must be prefixed with `VITE_`.
+
+#### Required
 ```bash
-# Azure Functions Configuration
 VITE_AZURE_FUNCTIONS_URL=https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api
-
-# Azure OpenAI Configuration (for AI features)
-VITE_AZURE_OPENAI_ENDPOINT=your-azure-openai-endpoint
-VITE_AZURE_OPENAI_KEY=your-azure-openai-key
-VITE_AZURE_OPENAI_DEPLOYMENT=your-deployment-name
-
-# Azure Vision Configuration (for document processing)
-VITE_AZURE_VISION_ENDPOINT=your-azure-vision-endpoint
-VITE_AZURE_VISION_KEY=your-azure-vision-key
-
-# Cosmos DB Configuration (optional)
-VITE_COSMOS_DB_CONNECTION_STRING=your-cosmos-connection-string
-VITE_COSMOS_DB_DATABASE=tcdynamics
-VITE_COSMOS_DB_CONTAINER_CONTACTS=contacts
-VITE_COSMOS_DB_CONTAINER_CONVERSATIONS=conversations
+VITE_NODE_ENV=development
+VITE_APP_VERSION=1.0.0
 ```
 
-### 2. Azure Functions Environment Variables
-
-In Azure Portal → Function App → Configuration → Application settings:
-
+#### Optional
 ```bash
-# Email Configuration (Zoho Mail)
+# Analytics
+VITE_GA_TRACKING_ID=GA_MEASUREMENT_ID
+VITE_HOTJAR_ID=your-hotjar-id
+
+# Feature Flags
+VITE_ENABLE_ANALYTICS=false
+VITE_ENABLE_DEBUG_LOGGING=false
+VITE_ENABLE_CACHE=true
+```
+
+### Server-Side Configuration
+These variables are used by Azure Functions and are kept server-side only.
+
+#### Azure OpenAI (Required for AI Chat)
+```bash
+AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
+AZURE_OPENAI_KEY=your-azure-openai-key
+AZURE_OPENAI_DEPLOYMENT=gpt-35-turbo
+```
+
+#### Azure Vision (Required for Document Processing)
+```bash
+AZURE_VISION_ENDPOINT=https://your-vision-resource.cognitiveservices.azure.com/
+AZURE_VISION_KEY=your-azure-vision-key
+```
+
+#### Email Configuration (Required for Contact Forms)
+```bash
 ZOHO_EMAIL=contact@tcdynamics.fr
 ZOHO_PASSWORD=your-zoho-app-password
+```
 
-# Azure Functions Configuration
-FUNCTIONS_WORKER_RUNTIME=python
-AzureWebJobsStorage=your-storage-connection-string
-APPLICATIONINSIGHTS_CONNECTION_STRING=your-app-insights-connection
+#### Database (Optional, for advanced features)
+```bash
+COSMOS_CONNECTION_STRING=your-cosmos-connection-string
+```
 
-# Security
-ADMIN_KEY=your-secure-admin-key
-
-# CORS (optional)
+#### Security (Required)
+```bash
+ADMIN_KEY=change-this-to-a-secure-random-string-at-least-32-characters-long
 FRONTEND_URL=https://tcdynamics.fr
 ```
 
-### 3. GitHub Secrets
+#### Monitoring (Optional)
+```bash
+APPLICATIONINSIGHTS_CONNECTION_STRING=your-app-insights-connection-string
+```
 
-In GitHub → Settings → Secrets and variables → Actions:
+#### Azure Functions (Required for local development)
+```bash
+AzureWebJobsStorage=UseDevelopmentStorage=true
+```
+
+## Security Best Practices
+
+### Development
+- Use different values for development and production
+- Never commit real secrets to version control
+- Use `.env` files (add to `.gitignore`)
+
+### Production
+- Use Azure Key Vault for sensitive data
+- Enable Azure Managed Identities
+- Rotate keys regularly
+- Use Azure Application Insights for monitoring
+
+### Azure Key Vault Setup
+
+1. Create a Key Vault in your Azure subscription
+2. Add secrets for each sensitive environment variable
+3. Grant your Azure Functions access to the Key Vault
+4. Update your Azure Functions configuration to reference Key Vault secrets
+
+Example Key Vault references:
+```
+AZURE_OPENAI_KEY=@Microsoft.KeyVault(SecretUri=https://your-vault.vault.azure.net/secrets/azure-openai-key/)
+```
+
+## Validation
+
+The application includes automatic validation for all environment variables:
+
+- Client-side variables are validated on app startup
+- Server-side variables are validated when Azure Functions start
+- Missing required variables will cause the application to fail fast with clear error messages
+
+## Testing Configuration
+
+For testing, you can use mock values or set up test-specific environment variables:
 
 ```bash
-# Azure Deployment Credentials
-AZURE_CREDENTIALS={"clientId":"...","clientSecret":"...","subscriptionId":"...","tenantId":"..."}
-AZURE_FUNCTIONAPP_PUBLISH_PROFILE=your-publish-profile-xml
+# Test environment
+VITE_NODE_ENV=test
+VITE_AZURE_FUNCTIONS_URL=http://localhost:7071/api
+
+# Use mock services for testing
+AZURE_OPENAI_ENDPOINT=http://localhost:3001/mock-openai
+AZURE_VISION_ENDPOINT=http://localhost:3001/mock-vision
 ```
-
-## How to Get Azure Credentials
-
-### AZURE_CREDENTIALS
-1. Go to Azure Portal → Azure Active Directory → App registrations
-2. Create new registration or use existing
-3. Go to Certificates & secrets → New client secret
-4. Copy the JSON format:
-```json
-{
-  "clientId": "your-client-id",
-  "clientSecret": "your-client-secret", 
-  "subscriptionId": "your-subscription-id",
-  "tenantId": "your-tenant-id"
-}
-```
-
-### AZURE_FUNCTIONAPP_PUBLISH_PROFILE
-1. Go to Azure Portal → Function App → func-tcdynamics-contact
-2. Go to Get publish profile
-3. Download the .PublishSettings file
-4. Copy the entire XML content
-
-## Zoho Mail Setup
-
-1. Go to Zoho Mail → Settings → Security
-2. Enable 2-Factor Authentication
-3. Generate App Password (not your regular password)
-4. Use the app password in ZOHO_PASSWORD
-
-## Testing Your Setup
-
-### Local Testing
-```bash
-# Test frontend
-npm run dev
-
-# Test Azure Functions locally
-cd TCDynamics
-func start
-```
-
-### Production Testing
-- Frontend: https://tcdynamics.fr
-- Health Check: https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api/health
-- Contact Form: https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api/ContactForm
-- Demo Form: https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api/DemoForm
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **"Email credentials not configured"**
-   - Check ZOHO_EMAIL and ZOHO_PASSWORD in Azure Functions settings
-   - Ensure you're using app password, not regular password
+1. **"Configuration validation failed"**
+   - Check that all required environment variables are set
+   - Verify variable names match exactly (case-sensitive)
+   - Ensure URLs are properly formatted
 
-2. **"CORS error"**
-   - Check FRONTEND_URL in Azure Functions settings
-   - Verify VITE_AZURE_FUNCTIONS_URL in frontend .env
+2. **Azure Functions not connecting**
+   - Verify `VITE_AZURE_FUNCTIONS_URL` is correct
+   - Check CORS settings in Azure Functions
+   - Ensure Azure Functions are deployed and running
 
-3. **"Azure Functions deployment failed"**
-   - Check AZURE_CREDENTIALS format in GitHub secrets
-   - Verify function app name matches exactly
+3. **AI services not working**
+   - Verify Azure OpenAI and Vision credentials
+   - Check that endpoints are accessible
+   - Ensure proper permissions are set in Azure
 
-4. **"Frontend build failed"**
-   - Check all VITE_* environment variables
-   - Run `npm run type-check` locally
+### Debug Mode
 
-### Environment Variable Validation
+Enable debug logging to see configuration status:
 
-Run this to check your setup:
 ```bash
-# Check frontend env vars
-npm run build
-
-# Check Azure Functions
-cd TCDynamics
-python -c "import os; print('ZOHO_EMAIL:', os.environ.get('ZOHO_EMAIL', 'NOT SET'))"
+VITE_ENABLE_DEBUG_LOGGING=true
 ```
 
-## Security Best Practices
+This will log configuration status to the browser console without exposing sensitive data.
 
-- ✅ Use app passwords for Zoho Mail
-- ✅ Rotate Azure credentials regularly  
-- ✅ Never commit .env files to git
-- ✅ Use environment-specific values
-- ✅ Monitor function app logs for security issues
+## Migration Guide
 
+### From v1.0 to v1.1
+
+If upgrading from an older version:
+
+1. Add the new `VITE_ENABLE_CACHE` variable
+2. Update `VITE_APP_VERSION` to current version
+3. Review and update Azure service endpoints if changed
+
+### Environment File Template
+
+```bash
+# .env file template
+VITE_AZURE_FUNCTIONS_URL=your-functions-url
+VITE_NODE_ENV=development
+VITE_APP_VERSION=1.0.0
+VITE_ENABLE_ANALYTICS=false
+VITE_ENABLE_DEBUG_LOGGING=false
+VITE_ENABLE_CACHE=true
+
+AZURE_OPENAI_ENDPOINT=your-openai-endpoint
+AZURE_OPENAI_KEY=your-openai-key
+AZURE_OPENAI_DEPLOYMENT=gpt-35-turbo
+AZURE_VISION_ENDPOINT=your-vision-endpoint
+AZURE_VISION_KEY=your-vision-key
+ZOHO_EMAIL=your-email
+ZOHO_PASSWORD=your-password
+ADMIN_KEY=your-secure-admin-key
+FRONTEND_URL=your-frontend-url
+AzureWebJobsStorage=UseDevelopmentStorage=true
+```

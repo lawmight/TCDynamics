@@ -75,7 +75,7 @@ const DocumentProcessor = () => {
 
     for (const file of Array.from(files)) {
       const documentId = `doc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-      
+
       // Ajouter le document en cours de traitement
       setDocuments(prev => [
         ...prev,
@@ -103,7 +103,7 @@ const DocumentProcessor = () => {
 
         // Appeler l'API Vision
         const result = await visionAPI.processDocument(base64)
-        
+
         if (!result.success) {
           throw new Error(result.message || 'Erreur lors du traitement')
         }
@@ -132,7 +132,9 @@ const DocumentProcessor = () => {
         } else if (visionData.analyzeResult?.readResults) {
           const reads = visionData.analyzeResult.readResults
           extractedText = reads
-            .flatMap((page: VisionReadResult) => (page.lines || []).map((l: VisionLine) => l.text))
+            .flatMap((page: VisionReadResult) =>
+              (page.lines || []).map((l: VisionLine) => l.text)
+            )
             .join('\n')
           confidence = 0.9
         } else {
@@ -151,7 +153,7 @@ const DocumentProcessor = () => {
       } catch (error) {
         // Utiliser le système de logging approprié
         logger.error('Error processing document', error)
-        
+
         setDocuments(prev =>
           prev.map(doc =>
             doc.id === documentId
@@ -170,16 +172,16 @@ const DocumentProcessor = () => {
   }
 
   // const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.readAsDataURL(file)
-      reader.onload = () => {
-        const base64 = reader.result as string
-        resolve(base64.split(',')[1]) // Remove data:image/jpeg;base64, prefix
-      }
-      reader.onerror = error => reject(error)
-    })
-  }
+  //   return new Promise((resolve, reject) => {
+  //     const reader = new FileReader()
+  //     reader.readAsDataURL(file)
+  //     reader.onload = () => {
+  //       const base64 = reader.result as string
+  //       resolve(base64.split(',')[1]) // Remove data:image/jpeg;base64, prefix
+  //     }
+  //     reader.onerror = error => reject(error)
+  //   })
+  // }
 
   const getStatusIcon = (status: string) => {
     switch (status) {

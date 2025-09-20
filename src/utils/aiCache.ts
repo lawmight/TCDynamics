@@ -218,7 +218,7 @@ export async function callOpenAIWithCache(
 
     const data = await response.json()
 
-    if (data.choices && data.choices[0]) {
+    if (data.choices?.[0]) {
       const responseText = data.choices[0].message.content
       const tokensUsed = data.usage?.total_tokens || 0
 

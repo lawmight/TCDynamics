@@ -27,7 +27,13 @@ describe('OptimizedImage Component', () => {
   })
 
   it('should accept custom className', () => {
-    render(<OptimizedImage src="/test.jpg" alt="Test image" className="custom-class" />)
+    render(
+      <OptimizedImage
+        src="/test.jpg"
+        alt="Test image"
+        className="custom-class"
+      />
+    )
 
     const container = screen.getByText('', { selector: 'div.relative' })
     expect(container).toHaveClass('custom-class')
