@@ -1,0 +1,452 @@
+openapi: 3.0.3
+info:
+  title: TCDynamics API
+  description: |
+    API for TCDynamics - AI-powered business automation platform.
+
+    ## Authentication
+    All endpoints require proper CORS configuration and may implement rate limiting.
+
+    ## Rate Limiting
+    - Contact forms: 5 requests per minute
+    - Demo requests: 3 requests per minute
+    - Chat messages: 20 requests per minute
+    - Vision processing: 10 requests per minute
+
+    ## Error Handling
+    All endpoints return standardized error responses with appropriate HTTP status codes.
+  version: 2.0.0
+  contact:
+    name: TCDynamics Support
+    email: contact@tcdynamics.fr
+    url: https://tcdynamics.fr
+
+servers:
+  - url: https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api
+    description: Production server
+  - url: http://localhost:7071/api
+    description: Local development server
+
+security:
+  - cors: []
+
+paths:
+  /ContactForm:
+    post:
+      summary: Submit contact form
+      description: Submit a contact form with validation and sanitization
+      operationId: submitContactForm
+      tags:
+        - Forms
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactFormData'
+      responses:
+        '200':
+          description: Contact form submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+
+  /DemoForm:
+    post:
+      summary: Submit demo request form
+      description: Submit a demo request form with validation and sanitization
+      operationId: submitDemoForm
+      tags:
+        - Forms
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DemoFormData'
+      responses:
+        '200':
+          description: Demo request submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+
+  /chat:
+    post:
+      summary: Send AI chat message
+      description: Send a message to the AI chat system with conversation history
+      operationId: sendChatMessage
+      tags:
+        - AI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+      responses:
+        '200':
+          description: Chat response generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+        '400':
+          description: Validation error or security violation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          description: AI service error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+
+  /vision:
+    post:
+      summary: Process document/image with AI vision
+      description: Process an uploaded image or document using Azure AI Vision
+      operationId: processDocument
+      tags:
+        - AI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisionRequest'
+      responses:
+        '200':
+          description: Document processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisionResponse'
+        '400':
+          description: Invalid image data or validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          description: Vision service error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Check if the API is running and responding correctly
+      operationId: healthCheck
+      tags:
+        - System
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '500':
+          description: Service is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+
+components:
+  schemas:
+    # Common Response Types
+    ApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Whether the request was successful
+        data:
+          description: Response data (if successful)
+        message:
+          type: string
+          description: Human-readable message
+        errors:
+          type: array
+          items:
+            type: string
+          description: List of error messages (if failed)
+        metadata:
+          $ref: '#/components/schemas/ResponseMetadata'
+      required:
+        - success
+
+    ApiError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          description: Error message
+        errors:
+          type: array
+          items:
+            type: string
+          description: Detailed error messages
+        metadata:
+          $ref: '#/components/schemas/ResponseMetadata'
+      required:
+        - success
+        - message
+
+    ResponseMetadata:
+      type: object
+      properties:
+        requestId:
+          type: string
+          description: Unique request identifier
+        timestamp:
+          type: string
+          format: date-time
+          description: Response timestamp
+        duration:
+          type: number
+          description: Request processing duration in milliseconds
+
+    # Form Data Types
+    ContactFormData:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+          description: Full name of the contact
+        email:
+          type: string
+          format: email
+          description: Email address
+        message:
+          type: string
+          minLength: 10
+          maxLength: 2000
+          description: Contact message
+        phone:
+          type: string
+          description: Phone number (optional)
+        company:
+          type: string
+          description: Company name (optional)
+      required:
+        - name
+        - email
+        - message
+
+    DemoFormData:
+      type: object
+      properties:
+        firstName:
+          type: string
+          minLength: 2
+          maxLength: 50
+          description: First name
+        lastName:
+          type: string
+          minLength: 2
+          maxLength: 50
+          description: Last name
+        email:
+          type: string
+          format: email
+          description: Email address
+        phone:
+          type: string
+          description: Phone number (optional)
+        company:
+          type: string
+          minLength: 2
+          maxLength: 100
+          description: Company name
+        employees:
+          type: string
+          description: Company size (optional)
+        needs:
+          type: string
+          description: Specific needs or requirements (optional)
+      required:
+        - firstName
+        - lastName
+        - email
+        - company
+
+    # AI Types
+    ChatMessage:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [system, user, assistant]
+          description: Role of the message sender
+        content:
+          type: string
+          minLength: 1
+          maxLength: 10000
+          description: Message content
+      required:
+        - role
+        - content
+
+    ChatRequest:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+          minItems: 1
+          description: Array of chat messages
+        sessionId:
+          type: string
+          minLength: 32
+          maxLength: 128
+          pattern: '^[a-zA-Z0-9\-]{32,128}$'
+          description: Unique session identifier
+        temperature:
+          type: number
+          minimum: 0
+          maximum: 2
+          default: 0.7
+          description: AI creativity level
+        maxTokens:
+          type: number
+          minimum: 1
+          maximum: 4000
+          default: 1000
+          description: Maximum response length
+      required:
+        - messages
+        - sessionId
+
+    ChatResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                message:
+                  type: string
+                  description: AI-generated response
+                usage:
+                  type: object
+                  properties:
+                    promptTokens:
+                      type: number
+                      description: Tokens used in the prompt
+                    completionTokens:
+                      type: number
+                      description: Tokens used in the completion
+                    totalTokens:
+                      type: number
+                      description: Total tokens used
+
+    VisionRequest:
+      type: object
+      properties:
+        imageData:
+          type: string
+          description: Base64-encoded image data or image URL
+        analyzeText:
+          type: boolean
+          default: true
+          description: Whether to perform OCR/text analysis
+      required:
+        - imageData
+
+    VisionResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              description: Vision API analysis results
+
+    HealthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            status:
+              type: string
+              example: "healthy"
+            timestamp:
+              type: string
+              format: date-time
+      required:
+        - success
+
+  securitySchemes:
+    cors:
+      type: http
+      scheme: basic
+      description: |
+        CORS-based authentication with origin validation.
+        Only allowed origins can access the API.

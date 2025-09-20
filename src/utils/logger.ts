@@ -17,7 +17,11 @@ class Logger {
     return level >= this.level
   }
 
-  private formatMessage(level: string, message: string, error?: unknown): string {
+  private formatMessage(
+    level: string,
+    message: string,
+    error?: unknown
+  ): string {
     const timestamp = new Date().toISOString()
     const errorInfo = error ? ` | Error: ${error}` : ''
     return `[${timestamp}] ${level}: ${message}${errorInfo}`
@@ -44,7 +48,7 @@ class Logger {
   error(message: string, error?: unknown): void {
     if (this.shouldLog(LogLevel.ERROR)) {
       console.error(this.formatMessage('ERROR', message), error)
-      
+
       // En production, envoyer à un service de monitoring
       if (import.meta.env.PROD) {
         this.sendToMonitoring(message, error)

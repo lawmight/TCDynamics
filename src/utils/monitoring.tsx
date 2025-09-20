@@ -119,7 +119,7 @@ class Monitoring {
   captureMessage(
     message: string,
     level: 'info' | 'warning' | 'error' = 'info'
-  ) {
+  ): void {
     // // console.log(`[${level.toUpperCase()}]`, message)
 
     if (!this.enabled) return

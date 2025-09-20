@@ -1,39 +1,40 @@
 import { useState } from 'react'
-import { contactAPI, type ContactFormData, type ContactResponse } from '@/api/azureServices'
+import {
+  contactAPI,
+  type ContactFormData,
+  type ApiResponse,
+} from '@/api/azureServices'
 
 export const useContactForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [response, setResponse] = useState<ContactResponse | null>(null)
+  const [response, setResponse] = useState<ApiResponse | null>(null)
 
-  const submitForm = async (data: ContactFormData): Promise<ContactResponse> => {
+  const submitForm = async (data: ContactFormData): Promise<ApiResponse> => {
     setIsSubmitting(true)
     setResponse(null)
 
-    try {
-      const result = await contactAPI.submitContactForm(data)
-      setResponse(result)
-      return result
-    } catch (error) {
-      const errorResponse: ContactResponse = {
-        success: false,
-        message: 'Une erreur est survenue. Veuillez réessayer.',
-        errors: [error instanceof Error ? error.message : 'Erreur inconnue']
-      }
-      setResponse(errorResponse)
-      return errorResponse
-    } finally {
-      setIsSubmitting(false)
-    }
+    const result = await contactAPI.submitContactForm(data)
+    setResponse(result)
+
+    setIsSubmitting(false)
+    return result
   }
 
   const clearResponse = () => {
     setResponse(null)
   }
 
+  const hasErrors = response?.success === false
+  const isSuccess = response?.success === true
+
   return {
     submitForm,
     isSubmitting,
     response,
-    clearResponse
+    clearResponse,
+    hasErrors,
+    isSuccess,
+    errors: response?.errors || [],
+    message: response?.message || '',
   }
 }

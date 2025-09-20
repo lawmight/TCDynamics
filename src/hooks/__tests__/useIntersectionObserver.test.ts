@@ -20,7 +20,9 @@ describe('useIntersectionObserver Hook', () => {
   })
 
   it('should handle threshold option', () => {
-    const { result } = renderHook(() => useIntersectionObserver({ threshold: 0.8 }))
+    const { result } = renderHook(() =>
+      useIntersectionObserver({ threshold: 0.8 })
+    )
 
     expect(result.current).toHaveProperty('ref')
     expect(result.current).toHaveProperty('isIntersecting')

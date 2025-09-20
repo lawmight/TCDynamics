@@ -1,39 +1,40 @@
 import { useState } from 'react'
-import { demoAPI, type DemoFormData, type DemoResponse } from '@/api/azureServices'
+import {
+  demoAPI,
+  type DemoFormData,
+  type ApiResponse,
+} from '@/api/azureServices'
 
 export const useDemoForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [response, setResponse] = useState<DemoResponse | null>(null)
+  const [response, setResponse] = useState<ApiResponse | null>(null)
 
-  const submitForm = async (data: DemoFormData): Promise<DemoResponse> => {
+  const submitForm = async (data: DemoFormData): Promise<ApiResponse> => {
     setIsSubmitting(true)
     setResponse(null)
 
-    try {
-      const result = await demoAPI.submitDemoForm(data)
-      setResponse(result)
-      return result
-    } catch (error) {
-      const errorResponse: DemoResponse = {
-        success: false,
-        message: 'Une erreur est survenue. Veuillez réessayer.',
-        errors: [error instanceof Error ? error.message : 'Erreur inconnue']
-      }
-      setResponse(errorResponse)
-      return errorResponse
-    } finally {
-      setIsSubmitting(false)
-    }
+    const result = await demoAPI.submitDemoForm(data)
+    setResponse(result)
+
+    setIsSubmitting(false)
+    return result
   }
 
   const clearResponse = () => {
     setResponse(null)
   }
 
+  const hasErrors = response?.success === false
+  const isSuccess = response?.success === true
+
   return {
     submitForm,
     isSubmitting,
     response,
-    clearResponse
+    clearResponse,
+    hasErrors,
+    isSuccess,
+    errors: response?.errors || [],
+    message: response?.message || '',
   }
 }

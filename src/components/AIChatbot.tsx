@@ -50,7 +50,8 @@ const AIChatbot = () => {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: data.message || data.response || 'Réponse reçue du service IA.',
+        content:
+          data.message || data.response || 'Réponse reçue du service IA.',
         timestamp: new Date(),
       }
 
