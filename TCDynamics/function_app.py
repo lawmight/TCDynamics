@@ -130,7 +130,7 @@ def create_payment_intent(req: func.HttpRequest) -> func.HttpResponse:
             headers={"Content-Type": "application/json"}
         )
 
-@app.route(route="create-subscription", methods=["POST"])
+@func_app.route(route="create-subscription", methods=["POST"])
 def create_subscription(req: func.HttpRequest) -> func.HttpResponse:
     """Créer un abonnement Stripe"""
     if not stripe_available:
