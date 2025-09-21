@@ -141,11 +141,10 @@ jobs:
         fi
 
     - name: Upload Azure Functions artifacts
-      working-directory: ./TCDynamics
       uses: actions/upload-artifact@v4
       with:
         name: azure-functions-package
-        path: azure-functions-package.zip
+        path: TCDynamics/azure-functions-package.zip
         retention-days: 1
         if-no-files-found: error
 
