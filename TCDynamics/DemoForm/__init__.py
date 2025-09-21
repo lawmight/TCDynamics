@@ -37,7 +37,20 @@ def create_demo_email(data: Dict[str, Any]) -> MIMEMultipart:
     msg['From'] = os.environ.get('ZOHO_EMAIL', 'contact@tcdynamics.fr')
     msg['To'] = os.environ.get('ZOHO_EMAIL', 'contact@tcdynamics.fr')
     msg['Reply-To'] = data['email']
-    
+
+    # Build conditional HTML parts
+    phone_html = f"<p><strong>Téléphone:</strong> {data['phone']}</p>" if data.get('phone') else ""
+    employees_html = f"<p><strong>Nombre d'employés:</strong> {data['employees']}</p>" if data.get('employees') else ""
+
+    needs_html = ""
+    if data.get('needs'):
+        needs_html = f"""
+        <div style="background-color: #ffffff; padding: 20px; border-left: 4px solid #e74c3c; margin: 20px 0;">
+            <h3 style="color: #2c3e50; margin-top: 0;">Besoins exprimés</h3>
+            <p style="white-space: pre-wrap;">{data['needs']}</p>
+        </div>
+        """
+
     # HTML email template
     html_content = f"""
     <html>
@@ -46,29 +59,24 @@ def create_demo_email(data: Dict[str, Any]) -> MIMEMultipart:
             <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">
                 🎯 Nouvelle demande de démonstration - TCDynamics
             </h2>
-            
+
             <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0;">
                 <h3 style="color: #2c3e50; margin-top: 0;">Informations du prospect</h3>
                 <p><strong>Nom complet:</strong> {data['firstName']} {data['lastName']}</p>
                 <p><strong>Email:</strong> <a href="mailto:{data['email']}">{data['email']}</a></p>
-                {f"<p><strong>Téléphone:</strong> {data['phone']}</p>" if data.get('phone') else ""}
+                {phone_html}
                 <p><strong>Entreprise:</strong> {data['company']}</p>
-                {f"<p><strong>Nombre d'employés:</strong> {data['employees']}</p>" if data.get('employees') else ""}
+                {employees_html}
             </div>
-            
-            {f"""
-            <div style="background-color: #ffffff; padding: 20px; border-left: 4px solid #e74c3c; margin: 20px 0;">
-                <h3 style="color: #2c3e50; margin-top: 0;">Besoins exprimés</h3>
-                <p style="white-space: pre-wrap;">{data['needs']}</p>
-            </div>
-            """ if data.get('needs') else ""}
-            
+
+            {needs_html}
+
             <div style="background-color: #e8f4f8; padding: 15px; border-radius: 5px; margin: 20px 0; font-size: 12px; color: #666;">
                 <p><strong>Date:</strong> {datetime.now().strftime('%d/%m/%Y à %H:%M')}</p>
                 <p><strong>Source:</strong> Formulaire de démonstration TCDynamics</p>
                 <p><strong>Priorité:</strong> <span style="color: #e74c3c; font-weight: bold;">HAUTE</span> - Contacter dans les 2 heures</p>
             </div>
-            
+
             <div style="background-color: #d4edda; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #28a745;">
                 <h4 style="color: #155724; margin-top: 0;">📋 Actions recommandées:</h4>
                 <ul style="color: #155724; margin: 0;">
@@ -81,7 +89,7 @@ def create_demo_email(data: Dict[str, Any]) -> MIMEMultipart:
     </body>
     </html>
     """
-    
+
     msg.attach(MIMEText(html_content, 'html'))
     return msg
 
