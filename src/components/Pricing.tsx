@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { Check, X, Phone, MapPin } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import StripeCheckout from '@/components/StripeCheckout'
 
 const pricingPlans = [
   {
@@ -79,6 +81,29 @@ const supportInfo = [
 ]
 
 const Pricing = () => {
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
+  const [showCheckout, setShowCheckout] = useState(false)
+
+  const handlePlanSelect = (planName: string) => {
+    setSelectedPlan(planName)
+    setShowCheckout(true)
+  }
+
+  const handlePaymentSuccess = (subscriptionId: string) => {
+    console.log('Payment successful:', subscriptionId)
+    // Ici vous pouvez rediriger vers une page de succès ou mettre à jour l'UI
+    alert(
+      'Abonnement créé avec succès ! Vous recevrez un email de confirmation.'
+    )
+    setShowCheckout(false)
+    setSelectedPlan(null)
+  }
+
+  const handlePaymentError = (error: string) => {
+    console.error('Payment error:', error)
+    alert(`Erreur lors du paiement: ${error}`)
+  }
+
   return (
     <section className="py-24 bg-background relative overflow-hidden">
       {/* Background Network Pattern */}
@@ -168,13 +193,44 @@ const Pricing = () => {
                   variant={plan.popular ? 'hero' : 'hero-outline'}
                   size="lg"
                   className="w-full"
+                  onClick={() =>
+                    plan.name !== 'Enterprise' &&
+                    handlePlanSelect(plan.name.toLowerCase())
+                  }
                 >
-                  {plan.cta}
+                  {plan.name === 'Enterprise'
+                    ? plan.cta
+                    : `S'abonner - ${plan.price}`}
                 </Button>
               </CardContent>
             </Card>
           ))}
         </div>
+
+        {/* Payment Checkout */}
+        {showCheckout && selectedPlan && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <div className="bg-background rounded-lg p-6 max-w-md w-full">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold">
+                  Finaliser votre abonnement
+                </h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowCheckout(false)}
+                >
+                  ✕
+                </Button>
+              </div>
+              <StripeCheckout
+                plan={selectedPlan as 'starter' | 'professional' | 'enterprise'}
+                onSuccess={handlePaymentSuccess}
+                onError={handlePaymentError}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Support Information */}
         <div className="text-center mb-12">

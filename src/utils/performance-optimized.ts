@@ -77,7 +77,7 @@ class OptimizedPerformanceMonitor {
         ...metrics.metadata,
         sessionId: this.sessionId,
         sampled: true,
-      }
+      },
     })
   }
 
@@ -255,7 +255,10 @@ export const optimizedPerformanceUtils = {
 
       if (trailing) {
         if (timeoutId === null) {
-          timeoutId = setTimeout(() => invokeFunc(time), wait - (time - lastInvokeTime))
+          timeoutId = setTimeout(
+            () => invokeFunc(time),
+            wait - (time - lastInvokeTime)
+          )
         }
       }
     }
@@ -270,7 +273,7 @@ export const optimizedPerformanceUtils = {
   throttle: <T extends (...args: any[]) => any>(
     func: T,
     limit: number
-  ): (...args: Parameters<T>) => void => {
+  ): ((...args: Parameters<T>) => void) => {
     let inThrottle = false
 
     return (...args: Parameters<T>) => {

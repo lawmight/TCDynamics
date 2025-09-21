@@ -30,7 +30,7 @@ const StickyHeader = () => {
     if (element) {
       element.scrollIntoView({
         behavior: 'smooth',
-        block: 'start'
+        block: 'start',
       })
     }
     setIsMobileMenuOpen(false)
@@ -63,7 +63,7 @@ const StickyHeader = () => {
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-2">
-              {navigationItems.slice(0, -1).map((item) => (
+              {navigationItems.slice(0, -1).map(item => (
                 <Button
                   key={item.id}
                   variant="ghost"
@@ -107,7 +107,7 @@ const StickyHeader = () => {
           <div className="lg:hidden absolute top-full left-0 right-0 bg-background/95 backdrop-blur-xl border-b border-primary/10 shadow-xl">
             <div className="container mx-auto px-4 py-6">
               <nav className="flex flex-col space-y-3">
-                {navigationItems.map((item) => (
+                {navigationItems.map(item => (
                   <Button
                     key={item.id}
                     variant="ghost"

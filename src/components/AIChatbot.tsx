@@ -45,7 +45,10 @@ const AIChatbot = () => {
     setIsLoading(true)
 
     try {
-      const data = await chatAPI.sendMessage(userMessage.content, 'web-session')
+      const data = await chatAPI.sendSimpleMessage(
+        userMessage.content,
+        'web-session'
+      )
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -190,6 +193,7 @@ const AIChatbot = () => {
                     placeholder="Posez votre question..."
                     className="flex-1 font-mono text-sm"
                     disabled={isLoading}
+                    aria-label="Message input"
                   />
                   <Button
                     onClick={sendMessage}

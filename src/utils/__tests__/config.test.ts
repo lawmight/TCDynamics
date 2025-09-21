@@ -41,8 +41,19 @@ describe('Configuration Management', () => {
   describe('Environment Helpers', () => {
     describe('getEnvVar', () => {
       it('should return environment variable value', () => {
+        // Set up test environment variable
+        const originalEnv = process.env.VITE_APP_VERSION
+        process.env.VITE_APP_VERSION = '1.0.0'
+
         const result = envHelpers.getEnvVar('VITE_APP_VERSION')
         expect(result).toBe('1.0.0')
+
+        // Cleanup
+        if (originalEnv === undefined) {
+          delete process.env.VITE_APP_VERSION
+        } else {
+          process.env.VITE_APP_VERSION = originalEnv
+        }
       })
 
       it('should return fallback value when env var is undefined', () => {
@@ -61,10 +72,29 @@ describe('Configuration Management', () => {
 
     describe('getBooleanEnvVar', () => {
       it('should parse true values', () => {
+        // Set up test environment variables
+        const originalAnalytics = process.env.VITE_ENABLE_ANALYTICS
+        const originalDebug = process.env.VITE_ENABLE_DEBUG_LOGGING
+
+        process.env.VITE_ENABLE_ANALYTICS = 'true'
+        process.env.VITE_ENABLE_DEBUG_LOGGING = 'false'
+
         expect(envHelpers.getBooleanEnvVar('VITE_ENABLE_ANALYTICS')).toBe(true)
         expect(envHelpers.getBooleanEnvVar('VITE_ENABLE_DEBUG_LOGGING')).toBe(
           false
         )
+
+        // Cleanup
+        if (originalAnalytics === undefined) {
+          delete process.env.VITE_ENABLE_ANALYTICS
+        } else {
+          process.env.VITE_ENABLE_ANALYTICS = originalAnalytics
+        }
+        if (originalDebug === undefined) {
+          delete process.env.VITE_ENABLE_DEBUG_LOGGING
+        } else {
+          process.env.VITE_ENABLE_DEBUG_LOGGING = originalDebug
+        }
       })
 
       it('should return fallback for undefined values', () => {
@@ -91,16 +121,29 @@ describe('Configuration Management', () => {
       })
 
       it('should parse numeric values', () => {
+        // Set up environment variable for test
+        process.env.VITE_TEST_NUMBER = '42'
         const result = envHelpers.getNumberEnvVar('VITE_TEST_NUMBER')
         expect(result).toBe(42)
       })
 
       it('should throw error for invalid numbers', () => {
+        // Set up invalid number environment variable
+        const originalVersion = process.env.VITE_APP_VERSION
+        process.env.VITE_APP_VERSION = 'not-a-number' // This should be invalid as it's not a number
+
         expect(() => {
-          envHelpers.getNumberEnvVar('VITE_APP_VERSION') // '1.0.0' is not a valid number
+          envHelpers.getNumberEnvVar('VITE_APP_VERSION')
         }).toThrow(
           'Environment variable VITE_APP_VERSION is not a valid number'
         )
+
+        // Cleanup
+        if (originalVersion === undefined) {
+          delete process.env.VITE_APP_VERSION
+        } else {
+          process.env.VITE_APP_VERSION = originalVersion
+        }
       })
 
       it('should return fallback for undefined values', () => {

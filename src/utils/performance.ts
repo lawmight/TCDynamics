@@ -334,7 +334,7 @@ class SmartCache {
         this.cache.delete(oldestKey)
         this.performanceMonitor.recordMetric('cache.evicted', 0, {
           key: oldestKey,
-          reason: 'size_limit'
+          reason: 'size_limit',
         })
       }
       targetSize = this.currentSize + newDataSize
@@ -360,7 +360,7 @@ class SmartCache {
     if (removed > 0) {
       this.performanceMonitor.recordMetric('cache.evicted', 0, {
         count: removed,
-        reason: 'expired'
+        reason: 'expired',
       })
     }
   }
@@ -397,7 +397,7 @@ class SmartCache {
       key,
       ttl: ttlMs,
       size: dataSize,
-      totalSize: this.currentSize
+      totalSize: this.currentSize,
     })
   }
 
@@ -455,7 +455,7 @@ class SmartCache {
       this.removeFromLRUQueue(key)
       this.performanceMonitor.recordMetric('cache.delete', 0, {
         key,
-        size: entry.size
+        size: entry.size,
       })
     }
     return deleted
@@ -502,7 +502,10 @@ class SmartCache {
       newestEntry,
       totalSize: this.currentSize,
       maxSize: this.config.maxSize,
-      utilizationPercent: this.config.maxSize > 0 ? (this.currentSize / this.config.maxSize) * 100 : 0,
+      utilizationPercent:
+        this.config.maxSize > 0
+          ? (this.currentSize / this.config.maxSize) * 100
+          : 0,
     }
   }
 
@@ -520,19 +523,30 @@ class SmartCache {
 
     return {
       ...stats,
-      entriesByTTL: entries.reduce((acc, entry) => {
-        const ttlRange = this.getTTlRange(entry.ttl)
-        acc[ttlRange] = (acc[ttlRange] || 0) + 1
-        return acc
-      }, {} as Record<string, number>),
-      averageEntrySize: entries.length > 0 ? entries.reduce((sum, entry) => sum + entry.size, 0) / entries.length : 0,
-      largestEntry: entries.length > 0 ? Math.max(...entries.map(entry => entry.size)) : 0,
-      smallestEntry: entries.length > 0 ? Math.min(...entries.map(entry => entry.size)) : 0,
-      entriesBySize: entries.reduce((acc, entry) => {
-        const sizeRange = this.getSizeRange(entry.size)
-        acc[sizeRange] = (acc[sizeRange] || 0) + 1
-        return acc
-      }, {} as Record<string, number>),
+      entriesByTTL: entries.reduce(
+        (acc, entry) => {
+          const ttlRange = this.getTTlRange(entry.ttl)
+          acc[ttlRange] = (acc[ttlRange] || 0) + 1
+          return acc
+        },
+        {} as Record<string, number>
+      ),
+      averageEntrySize:
+        entries.length > 0
+          ? entries.reduce((sum, entry) => sum + entry.size, 0) / entries.length
+          : 0,
+      largestEntry:
+        entries.length > 0 ? Math.max(...entries.map(entry => entry.size)) : 0,
+      smallestEntry:
+        entries.length > 0 ? Math.min(...entries.map(entry => entry.size)) : 0,
+      entriesBySize: entries.reduce(
+        (acc, entry) => {
+          const sizeRange = this.getSizeRange(entry.size)
+          acc[sizeRange] = (acc[sizeRange] || 0) + 1
+          return acc
+        },
+        {} as Record<string, number>
+      ),
     }
   }
 
