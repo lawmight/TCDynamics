@@ -310,12 +310,19 @@ jobs:
       run: |
         echo "🚀 Deploying Azure Functions using Azure CLI (bypassing functions-action)..."
 
-        # Configure run-from-package (already authenticated via azure/login above)
-        echo "⚙️ Setting WEBSITE_RUN_FROM_PACKAGE=1..."
+        # Configure Azure Functions app settings
+        echo "⚙️ Setting Azure Functions configuration..."
+
+        # Set required Azure Functions settings
         az functionapp config appsettings set \
           --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
           --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-          --settings WEBSITE_RUN_FROM_PACKAGE=1 \
+          --settings \
+            WEBSITE_RUN_FROM_PACKAGE=1 \
+            FUNCTIONS_WORKER_RUNTIME=python \
+            AzureWebJobsStorage=${{ secrets.AZURE_STORAGE_CONNECTION_STRING }} \
+            WEBSITE_CONTENTAZUREFILECONNECTIONSTRING=${{ secrets.AZURE_STORAGE_CONNECTION_STRING }} \
+            WEBSITE_CONTENTSHARE=${{ env.AZURE_FUNCTIONAPP_NAME }} \
           --output none
 
         # Deploy using Azure CLI ZIP push (bypassing functions-action)
