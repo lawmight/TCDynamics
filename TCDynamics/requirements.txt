@@ -2,10 +2,13 @@
 azure-functions==1.18.0
 azure-functions-worker==1.0.0
 
-# gRPC with pre-compiled wheels to avoid compilation issues
-grpcio==1.60.0
-grpcio-status==1.60.0
+# gRPC - Exact versions required for azure-functions-worker 1.0.0 compatibility
+grpcio==1.33.2
+grpcio-status==1.33.2
 
-# Protocol Buffers
-protobuf==4.25.1
+# Protocol Buffers - Compatible with grpcio 1.33.2
+protobuf==3.20.3
+
+# Optional Stripe (if needed for payments)
+stripe>=8.0.0
 

@@ -5,6 +5,16 @@ import json
 import time
 from datetime import datetime
 
+# Optional Stripe import (only if available)
+try:
+    import stripe
+    stripe_available = True
+    # Configure Stripe if available
+    stripe.api_key = os.getenv('STRIPE_SECRET_KEY', 'sk_test_...')
+except ImportError:
+    stripe_available = False
+    logging.warning("Stripe not available - payment functions will not work")
+
 # Track application start time for uptime calculation
 app_start_time = time.time()
 

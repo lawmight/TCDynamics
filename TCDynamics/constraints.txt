@@ -1,0 +1,16 @@
+# Constraints file to pin exact versions and avoid dependency conflicts
+# These versions are specifically chosen for azure-functions-worker 1.0.0 compatibility
+
+# Core Azure Functions dependencies
+azure-functions==1.18.0
+azure-functions-worker==1.0.0
+
+# gRPC - Exact versions required for azure-functions-worker 1.0.0
+grpcio==1.33.2
+grpcio-status==1.33.2
+
+# Protocol Buffers - Compatible with grpcio 1.33.2
+protobuf==3.20.3
+
+# Six is required by grpcio
+six==1.16.0
