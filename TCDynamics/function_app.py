@@ -94,6 +94,13 @@ def health_check(req: func.HttpRequest) -> func.HttpResponse:
 @app.route(route="create-payment-intent", methods=["POST"])
 def create_payment_intent(req: func.HttpRequest) -> func.HttpResponse:
     """Créer une intention de paiement Stripe"""
+    if not stripe_available:
+        return func.HttpResponse(
+            json.dumps({'error': 'Stripe not available'}),
+            status_code=503,
+            headers={"Content-Type": "application/json"}
+        )
+
     try:
         req_body = req.get_json()
         amount = req_body.get('amount', 0)  # Montant en centimes
@@ -126,6 +133,13 @@ def create_payment_intent(req: func.HttpRequest) -> func.HttpResponse:
 @app.route(route="create-subscription", methods=["POST"])
 def create_subscription(req: func.HttpRequest) -> func.HttpResponse:
     """Créer un abonnement Stripe"""
+    if not stripe_available:
+        return func.HttpResponse(
+            json.dumps({'error': 'Stripe not available'}),
+            status_code=503,
+            headers={"Content-Type": "application/json"}
+        )
+
     try:
         req_body = req.get_json()
         customer_email = req_body.get('email')
