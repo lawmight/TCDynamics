@@ -162,10 +162,16 @@ jobs:
     - name: Package Azure Functions for deployment
       run: |
         cd TCDynamics
-        # Create deployment package
-        zip -r ../azure-functions-package.zip . -x "*.pyc" "__pycache__/*" "*.git*" "local.settings.json"
+        # Clean up Python cache files
+        find . -type d -name "__pycache__" -exec rm -rf {} +
+        find . -name "*.pyc" -delete
+        # Create deployment package (exclude unnecessary files)
+        zip -r ../azure-functions-package.zip . -x "*.git*" "local.settings.json" ".funcignore"
         cd ..
         ls -la azure-functions-package.zip
+        # Verify package contents
+        echo "Package contents:"
+        unzip -l azure-functions-package.zip | head -20
 
     - name: Extract Azure Functions package
       run: |
@@ -185,6 +191,17 @@ jobs:
       uses: azure/login@v2
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Verify Function App Configuration
+      run: |
+        echo "Verifying function app is ready for deployment..."
+        # Check if we can reach the function app
+        if curl -f -s https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/ > /dev/null; then
+          echo "✅ Function app is responding"
+        else
+          echo "❌ Function app is not responding - deployment may fail"
+          exit 1
+        fi
 
     - name: Deploy to Azure Functions
       uses: Azure/functions-action@v1
