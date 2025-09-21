@@ -12,18 +12,22 @@ export const isBrowser = (): boolean => {
  * Check if we're running in a Node.js environment
  */
 export const isNode = (): boolean => {
-  return typeof process !== 'undefined' &&
-         typeof process.versions !== 'undefined' &&
-         typeof process.versions.node !== 'undefined'
+  return (
+    typeof process !== 'undefined' &&
+    typeof process.versions !== 'undefined' &&
+    typeof process.versions.node !== 'undefined'
+  )
 }
 
 /**
  * Check if we're running in a web worker
  */
 export const isWebWorker = (): boolean => {
-  return typeof self !== 'undefined' &&
-         typeof importScripts !== 'undefined' &&
-         !isBrowser()
+  return (
+    typeof self !== 'undefined' &&
+    typeof importScripts !== 'undefined' &&
+    !isBrowser()
+  )
 }
 
 /**
@@ -31,7 +35,9 @@ export const isWebWorker = (): boolean => {
  */
 export const isDevelopment = (): boolean => {
   if (isBrowser()) {
-    return import.meta.env?.DEV === true || import.meta.env?.MODE === 'development'
+    return (
+      import.meta.env?.DEV === true || import.meta.env?.MODE === 'development'
+    )
   }
 
   if (isNode()) {
@@ -46,7 +52,9 @@ export const isDevelopment = (): boolean => {
  */
 export const isProduction = (): boolean => {
   if (isBrowser()) {
-    return import.meta.env?.PROD === true || import.meta.env?.MODE === 'production'
+    return (
+      import.meta.env?.PROD === true || import.meta.env?.MODE === 'production'
+    )
   }
 
   if (isNode()) {
@@ -65,9 +73,11 @@ export const isTest = (): boolean => {
   }
 
   if (isNode()) {
-    return process.env.NODE_ENV === 'test' ||
-           process.env.JEST_WORKER_ID !== undefined ||
-           process.env.VITEST === 'true'
+    return (
+      process.env.NODE_ENV === 'test' ||
+      process.env.JEST_WORKER_ID !== undefined ||
+      process.env.VITEST === 'true'
+    )
   }
 
   return false
@@ -99,9 +109,9 @@ export const cryptoUtils = {
     }
 
     // Fallback implementation
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      const r = Math.random() * 16 | 0
-      const v = c === 'x' ? r : (r & 0x3 | 0x8)
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const r = (Math.random() * 16) | 0
+      const v = c === 'x' ? r : (r & 0x3) | 0x8
       return v.toString(16)
     })
   },
@@ -140,7 +150,7 @@ export const cryptoUtils = {
     let hash = 0
     for (let i = 0; i < input.length; i++) {
       const char = input.charCodeAt(i)
-      hash = ((hash << 5) - hash) + char
+      hash = (hash << 5) - hash + char
       hash = hash & hash // Convert to 32-bit integer
     }
     return Math.abs(hash).toString(16)
@@ -180,9 +190,9 @@ export const storageUtils = {
     } else {
       // In-memory storage for Node.js/testing
       if (!(globalThis as any).__MEMORY_STORAGE__) {
-        (globalThis as any).__MEMORY_STORAGE__ = {}
+        ;(globalThis as any).__MEMORY_STORAGE__ = {}
       }
-      (globalThis as any).__MEMORY_STORAGE__[key] = value
+      ;(globalThis as any).__MEMORY_STORAGE__[key] = value
     }
   },
 
@@ -212,7 +222,10 @@ export const timerUtils = {
   /**
    * Set timeout that works in browser and Node.js
    */
-  setTimeout: (callback: () => void, delay: number): NodeJS.Timeout | number => {
+  setTimeout: (
+    callback: () => void,
+    delay: number
+  ): NodeJS.Timeout | number => {
     if (isNode() && typeof global !== 'undefined' && global.setTimeout) {
       return global.setTimeout(callback, delay)
     }
@@ -231,7 +244,11 @@ export const timerUtils = {
   clearTimeout: (timeoutId: NodeJS.Timeout | number): void => {
     if (isNode() && typeof global !== 'undefined' && global.clearTimeout) {
       global.clearTimeout(timeoutId as NodeJS.Timeout)
-    } else if (isBrowser() && typeof window !== 'undefined' && window.clearTimeout) {
+    } else if (
+      isBrowser() &&
+      typeof window !== 'undefined' &&
+      window.clearTimeout
+    ) {
       window.clearTimeout(timeoutId as number)
     } else {
       clearTimeout(timeoutId as any)
@@ -241,7 +258,10 @@ export const timerUtils = {
   /**
    * Set interval that works across environments
    */
-  setInterval: (callback: () => void, delay: number): NodeJS.Timeout | number => {
+  setInterval: (
+    callback: () => void,
+    delay: number
+  ): NodeJS.Timeout | number => {
     if (isNode() && typeof global !== 'undefined' && global.setInterval) {
       return global.setInterval(callback, delay)
     }
@@ -260,7 +280,11 @@ export const timerUtils = {
   clearInterval: (intervalId: NodeJS.Timeout | number): void => {
     if (isNode() && typeof global !== 'undefined' && global.clearInterval) {
       global.clearInterval(intervalId as NodeJS.Timeout)
-    } else if (isBrowser() && typeof window !== 'undefined' && window.clearInterval) {
+    } else if (
+      isBrowser() &&
+      typeof window !== 'undefined' &&
+      window.clearInterval
+    ) {
       window.clearInterval(intervalId as number)
     } else {
       clearInterval(intervalId as any)
@@ -347,8 +371,12 @@ export const consoleUtils = {
     console.error(`[ERROR] ${errorMessage}${contextInfo}`)
 
     // In browser, also log to monitoring if available
-    if (isBrowser() && typeof window !== 'undefined' && (window as any).performanceMonitor) {
-      (window as any).performanceMonitor.recordMetric('error.runtime', 1, {
+    if (
+      isBrowser() &&
+      typeof window !== 'undefined' &&
+      (window as any).performanceMonitor
+    ) {
+      ;(window as any).performanceMonitor.recordMetric('error.runtime', 1, {
         error: errorMessage,
         context,
         environment: isBrowser() ? 'browser' : isNode() ? 'node' : 'unknown',
@@ -359,7 +387,11 @@ export const consoleUtils = {
   /**
    * Log performance metrics
    */
-  perf: (name: string, duration: number, metadata?: Record<string, any>): void => {
+  perf: (
+    name: string,
+    duration: number,
+    metadata?: Record<string, any>
+  ): void => {
     if (isDevelopment()) {
       console.log(`[PERF] ${name}: ${duration}ms`, metadata || '')
     }

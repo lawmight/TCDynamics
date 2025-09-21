@@ -37,8 +37,8 @@ class ErrorBoundary extends Component<Props, State> {
 
     // Reset error state if resetKeys changed
     if (hasError && resetKeys && resetOnPropsChange !== false) {
-      const hasResetKeyChanged = resetKeys.some((resetKey, index) =>
-        prevProps.resetKeys?.[index] !== resetKey
+      const hasResetKeyChanged = resetKeys.some(
+        (resetKey, index) => prevProps.resetKeys?.[index] !== resetKey
       )
 
       if (hasResetKeyChanged) {
@@ -59,7 +59,7 @@ class ErrorBoundary extends Component<Props, State> {
 
     this.setState({
       error,
-      errorInfo
+      errorInfo,
     })
 
     // Call custom error handler if provided
@@ -69,9 +69,9 @@ class ErrorBoundary extends Component<Props, State> {
 
     // Report to monitoring service
     if (typeof window !== 'undefined' && (window as any).performanceMonitor) {
-      (window as any).performanceMonitor.recordMetric('error.boundary', 1, {
+      ;(window as any).performanceMonitor.recordMetric('error.boundary', 1, {
         error: error.message,
-        componentStack: errorInfo.componentStack
+        componentStack: errorInfo.componentStack,
       })
     }
   }
@@ -81,7 +81,7 @@ class ErrorBoundary extends Component<Props, State> {
       hasError: false,
       error: undefined,
       errorInfo: undefined,
-      resetCount: prevState.resetCount + 1
+      resetCount: prevState.resetCount + 1,
     }))
 
     // Call custom reset handler if provided
@@ -136,7 +136,8 @@ class ErrorBoundary extends Component<Props, State> {
             </h1>
 
             <p className="text-muted-foreground mb-2">
-              Une erreur inattendue s'est produite. Nos équipes ont été notifiées.
+              Une erreur inattendue s'est produite. Nos équipes ont été
+              notifiées.
             </p>
 
             <p className="text-sm text-muted-foreground mb-6">

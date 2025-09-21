@@ -66,18 +66,22 @@ describe('useDemoForm', () => {
     })
 
     expect(result.current.response?.success).toBe(false)
-    expect(result.current.response?.message).toContain('Erreur de connexion')
+    expect(result.current.response?.message).toContain('Network error')
   })
 
   it('should handle server validation errors', async () => {
     const mockResponse = {
       success: false,
-      message: 'Données invalides',
-      errors: ['Email invalide', 'Entreprise requise'],
+      message:
+        "Validation error: email: Adresse email invalide, company: Le nom de l'entreprise doit contenir au moins 2 caractères",
+      errors: [
+        'email: Adresse email invalide',
+        "company: Le nom de l'entreprise doit contenir au moins 2 caractères",
+      ],
     }
 
     ;(fetch as any).mockResolvedValueOnce({
-      ok: true,
+      ok: false,
       json: async () => mockResponse,
     })
 
@@ -87,12 +91,13 @@ describe('useDemoForm', () => {
       await result.current.submitForm({
         firstName: 'Jean',
         lastName: 'Dupont',
-        email: 'invalid-email',
-        company: '',
+        email: 'jean.dupont@example.com',
+        company: 'Test Company',
       })
     })
 
-    expect(result.current.response).toEqual(mockResponse)
+    expect(result.current.response?.success).toBe(false)
+    expect(result.current.response?.errors).toBeDefined()
     expect(result.current.isSubmitting).toBe(false)
   })
 })

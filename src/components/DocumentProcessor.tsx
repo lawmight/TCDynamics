@@ -217,14 +217,17 @@ const DocumentProcessor = () => {
   }
 
   return (
-    <Card className="w-full">
+    <Card className="w-full" data-testid="document-processor">
       <CardHeader>
         <div className="flex items-center gap-3">
           <div className="p-2 bg-primary/10 rounded-lg">
             <FileText className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <CardTitle className="text-xl font-mono">
+            <CardTitle
+              className="text-xl font-mono"
+              data-testid="processor-title"
+            >
               Traitement de Documents IA
             </CardTitle>
             <p className="text-muted-foreground font-mono text-sm">
@@ -236,7 +239,10 @@ const DocumentProcessor = () => {
 
       <CardContent className="space-y-6">
         {/* Upload Area */}
-        <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
+        <div
+          className="border-2 border-dashed border-border rounded-lg p-8 text-center"
+          data-testid="upload-area"
+        >
           <input
             ref={fileInputRef}
             type="file"
@@ -244,6 +250,7 @@ const DocumentProcessor = () => {
             accept="image/*,.pdf,.doc,.docx"
             onChange={handleFileUpload}
             className="hidden"
+            data-testid="file-input"
           />
 
           <div className="space-y-4">

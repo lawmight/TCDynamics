@@ -35,7 +35,9 @@ describe('Contact Component', () => {
 
     // Check for form labels (there are multiple forms, so we use getAllByText)
     expect(screen.getAllByText(/Prénom/i).length).toBeGreaterThan(0)
-    expect(screen.getAllByText(/Email/i).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/Email professionnel/i).length).toBeGreaterThan(
+      0
+    )
     expect(screen.getAllByText(/Téléphone/i).length).toBeGreaterThan(0)
     expect(screen.getAllByText(/Entreprise/i).length).toBeGreaterThan(0)
     expect(screen.getAllByText(/Message/i).length).toBeGreaterThan(0)

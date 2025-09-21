@@ -7,7 +7,7 @@ import { z } from 'zod'
 
 const clientConfigSchema = z.object({
   // API URLs
-  VITE_AZURE_FUNCTIONS_URL: z.string().url().optional(),
+  VITE_AZURE_FUNCTIONS_URL: z.union([z.string(), z.undefined()]).optional(),
 
   // Environment
   VITE_NODE_ENV: z
@@ -16,64 +16,30 @@ const clientConfigSchema = z.object({
   VITE_APP_VERSION: z.string().default('1.0.0'),
 
   // Analytics (optional)
-  VITE_ANALYTICS_GA_TRACKING_ID: z.string().optional(),
-  VITE_ANALYTICS_HOTJAR_ID: z.string().optional(),
+  VITE_ANALYTICS_GA_TRACKING_ID: z
+    .union([z.string(), z.undefined()])
+    .optional(),
+  VITE_ANALYTICS_HOTJAR_ID: z.union([z.string(), z.undefined()]).optional(),
 
-  // Feature flags
-  VITE_FEATURE_ENABLE_ANALYTICS: z
-    .string()
-    .transform(val => val === 'true')
-    .default('false'),
-  VITE_FEATURE_ENABLE_DEBUG_LOGGING: z
-    .string()
-    .transform(val => val === 'true')
-    .default('false'),
-  VITE_FEATURE_ENABLE_CACHE: z
-    .string()
-    .transform(val => val === 'true')
-    .default('true'),
+  // Feature flags (booleans)
+  VITE_FEATURE_ENABLE_ANALYTICS: z.boolean().default(false),
+  VITE_FEATURE_ENABLE_DEBUG_LOGGING: z.boolean().default(false),
+  VITE_FEATURE_ENABLE_CACHE: z.boolean().default(true),
 
-  // Cache configuration
-  VITE_CACHE_MAX_SIZE: z
-    .string()
-    .transform(val => parseInt(val, 10))
-    .default('1000'),
-  VITE_CACHE_DEFAULT_TTL: z
-    .string()
-    .transform(val => parseInt(val, 10))
-    .default('300000'), // 5 minutes
-  VITE_CACHE_CLEANUP_INTERVAL: z
-    .string()
-    .transform(val => parseInt(val, 10))
-    .default('300000'), // 5 minutes
+  // Cache configuration (numbers)
+  VITE_CACHE_MAX_SIZE: z.number().int().positive().default(1000),
+  VITE_CACHE_DEFAULT_TTL: z.number().int().positive().default(300000), // 5 minutes
+  VITE_CACHE_CLEANUP_INTERVAL: z.number().int().positive().default(300000), // 5 minutes
 
   // Performance monitoring
-  VITE_PERFORMANCE_ENABLE_SAMPLING: z
-    .string()
-    .transform(val => val === 'true')
-    .default('true'),
-  VITE_PERFORMANCE_SAMPLE_RATE: z
-    .string()
-    .transform(val => parseFloat(val))
-    .default('0.1'), // 10% sampling
-  VITE_PERFORMANCE_MAX_METRICS: z
-    .string()
-    .transform(val => parseInt(val, 10))
-    .default('1000'),
+  VITE_PERFORMANCE_ENABLE_SAMPLING: z.boolean().default(true),
+  VITE_PERFORMANCE_SAMPLE_RATE: z.number().min(0).max(1).default(0.1), // 10% sampling
+  VITE_PERFORMANCE_MAX_METRICS: z.number().int().positive().default(1000),
 
   // Security
-  VITE_SECURITY_CSP_STRICT: z
-    .string()
-    .transform(val => val === 'true')
-    .default('false'),
-  VITE_SECURITY_RATE_LIMIT_REQUESTS: z
-    .string()
-    .transform(val => parseInt(val, 10))
-    .default('100'),
-  VITE_SECURITY_RATE_LIMIT_WINDOW: z
-    .string()
-    .transform(val => parseInt(val, 10))
-    .default('60000'), // 1 minute
+  VITE_SECURITY_CSP_STRICT: z.boolean().default(false),
+  VITE_SECURITY_RATE_LIMIT_REQUESTS: z.number().int().positive().default(100),
+  VITE_SECURITY_RATE_LIMIT_WINDOW: z.number().int().positive().default(60000), // 1 minute
 })
 
 const serverConfigSchema = z.object({
@@ -124,23 +90,51 @@ class ConfigManager {
 
     // Apply safe defaults for missing or invalid values
     return {
-      VITE_AZURE_FUNCTIONS_URL: env.VITE_AZURE_FUNCTIONS_URL || 'https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api',
-      VITE_NODE_ENV: (env.VITE_NODE_ENV as 'development' | 'production' | 'test') || 'development',
+      VITE_AZURE_FUNCTIONS_URL:
+        env.VITE_AZURE_FUNCTIONS_URL ||
+        'https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api',
+      VITE_NODE_ENV:
+        (env.VITE_NODE_ENV as 'development' | 'production' | 'test') ||
+        'development',
       VITE_APP_VERSION: env.VITE_APP_VERSION || '1.0.0',
       VITE_ANALYTICS_GA_TRACKING_ID: env.VITE_ANALYTICS_GA_TRACKING_ID,
       VITE_ANALYTICS_HOTJAR_ID: env.VITE_ANALYTICS_HOTJAR_ID,
-      VITE_FEATURE_ENABLE_ANALYTICS: env.VITE_FEATURE_ENABLE_ANALYTICS === 'true',
-      VITE_FEATURE_ENABLE_DEBUG_LOGGING: env.VITE_FEATURE_ENABLE_DEBUG_LOGGING === 'true',
+      VITE_FEATURE_ENABLE_ANALYTICS:
+        env.VITE_FEATURE_ENABLE_ANALYTICS === 'true',
+      VITE_FEATURE_ENABLE_DEBUG_LOGGING:
+        env.VITE_FEATURE_ENABLE_DEBUG_LOGGING === 'true',
       VITE_FEATURE_ENABLE_CACHE: env.VITE_FEATURE_ENABLE_CACHE !== 'false', // Default true
-      VITE_CACHE_MAX_SIZE: Math.max(100, parseInt(env.VITE_CACHE_MAX_SIZE || '1000', 10)),
-      VITE_CACHE_DEFAULT_TTL: Math.max(60000, parseInt(env.VITE_CACHE_DEFAULT_TTL || '300000', 10)), // Min 1 minute
-      VITE_CACHE_CLEANUP_INTERVAL: Math.max(60000, parseInt(env.VITE_CACHE_CLEANUP_INTERVAL || '300000', 10)),
-      VITE_PERFORMANCE_ENABLE_SAMPLING: env.VITE_PERFORMANCE_ENABLE_SAMPLING !== 'false',
-      VITE_PERFORMANCE_SAMPLE_RATE: Math.max(0.01, Math.min(1, parseFloat(env.VITE_PERFORMANCE_SAMPLE_RATE || '0.1'))),
-      VITE_PERFORMANCE_MAX_METRICS: Math.max(100, parseInt(env.VITE_PERFORMANCE_MAX_METRICS || '1000', 10)),
+      VITE_CACHE_MAX_SIZE: Math.max(
+        100,
+        parseInt(env.VITE_CACHE_MAX_SIZE || '1000', 10)
+      ),
+      VITE_CACHE_DEFAULT_TTL: Math.max(
+        60000,
+        parseInt(env.VITE_CACHE_DEFAULT_TTL || '300000', 10)
+      ), // Min 1 minute
+      VITE_CACHE_CLEANUP_INTERVAL: Math.max(
+        60000,
+        parseInt(env.VITE_CACHE_CLEANUP_INTERVAL || '300000', 10)
+      ),
+      VITE_PERFORMANCE_ENABLE_SAMPLING:
+        env.VITE_PERFORMANCE_ENABLE_SAMPLING !== 'false',
+      VITE_PERFORMANCE_SAMPLE_RATE: Math.max(
+        0.01,
+        Math.min(1, parseFloat(env.VITE_PERFORMANCE_SAMPLE_RATE || '0.1'))
+      ),
+      VITE_PERFORMANCE_MAX_METRICS: Math.max(
+        100,
+        parseInt(env.VITE_PERFORMANCE_MAX_METRICS || '1000', 10)
+      ),
       VITE_SECURITY_CSP_STRICT: env.VITE_SECURITY_CSP_STRICT === 'true',
-      VITE_SECURITY_RATE_LIMIT_REQUESTS: Math.max(10, parseInt(env.VITE_SECURITY_RATE_LIMIT_REQUESTS || '100', 10)),
-      VITE_SECURITY_RATE_LIMIT_WINDOW: Math.max(10000, parseInt(env.VITE_SECURITY_RATE_LIMIT_WINDOW || '60000', 10)),
+      VITE_SECURITY_RATE_LIMIT_REQUESTS: Math.max(
+        10,
+        parseInt(env.VITE_SECURITY_RATE_LIMIT_REQUESTS || '100', 10)
+      ),
+      VITE_SECURITY_RATE_LIMIT_WINDOW: Math.max(
+        10000,
+        parseInt(env.VITE_SECURITY_RATE_LIMIT_WINDOW || '60000', 10)
+      ),
     }
   }
 
@@ -161,7 +155,8 @@ class ConfigManager {
       COSMOS_CONNECTION_STRING: env.COSMOS_CONNECTION_STRING,
       ADMIN_KEY: env.ADMIN_KEY,
       FRONTEND_URL: env.FRONTEND_URL || 'https://tcdynamics.fr',
-      APPLICATIONINSIGHTS_CONNECTION_STRING: env.APPLICATIONINSIGHTS_CONNECTION_STRING,
+      APPLICATIONINSIGHTS_CONNECTION_STRING:
+        env.APPLICATIONINSIGHTS_CONNECTION_STRING,
       AzureWebJobsStorage: env.AzureWebJobsStorage,
     }
   }
@@ -178,7 +173,10 @@ class ConfigManager {
       const clientValidation = clientConfigSchema.safeParse(safeClientConfig)
 
       if (!clientValidation.success) {
-        console.warn('Client configuration validation failed, using safe defaults:', clientValidation.error.issues)
+        console.warn(
+          'Client configuration validation failed, using safe defaults:',
+          clientValidation.error.issues
+        )
         this.clientConfig = safeClientConfig
       } else {
         this.clientConfig = clientValidation.data
@@ -189,7 +187,10 @@ class ConfigManager {
       const serverValidation = serverConfigSchema.safeParse(safeServerConfig)
 
       if (!serverValidation.success) {
-        console.warn('Server configuration validation failed, using safe defaults:', serverValidation.error.issues)
+        console.warn(
+          'Server configuration validation failed, using safe defaults:',
+          serverValidation.error.issues
+        )
         this.serverConfig = safeServerConfig
       } else {
         this.serverConfig = serverValidation.data
@@ -210,7 +211,9 @@ class ConfigManager {
         this.clientConfig = this.getSafeClientConfig()
         this.serverConfig = this.getSafeServerConfig()
         this.isInitialized = true
-        console.warn('Using safe configuration defaults due to initialization failure')
+        console.warn(
+          'Using safe configuration defaults due to initialization failure'
+        )
       } catch (fallbackError) {
         console.error('Even fallback configuration failed:', fallbackError)
         throw new Error(

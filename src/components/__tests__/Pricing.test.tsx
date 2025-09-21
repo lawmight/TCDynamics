@@ -50,8 +50,8 @@ describe('Pricing Component', () => {
   it('should have CTA buttons', () => {
     render(<Pricing />)
 
-    expect(screen.getByText("Commencer l'essai")).toBeInTheDocument()
-    expect(screen.getByText('Choisir Professional')).toBeInTheDocument()
+    expect(screen.getByText("S'abonner - 29€")).toBeInTheDocument()
+    expect(screen.getByText("S'abonner - 79€")).toBeInTheDocument()
     expect(screen.getByText('Contactez-nous')).toBeInTheDocument()
   })
 })

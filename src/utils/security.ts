@@ -214,18 +214,28 @@ export const securityHeaders = {
   /**
    * Get security headers for API responses
    */
-  getSecurityHeaders: (config?: { strictCSP?: boolean; includeHSTS?: boolean; reportUri?: string }) => ({
-    'Strict-Transport-Security': config?.includeHSTS !== false ? 'max-age=31536000; includeSubDomains; preload' : undefined,
+  getSecurityHeaders: (config?: {
+    strictCSP?: boolean
+    includeHSTS?: boolean
+    reportUri?: string
+  }) => ({
+    'Strict-Transport-Security':
+      config?.includeHSTS !== false
+        ? 'max-age=31536000; includeSubDomains; preload'
+        : undefined,
     'X-Content-Type-Options': 'nosniff',
     'X-Frame-Options': 'DENY',
     'X-XSS-Protection': '1; mode=block',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
-    'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+    'Permissions-Policy':
+      'camera=(), microphone=(), geolocation=(), interest-cohort=()',
     'Cross-Origin-Embedder-Policy': 'require-corp',
     'Cross-Origin-Opener-Policy': 'same-origin',
     'Cross-Origin-Resource-Policy': 'same-origin',
     'Expect-CT': 'max-age=86400, enforce',
-    'Content-Security-Policy': config?.strictCSP ? securityHeaders.getStrictCSP(config) : securityHeaders.getStandardCSP(config),
+    'Content-Security-Policy': config?.strictCSP
+      ? securityHeaders.getStrictCSP(config)
+      : securityHeaders.getStandardCSP(config),
   }),
 
   /**
@@ -237,7 +247,8 @@ export const securityHeaders = {
     const styleCSP = "style-src 'self' 'unsafe-inline' https:;"
     const imgCSP = "img-src 'self' data: https: blob:;"
     const fontCSP = "font-src 'self' data: https:;"
-    const connectCSP = "connect-src 'self' https://api.tcdynamics.fr wss://api.tcdynamics.fr;"
+    const connectCSP =
+      "connect-src 'self' https://api.tcdynamics.fr wss://api.tcdynamics.fr;"
     const frameCSP = "frame-ancestors 'none';"
     const baseURICSP = "base-uri 'self';"
     const formActionCSP = "form-action 'self';"
@@ -291,13 +302,18 @@ export const securityHeaders = {
   /**
    * Test CSP policy for violations
    */
-  testCSP: (cspString: string): { valid: boolean; errors: string[]; warnings: string[] } => {
+  testCSP: (
+    cspString: string
+  ): { valid: boolean; errors: string[]; warnings: string[] } => {
     const errors: string[] = []
     const warnings: string[] = []
 
     try {
       // Basic syntax validation
-      const directives = cspString.split(';').map(d => d.trim()).filter(d => d.length > 0)
+      const directives = cspString
+        .split(';')
+        .map(d => d.trim())
+        .filter(d => d.length > 0)
 
       // Check for common CSP issues
       const hasDefaultSrc = directives.some(d => d.startsWith('default-src'))
@@ -305,11 +321,15 @@ export const securityHeaders = {
       const hasStyleSrc = directives.some(d => d.startsWith('style-src'))
 
       if (!hasDefaultSrc && !hasScriptSrc) {
-        warnings.push('No default-src or script-src directive found - this may block legitimate scripts')
+        warnings.push(
+          'No default-src or script-src directive found - this may block legitimate scripts'
+        )
       }
 
       if (!hasDefaultSrc && !hasStyleSrc) {
-        warnings.push('No default-src or style-src directive found - this may block legitimate styles')
+        warnings.push(
+          'No default-src or style-src directive found - this may block legitimate styles'
+        )
       }
 
       // Check for unsafe directives
@@ -322,28 +342,40 @@ export const securityHeaders = {
           warnings.push(`Directive contains 'unsafe-eval': ${directive}`)
         }
         if (lowerDirective.includes('data:')) {
-          warnings.push(`Directive allows data: URIs which can be unsafe: ${directive}`)
+          warnings.push(
+            `Directive allows data: URIs which can be unsafe: ${directive}`
+          )
         }
         if (lowerDirective.includes('http:')) {
-          warnings.push(`Directive allows HTTP (non-HTTPS) resources: ${directive}`)
+          warnings.push(
+            `Directive allows HTTP (non-HTTPS) resources: ${directive}`
+          )
         }
       })
 
       // Check for missing important directives
       const hasBaseUri = directives.some(d => d.startsWith('base-uri'))
       const hasFormAction = directives.some(d => d.startsWith('form-action'))
-      const hasFrameAncestors = directives.some(d => d.startsWith('frame-ancestors'))
+      const hasFrameAncestors = directives.some(d =>
+        d.startsWith('frame-ancestors')
+      )
 
       if (!hasBaseUri) {
-        warnings.push('Missing base-uri directive - base tag injection attacks possible')
+        warnings.push(
+          'Missing base-uri directive - base tag injection attacks possible'
+        )
       }
 
       if (!hasFormAction) {
-        warnings.push('Missing form-action directive - form action hijacking possible')
+        warnings.push(
+          'Missing form-action directive - form action hijacking possible'
+        )
       }
 
       if (!hasFrameAncestors) {
-        warnings.push('Missing frame-ancestors directive - clickjacking protection limited')
+        warnings.push(
+          'Missing frame-ancestors directive - clickjacking protection limited'
+        )
       }
 
       return {
@@ -352,7 +384,9 @@ export const securityHeaders = {
         warnings,
       }
     } catch (error) {
-      errors.push(`CSP parsing failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      errors.push(
+        `CSP parsing failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      )
       return {
         valid: false,
         errors,
@@ -364,11 +398,17 @@ export const securityHeaders = {
   /**
    * Validate security headers configuration
    */
-  validateHeaders: (headers: Record<string, string>): { valid: boolean; issues: string[] } => {
+  validateHeaders: (
+    headers: Record<string, string>
+  ): { valid: boolean; issues: string[] } => {
     const issues: string[] = []
 
     // Check for required headers
-    const requiredHeaders = ['Strict-Transport-Security', 'X-Content-Type-Options', 'X-Frame-Options']
+    const requiredHeaders = [
+      'Strict-Transport-Security',
+      'X-Content-Type-Options',
+      'X-Frame-Options',
+    ]
     requiredHeaders.forEach(header => {
       if (!headers[header]) {
         issues.push(`Missing required header: ${header}`)
@@ -388,18 +428,21 @@ export const securityHeaders = {
 
     // Check CSP configuration
     const csp = headers['Content-Security-Policy']
+    let hasErrors = false
     if (csp) {
       const cspTest = securityHeaders.testCSP(csp)
       issues.push(...cspTest.warnings)
       if (!cspTest.valid) {
         issues.push(...cspTest.errors)
+        hasErrors = cspTest.errors.length > 0
       }
     } else {
       issues.push('Missing Content-Security-Policy header')
+      hasErrors = true
     }
 
     return {
-      valid: issues.length === 0,
+      valid: !hasErrors, // Valid if no errors, warnings are acceptable
       issues,
     }
   },

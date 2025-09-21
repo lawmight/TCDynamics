@@ -43,10 +43,10 @@ const PageLoader = () => (
 const handleAppError = (error: Error, errorInfo: any) => {
   // Report to monitoring service
   if (typeof window !== 'undefined' && (window as any).performanceMonitor) {
-    (window as any).performanceMonitor.recordMetric('error.app', 1, {
+    ;(window as any).performanceMonitor.recordMetric('error.app', 1, {
       error: error.message,
       componentStack: errorInfo.componentStack,
-      severity: 'high'
+      severity: 'high',
     })
   }
 }
