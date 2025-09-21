@@ -26,6 +26,7 @@ env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: './TCDynamics'
   FRONTEND_BUILD_PATH: './dist'
   AZURE_FUNCTIONAPP_BASE_URL: 'https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net'
+  AZURE_RESOURCE_GROUP: 'rg-TCDynamics'
 
 jobs:
   # Test Frontend
@@ -162,18 +163,53 @@ jobs:
     - name: Package Azure Functions for deployment
       run: |
         cd TCDynamics
-        # Clean up Python cache files
-        find . -type d -name "__pycache__" -exec rm -rf {} +
-        find . -name "*.pyc" -delete
-        # Create deployment package (exclude unnecessary files)
-        zip -r ../azure-functions-package.zip . -x "*.git*" "local.settings.json" ".funcignore"
+        echo "📦 Preparing Azure Functions package..."
+
+        # Clean up Python cache files and unnecessary files
+        find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+        find . -name "*.pyc" -delete 2>/dev/null || true
+        find . -name ".pytest_cache" -type d -exec rm -rf {} + 2>/dev/null || true
+        find . -name "*.log" -delete 2>/dev/null || true
+
+        # Create .funcignore if it doesn't exist to exclude unnecessary files
+        if [ ! -f .funcignore ]; then
+          cat > .funcignore << 'EOF'
+        .git*
+        .vscode/
+        .venv/
+        __pycache__/
+        *.pyc
+        .pytest_cache/
+        test_*.py
+        *_test.py
+        .coverage
+        *.log
+        local.settings.json
+        requirements-dev.txt
+        test_dependencies.py
+        constraints.txt
+        EOF
+          echo "✅ Created .funcignore file"
+        fi
+
+        echo "📋 Files to be included in package:"
+        find . -type f | grep -v -E '\.(git|vscode|venv|pytest_cache)' | head -20
+
+        # Create deployment package with proper exclusions
+        echo "🔨 Creating deployment package..."
+        zip -r ../azure-functions-package.zip . -x@.funcignore "*.git*" "local.settings.json" ".funcignore"
+
         cd ..
         ls -la azure-functions-package.zip
+        PACKAGE_SIZE=$(du -h azure-functions-package.zip | cut -f1)
+        echo "📏 Package size: $PACKAGE_SIZE"
+
         # Verify package contents
-        echo "Package contents:"
+        echo ""
+        echo "📋 Package contents (first 20 files):"
         unzip -l azure-functions-package.zip | head -20
         echo ""
-        echo "Checking for critical files:"
+        echo "🔍 Checking for critical files:"
         if unzip -l azure-functions-package.zip | grep -q "function_app.py"; then
           echo "✅ function_app.py found"
         else
@@ -186,11 +222,25 @@ jobs:
           echo "❌ host.json missing!"
           exit 1
         fi
+        if unzip -l azure-functions-package.zip | grep -q "requirements.txt"; then
+          echo "✅ requirements.txt found"
+        else
+          echo "❌ requirements.txt missing!"
+          exit 1
+        fi
+
+        # Check package size (warn if too large)
+        PACKAGE_BYTES=$(stat -f%z azure-functions-package.zip 2>/dev/null || stat -c%s azure-functions-package.zip)
+        if [ "$PACKAGE_BYTES" -gt 104857600 ]; then  # 100MB
+          echo "⚠️  WARNING: Package size ($PACKAGE_SIZE) is quite large. Consider optimizing."
+        fi
 
     - name: Extract Azure Functions package
       run: |
+        echo "📦 Extracting Azure Functions package..."
         unzip azure-functions-package.zip -d azure-functions-deploy
-        ls -la azure-functions-deploy/
+        echo "📁 Package structure:"
+        find azure-functions-deploy -type f | head -20
 
     - name: Setup Python
       uses: actions/setup-python@v5
@@ -223,7 +273,41 @@ jobs:
           exit 1
         fi
 
-    - name: Deploy to Azure Functions
+    - name: Remove Conflicting App Settings
+      run: |
+        echo "🧹 Removing conflicting app settings before deployment..."
+        echo "This prevents WEBSITE_RUN_FROM_PACKAGE conflicts with ZIP deployment"
+
+        # Remove WEBSITE_RUN_FROM_PACKAGE which conflicts with ZIP deploy
+        az functionapp config appsettings delete \
+          --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
+          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+          --setting-names WEBSITE_RUN_FROM_PACKAGE \
+          --output none || echo "WEBSITE_RUN_FROM_PACKAGE not found or already removed"
+
+        # Also remove the blob MI resource ID if present
+        az functionapp config appsettings delete \
+          --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
+          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+          --setting-names WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID \
+          --output none || echo "WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID not found or already removed"
+
+        echo "✅ Conflicting app settings removed"
+
+    - name: Verify App Settings After Cleanup
+      run: |
+        echo "🔍 Verifying app settings after cleanup..."
+        echo "Current app settings:"
+        az functionapp config appsettings list \
+          --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
+          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+          --output table || echo "Could not list app settings"
+
+        echo ""
+        echo "✅ App settings verified - deployment should now proceed without conflicts"
+
+    - name: Deploy to Azure Functions (Attempt 1)
+      id: deploy-attempt-1
       uses: Azure/functions-action@v1
       with:
         app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
@@ -231,6 +315,40 @@ jobs:
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
         scm-do-build-during-deployment: true
         enable-oryx-build: true
+      continue-on-error: true
+      env:
+        ACTIONS_STEP_DEBUG: true
+        ACTIONS_RUNNER_DEBUG: true
+
+    - name: Deploy to Azure Functions (Retry Attempt)
+      if: steps.deploy-attempt-1.outcome == 'failure'
+      uses: Azure/functions-action@v1
+      with:
+        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+        package: ./azure-functions-deploy
+        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+        scm-do-build-during-deployment: true
+        enable-oryx-build: true
+      env:
+        ACTIONS_STEP_DEBUG: true
+        ACTIONS_RUNNER_DEBUG: true
+
+    - name: Check Deployment Status
+      run: |
+        echo "Checking deployment status..."
+        # Wait a moment for deployment to settle
+        sleep 30
+
+        # Check if functions are responding
+        if curl -f -s ${{ env.AZURE_FUNCTIONAPP_BASE_URL }}/api/health > /dev/null; then
+          echo "✅ Azure Functions deployment successful - health check passed"
+        else
+          echo "❌ Azure Functions deployment failed - health check failed"
+          echo "Attempting to get deployment logs..."
+          # Try to get deployment logs if available
+          curl -s ${{ env.AZURE_FUNCTIONAPP_BASE_URL }}/admin/host/status || echo "Could not retrieve host status"
+          exit 1
+        fi
 
     # Alternative OIDC-based deployment (recommended for security)
     # Uncomment the following and comment out the above deployment step
