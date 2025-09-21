@@ -1,13 +1,10 @@
 # Azure Functions Python Dependencies
-azure-functions==1.18.0
-azure-functions-worker==1.0.0
+azure-functions==1.19.0b3
 
-# gRPC - Exact versions required for azure-functions-worker 1.0.0 compatibility
-grpcio==1.33.2
-grpcio-status==1.33.2
-
-# Protocol Buffers - Compatible with grpcio 1.33.2
-protobuf==3.20.3
+# gRPC and Protocol Buffers - Latest versions compatible with Python 3.13
+grpcio==1.74.0
+grpcio-tools==1.74.0
+protobuf>=6.31.1,<7.0.0
 
 # Optional Stripe (if needed for payments)
 stripe>=8.0.0

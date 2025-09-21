@@ -17,3 +17,7 @@ coverage.xml
 .DS_Store
 .env
 
+# Test and development files
+test_dependencies.py
+constraints.txt
+
