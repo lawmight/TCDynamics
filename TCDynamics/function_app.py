@@ -1,10 +1,21 @@
 import azure.functions as func
 import logging
+import stripe
+import os
+import json
+import time
+from datetime import datetime, timedelta
 
 # Import individual functions directly
 from ContactForm import contact_form
-from DemoForm import demo_form  
+from DemoForm import demo_form
 from AIFunctions import ai_chat, ai_vision
+
+# Configuration Stripe
+stripe.api_key = os.getenv('STRIPE_SECRET_KEY', 'sk_test_...')
+
+# Track application start time for uptime calculation
+app_start_time = time.time()
 
 app = func.FunctionApp()
 
@@ -28,9 +39,102 @@ def ai_vision_wrapper(req: func.HttpRequest) -> func.HttpResponse:
 @app.route(route="health", methods=["GET"])
 def health_check(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Health check function processed a request.')
-    return func.HttpResponse(
-        "TCDynamics Azure Functions are running",
-        status_code=200,
-        headers={"Content-Type": "text/plain"}
-    )
+
+    try:
+        # Calculate uptime
+        current_time = time.time()
+        uptime_seconds = current_time - app_start_time
+
+        # Create health response
+        health_data = {
+            "status": "healthy",
+            "uptime": uptime_seconds,
+            "timestamp": datetime.utcnow().isoformat() + "Z"
+        }
+
+        return func.HttpResponse(
+            json.dumps(health_data),
+            status_code=200,
+            headers={"Content-Type": "application/json"}
+        )
+    except Exception as e:
+        logging.error(f"Health check error: {str(e)}")
+        error_data = {
+            "status": "unhealthy",
+            "error": str(e),
+            "timestamp": datetime.utcnow().isoformat() + "Z"
+        }
+        return func.HttpResponse(
+            json.dumps(error_data),
+            status_code=503,
+            headers={"Content-Type": "application/json"}
+        )
+
+@app.route(route="create-payment-intent", methods=["POST"])
+def create_payment_intent(req: func.HttpRequest) -> func.HttpResponse:
+    """Créer une intention de paiement Stripe"""
+    try:
+        req_body = req.get_json()
+        amount = req_body.get('amount', 0)  # Montant en centimes
+        currency = req_body.get('currency', 'eur')
+        plan_name = req_body.get('plan', 'starter')
+
+        # Créer l'intention de paiement
+        intent = stripe.PaymentIntent.create(
+            amount=amount,
+            currency=currency,
+            metadata={'plan': plan_name}
+        )
+
+        return func.HttpResponse(
+            json.dumps({
+                'clientSecret': intent.client_secret,
+                'paymentIntentId': intent.id
+            }),
+            status_code=200,
+            headers={"Content-Type": "application/json"}
+        )
+    except Exception as e:
+        logging.error(f"Erreur lors de la création de l'intention de paiement: {str(e)}")
+        return func.HttpResponse(
+            json.dumps({'error': str(e)}),
+            status_code=400,
+            headers={"Content-Type": "application/json"}
+        )
+
+@app.route(route="create-subscription", methods=["POST"])
+def create_subscription(req: func.HttpRequest) -> func.HttpResponse:
+    """Créer un abonnement Stripe"""
+    try:
+        req_body = req.get_json()
+        customer_email = req_body.get('email')
+        price_id = req_body.get('price_id')  # ID du prix Stripe
+
+        # Créer ou récupérer le client
+        customer = stripe.Customer.create(email=customer_email)
+
+        # Créer l'abonnement avec période d'essai de 14 jours
+        subscription = stripe.Subscription.create(
+            customer=customer.id,
+            items=[{'price': price_id}],
+            trial_period_days=14,
+            metadata={'plan': req_body.get('plan', 'starter')}
+        )
+
+        return func.HttpResponse(
+            json.dumps({
+                'subscriptionId': subscription.id,
+                'clientSecret': subscription.latest_invoice.payment_intent.client_secret,
+                'customerId': customer.id
+            }),
+            status_code=200,
+            headers={"Content-Type": "application/json"}
+        )
+    except Exception as e:
+        logging.error(f"Erreur lors de la création de l'abonnement: {str(e)}")
+        return func.HttpResponse(
+            json.dumps({'error': str(e)}),
+            status_code=400,
+            headers={"Content-Type": "application/json"}
+        )
 
