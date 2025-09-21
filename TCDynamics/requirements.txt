@@ -1,12 +1,7 @@
-# Azure Functions Python Dependencies
-azure-functions==1.19.0
+# DO NOT include azure-functions-worker in this file
+# The Python Worker is managed by Azure Functions platform
+# Manually managing azure-functions-worker may cause unexpected issues
 
-# gRPC and Protocol Buffers - Latest versions compatible with Python 3.13
-grpcio==1.74.0
-grpcio-tools==1.74.0
-protobuf>=6.31.1,<7.0.0
-
-# Optional Stripe (if needed for payments)
-stripe>=8.0.0
+azure-functions
 
 # Deployment test trigger - 2025-09-21 12:15:54
