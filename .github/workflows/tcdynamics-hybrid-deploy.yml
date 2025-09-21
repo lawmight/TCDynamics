@@ -306,32 +306,28 @@ jobs:
         echo ""
         echo "✅ App settings verified - deployment should now proceed without conflicts"
 
-    - name: Deploy to Azure Functions (Attempt 1)
-      id: deploy-attempt-1
-      uses: Azure/functions-action@v1
-      with:
-        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-        package: ./azure-functions-deploy
-        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
-        scm-do-build-during-deployment: true
-        enable-oryx-build: false
-      continue-on-error: true
-      env:
-        ACTIONS_STEP_DEBUG: true
-        ACTIONS_RUNNER_DEBUG: true
+    - name: Deploy to Azure Functions (Azure CLI Method)
+      run: |
+        echo "🚀 Deploying Azure Functions using Azure CLI (bypassing functions-action)..."
 
-    - name: Deploy to Azure Functions (Retry Attempt)
-      if: steps.deploy-attempt-1.outcome == 'failure'
-      uses: Azure/functions-action@v1
-      with:
-        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-        package: ./azure-functions-deploy
-        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
-        scm-do-build-during-deployment: true
-        enable-oryx-build: false
-      env:
-        ACTIONS_STEP_DEBUG: true
-        ACTIONS_RUNNER_DEBUG: true
+        # Configure run-from-package (already authenticated via azure/login above)
+        echo "⚙️ Setting WEBSITE_RUN_FROM_PACKAGE=1..."
+        az functionapp config appsettings set \
+          --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+          --settings WEBSITE_RUN_FROM_PACKAGE=1 \
+          --output none
+
+        # Deploy using Azure CLI ZIP push (bypassing functions-action)
+        echo "📦 Deploying ZIP package using Azure CLI..."
+        az functionapp deployment source config-zip \
+          --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+          --src azure-functions-package.zip \
+          --build-remote true \
+          --output none
+
+        echo "✅ Azure Functions deployed successfully using Azure CLI!"
 
     - name: Check Deployment Status
       run: |
