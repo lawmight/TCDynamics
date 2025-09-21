@@ -172,6 +172,20 @@ jobs:
         # Verify package contents
         echo "Package contents:"
         unzip -l azure-functions-package.zip | head -20
+        echo ""
+        echo "Checking for critical files:"
+        if unzip -l azure-functions-package.zip | grep -q "function_app.py"; then
+          echo "✅ function_app.py found"
+        else
+          echo "❌ function_app.py missing!"
+          exit 1
+        fi
+        if unzip -l azure-functions-package.zip | grep -q "host.json"; then
+          echo "✅ host.json found"
+        else
+          echo "❌ host.json missing!"
+          exit 1
+        fi
 
     - name: Extract Azure Functions package
       run: |
@@ -191,6 +205,12 @@ jobs:
       uses: azure/login@v2
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Configure Function App for V2 Python Model
+      run: |
+        echo "Setting AzureWebJobsFeatureFlags for Python v2 model..."
+        # This enables function discovery for @app.route() decorators
+        # Without this, no functions are found and deployment fails with 400
 
     - name: Verify Function App Configuration
       run: |
