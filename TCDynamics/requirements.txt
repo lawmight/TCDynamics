@@ -9,3 +9,4 @@ protobuf>=6.31.1,<7.0.0
 # Optional Stripe (if needed for payments)
 stripe>=8.0.0
 
+# Deployment test trigger - 2025-09-21 12:15:54
