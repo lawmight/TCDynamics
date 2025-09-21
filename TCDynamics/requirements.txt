@@ -1,4 +1,11 @@
-# Azure Functions Python Dependencies - Minimal set
+# Azure Functions Python Dependencies
 azure-functions==1.18.0
 azure-functions-worker==1.0.0
+
+# gRPC with pre-compiled wheels to avoid compilation issues
+grpcio==1.60.0
+grpcio-status==1.60.0
+
+# Protocol Buffers
+protobuf==4.25.1
 
