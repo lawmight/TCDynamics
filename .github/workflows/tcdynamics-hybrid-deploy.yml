@@ -314,7 +314,7 @@ jobs:
         package: ./azure-functions-deploy
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
         scm-do-build-during-deployment: true
-        enable-oryx-build: true
+        enable-oryx-build: false
       continue-on-error: true
       env:
         ACTIONS_STEP_DEBUG: true
@@ -328,7 +328,7 @@ jobs:
         package: ./azure-functions-deploy
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
         scm-do-build-during-deployment: true
-        enable-oryx-build: true
+        enable-oryx-build: false
       env:
         ACTIONS_STEP_DEBUG: true
         ACTIONS_RUNNER_DEBUG: true
