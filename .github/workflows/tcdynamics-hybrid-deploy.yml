@@ -113,14 +113,35 @@ jobs:
         
     - name: Package Azure Functions
       run: |
-        # Create deployment package
-        zip -r azure-functions-package.zip . -x "*.pyc" "__pycache__/*" "*.git*" "local.settings.json"
+        # Check if zip is available
+        if ! command -v zip &> /dev/null; then
+          echo "ERROR: zip command not found"
+          exit 1
+        fi
+
+        # Debug: Check current directory and contents
+        pwd
+        ls -la
+        echo "Files to be zipped:"
+        find . -name "*.py" | head -10
+
+        # Create deployment package (simplified, no exclusions first)
+        echo "Creating zip file..."
+        zip -r azure-functions-package.zip . 2>&1
 
         # Verify the package was created
-        ls -la azure-functions-package.zip
-        echo "Package size: $(du -h azure-functions-package.zip | cut -f1)"
+        if [ -f "azure-functions-package.zip" ]; then
+          ls -la azure-functions-package.zip
+          echo "Package size: $(du -h azure-functions-package.zip | cut -f1)"
+          echo "SUCCESS: Zip file created successfully"
+        else
+          echo "ERROR: Zip file was not created"
+          echo "Zip command exit code: $?"
+          exit 1
+        fi
 
     - name: Upload Azure Functions artifacts
+      working-directory: ./TCDynamics
       uses: actions/upload-artifact@v4
       with:
         name: azure-functions-package
