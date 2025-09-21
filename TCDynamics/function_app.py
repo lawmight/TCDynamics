@@ -1,40 +1,51 @@
 import azure.functions as func
 import logging
-import stripe
 import os
 import json
 import time
-from datetime import datetime, timedelta
-
-# Import individual functions directly
-from ContactForm import contact_form
-from DemoForm import demo_form
-from AIFunctions import ai_chat, ai_vision
-
-# Configuration Stripe
-stripe.api_key = os.getenv('STRIPE_SECRET_KEY', 'sk_test_...')
+from datetime import datetime
 
 # Track application start time for uptime calculation
 app_start_time = time.time()
 
 app = func.FunctionApp()
 
-# Register functions directly
+# Simple inline functions to test basic routing
 @app.route(route="ContactForm", methods=["POST"])
 def contact_form_wrapper(req: func.HttpRequest) -> func.HttpResponse:
-    return contact_form(req)
+    logging.info('Contact form processed a request.')
+    return func.HttpResponse(
+        json.dumps({"success": True, "message": "Contact form received"}),
+        status_code=200,
+        headers={"Content-Type": "application/json"}
+    )
 
-@app.route(route="DemoForm", methods=["POST"]) 
+@app.route(route="DemoForm", methods=["POST"])
 def demo_form_wrapper(req: func.HttpRequest) -> func.HttpResponse:
-    return demo_form(req)
+    logging.info('Demo form processed a request.')
+    return func.HttpResponse(
+        json.dumps({"success": True, "message": "Demo form received"}),
+        status_code=200,
+        headers={"Content-Type": "application/json"}
+    )
 
 @app.route(route="chat", methods=["POST"])
 def ai_chat_wrapper(req: func.HttpRequest) -> func.HttpResponse:
-    return ai_chat(req)
+    logging.info('Chat request processed.')
+    return func.HttpResponse(
+        json.dumps({"success": True, "message": "Chat request received"}),
+        status_code=200,
+        headers={"Content-Type": "application/json"}
+    )
 
 @app.route(route="vision", methods=["POST"])
 def ai_vision_wrapper(req: func.HttpRequest) -> func.HttpResponse:
-    return ai_vision(req)
+    logging.info('Vision request processed.')
+    return func.HttpResponse(
+        json.dumps({"success": True, "message": "Vision request received"}),
+        status_code=200,
+        headers={"Content-Type": "application/json"}
+    )
 
 @app.route(route="health", methods=["GET"])
 def health_check(req: func.HttpRequest) -> func.HttpResponse:
