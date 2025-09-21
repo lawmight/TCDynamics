@@ -18,10 +18,10 @@ except ImportError:
 # Track application start time for uptime calculation
 app_start_time = time.time()
 
-app = func.FunctionApp()
+func_app = func.FunctionApp()
 
 # Simple inline functions to test basic routing
-@app.route(route="ContactForm", methods=["POST"])
+@func_app.route(route="ContactForm", methods=["POST"])
 def contact_form_wrapper(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Contact form processed a request.')
     return func.HttpResponse(
@@ -30,7 +30,7 @@ def contact_form_wrapper(req: func.HttpRequest) -> func.HttpResponse:
         headers={"Content-Type": "application/json"}
     )
 
-@app.route(route="DemoForm", methods=["POST"])
+@func_app.route(route="DemoForm", methods=["POST"])
 def demo_form_wrapper(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Demo form processed a request.')
     return func.HttpResponse(
@@ -39,7 +39,7 @@ def demo_form_wrapper(req: func.HttpRequest) -> func.HttpResponse:
         headers={"Content-Type": "application/json"}
     )
 
-@app.route(route="chat", methods=["POST"])
+@func_app.route(route="chat", methods=["POST"])
 def ai_chat_wrapper(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Chat request processed.')
     return func.HttpResponse(
@@ -48,7 +48,7 @@ def ai_chat_wrapper(req: func.HttpRequest) -> func.HttpResponse:
         headers={"Content-Type": "application/json"}
     )
 
-@app.route(route="vision", methods=["POST"])
+@func_app.route(route="vision", methods=["POST"])
 def ai_vision_wrapper(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Vision request processed.')
     return func.HttpResponse(
@@ -57,7 +57,7 @@ def ai_vision_wrapper(req: func.HttpRequest) -> func.HttpResponse:
         headers={"Content-Type": "application/json"}
     )
 
-@app.route(route="health", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+@func_app.route(route="health", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
 def health_check(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Health check function processed a request.')
 
@@ -91,7 +91,7 @@ def health_check(req: func.HttpRequest) -> func.HttpResponse:
             headers={"Content-Type": "application/json"}
         )
 
-@app.route(route="create-payment-intent", methods=["POST"])
+@func_app.route(route="create-payment-intent", methods=["POST"])
 def create_payment_intent(req: func.HttpRequest) -> func.HttpResponse:
     """Créer une intention de paiement Stripe"""
     if not stripe_available:
