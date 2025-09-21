@@ -2,7 +2,7 @@
   "name": "tcdynamics-frontend",
   "private": true,
   "version": "1.0.0",
-  "description": "TCDynamics React frontend - deployment trigger v2",
+  "description": "TCDynamics React frontend - deployment with function discovery",
   "type": "module",
   "scripts": {
     "dev": "vite",
