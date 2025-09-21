@@ -38,7 +38,8 @@ def test_stripe():
     """Test Stripe import (optional)"""
     try:
         import stripe
-        print(f"✓ stripe: {stripe.__version__}")
+        version = getattr(stripe, '__version__', getattr(stripe, '_version', 'unknown'))
+        print(f"✓ stripe: {version}")
         return True
     except ImportError:
         print("⚠ stripe: not available (optional)")
