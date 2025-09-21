@@ -3,11 +3,7 @@
 // retry logic, type safety, and performance optimizations
 
 import { z } from 'zod'
-import {
-  sanitizeInput,
-  rateLimiters,
-  contentSecurity,
-} from '@/utils/security'
+import { sanitizeInput, rateLimiters, contentSecurity } from '@/utils/security'
 import { config } from '@/utils/config'
 import { performanceMonitor, smartCache } from '@/utils/performance'
 
@@ -86,6 +82,29 @@ export interface VisionRequest {
 
 export interface VisionResponse {
   data: any // Vision API response structure
+}
+
+export interface PaymentIntentRequest {
+  amount: number // Montant en centimes
+  currency?: string
+  plan: 'starter' | 'professional' | 'enterprise'
+}
+
+export interface PaymentIntentResponse {
+  clientSecret: string
+  paymentIntentId: string
+}
+
+export interface SubscriptionRequest {
+  email: string
+  price_id: string
+  plan: 'starter' | 'professional' | 'enterprise'
+}
+
+export interface SubscriptionResponse {
+  subscriptionId: string
+  clientSecret: string
+  customerId: string
 }
 
 // ========== VALIDATION SCHEMAS ==========
@@ -444,6 +463,58 @@ export const demoAPI = {
   },
 }
 
+export const paymentAPI = {
+  async createPaymentIntent(
+    request: PaymentIntentRequest
+  ): Promise<ApiResponse<PaymentIntentResponse>> {
+    try {
+      const response = await apiRequest<ApiResponse<PaymentIntentResponse>>(
+        '/create-payment-intent',
+        {
+          method: 'POST',
+          body: JSON.stringify(request),
+        }
+      )
+
+      return response
+    } catch (error) {
+      return {
+        success: false,
+        message:
+          error instanceof ApiError
+            ? error.message
+            : 'Payment intent creation failed',
+        errors: [error instanceof Error ? error.message : 'Unknown error'],
+      }
+    }
+  },
+
+  async createSubscription(
+    request: SubscriptionRequest
+  ): Promise<ApiResponse<SubscriptionResponse>> {
+    try {
+      const response = await apiRequest<ApiResponse<SubscriptionResponse>>(
+        '/create-subscription',
+        {
+          method: 'POST',
+          body: JSON.stringify(request),
+        }
+      )
+
+      return response
+    } catch (error) {
+      return {
+        success: false,
+        message:
+          error instanceof ApiError
+            ? error.message
+            : 'Subscription creation failed',
+        errors: [error instanceof Error ? error.message : 'Unknown error'],
+      }
+    }
+  },
+}
+
 export const chatAPI = {
   async sendMessage(request: ChatRequest): Promise<ApiResponse<ChatResponse>> {
     // Check rate limiting
@@ -564,14 +635,23 @@ export const healthAPI = {
     ApiResponse<{ status: string; timestamp: string }>
   > {
     try {
-      await apiRequest<ApiResponse>('/health', {
+      const response = await apiRequest<{
+        status: string
+        uptime: number
+        timestamp: string
+      }>('/health', {
         method: 'GET',
       })
 
+      // Transform backend response to match expected frontend structure
       return {
         success: true,
         data: {
-          status: 'healthy',
+          status: response.status,
+          timestamp: response.timestamp,
+        },
+        metadata: {
+          duration: 0,
           timestamp: new Date().toISOString(),
         },
       }
@@ -580,6 +660,10 @@ export const healthAPI = {
         success: false,
         message: 'Health check failed',
         errors: [error instanceof Error ? error.message : 'Unknown error'],
+        metadata: {
+          duration: 0,
+          timestamp: new Date().toISOString(),
+        },
       }
     }
   },
@@ -594,7 +678,7 @@ export const apiUtils = {
     if (!enabled) apiCache.clear()
   },
   getCacheStats: () => ({
-    size: apiCache['cache'].size,
+    size: apiCache.cache?.size || 0,
     enabled: API_CONFIG.cacheEnabled,
   }),
 }
