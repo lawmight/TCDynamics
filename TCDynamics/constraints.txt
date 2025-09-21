@@ -2,7 +2,7 @@
 # These versions are specifically chosen for Python 3.13 compatibility
 
 # Core Azure Functions dependencies
-azure-functions==1.19.0b3
+azure-functions==1.19.0
 
 # gRPC - Latest versions compatible with Python 3.13
 grpcio==1.74.0
