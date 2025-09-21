@@ -273,26 +273,27 @@ jobs:
           exit 1
         fi
 
-    - name: Remove Conflicting App Settings
+    - name: Configure App Settings for ZIP Deployment
       run: |
-        echo "🧹 Removing conflicting app settings before deployment..."
-        echo "This prevents WEBSITE_RUN_FROM_PACKAGE conflicts with ZIP deployment"
+        echo "⚙️ Configuring app settings for ZIP deployment..."
+        echo "Setting WEBSITE_RUN_FROM_PACKAGE=1 to enable proper ZIP deployment"
 
-        # Remove WEBSITE_RUN_FROM_PACKAGE which conflicts with ZIP deploy
-        az functionapp config appsettings delete \
+        # Set WEBSITE_RUN_FROM_PACKAGE to 1 for ZIP deployment (REQUIRED for ZIP deploy to work)
+        az functionapp config appsettings set \
           --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
-          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
           --setting-names WEBSITE_RUN_FROM_PACKAGE \
-          --output none || echo "WEBSITE_RUN_FROM_PACKAGE not found or already removed"
+          --setting-values 1 \
+          --output none
 
-        # Also remove the blob MI resource ID if present
+        # Remove the blob MI resource ID if present (not needed for local package)
         az functionapp config appsettings delete \
           --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
-          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
           --setting-names WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID \
           --output none || echo "WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID not found or already removed"
 
-        echo "✅ Conflicting app settings removed"
+        echo "✅ App settings configured for ZIP deployment"
 
     - name: Verify App Settings After Cleanup
       run: |
@@ -300,7 +301,7 @@ jobs:
         echo "Current app settings:"
         az functionapp config appsettings list \
           --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
-          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
           --output table || echo "Could not list app settings"
 
         echo ""
