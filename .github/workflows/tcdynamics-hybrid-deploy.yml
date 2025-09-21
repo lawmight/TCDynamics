@@ -114,13 +114,13 @@ jobs:
     - name: Package Azure Functions
       run: |
         # Create deployment package
-        zip -r ../azure-functions-package.zip . -x "*.pyc" "__pycache__/*" "*.git*" "local.settings.json"
+        zip -r azure-functions-package.zip . -x "*.pyc" "__pycache__/*" "*.git*" "local.settings.json"
         
     - name: Upload Azure Functions artifacts
       uses: actions/upload-artifact@v4
       with:
         name: azure-functions-package
-        path: ../azure-functions-package.zip
+        path: azure-functions-package.zip
         retention-days: 1
 
   # Deploy Azure Functions
