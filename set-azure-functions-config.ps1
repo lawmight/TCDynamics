@@ -52,8 +52,18 @@ try {
     Write-Host "❌ Failed to set WEBSITE_RUN_FROM_PACKAGE: $($_.Exception.Message)" -ForegroundColor Red
 }
 
+# Set FUNCTIONS_EXTENSION_VERSION (CRITICAL for v2 model)
+Write-Host "3️⃣ Setting FUNCTIONS_EXTENSION_VERSION (CRITICAL)..." -ForegroundColor Yellow
+try {
+    az functionapp config appsettings set --name $FunctionAppName --resource-group $ResourceGroupName --setting FUNCTIONS_EXTENSION_VERSION=~4 | Out-Null
+    Write-Host "✅ FUNCTIONS_EXTENSION_VERSION = ~4" -ForegroundColor Green
+    Write-Host "   This enables Azure Functions v2 runtime!" -ForegroundColor Green
+} catch {
+    Write-Host "❌ Failed to set FUNCTIONS_EXTENSION_VERSION: $($_.Exception.Message)" -ForegroundColor Red
+}
+
 # Set AzureWebJobsFeatureFlags (CRITICAL for v2 model)
-Write-Host "3️⃣ Setting AzureWebJobsFeatureFlags (CRITICAL)..." -ForegroundColor Yellow
+Write-Host "4️⃣ Setting AzureWebJobsFeatureFlags (CRITICAL)..." -ForegroundColor Yellow
 try {
     az functionapp config appsettings set --name $FunctionAppName --resource-group $ResourceGroupName --setting AzureWebJobsFeatureFlags=EnableWorkerIndexing | Out-Null
     Write-Host "✅ AzureWebJobsFeatureFlags = EnableWorkerIndexing" -ForegroundColor Green
