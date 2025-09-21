@@ -57,7 +57,7 @@ def ai_vision_wrapper(req: func.HttpRequest) -> func.HttpResponse:
         headers={"Content-Type": "application/json"}
     )
 
-@app.route(route="health", methods=["GET"])
+@app.route(route="health", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
 def health_check(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Health check function processed a request.')
 
