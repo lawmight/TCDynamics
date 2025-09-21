@@ -1,5 +1,5 @@
 # Azure Functions Python Dependencies
-azure-functions>=1.19.0
+azure-functions==1.19.0
 
 # gRPC and Protocol Buffers - Latest versions compatible with Python 3.13
 grpcio==1.74.0
