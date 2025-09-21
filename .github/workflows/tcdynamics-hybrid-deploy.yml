@@ -186,6 +186,12 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+    - name: Configure Function App Settings
+      run: |
+        echo "Setting critical function app configuration..."
+        # Note: Update 'your-resource-group-name' with your actual resource group name
+        az functionapp config appsettings set --name ${{ env.AZURE_FUNCTIONAPP_NAME }} --resource-group "your-resource-group-name" --setting FUNCTIONS_WORKER_RUNTIME=python WEBSITE_RUN_FROM_PACKAGE=1
+
     - name: Deploy to Azure Functions
       uses: Azure/functions-action@v1
       with:
