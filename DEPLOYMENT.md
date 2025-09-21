@@ -3,6 +3,7 @@
 ## Architecture Overview
 
 TCDynamics uses a hybrid architecture:
+
 - **Frontend**: React app deployed to OVHcloud
 - **Backend**: Azure Functions for contact/demo forms
 - **Email**: Zoho Mail integration
@@ -84,6 +85,7 @@ The hybrid workflow automatically:
 ### Manual Deployment Steps
 
 #### Azure Functions
+
 ```bash
 # Install Azure Functions Core Tools
 npm install -g azure-functions-core-tools@4
@@ -93,6 +95,7 @@ func azure functionapp publish func-tcdynamics-contact --python
 ```
 
 #### Frontend to OVHcloud
+
 ```bash
 # Build the frontend
 npm run build
@@ -116,6 +119,7 @@ To disable all redundant workflows and keep only the hybrid deployment:
 Only one workflow is active: `tcdynamics-hybrid-deploy.yml`
 
 This workflow handles:
+
 - Frontend testing and building
 - Azure Functions testing and deployment
 - OVHcloud deployment package creation
@@ -125,17 +129,26 @@ This workflow handles:
 
 ### Common Issues
 
-1. **Azure Functions deployment fails**
+1. **Azure Functions deployment fails with 401 Unauthorized**
+   - **Most Common**: SCM Basic Auth is disabled (see `AZURE_DEPLOYMENT_FIX.md`)
+   - Use the PowerShell script: `.\fix-azure-deployment.ps1 -EnableBasicAuth`
+   - Or migrate to OIDC authentication (recommended)
    - Check Azure credentials in GitHub secrets
    - Verify function app name matches `func-tcdynamics-contact`
    - Ensure Python dependencies are in `requirements.txt`
 
-2. **Frontend build fails**
+2. **"Failed to fetch Kudu App Settings" error**
+   - This is the same 401 Unauthorized issue
+   - Follow the fix in `AZURE_DEPLOYMENT_FIX.md`
+   - Quick fix: Enable SCM Basic Auth in Azure Portal
+   - Better fix: Switch to OIDC authentication
+
+3. **Frontend build fails**
    - Check environment variables are set correctly
    - Verify all dependencies are installed
    - Run `npm run type-check` locally
 
-3. **Email sending fails**
+4. **Email sending fails**
    - Verify Zoho email credentials in Azure Functions settings
    - Check SMTP settings (smtp.zoho.eu:465)
    - Ensure app password is used, not regular password
@@ -157,8 +170,8 @@ This workflow handles:
 ## Support
 
 For deployment issues:
+
 1. Check GitHub Actions logs
 2. Verify Azure Functions logs in Azure Portal
 3. Test endpoints manually
 4. Check environment variables configuration
-

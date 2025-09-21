@@ -1,4 +1,4 @@
-name: TCDynamics Hybrid Deployment
+name: TCDynamics Hybrid Deployment (OIDC)
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'requirements.txt'
-      - '.github/workflows/tcdynamics-hybrid-deploy.yml'
+      - '.github/workflows/tcdynamics-hybrid-deploy-oidc.yml'
   pull_request:
     branches: [ main ]
     paths:
@@ -35,34 +35,34 @@ jobs:
     defaults:
       run:
         working-directory: ./
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
-        
+
     - name: Install dependencies
       run: npm ci
-      
+
     - name: Run linting
       run: npm run lint
-      
+
     - name: Run type checking
       run: npm run type-check
-      
+
     - name: Run tests
       run: npm run test:coverage
-      
+
     - name: Build frontend
       run: npm run build
       env:
         VITE_AZURE_FUNCTIONS_URL: https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api
-        
+
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
@@ -77,29 +77,29 @@ jobs:
     defaults:
       run:
         working-directory: ./TCDynamics
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ env.PYTHON_VERSION }}
-        
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools wheel
         # Install with constraints file to avoid version conflicts
         pip install --no-cache-dir -r requirements.txt -c constraints.txt
         pip install pytest pytest-cov
-        
+
     - name: Run Python linting
       run: |
         pip install flake8
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-        
+
     - name: Test Azure Functions locally
       run: |
         # Create test environment file
@@ -107,10 +107,10 @@ jobs:
         echo "ZOHO_PASSWORD=test-password" >> local.settings.json
         echo "FUNCTIONS_WORKER_RUNTIME=python" >> local.settings.json
         echo "AzureWebJobsStorage=UseDevelopmentStorage=true" >> local.settings.json
-        
+
         # Test function imports
         python -c "import azure.functions as func; print('Azure Functions SDK imported successfully')"
-        
+
     - name: Package Azure Functions
       run: |
         # Check if zip is available
@@ -148,9 +148,9 @@ jobs:
         retention-days: 1
         if-no-files-found: error
 
-  # Deploy Azure Functions
+  # Deploy Azure Functions (OIDC Authentication)
   deploy-functions:
-    name: Deploy Azure Functions
+    name: Deploy Azure Functions (OIDC)
     runs-on: ubuntu-latest
     needs: [test-frontend, test-functions]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -181,31 +181,22 @@ jobs:
       run: |
         npm install -g azure-functions-core-tools@4 --unsafe-perm true
 
-    - name: Login to Azure
+    - name: Login to Azure (OIDC)
       uses: azure/login@v2
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
     - name: Deploy to Azure Functions
       uses: Azure/functions-action@v1
       with:
         app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
         package: ./azure-functions-deploy
-        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+        # No publish-profile needed with OIDC authentication
         scm-do-build-during-deployment: true
         enable-oryx-build: true
 
-    # Alternative OIDC-based deployment (recommended for security)
-    # Uncomment the following and comment out the above deployment step
-    # when you have OIDC configured in Azure
-    #
-    # - name: Deploy to Azure Functions (OIDC)
-    #   uses: Azure/functions-action@v1
-    #   with:
-    #     app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-    #     package: ./azure-functions-deploy
-    #     # Remove publish-profile when using OIDC
-        
     - name: Verify deployment
       run: |
         echo "Verifying Azure Functions deployment..."
@@ -218,27 +209,27 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test-frontend, deploy-functions]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Download frontend artifacts
       uses: actions/download-artifact@v4
       with:
         name: frontend-build
         path: ${{ env.FRONTEND_BUILD_PATH }}
-        
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
-        
+
     - name: Create OVHcloud deployment package
       run: |
         # Create a deployment package for OVHcloud
         tar -czf tcdynamics-frontend.tar.gz -C ${{ env.FRONTEND_BUILD_PATH }} .
-        
+
     - name: Deploy to OVHcloud
       run: |
         echo "🚀 Deploying frontend to OVHcloud..."
@@ -253,7 +244,7 @@ jobs:
         echo ""
         echo "🔗 Frontend will be available at: https://tcdynamics.fr"
         echo "🔗 Backend API: https://func-tcdynamics-contact.azurewebsites.net/api"
-        
+
     - name: Upload OVHcloud deployment package
       uses: actions/upload-artifact@v4
       with:
@@ -267,12 +258,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: [deploy-functions, deploy-frontend]
     if: always() && github.ref == 'refs/heads/main'
-    
+
     steps:
     - name: Deployment Summary
       run: |
-        echo "🎉 TCDynamics Hybrid Deployment Summary"
-        echo "======================================"
+        echo "🎉 TCDynamics Hybrid Deployment Summary (OIDC)"
+        echo "==============================================="
         echo ""
         echo "📅 Deployment Date: $(date)"
         echo "🔗 Repository: ${{ github.repository }}"
@@ -283,21 +274,27 @@ jobs:
         echo "  • React Frontend → OVHcloud (https://tcdynamics.fr)"
         echo "  • Azure Functions → func-tcdynamics-contact"
         echo ""
-        echo "🔧 Environment Variables Required:"
-        echo "  • ZOHO_EMAIL (Azure Functions)"
-        echo "  • ZOHO_PASSWORD (Azure Functions)"
-        echo "  • VITE_AZURE_FUNCTIONS_URL (Frontend)"
+        echo "🔧 Authentication Method: OIDC (Secure)"
+        echo ""
+        echo "🔗 Endpoints:"
+        echo "  • Frontend: https://tcdynamics.fr"
+        echo "  • API: https://func-tcdynamics-contact.azurewebsites.net/api"
+        echo "  • Health: https://func-tcdynamics-contact.azurewebsites.net/api/health"
         echo ""
         echo "📊 Deployment Status:"
         echo "  • Frontend Tests: ${{ needs.deploy-frontend.result }}"
         echo "  • Functions Tests: ${{ needs.deploy-functions.result }}"
         echo "  • Functions Deploy: ${{ needs.deploy-functions.result }}"
         echo "  • Frontend Deploy: ${{ needs.deploy-frontend.result }}"
-        
+
     - name: Notify on Failure
       if: failure()
       run: |
         echo "❌ Deployment failed!"
         echo "Please check the logs and fix any issues before retrying."
+        echo ""
+        echo "🔧 Common fixes:"
+        echo "1. Check Azure credentials and permissions"
+        echo "2. Verify Function App configuration"
+        echo "3. Check AZURE_DEPLOYMENT_FIX.md for troubleshooting"
         exit 1
-
