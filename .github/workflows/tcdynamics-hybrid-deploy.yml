@@ -400,13 +400,48 @@ jobs:
         sleep 30
 
         # Check if functions are responding
-        if curl -f -s ${{ env.AZURE_FUNCTIONAPP_BASE_URL }}/api/health > /dev/null; then
+        echo "Testing health endpoint..."
+        HEALTH_RESPONSE=$(curl -s -w "HTTPSTATUS:%{http_code}" ${{ env.AZURE_FUNCTIONAPP_BASE_URL }}/api/health 2>/dev/null)
+        HEALTH_BODY=$(echo "$HEALTH_RESPONSE" | sed 's/HTTPSTATUS.*//')
+        HEALTH_CODE=$(echo "$HEALTH_RESPONSE" | grep -o "HTTPSTATUS:[0-9]*" | cut -d: -f2)
+
+        echo "Health check response code: $HEALTH_CODE"
+        echo "Health check response body: $HEALTH_BODY"
+
+        if [ "$HEALTH_CODE" = "200" ] && echo "$HEALTH_BODY" | grep -q "healthy"; then
           echo "✅ Azure Functions deployment successful - health check passed"
         else
           echo "❌ Azure Functions deployment failed - health check failed"
-          echo "Attempting to get deployment logs..."
-          # Try to get deployment logs if available
-          curl -s ${{ env.AZURE_FUNCTIONAPP_BASE_URL }}/admin/host/status || echo "Could not retrieve host status"
+          echo "HTTP Status: $HEALTH_CODE"
+          echo "Response: $HEALTH_BODY"
+
+          echo ""
+          echo "🔍 Attempting to diagnose the issue..."
+
+          # Check if the function app is responding at all
+          echo "Testing basic function app connectivity..."
+          BASIC_RESPONSE=$(curl -s -w "HTTPSTATUS:%{http_code}" ${{ env.AZURE_FUNCTIONAPP_BASE_URL }}/ 2>/dev/null)
+          BASIC_CODE=$(echo "$BASIC_RESPONSE" | grep -o "HTTPSTATUS:[0-9]*" | cut -d: -f2)
+          echo "Basic connectivity status: $BASIC_CODE"
+
+          # Try to get host status
+          echo "Attempting to get host status..."
+          HOST_STATUS=$(curl -s ${{ env.AZURE_FUNCTIONAPP_BASE_URL }}/admin/host/status 2>/dev/null || echo "Could not retrieve host status")
+          echo "Host status response: $HOST_STATUS"
+
+          # Check function list endpoint
+          echo "Checking function list..."
+          FUNC_LIST=$(curl -s ${{ env.AZURE_FUNCTIONAPP_BASE_URL }}/admin/functions 2>/dev/null || echo "Could not retrieve function list")
+          echo "Function list response: $FUNC_LIST"
+
+          echo ""
+          echo "💡 Possible issues:"
+          echo "1. Function host not starting (check Azure Portal logs)"
+          echo "2. Function discovery failed (check if functions are registered)"
+          echo "3. Runtime errors in function_app.py (check import/dependency issues)"
+          echo "4. Authentication issues (health endpoint should be anonymous)"
+          echo "5. WEBSITE_RUN_FROM_PACKAGE configuration issues"
+
           exit 1
         fi
 
