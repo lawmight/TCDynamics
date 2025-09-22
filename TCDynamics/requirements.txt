@@ -10,5 +10,7 @@ python-dotenv>=1.0.0
 azure-cosmos>=4.5.0
 azure-cognitiveservices-vision-computervision>=0.7.0
 azure-cognitiveservices-vision-face>=0.6.0
+stripe>=7.0.0
+azure-monitor-opentelemetry>=1.0.0
 
-# Deployment test trigger - 2025-09-21 12:15:54
+# Deployment test trigger - 2025-09-22 19:00:00

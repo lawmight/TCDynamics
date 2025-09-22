@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useId } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { MessageCircle, Send, Bot, User, Loader2 } from 'lucide-react'
 import { chatAPI } from '@/api/azureServices'
 import { logger } from '@/utils/logger'
+import { useToggle } from '@/hooks/useToggle'
 
 interface Message {
   id: string
@@ -16,11 +17,14 @@ interface Message {
 }
 
 const AIChatbot = () => {
-  const [isOpen, setIsOpen] = useState(false)
+  const { isOpen, toggle, close } = useToggle()
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isConnecting, setIsConnecting] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const liveRegionId = useId()
+  const chatbotId = useId()
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -30,8 +34,19 @@ const AIChatbot = () => {
     scrollToBottom()
   }, [messages])
 
+  // Announce new messages to screen readers
+  useEffect(() => {
+    if (messages.length > 0) {
+      const latestMessage = messages[messages.length - 1]
+      const liveRegion = document.getElementById(liveRegionId)
+      if (liveRegion) {
+        liveRegion.textContent = `${latestMessage.role === 'assistant' ? 'Assistant IA' : 'Vous'}: ${latestMessage.content}`
+      }
+    }
+  }, [messages, liveRegionId])
+
   const sendMessage = async () => {
-    if (!input.trim() || isLoading) return
+    if (!input.trim() || isLoading || isConnecting) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -42,7 +57,13 @@ const AIChatbot = () => {
 
     setMessages(prev => [...prev, userMessage])
     setInput('')
+    setIsConnecting(true)
+
+    // Small delay to show connecting state for better UX
+    await new Promise(resolve => setTimeout(resolve, 300))
+
     setIsLoading(true)
+    setIsConnecting(false)
 
     try {
       const data = await chatAPI.sendSimpleMessage(
@@ -85,9 +106,12 @@ const AIChatbot = () => {
       {/* Chatbot Toggle Button */}
       <div className="fixed bottom-6 right-6 z-50">
         <Button
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={toggle}
           size="lg"
           className="rounded-full w-16 h-16 shadow-lg hover:shadow-xl transition-all duration-300 bg-primary hover:bg-primary/90"
+          aria-expanded={isOpen}
+          aria-controls={chatbotId}
+          aria-label={isOpen ? 'Fermer le chatbot IA' : 'Ouvrir le chatbot IA'}
         >
           {isOpen ? (
             <MessageCircle className="w-6 h-6" />
@@ -97,9 +121,23 @@ const AIChatbot = () => {
         </Button>
       </div>
 
+      {/* ARIA Live Region for screen reader announcements */}
+      <div
+        id={liveRegionId}
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      />
+
       {/* Chatbot Window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-40 w-96 h-[500px] shadow-2xl">
+        <div
+          id={chatbotId}
+          className="fixed bottom-24 right-6 z-40 w-96 h-[500px] shadow-2xl"
+          role="dialog"
+          aria-labelledby="chatbot-title"
+          aria-describedby="chatbot-description"
+        >
           <Card className="h-full flex flex-col bg-card/95 backdrop-blur-sm border-primary/20">
             <CardHeader className="pb-4 bg-primary/5">
               <div className="flex items-center justify-between">
@@ -108,7 +146,7 @@ const AIChatbot = () => {
                     <Bot className="w-4 h-4 text-primary" />
                   </div>
                   <div>
-                    <CardTitle className="text-lg font-mono">
+                    <CardTitle id="chatbot-title" className="text-lg font-mono">
                       WorkFlowAI Assistant
                     </CardTitle>
                     <Badge variant="secondary" className="text-xs font-mono">
@@ -119,13 +157,18 @@ const AIChatbot = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setIsOpen(false)}
+                  onClick={close}
                   className="h-8 w-8 p-0"
+                  aria-label="Fermer le chatbot IA"
                 >
                   ×
                 </Button>
               </div>
             </CardHeader>
+
+            <div id="chatbot-description" className="sr-only">
+              Chatbot IA pour assistance avec WorkFlowAI. Posez vos questions et recevez des réponses intelligentes.
+            </div>
 
             <CardContent className="flex-1 flex flex-col p-0">
               {/* Messages Area */}
@@ -168,13 +211,33 @@ const AIChatbot = () => {
                         )}
                       </div>
                     ))}
+                    {isConnecting && (
+                      <div className="flex gap-3 justify-start">
+                        <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+                          <Bot className="w-4 h-4 text-primary" />
+                        </div>
+                        <div className="bg-card border border-border rounded-lg px-4 py-2">
+                          <div className="flex items-center gap-2">
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span className="text-xs text-muted-foreground font-mono">
+                              Connexion...
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                     {isLoading && (
                       <div className="flex gap-3 justify-start">
                         <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
                           <Bot className="w-4 h-4 text-primary" />
                         </div>
                         <div className="bg-card border border-border rounded-lg px-4 py-2">
-                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <div className="flex items-center gap-2">
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span className="text-xs text-muted-foreground font-mono">
+                              Réflexion...
+                            </span>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -197,7 +260,7 @@ const AIChatbot = () => {
                   />
                   <Button
                     onClick={sendMessage}
-                    disabled={!input.trim() || isLoading}
+                    disabled={!input.trim() || isLoading || isConnecting}
                     size="sm"
                     className="px-3"
                   >

@@ -354,26 +354,26 @@ export const securityHeaders = {
       })
 
       // Check for missing important directives
-      const hasBaseUri = directives.some(d => d.startsWith('base-uri'))
-      const hasFormAction = directives.some(d => d.startsWith('form-action'))
+      const hasBaseUri = directives.some(d => d.trim().startsWith('base-uri'))
+      const hasFormAction = directives.some(d => d.trim().startsWith('form-action'))
       const hasFrameAncestors = directives.some(d =>
-        d.startsWith('frame-ancestors')
+        d.trim().startsWith('frame-ancestors')
       )
 
       if (!hasBaseUri) {
-        warnings.push(
+        errors.push(
           'Missing base-uri directive - base tag injection attacks possible'
         )
       }
 
       if (!hasFormAction) {
-        warnings.push(
+        errors.push(
           'Missing form-action directive - form action hijacking possible'
         )
       }
 
       if (!hasFrameAncestors) {
-        warnings.push(
+        errors.push(
           'Missing frame-ancestors directive - clickjacking protection limited'
         )
       }

@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useId, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { ShoppingCart, Menu, X } from 'lucide-react'
+import { useToggle } from '@/hooks/useToggle'
+import { useThrottle } from '@/hooks/useThrottle'
 
 const StickyHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { isOpen: isMobileMenuOpen, toggle: toggleMobileMenu, close: closeMobileMenu } = useToggle()
+  const mobileMenuId = useId()
 
   const navigationItems = [
     { label: 'Accueil', id: 'hero' },
@@ -15,15 +18,18 @@ const StickyHeader = () => {
     { label: 'Contact', id: 'contact' },
   ]
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.scrollY
-      setIsScrolled(scrollTop > 50)
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+  const handleScroll = useCallback(() => {
+    const scrollTop = window.scrollY
+    setIsScrolled(scrollTop > 50)
   }, [])
+
+  // Throttle scroll events to improve performance
+  const throttledScrollHandler = useThrottle(handleScroll, 100)
+
+  useEffect(() => {
+    window.addEventListener('scroll', throttledScrollHandler, { passive: true })
+    return () => window.removeEventListener('scroll', throttledScrollHandler)
+  }, [throttledScrollHandler])
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId)
@@ -33,7 +39,7 @@ const StickyHeader = () => {
         block: 'start',
       })
     }
-    setIsMobileMenuOpen(false)
+    closeMobileMenu()
   }
 
   const handleCheckoutClick = () => {
@@ -91,7 +97,10 @@ const StickyHeader = () => {
               variant="ghost"
               size="icon"
               className="lg:hidden rounded-full hover:bg-primary/5"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              onClick={toggleMobileMenu}
+              aria-expanded={isMobileMenuOpen}
+              aria-controls={mobileMenuId}
+              aria-label={isMobileMenuOpen ? 'Fermer le menu de navigation' : 'Ouvrir le menu de navigation'}
             >
               {isMobileMenuOpen ? (
                 <X className="w-5 h-5" />
@@ -104,7 +113,12 @@ const StickyHeader = () => {
 
         {/* Mobile Menu Overlay */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden absolute top-full left-0 right-0 bg-background/95 backdrop-blur-xl border-b border-primary/10 shadow-xl">
+          <div
+            id={mobileMenuId}
+            className="lg:hidden absolute top-full left-0 right-0 bg-background/95 backdrop-blur-xl border-b border-primary/10 shadow-xl"
+            role="menu"
+            aria-label="Menu de navigation mobile"
+          >
             <div className="container mx-auto px-4 py-6">
               <nav className="flex flex-col space-y-3">
                 {navigationItems.map(item => (
@@ -113,6 +127,7 @@ const StickyHeader = () => {
                     variant="ghost"
                     onClick={() => scrollToSection(item.id)}
                     className="justify-start px-4 py-3 text-left font-mono text-foreground/80 hover:text-foreground hover:bg-primary/5 rounded-xl transition-all duration-300"
+                    role="menuitem"
                   >
                     {item.label}
                   </Button>
@@ -122,6 +137,7 @@ const StickyHeader = () => {
                 <Button
                   onClick={handleCheckoutClick}
                   className="mt-4 w-full px-6 py-3 bg-gradient-primary text-primary-foreground rounded-xl hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 button-hover-scale font-medium"
+                  role="menuitem"
                 >
                   <ShoppingCart className="w-4 h-4 mr-2" />
                   Voir les tarifs

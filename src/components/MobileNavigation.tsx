@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useId } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -8,15 +8,21 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { Menu, Phone, Calendar, Mail, MapPin } from 'lucide-react'
+import { useToggle } from '@/hooks/useToggle'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 
 const MobileNavigation = () => {
-  const [isOpen, setIsOpen] = useState(false)
+  const { isOpen, toggle, close } = useToggle()
+  const panelId = useId()
+
+  // Prevent background scrolling when mobile menu is open
+  useBodyScrollLock(isOpen)
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId)
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' })
-      setIsOpen(false)
+      close()
     }
   }
 
@@ -33,17 +39,21 @@ const MobileNavigation = () => {
 
   return (
     <div className="fixed top-4 right-4 z-50 md:hidden">
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <Sheet open={isOpen} onOpenChange={toggle}>
         <SheetTrigger asChild>
           <Button
             variant="hero-outline"
             size="icon"
             className="h-12 w-12 rounded-full shadow-lg backdrop-blur-md"
+            aria-expanded={isOpen}
+            aria-controls={panelId}
+            aria-label={isOpen ? 'Fermer le menu de navigation' : 'Ouvrir le menu de navigation'}
           >
             <Menu className="h-6 w-6" />
           </Button>
         </SheetTrigger>
         <SheetContent
+          id={panelId}
           side="right"
           className="w-full sm:max-w-md bg-background/95 backdrop-blur-xl border-l border-primary/20"
         >

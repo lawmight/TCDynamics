@@ -1,11 +1,66 @@
-import React from 'react'
+import React, { createContext, useContext, useState, useId } from 'react'
 
-// Composant Accordion simple sans dépendances externes
-const Accordion = ({ children }: { children: React.ReactNode }) => (
-  <div className="space-y-4" role="region" aria-label="Questions fréquentes">
-    {children}
-  </div>
-)
+// Accordion Context for state management
+interface AccordionContextType {
+  openItems: Set<string>
+  toggleItem: (value: string) => void
+}
+
+const AccordionContext = createContext<AccordionContextType | null>(null)
+
+const useAccordion = () => {
+  const context = useContext(AccordionContext)
+  if (!context) {
+    throw new Error('Accordion components must be used within an Accordion provider')
+  }
+  return context
+}
+
+// Main Accordion component
+const Accordion = ({
+  children,
+  type = 'single',
+  collapsible = true
+}: {
+  children: React.ReactNode
+  type?: 'single' | 'multiple'
+  collapsible?: boolean
+}) => {
+  const [openItems, setOpenItems] = useState<Set<string>>(new Set())
+
+  const toggleItem = (value: string) => {
+    setOpenItems(prev => {
+      const newSet = new Set(prev)
+      if (type === 'single') {
+        // Single mode: close all others
+        if (newSet.has(value)) {
+          if (collapsible) {
+            newSet.delete(value)
+          }
+        } else {
+          newSet.clear()
+          newSet.add(value)
+        }
+      } else {
+        // Multiple mode: toggle individual items
+        if (newSet.has(value)) {
+          newSet.delete(value)
+        } else {
+          newSet.add(value)
+        }
+      }
+      return newSet
+    })
+  }
+
+  return (
+    <AccordionContext.Provider value={{ openItems, toggleItem }}>
+      <div className="space-y-4" role="region" aria-label="Questions fréquentes">
+        {children}
+      </div>
+    </AccordionContext.Provider>
+  )
+}
 
 const AccordionItem = ({
   children,
@@ -24,24 +79,46 @@ const AccordionItem = ({
 const AccordionTrigger = ({
   children,
   className,
+  value,
 }: {
   children: React.ReactNode
   className?: string
+  value: string
 }) => {
-  const [isOpen, setIsOpen] = React.useState(false)
+  const { openItems, toggleItem } = useAccordion()
+  const isOpen = openItems.has(value)
+  const triggerId = useId()
+  const contentId = `accordion-content-${value}`
+
+  const handleClick = () => {
+    toggleItem(value)
+  }
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      toggleItem(value)
+    }
+  }
+
   return (
     <button
-      className={`${className} w-full flex items-center justify-between text-left`}
-      onClick={() => setIsOpen(!isOpen)}
+      id={triggerId}
+      className={`${className} w-full flex items-center justify-between text-left focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg`}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
       aria-expanded={isOpen}
-      aria-controls={`content-${children?.toString().slice(0, 10)}`}
+      aria-controls={contentId}
+      role="button"
+      tabIndex={0}
     >
       {children}
       <svg
-        className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+        className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
+        aria-hidden="true"
       >
         <path
           strokeLinecap="round"
@@ -57,30 +134,24 @@ const AccordionTrigger = ({
 const AccordionContent = ({
   children,
   className,
+  value,
 }: {
   children: React.ReactNode
   className?: string
+  value: string
 }) => {
-  const [isOpen, setIsOpen] = React.useState(false)
-
-  React.useEffect(() => {
-    const button = document.querySelector(
-      `[aria-controls="content-${children?.toString().slice(0, 10)}"]`
-    ) as HTMLElement
-    if (button) {
-      const handleClick = () =>
-        setIsOpen(button.getAttribute('aria-expanded') === 'true')
-      button.addEventListener('click', handleClick)
-      return () => button.removeEventListener('click', handleClick)
-    }
-  }, [children])
+  const { openItems } = useAccordion()
+  const isOpen = openItems.has(value)
+  const contentId = `accordion-content-${value}`
 
   return (
     <div
+      id={contentId}
       className={`${className} overflow-hidden transition-all duration-300 ${
         isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
       }`}
-      id={`content-${children?.toString().slice(0, 10)}`}
+      role="region"
+      aria-labelledby={`accordion-trigger-${value}`}
     >
       <div className="pb-4 pt-2">{children}</div>
     </div>
@@ -267,7 +338,7 @@ const FAQ = () => {
                     value={faq.id}
                     className="border border-primary/10 rounded-lg px-6 py-2 hover:border-primary/30 transition-colors"
                   >
-                    <AccordionTrigger className="text-left hover:no-underline group py-6">
+                    <AccordionTrigger value={faq.id} className="text-left hover:no-underline group py-6">
                       <div className="flex items-center gap-4 flex-1">
                         <div className="p-2 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors flex-shrink-0">
                           <IconComponent className="w-5 h-5 text-primary" />
@@ -287,7 +358,7 @@ const FAQ = () => {
                         </div>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="pb-6 pt-2">
+                    <AccordionContent value={faq.id} className="pb-6 pt-2">
                       <div className="ml-14 space-y-3">
                         {faq.answer.map((line, lineIndex) => {
                           if (line.includes('**')) {

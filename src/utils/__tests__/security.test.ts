@@ -274,6 +274,49 @@ describe('Security Utilities', () => {
       expect(headers).toHaveProperty('Content-Security-Policy')
     })
 
+    describe('testCSP', () => {
+      it('should validate standard CSP correctly', () => {
+        const csp = securityHeaders.getStandardCSP()
+        const result = securityHeaders.testCSP(csp)
+
+        expect(result.valid).toBe(true)
+        expect(result.errors).toHaveLength(0)
+        expect(result.warnings).toBeDefined() // May have warnings about unsafe directives
+      })
+
+      it('should validate strict CSP correctly', () => {
+        const csp = securityHeaders.getStrictCSP()
+        const result = securityHeaders.testCSP(csp)
+
+        expect(result.valid).toBe(true)
+        expect(result.errors).toHaveLength(0)
+        expect(result.warnings).toBeDefined()
+      })
+
+      it('should detect missing critical directives', () => {
+        const invalidCsp = "default-src 'self'; script-src 'self';"
+        const result = securityHeaders.testCSP(invalidCsp)
+
+        expect(result.valid).toBe(false)
+        expect(result.errors).toContain('Missing base-uri directive - base tag injection attacks possible')
+        expect(result.errors).toContain('Missing form-action directive - form action hijacking possible')
+        expect(result.errors).toContain('Missing frame-ancestors directive - clickjacking protection limited')
+      })
+
+      it('should handle CSP strings without critical directives', () => {
+        const incompleteCsp = 'default-src \'self\'; script-src \'self\'; style-src \'self\';'
+        const result = securityHeaders.testCSP(incompleteCsp)
+
+        expect(result.valid).toBe(false)
+        expect(result.errors.length).toBeGreaterThan(0)
+        expect(result.errors.some(error =>
+          error.includes('Missing base-uri directive') ||
+          error.includes('Missing form-action directive') ||
+          error.includes('Missing frame-ancestors directive')
+        )).toBe(true)
+      })
+    })
+
     describe('isAllowedOrigin', () => {
       it('should accept allowed origins', () => {
         const allowedOrigins = [
