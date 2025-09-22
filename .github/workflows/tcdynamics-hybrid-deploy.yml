@@ -163,7 +163,7 @@ jobs:
     - name: Package Azure Functions for deployment
       run: |
         cd TCDynamics
-        echo "📦 Preparing Azure Functions package..."
+        echo "INFO: Preparing Azure Functions package..."
 
         # Clean up Python cache files and unnecessary files
         find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
@@ -174,89 +174,89 @@ jobs:
         # Create .funcignore if it doesn't exist to exclude unnecessary files
         if [ ! -f .funcignore ]; then
           cat > .funcignore << 'EOF'
-        .git*
-        .vscode/
-        .venv/
-        __pycache__/
-        *.pyc
-        .pytest_cache/
-        test_*.py
-        *_test.py
-        .coverage
-        *.log
-        local.settings.json
-        requirements-dev.txt
-        test_dependencies.py
-        constraints.txt
-        .funcignore
-        *.zip
-        *.tar.gz
-        EOF
-          echo "✅ Created .funcignore file"
+          .git*
+          .vscode/
+          .venv/
+          __pycache__/
+          *.pyc
+          .pytest_cache/
+          test_*.py
+          *_test.py
+          .coverage
+          *.log
+          local.settings.json
+          requirements-dev.txt
+          test_dependencies.py
+          constraints.txt
+          .funcignore
+          *.zip
+          *.tar.gz
+          EOF
+          echo "SUCCESS: Created .funcignore file"
         fi
 
         # Create requirements.txt for runtime (clean version without dev dependencies)
         if [ ! -f requirements-runtime.txt ]; then
           cat > requirements-runtime.txt << 'EOF'
-azure-functions
-requests
-azure-core
-openai
-python-dotenv
-azure-cosmos
-azure-cognitiveservices-vision-computervision
-EOF
-          echo "✅ Created requirements-runtime.txt"
+          azure-functions
+          requests
+          azure-core
+          openai
+          python-dotenv
+          azure-cosmos
+          azure-cognitiveservices-vision-computervision
+          EOF
+          echo "SUCCESS: Created requirements-runtime.txt"
         fi
 
-        echo "📋 Files to be included in package:"
+        echo "INFO: Files to be included in package:"
         find . -type f | grep -v -E '\.(git|vscode|venv|pytest_cache)' | head -20
 
         # Create deployment package with proper exclusions
-        echo "🔨 Creating deployment package..."
+        echo "INFO: Creating deployment package..."
         zip -r ../azure-functions-package.zip . -x@.funcignore "*.git*" "local.settings.json" ".funcignore"
 
         cd ..
         ls -la azure-functions-package.zip
         PACKAGE_SIZE=$(du -h azure-functions-package.zip | cut -f1)
-        echo "📏 Package size: $PACKAGE_SIZE"
+        echo "INFO: Package size: $PACKAGE_SIZE"
 
         # Verify package contents
         echo ""
-        echo "📋 Package contents (first 20 files):"
+        echo "INFO: Package contents (first 20 files):"
         unzip -l azure-functions-package.zip | head -20
         echo ""
-        echo "🔍 Checking for critical files:"
+        echo "INFO: Checking for critical files:"
         if unzip -l azure-functions-package.zip | grep -q "function_app.py"; then
-          echo "✅ function_app.py found"
+          echo "SUCCESS: function_app.py found"
         else
-          echo "❌ function_app.py missing!"
+          echo "ERROR: function_app.py missing!"
           exit 1
         fi
         if unzip -l azure-functions-package.zip | grep -q "host.json"; then
-          echo "✅ host.json found"
+          echo "SUCCESS: host.json found"
         else
-          echo "❌ host.json missing!"
+          echo "ERROR: host.json missing!"
           exit 1
         fi
         if unzip -l azure-functions-package.zip | grep -q "requirements.txt"; then
-          echo "✅ requirements.txt found"
+          echo "SUCCESS: requirements.txt found"
         else
-          echo "❌ requirements.txt missing!"
+          echo "ERROR: requirements.txt missing!"
           exit 1
         fi
 
         # Check package size (warn if too large)
         PACKAGE_BYTES=$(stat -f%z azure-functions-package.zip 2>/dev/null || stat -c%s azure-functions-package.zip)
         if [ "$PACKAGE_BYTES" -gt 104857600 ]; then  # 100MB
-          echo "⚠️  WARNING: Package size ($PACKAGE_SIZE) is quite large. Consider optimizing."
+          echo "WARNING: Package size ($PACKAGE_SIZE) is quite large. Consider optimizing."
         fi
 
     - name: Extract Azure Functions package
       run: |
-        echo "📦 Extracting Azure Functions package..."
+        echo "INFO: Extracting Azure Functions package..."
         unzip azure-functions-package.zip -d azure-functions-deploy
-        echo "📁 Package structure:"
+        echo "INFO: Package structure:"
         find azure-functions-deploy -type f | head -20
 
     - name: Setup Python
@@ -284,28 +284,28 @@ EOF
         echo "Verifying function app is ready for deployment..."
         # Check if we can reach the function app
         if curl -f -s https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/ > /dev/null; then
-          echo "✅ Function app is responding"
+          echo "SUCCESS: Function app is responding"
         else
-          echo "❌ Function app is not responding - deployment may fail"
+          echo "ERROR: Function app is not responding - deployment may fail"
           exit 1
         fi
 
     - name: Validate Azure Storage Connection String
       run: |
-        echo "🔍 Validating Azure Storage connection string..."
+        echo "INFO: Validating Azure Storage connection string..."
 
         # Get the storage connection string from environment variable
         STORAGE_CONNECTION_STRING="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}"
 
         # Check if the storage connection string secret is set and not empty
         if [ -z "$STORAGE_CONNECTION_STRING" ]; then
-          echo "❌ CRITICAL ERROR: AZURE_STORAGE_CONNECTION_STRING secret is empty or not set!"
+          echo "ERROR: CRITICAL ERROR: AZURE_STORAGE_CONNECTION_STRING secret is empty or not set!"
           echo ""
-          echo "📋 Required GitHub Secrets:"
+          echo "INFO: Required GitHub Secrets:"
           echo "  • AZURE_STORAGE_CONNECTION_STRING: Your Azure Storage account connection string"
           echo "  • AZURE_CREDENTIALS: Azure service principal credentials"
           echo ""
-          echo "💡 How to fix:"
+          echo "INFO How to fix:"
           echo "1. Go to Azure Portal → Your Storage Account → Access Keys"
           echo "2. Copy the connection string"
           echo "3. Go to GitHub → Settings → Secrets → Actions"
@@ -321,7 +321,7 @@ EOF
           echo "📋 Required GitHub Secrets:"
           echo "  • AZURE_STORAGE_CONNECTION_STRING: Your Azure Storage account connection string"
           echo ""
-          echo "💡 How to fix:"
+          echo "INFO How to fix:"
           echo "1. Go to Azure Portal → Your Storage Account → Access Keys"
           echo "2. Copy the connection string"
           echo "3. Go to GitHub → Settings → Secrets → Actions"
@@ -381,39 +381,39 @@ EOF
           --output table
         
         echo ""
-        echo "✅ App settings verified - ready for deployment"
+        echo "SUCCESS: App settings verified - ready for deployment"
 
     - name: Deploy to Azure Functions (Azure CLI Method)
       run: |
-        echo "🚀 Deploying Azure Functions using Azure CLI..."
+        echo "INFO: Deploying Azure Functions using Azure CLI..."
 
         # Verify the package exists and has content
         if [ ! -f azure-functions-package.zip ]; then
-          echo "❌ Error: azure-functions-package.zip not found!"
+          echo "ERROR: azure-functions-package.zip not found!"
           exit 1
         fi
 
         PACKAGE_SIZE=$(du -h azure-functions-package.zip | cut -f1)
-        echo "📦 Package size: $PACKAGE_SIZE"
+        echo "INFO: Package size: $PACKAGE_SIZE"
 
         # Check if package contains required files
-        echo "🔍 Verifying package contents..."
+        echo "INFO: Verifying package contents..."
         if unzip -l azure-functions-package.zip | grep -q "function_app.py"; then
-          echo "✅ function_app.py found in package"
+          echo "SUCCESS: function_app.py found in package"
         else
-          echo "❌ function_app.py missing from package!"
+          echo "ERROR: function_app.py missing from package!"
           exit 1
         fi
 
         if unzip -l azure-functions-package.zip | grep -q "__init__.py"; then
-          echo "✅ __init__.py found in package"
+          echo "SUCCESS: __init__.py found in package"
         else
-          echo "❌ __init__.py missing from package!"
+          echo "ERROR: __init__.py missing from package!"
           exit 1
         fi
 
         # Deploy using Azure CLI ZIP push
-        echo "📦 Uploading deployment package..."
+        echo "INFO: Uploading deployment package..."
         az functionapp deployment source config-zip \
           --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
           --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
@@ -422,8 +422,8 @@ EOF
           --timeout 600 \
           --output none
 
-        echo "✅ Azure Functions deployment initiated!"
-        echo "📊 Deployment may take a few minutes to complete..."
+        echo "SUCCESS: Azure Functions deployment initiated!"
+        echo "INFO: Deployment may take a few minutes to complete..."
 
     - name: Check Deployment Status
       run: |
@@ -449,22 +449,22 @@ EOF
         echo "Health check response body: $HEALTH_BODY"
 
         if [ "$TEST_CODE" = "200" ] && echo "$TEST_BODY" | grep -q "Function discovery working"; then
-          echo "✅ Function discovery working - test endpoint responded"
+          echo "SUCCESS: Function discovery working - test endpoint responded"
           if [ "$HEALTH_CODE" = "200" ] && echo "$HEALTH_BODY" | grep -q "healthy"; then
-            echo "✅ Azure Functions deployment successful - health check passed"
+            echo "SUCCESS: Azure Functions deployment successful - health check passed"
           else
-            echo "⚠️ Test endpoint works but health endpoint failed"
+            echo "WARNING: Test endpoint works but health endpoint failed"
             echo "   This suggests function discovery is working but health function has issues"
           fi
         else
-          echo "❌ Azure Functions deployment failed - function discovery not working"
+          echo "ERROR: Azure Functions deployment failed - function discovery not working"
           echo "Test Status: $TEST_CODE"
           echo "Test Response: $TEST_BODY"
           echo "Health Status: $HEALTH_CODE"
           echo "Health Response: $HEALTH_BODY"
 
           echo ""
-          echo "🔍 Attempting to diagnose the issue..."
+          echo "INFO: Attempting to diagnose the issue..."
 
           # Check if the function app is responding at all
           echo "Testing basic function app connectivity..."
@@ -483,7 +483,7 @@ EOF
           echo "Function list response: $FUNC_LIST"
 
           echo ""
-          echo "💡 Possible issues:"
+          echo "INFO Possible issues:"
           echo "1. Function host not starting (check Azure Portal logs)"
           echo "2. Function discovery failed (check if functions are registered)"
           echo "3. Runtime errors in function_app.py (check import/dependency issues)"
@@ -508,7 +508,7 @@ EOF
       run: |
         echo "Verifying Azure Functions deployment..."
         curl -f ${{ env.AZURE_FUNCTIONAPP_BASE_URL }}/api/health || exit 1
-        echo "✅ Azure Functions deployed successfully!"
+        echo "SUCCESS: Azure Functions deployed successfully!"
 
   # Deploy Frontend to OVHcloud
   deploy-frontend:
@@ -539,11 +539,11 @@ EOF
         
     - name: Deploy to OVHcloud
       run: |
-        echo "🚀 Deploying frontend to OVHcloud..."
-        echo "📦 Deployment package created: tcdynamics-frontend.tar.gz"
-        echo "📁 Package size: $(du -h tcdynamics-frontend.tar.gz | cut -f1)"
+        echo "INFO: Deploying frontend to OVHcloud..."
+        echo "INFO: Deployment package created: tcdynamics-frontend.tar.gz"
+        echo "INFO: Package size: $(du -h tcdynamics-frontend.tar.gz | cut -f1)"
         echo ""
-        echo "📋 Manual deployment steps for OVHcloud:"
+        echo "INFO: Manual deployment steps for OVHcloud:"
         echo "1. Upload tcdynamics-frontend.tar.gz to your OVHcloud hosting"
         echo "2. Extract the files to your web directory"
         echo "3. Configure your web server to serve the React app"
@@ -569,24 +569,24 @@ EOF
     steps:
     - name: Deployment Summary
       run: |
-        echo "🎉 TCDynamics Hybrid Deployment Summary"
+        echo "INFO: TCDynamics Hybrid Deployment Summary"
         echo "======================================"
         echo ""
-        echo "📅 Deployment Date: $(date)"
-        echo "🔗 Repository: ${{ github.repository }}"
-        echo "🌿 Branch: ${{ github.ref_name }}"
-        echo "📝 Commit: ${{ github.sha }}"
+        echo "INFO: Deployment Date: $(date)"
+        echo "INFO: Repository: ${{ github.repository }}"
+        echo "INFO: Branch: ${{ github.ref_name }}"
+        echo "INFO: Commit: ${{ github.sha }}"
         echo ""
-        echo "✅ Components Deployed:"
+        echo "SUCCESS: Components Deployed:"
         echo "  • React Frontend → OVHcloud (https://tcdynamics.fr)"
         echo "  • Azure Functions → func-tcdynamics-contact"
         echo ""
-        echo "🔧 Environment Variables Required:"
+        echo "INFO: Environment Variables Required:"
         echo "  • ZOHO_EMAIL (Azure Functions)"
         echo "  • ZOHO_PASSWORD (Azure Functions)"
         echo "  • VITE_AZURE_FUNCTIONS_URL (Frontend)"
         echo ""
-        echo "📊 Deployment Status:"
+        echo "INFO: Deployment Status:"
         echo "  • Frontend Tests: ${{ needs.deploy-frontend.result }}"
         echo "  • Functions Tests: ${{ needs.deploy-functions.result }}"
         echo "  • Functions Deploy: ${{ needs.deploy-functions.result }}"
@@ -595,7 +595,7 @@ EOF
     - name: Notify on Failure
       if: failure()
       run: |
-        echo "❌ Deployment failed!"
+        echo "ERROR: Deployment failed!"
         echo "Please check the logs and fix any issues before retrying."
         exit 1
 
