@@ -23,7 +23,13 @@ except ImportError:
 # Track application start time for uptime calculation
 app_start_time = time.time()
 
+# Log that the function app is being initialized
+logging.info("Initializing Azure Functions app...")
+
 func_app = func.FunctionApp()
+
+# Log successful initialization
+logging.info("Azure Functions app initialized successfully")
 
 # Contact Form Function
 @func_app.route(route="ContactForm", methods=["POST"])
@@ -392,6 +398,7 @@ def ai_vision(req: func.HttpRequest) -> func.HttpResponse:
 
 @func_app.route(route="health", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
 def health_check(req: func.HttpRequest) -> func.HttpResponse:
+    """Health check endpoint to verify function app is running"""
     logging.info('Health check function processed a request.')
 
     try:
@@ -399,13 +406,25 @@ def health_check(req: func.HttpRequest) -> func.HttpResponse:
         current_time = time.time()
         uptime_seconds = current_time - app_start_time
 
-        # Create health response
+        # Basic system checks
+        import sys
+        python_version = sys.version
+
+        # Count registered functions
+        function_count = len([f for f in dir(func_app) if not f.startswith('_')])
+
+        # Create health response with diagnostic information
         health_data = {
             "status": "healthy",
             "uptime": uptime_seconds,
-            "timestamp": datetime.utcnow().isoformat() + "Z"
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "python_version": python_version.split()[0],
+            "function_count": function_count,
+            "environment": os.getenv('FUNCTIONS_WORKER_RUNTIME', 'unknown'),
+            "azure_functions_version": getattr(func, '__version__', 'unknown')
         }
 
+        logging.info(f"Health check successful: status={health_data['status']}, uptime={uptime_seconds:.1f}s, functions={function_count}")
         return func.HttpResponse(
             json.dumps(health_data),
             status_code=200,
@@ -413,9 +432,14 @@ def health_check(req: func.HttpRequest) -> func.HttpResponse:
         )
     except Exception as e:
         logging.error(f"Health check error: {str(e)}")
+        logging.error(f"Error type: {type(e).__name__}")
+        import traceback
+        logging.error(f"Traceback: {traceback.format_exc()}")
+
         error_data = {
             "status": "unhealthy",
             "error": str(e),
+            "error_type": type(e).__name__,
             "timestamp": datetime.utcnow().isoformat() + "Z"
         }
         return func.HttpResponse(
