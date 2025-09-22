@@ -11,10 +11,9 @@ python-dotenv
 azure-identity
 azure-storage-blob
 azure-cosmos
-azure-ai-vision
-azure-ai-language
-azure-cognitiveservices-vision
-azure-cognitiveservices-language
+azure-cognitiveservices-vision-computervision
+azure-cognitiveservices-vision-face
+azure-ai-textanalytics
 Pillow
 
 # Deployment test trigger - 2025-09-21 12:15:54
