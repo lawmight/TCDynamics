@@ -3,5 +3,18 @@
 # Manually managing azure-functions-worker may cause unexpected issues
 
 azure-functions
+requests
+azure-core
+azure-ai-formrecognizer
+openai
+python-dotenv
+azure-identity
+azure-storage-blob
+azure-cosmos
+azure-ai-vision
+azure-ai-language
+azure-cognitiveservices-vision
+azure-cognitiveservices-language
+Pillow
 
 # Deployment test trigger - 2025-09-21 12:15:54

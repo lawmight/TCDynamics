@@ -273,68 +273,96 @@ jobs:
           exit 1
         fi
 
+    - name: Validate Azure Storage Connection String
+      run: |
+        echo "🔍 Validating Azure Storage connection string..."
+        
+        # Check if the storage connection string secret is set and not empty
+        # Note: Linter warnings about AZURE_STORAGE_CONNECTION_STRING are false positives
+        # This validation ensures the secret exists before attempting to use it
+        if [ -z "${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" ]; then
+          echo "❌ CRITICAL ERROR: AZURE_STORAGE_CONNECTION_STRING secret is empty or not set!"
+          echo ""
+          echo "📋 Required GitHub Secrets:"
+          echo "  • AZURE_STORAGE_CONNECTION_STRING: Your Azure Storage account connection string"
+          echo "  • AZURE_CREDENTIALS: Azure service principal credentials"
+          echo ""
+          echo "💡 How to fix:"
+          echo "1. Go to Azure Portal → Your Storage Account → Access Keys"
+          echo "2. Copy the connection string"
+          echo "3. Go to GitHub → Settings → Secrets → Actions"
+          echo "4. Add/Update AZURE_STORAGE_CONNECTION_STRING with the connection string"
+          exit 1
+        fi
+        
+        # Basic validation of the connection string format
+        # Linter warning can be ignored here - we've already validated the secret exists
+        if [[ "${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" != *"DefaultEndpointsProtocol="* ]]; then
+          echo "⚠️  WARNING: Storage connection string format may be invalid"
+          echo "   Expected format: DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...;EndpointSuffix=..."
+        else
+          echo "✅ Storage connection string format appears valid"
+        fi
+
     - name: Configure App Settings for ZIP Deployment
       run: |
         echo "⚙️ Configuring app settings for ZIP deployment..."
-        echo "Setting WEBSITE_RUN_FROM_PACKAGE=1 to enable proper ZIP deployment"
-
-        # Set WEBSITE_RUN_FROM_PACKAGE to 1 for ZIP deployment (REQUIRED for ZIP deploy to work)
+        
+        # Set required Azure Functions settings for Python v2 model
+        echo "Setting up Azure Functions Python v2 configuration..."
+        
+        # Create a temporary settings file to avoid command line length issues
+        # Note: Linter warnings about AZURE_STORAGE_CONNECTION_STRING are false positives
+        # The validation step above ensures the secret exists before we use it here
+        cat > /tmp/appsettings.json << 'EOF'
+        {
+          "WEBSITE_RUN_FROM_PACKAGE": "1",
+          "FUNCTIONS_WORKER_RUNTIME": "python",
+          "AzureWebJobsStorage": "${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}",
+          "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}",
+          "WEBSITE_CONTENTSHARE": "${{ env.AZURE_FUNCTIONAPP_NAME }}",
+          "AzureWebJobsFeatureFlags": "EnableWorkerIndexing"
+        }
+        EOF
+        
+        # Update app settings using JSON file
         az functionapp config appsettings set \
           --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
           --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-          --settings WEBSITE_RUN_FROM_PACKAGE=1 \
+          --settings @/tmp/appsettings.json \
           --output none
+        
+        echo "✅ App settings configured for ZIP deployment and Python v2 model"
 
-        # Remove the blob MI resource ID if present (not needed for local package)
-        az functionapp config appsettings delete \
-          --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
-          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-          --setting-names WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID \
-          --output none || echo "WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID not found or already removed"
-
-        echo "✅ App settings configured for ZIP deployment"
-
-    - name: Verify App Settings After Cleanup
+    - name: Verify App Settings
       run: |
-        echo "🔍 Verifying app settings after cleanup..."
+        echo "🔍 Verifying app settings configuration..."
         echo "Current app settings:"
         az functionapp config appsettings list \
           --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
           --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-          --output table || echo "Could not list app settings"
-
+          --query "[?contains(name, 'WEBSITE_') || contains(name, 'AzureWebJobs') || contains(name, 'FUNCTIONS_')]" \
+          --output table
+        
         echo ""
-        echo "✅ App settings verified - deployment should now proceed without conflicts"
+        echo "✅ App settings verified - ready for deployment"
 
     - name: Deploy to Azure Functions (Azure CLI Method)
       run: |
-        echo "🚀 Deploying Azure Functions using Azure CLI (bypassing functions-action)..."
-
-        # Configure Azure Functions app settings
-        echo "⚙️ Setting Azure Functions configuration..."
-
-        # Set required Azure Functions settings
-        az functionapp config appsettings set \
-          --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
-          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-          --settings \
-            WEBSITE_RUN_FROM_PACKAGE=1 \
-            FUNCTIONS_WORKER_RUNTIME=python \
-            AzureWebJobsStorage=${{ secrets.AZURE_STORAGE_CONNECTION_STRING }} \
-            WEBSITE_CONTENTAZUREFILECONNECTIONSTRING=${{ secrets.AZURE_STORAGE_CONNECTION_STRING }} \
-            WEBSITE_CONTENTSHARE=${{ env.AZURE_FUNCTIONAPP_NAME }} \
-          --output none
-
-        # Deploy using Azure CLI ZIP push (bypassing functions-action)
-        echo "📦 Deploying ZIP package using Azure CLI..."
+        echo "🚀 Deploying Azure Functions using Azure CLI..."
+        
+        # Deploy using Azure CLI ZIP push
+        echo "📦 Uploading deployment package..."
         az functionapp deployment source config-zip \
           --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
           --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
           --src azure-functions-package.zip \
           --build-remote true \
+          --timeout 600 \
           --output none
-
-        echo "✅ Azure Functions deployed successfully using Azure CLI!"
+        
+        echo "✅ Azure Functions deployment initiated!"
+        echo "📊 Deployment may take a few minutes to complete..."
 
     - name: Check Deployment Status
       run: |
