@@ -47,7 +47,11 @@ const MobileNavigation = () => {
             className="h-12 w-12 rounded-full shadow-lg backdrop-blur-md"
             aria-expanded={isOpen}
             aria-controls={panelId}
-            aria-label={isOpen ? 'Fermer le menu de navigation' : 'Ouvrir le menu de navigation'}
+            aria-label={
+              isOpen
+                ? 'Fermer le menu de navigation'
+                : 'Ouvrir le menu de navigation'
+            }
           >
             <Menu className="h-6 w-6" />
           </Button>

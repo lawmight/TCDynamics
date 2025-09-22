@@ -436,7 +436,7 @@ components:
           properties:
             status:
               type: string
-              example: "healthy"
+              example: 'healthy'
             timestamp:
               type: string
               format: date-time

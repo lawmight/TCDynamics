@@ -298,22 +298,32 @@ describe('Security Utilities', () => {
         const result = securityHeaders.testCSP(invalidCsp)
 
         expect(result.valid).toBe(false)
-        expect(result.errors).toContain('Missing base-uri directive - base tag injection attacks possible')
-        expect(result.errors).toContain('Missing form-action directive - form action hijacking possible')
-        expect(result.errors).toContain('Missing frame-ancestors directive - clickjacking protection limited')
+        expect(result.errors).toContain(
+          'Missing base-uri directive - base tag injection attacks possible'
+        )
+        expect(result.errors).toContain(
+          'Missing form-action directive - form action hijacking possible'
+        )
+        expect(result.errors).toContain(
+          'Missing frame-ancestors directive - clickjacking protection limited'
+        )
       })
 
       it('should handle CSP strings without critical directives', () => {
-        const incompleteCsp = 'default-src \'self\'; script-src \'self\'; style-src \'self\';'
+        const incompleteCsp =
+          "default-src 'self'; script-src 'self'; style-src 'self';"
         const result = securityHeaders.testCSP(incompleteCsp)
 
         expect(result.valid).toBe(false)
         expect(result.errors.length).toBeGreaterThan(0)
-        expect(result.errors.some(error =>
-          error.includes('Missing base-uri directive') ||
-          error.includes('Missing form-action directive') ||
-          error.includes('Missing frame-ancestors directive')
-        )).toBe(true)
+        expect(
+          result.errors.some(
+            error =>
+              error.includes('Missing base-uri directive') ||
+              error.includes('Missing form-action directive') ||
+              error.includes('Missing frame-ancestors directive')
+          )
+        ).toBe(true)
       })
     })
 

@@ -167,7 +167,8 @@ const AIChatbot = () => {
             </CardHeader>
 
             <div id="chatbot-description" className="sr-only">
-              Chatbot IA pour assistance avec WorkFlowAI. Posez vos questions et recevez des réponses intelligentes.
+              Chatbot IA pour assistance avec WorkFlowAI. Posez vos questions et
+              recevez des réponses intelligentes.
             </div>
 
             <CardContent className="flex-1 flex flex-col p-0">

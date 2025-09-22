@@ -26,10 +26,13 @@ export function useThrottle<T extends (...args: any[]) => any>(
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current)
       }
-      timeoutRef.current = setTimeout(() => {
-        callback(...args)
-        lastExecutedRef.current = Date.now()
-      }, delay - (now - lastExecutedRef.current))
+      timeoutRef.current = setTimeout(
+        () => {
+          callback(...args)
+          lastExecutedRef.current = Date.now()
+        },
+        delay - (now - lastExecutedRef.current)
+      )
     }
   }) as T
 

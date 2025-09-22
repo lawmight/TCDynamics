@@ -355,7 +355,9 @@ export const securityHeaders = {
 
       // Check for missing important directives
       const hasBaseUri = directives.some(d => d.trim().startsWith('base-uri'))
-      const hasFormAction = directives.some(d => d.trim().startsWith('form-action'))
+      const hasFormAction = directives.some(d =>
+        d.trim().startsWith('form-action')
+      )
       const hasFrameAncestors = directives.some(d =>
         d.trim().startsWith('frame-ancestors')
       )
