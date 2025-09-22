@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useId, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { ShoppingCart, Menu, X } from 'lucide-react'
 import { useToggle } from '@/hooks/useToggle'
 import { useThrottle } from '@/hooks/useThrottle'
 
 const StickyHeader = () => {
+  const navigate = useNavigate()
   const [isScrolled, setIsScrolled] = useState(false)
   const {
     isOpen: isMobileMenuOpen,
@@ -47,7 +49,7 @@ const StickyHeader = () => {
   }
 
   const handleCheckoutClick = () => {
-    scrollToSection('pricing')
+    navigate('/checkout')
   }
 
   return (
