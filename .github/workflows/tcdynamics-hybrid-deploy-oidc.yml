@@ -1,5 +1,9 @@
 name: TCDynamics Hybrid Deployment (OIDC)
 
+permissions:
+  id-token: write
+  contents: read
+
 on:
   push:
     branches: [main, develop]
