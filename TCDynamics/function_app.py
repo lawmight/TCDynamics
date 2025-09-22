@@ -6,6 +6,23 @@ import time
 
 # Handle optional imports that might fail
 try:
+    import requests
+    requests_available = True
+except ImportError as e:
+    logging.warning(f"requests library not available: {e}")
+    requests_available = False
+    requests = None
+
+try:
+    from datetime import datetime
+    datetime_available = True
+except ImportError as e:
+    logging.warning(f"datetime library not available: {e}")
+    datetime_available = False
+    datetime = None
+
+# Handle optional imports that might fail
+try:
     from azure.cosmos import CosmosClient
     cosmos_available = True
 except ImportError as e:
@@ -300,6 +317,16 @@ Réponds de manière professionnelle, helpful et en français."""
         }
 
         # Call Azure OpenAI
+        if not requests_available:
+            return func.HttpResponse(
+                json.dumps({
+                    "success": False,
+                    "message": "HTTP client not available"
+                }),
+                status_code=503,
+                headers={"Content-Type": "application/json"}
+            )
+
         response = requests.post(
             f"{openai_endpoint}/openai/deployments/{deployment_name}/chat/completions?api-version=2023-12-01-preview",
             headers=headers,
@@ -347,7 +374,7 @@ Réponds de manière professionnelle, helpful et en français."""
             status_code=400,
             headers={"Content-Type": "application/json"}
         )
-    except requests.exceptions.Timeout:
+    except (requests.exceptions.Timeout if requests_available else Exception):
         return func.HttpResponse(
             json.dumps({
                 "success": False,
@@ -497,7 +524,7 @@ def health_check(req: func.HttpRequest) -> func.HttpResponse:
             "status": "unhealthy",
             "error": str(e),
             "error_type": type(e).__name__,
-            "timestamp": datetime.utcnow().isoformat() + "Z"
+            "timestamp": (datetime.utcnow().isoformat() + "Z" if datetime_available else "error")
         }
         return func.HttpResponse(
             json.dumps(error_data),
@@ -665,7 +692,7 @@ def store_contact_submission(name: str, email: str, company: str, message: str) 
             'email': email,
             'company': company,
             'message': message,
-            'submitted_at': datetime.utcnow().isoformat() + 'Z',
+            'submitted_at': (datetime.utcnow().isoformat() + 'Z' if datetime_available else str(time.time())),
             'ip_address': 'unknown',  # Could be extracted from request headers
             'user_agent': 'unknown'   # Could be extracted from request headers
         }
@@ -760,7 +787,7 @@ def store_demo_submission(name: str, email: str, company: str, phone: str, busin
             'phone': phone,
             'business_needs': business_needs,
             'timeline': timeline,
-            'submitted_at': datetime.utcnow().isoformat() + 'Z',
+            'submitted_at': (datetime.utcnow().isoformat() + 'Z' if datetime_available else str(time.time())),
             'status': 'new',  # new, contacted, scheduled, completed
             'ip_address': 'unknown',
             'user_agent': 'unknown'
@@ -800,7 +827,7 @@ def store_chat_conversation(user_message: str, ai_response: str, conversation_id
             'type': 'chat_conversation',
             'user_message': user_message,
             'ai_response': ai_response,
-            'timestamp': datetime.utcnow().isoformat() + 'Z',
+            'timestamp': (datetime.utcnow().isoformat() + 'Z' if datetime_available else str(time.time())),
             'model_used': os.getenv('AZURE_OPENAI_DEPLOYMENT', 'gpt-35-turbo'),
             'tokens_used': 0,  # Could be calculated if needed
             'ip_address': 'unknown',
@@ -889,7 +916,7 @@ def analyze_image_with_azure_vision(image_url: str, image_data: str, endpoint: s
         formatted_result["metadata"] = {
             "requestId": analysis.request_id if hasattr(analysis, 'request_id') else '',
             "modelVersion": analysis.model_version if hasattr(analysis, 'model_version') else '',
-            "timestamp": datetime.utcnow().isoformat() + 'Z'
+            "timestamp": (datetime.utcnow().isoformat() + 'Z' if datetime_available else str(time.time()))
         }
 
         logging.info(f"Image analysis completed successfully")
