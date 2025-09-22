@@ -724,15 +724,9 @@ def store_chat_conversation(user_message: str, ai_response: str, conversation_id
 def analyze_image_with_azure_vision(image_url: str, image_data: str, endpoint: str, key: str) -> dict:
     """Analyze image using Azure Computer Vision"""
     try:
-        headers = {
-            'Ocp-Apim-Subscription-Key': key,
-            'Content-Type': 'application/json'
-        }
-
-        # Prepare request body
-        request_body = {
-            "url": image_url if image_url else None
-        }
+        from azure.cognitiveservices.vision.computervision import ComputerVisionClient
+        from azure.cognitiveservices.vision.computervision.models import VisualFeatureTypes
+        from msrest.authentication import CognitiveServicesCredentials
 
         # If no URL but we have image data, we'd need to handle base64
         # For now, we'll focus on URL-based analysis
@@ -744,56 +738,64 @@ def analyze_image_with_azure_vision(image_url: str, image_data: str, endpoint: s
             logging.error("No image URL provided and base64 analysis not implemented")
             return None
 
-        # Call Azure Computer Vision API
-        response = requests.post(
-            f"{endpoint}/vision/v3.2/analyze?visualFeatures=Categories,Description,Color&details=Landmarks&language=fr",
-            headers=headers,
-            json=request_body,
-            timeout=30
-        )
+        # Create Computer Vision client
+        credentials = CognitiveServicesCredentials(key)
+        client = ComputerVisionClient(endpoint, credentials)
 
-        if response.status_code != 200:
-            logging.error(f"Computer Vision API error: {response.status_code} - {response.text}")
-            return None
+        # Analyze image
+        features = [
+            VisualFeatureTypes.categories,
+            VisualFeatureTypes.description,
+            VisualFeatureTypes.color,
+            VisualFeatureTypes.tags
+        ]
 
-        # Parse and format response
-        result = response.json()
+        # Analyze image by URL
+        analysis = client.analyze_image(image_url, features)
 
-        # Format the response for easier consumption
+        # Format the response
         formatted_result = {
             "description": "",
             "categories": [],
             "color": {},
+            "tags": [],
             "confidence": 0.0
         }
 
         # Extract description
-        if 'description' in result and 'captions' in result['description']:
-            caption = result['description']['captions'][0]
-            formatted_result["description"] = caption['text']
-            formatted_result["confidence"] = caption['confidence']
+        if analysis.description and analysis.description.captions:
+            caption = analysis.description.captions[0]
+            formatted_result["description"] = caption.text
+            formatted_result["confidence"] = caption.confidence
 
         # Extract categories
-        if 'categories' in result:
+        if analysis.categories:
             formatted_result["categories"] = [
-                {"name": cat['name'], "score": cat['score']}
-                for cat in result['categories']
-                if cat['score'] > 0.5  # Only include high-confidence categories
+                {"name": cat.name, "score": cat.score}
+                for cat in analysis.categories
+                if cat.score > 0.5
             ]
 
         # Extract color information
-        if 'color' in result:
-            color = result['color']
+        if analysis.color:
+            color = analysis.color
             formatted_result["color"] = {
-                "dominantColors": color.get('dominantColors', []),
-                "accentColor": color.get('accentColor', ''),
-                "isBlackAndWhite": color.get('isBlackAndWhite', False)
+                "dominantColors": [color.dominant_color_foreground, color.dominant_color_background] if (hasattr(color, 'dominant_color_foreground') and hasattr(color, 'dominant_color_background')) else [],
+                "accentColor": color.accent_color if hasattr(color, 'accent_color') else '',
+                "isBlackAndWhite": color.is_bw_img if hasattr(color, 'is_bw_img') else False
             }
+
+        # Extract tags
+        if analysis.tags:
+            formatted_result["tags"] = [
+                {"name": tag.name, "confidence": tag.confidence}
+                for tag in analysis.tags
+            ]
 
         # Add metadata
         formatted_result["metadata"] = {
-            "requestId": result.get('requestId', ''),
-            "modelVersion": result.get('modelVersion', ''),
+            "requestId": analysis.request_id if hasattr(analysis, 'request_id') else '',
+            "modelVersion": analysis.model_version if hasattr(analysis, 'model_version') else '',
             "timestamp": datetime.utcnow().isoformat() + 'Z'
         }
 
