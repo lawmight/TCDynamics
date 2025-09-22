@@ -188,8 +188,25 @@ jobs:
         requirements-dev.txt
         test_dependencies.py
         constraints.txt
+        .funcignore
+        *.zip
+        *.tar.gz
         EOF
           echo "✅ Created .funcignore file"
+        fi
+
+        # Create requirements.txt for runtime (clean version without dev dependencies)
+        if [ ! -f requirements-runtime.txt ]; then
+          cat > requirements-runtime.txt << 'EOF'
+azure-functions
+requests
+azure-core
+openai
+python-dotenv
+azure-cosmos
+azure-cognitiveservices-vision-computervision
+EOF
+          echo "✅ Created requirements-runtime.txt"
         fi
 
         echo "📋 Files to be included in package:"
@@ -329,39 +346,29 @@ jobs:
         # Set required Azure Functions settings for Python v2 model
         echo "Setting up Azure Functions Python v2 configuration..."
 
-        # Check current app settings to see if they need updating
-        echo "🔍 Checking current app settings..."
-        CURRENT_SETTINGS=$(az functionapp config appsettings list \
+        # Update app settings directly using Azure CLI with secret reference
+        echo "📝 Updating app settings..."
+        az functionapp config appsettings set \
           --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
           --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-          --query "[?name=='WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'].value | [0]" \
-          --output tsv 2>/dev/null || echo "")
+          --settings \
+            WEBSITE_RUN_FROM_PACKAGE=1 \
+            FUNCTIONS_WORKER_RUNTIME=python \
+            AzureWebJobsStorage="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
+            WEBSITE_CONTENTAZUREFILECONNECTIONSTRING="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
+            WEBSITE_CONTENTSHARE="${{ env.AZURE_FUNCTIONAPP_NAME }}" \
+            AzureWebJobsFeatureFlags=EnableWorkerIndexing \
+            SCM_DO_BUILD_DURING_DEPLOYMENT=true \
+            ENABLE_ORYX_BUILD=true \
+            FUNCTIONS_EXTENSION_VERSION=~4 \
+            PYTHON_ISOLATE_WORKER_DEPENDENCIES=1 \
+            PYTHON_ENABLE_WORKER_EXTENSIONS=1 \
+            FUNCTIONS_V2_COMPATIBILITY_MODE=false \
+            WEBSITE_PYTHON_ISOLATE_WORKER_DEPENDENCIES=1 \
+            WEBSITE_FUNCTIONS_WORKER_RUNTIME_VERSION=~4 \
+          --output none
 
-        # Check if settings are already correct by comparing with secret directly
-        if [ "$CURRENT_SETTINGS" = "${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" ]; then
-          echo "✅ App settings already correctly configured"
-          echo "   WEBSITE_CONTENTAZUREFILECONNECTIONSTRING is properly set"
-        else
-          echo "⚠️ App settings need to be updated"
-          echo "   Current WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: $CURRENT_SETTINGS"
-          echo "   Expected: [storage connection string configured]"
-
-          # Update app settings directly using Azure CLI with secret reference
-          echo "📝 Updating app settings..."
-          az functionapp config appsettings set \
-            --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
-            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-            --settings \
-              WEBSITE_RUN_FROM_PACKAGE=1 \
-              FUNCTIONS_WORKER_RUNTIME=python \
-              AzureWebJobsStorage="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
-              WEBSITE_CONTENTAZUREFILECONNECTIONSTRING="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
-              WEBSITE_CONTENTSHARE="${{ env.AZURE_FUNCTIONAPP_NAME }}" \
-              AzureWebJobsFeatureFlags=EnableWorkerIndexing \
-            --output none
-
-          echo "✅ App settings configured for ZIP deployment and Python v2 model"
-        fi
+        echo "✅ App settings configured for ZIP deployment and Python v2 model"
 
     - name: Verify App Settings
       run: |
@@ -379,7 +386,32 @@ jobs:
     - name: Deploy to Azure Functions (Azure CLI Method)
       run: |
         echo "🚀 Deploying Azure Functions using Azure CLI..."
-        
+
+        # Verify the package exists and has content
+        if [ ! -f azure-functions-package.zip ]; then
+          echo "❌ Error: azure-functions-package.zip not found!"
+          exit 1
+        fi
+
+        PACKAGE_SIZE=$(du -h azure-functions-package.zip | cut -f1)
+        echo "📦 Package size: $PACKAGE_SIZE"
+
+        # Check if package contains required files
+        echo "🔍 Verifying package contents..."
+        if unzip -l azure-functions-package.zip | grep -q "function_app.py"; then
+          echo "✅ function_app.py found in package"
+        else
+          echo "❌ function_app.py missing from package!"
+          exit 1
+        fi
+
+        if unzip -l azure-functions-package.zip | grep -q "__init__.py"; then
+          echo "✅ __init__.py found in package"
+        else
+          echo "❌ __init__.py missing from package!"
+          exit 1
+        fi
+
         # Deploy using Azure CLI ZIP push
         echo "📦 Uploading deployment package..."
         az functionapp deployment source config-zip \
@@ -389,7 +421,7 @@ jobs:
           --build-remote true \
           --timeout 600 \
           --output none
-        
+
         echo "✅ Azure Functions deployment initiated!"
         echo "📊 Deployment may take a few minutes to complete..."
 
