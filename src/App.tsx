@@ -9,6 +9,7 @@ import MobileNavigation from './components/MobileNavigation'
 import StickyHeader from './components/StickyHeader'
 import OfflineIndicator from './components/OfflineIndicator'
 import PerformanceMonitor from './components/PerformanceMonitor'
+import LazyAIChatbot from './components/LazyAIChatbot'
 
 // Lazy load pages for better performance
 const Index = lazy(() => import('./pages/Index'))
@@ -61,6 +62,7 @@ const App = () => (
         <StickyHeader />
         <OfflineIndicator />
         <PerformanceMonitor />
+        <LazyAIChatbot />
         <BrowserRouter>
           <Suspense fallback={<PageLoader />}>
             <Routes>

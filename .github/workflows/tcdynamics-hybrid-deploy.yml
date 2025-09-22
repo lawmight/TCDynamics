@@ -26,7 +26,6 @@ env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: './TCDynamics'
   FRONTEND_BUILD_PATH: './dist'
   AZURE_FUNCTIONAPP_BASE_URL: 'https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net'
-  AZURE_RESOURCE_GROUP: 'rg-TCDynamics'
 
 jobs:
   # Test Frontend
@@ -36,34 +35,34 @@ jobs:
     defaults:
       run:
         working-directory: ./
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
-        
+
     - name: Install dependencies
       run: npm ci
-      
+
     - name: Run linting
       run: npm run lint
-      
+
     - name: Run type checking
       run: npm run type-check
-      
+
     - name: Run tests
       run: npm run test:coverage
-      
+
     - name: Build frontend
       run: npm run build
       env:
         VITE_AZURE_FUNCTIONS_URL: https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api
-        
+
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
@@ -78,29 +77,29 @@ jobs:
     defaults:
       run:
         working-directory: ./TCDynamics
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ env.PYTHON_VERSION }}
-        
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools wheel
-        # Install dependencies as per Azure Functions documentation (only requirements.txt)
-        pip install --no-cache-dir -r requirements.txt
+        # Install with constraints file to avoid version conflicts
+        pip install --no-cache-dir -r requirements.txt -c constraints.txt
         pip install pytest pytest-cov
-        
+
     - name: Run Python linting
       run: |
         pip install flake8
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-        
+
     - name: Test Azure Functions locally
       run: |
         # Create test environment file
@@ -108,10 +107,10 @@ jobs:
         echo "ZOHO_PASSWORD=test-password" >> local.settings.json
         echo "FUNCTIONS_WORKER_RUNTIME=python" >> local.settings.json
         echo "AzureWebJobsStorage=UseDevelopmentStorage=true" >> local.settings.json
-        
+
         # Test function imports
         python -c "import azure.functions as func; print('Azure Functions SDK imported successfully')"
-        
+
     - name: Package Azure Functions
       run: |
         # Check if zip is available
@@ -163,101 +162,15 @@ jobs:
     - name: Package Azure Functions for deployment
       run: |
         cd TCDynamics
-        echo "INFO: Preparing Azure Functions package..."
-
-        # Clean up Python cache files and unnecessary files
-        find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-        find . -name "*.pyc" -delete 2>/dev/null || true
-        find . -name ".pytest_cache" -type d -exec rm -rf {} + 2>/dev/null || true
-        find . -name "*.log" -delete 2>/dev/null || true
-
-        # Create .funcignore if it doesn't exist to exclude unnecessary files
-        if [ ! -f .funcignore ]; then
-          cat > .funcignore << 'EOF'
-          .git*
-          .vscode/
-          .venv/
-          __pycache__/
-          *.pyc
-          .pytest_cache/
-          test_*.py
-          *_test.py
-          .coverage
-          *.log
-          local.settings.json
-          requirements-dev.txt
-          test_dependencies.py
-          constraints.txt
-          .funcignore
-          *.zip
-          *.tar.gz
-          EOF
-          echo "SUCCESS: Created .funcignore file"
-        fi
-
-        # Create requirements.txt for runtime (clean version without dev dependencies)
-        if [ ! -f requirements-runtime.txt ]; then
-          cat > requirements-runtime.txt << 'EOF'
-          azure-functions
-          requests
-          azure-core
-          openai
-          python-dotenv
-          azure-cosmos
-          azure-cognitiveservices-vision-computervision
-          EOF
-          echo "SUCCESS: Created requirements-runtime.txt"
-        fi
-
-        echo "INFO: Files to be included in package:"
-        find . -type f | grep -v -E '\.(git|vscode|venv|pytest_cache)' | head -20
-
-        # Create deployment package with proper exclusions
-        echo "INFO: Creating deployment package..."
-        zip -r ../azure-functions-package.zip . -x@.funcignore "*.git*" "local.settings.json" ".funcignore"
-
+        # Create deployment package
+        zip -r ../azure-functions-package.zip . -x "*.pyc" "__pycache__/*" "*.git*" "local.settings.json"
         cd ..
         ls -la azure-functions-package.zip
-        PACKAGE_SIZE=$(du -h azure-functions-package.zip | cut -f1)
-        echo "INFO: Package size: $PACKAGE_SIZE"
-
-        # Verify package contents
-        echo ""
-        echo "INFO: Package contents (first 20 files):"
-        unzip -l azure-functions-package.zip | head -20
-        echo ""
-        echo "INFO: Checking for critical files:"
-        if unzip -l azure-functions-package.zip | grep -q "function_app.py"; then
-          echo "SUCCESS: function_app.py found"
-        else
-          echo "ERROR: function_app.py missing!"
-          exit 1
-        fi
-        if unzip -l azure-functions-package.zip | grep -q "host.json"; then
-          echo "SUCCESS: host.json found"
-        else
-          echo "ERROR: host.json missing!"
-          exit 1
-        fi
-        if unzip -l azure-functions-package.zip | grep -q "requirements.txt"; then
-          echo "SUCCESS: requirements.txt found"
-        else
-          echo "ERROR: requirements.txt missing!"
-          exit 1
-        fi
-
-        # Check package size (warn if too large)
-        PACKAGE_BYTES=$(stat -f%z azure-functions-package.zip 2>/dev/null || stat -c%s azure-functions-package.zip)
-        if [ "$PACKAGE_BYTES" -gt 104857600 ]; then  # 100MB
-          echo "WARNING: Package size ($PACKAGE_SIZE) is quite large. Consider optimizing."
-        fi
 
     - name: Extract Azure Functions package
       run: |
-        echo "INFO: Extracting Azure Functions package..."
         unzip azure-functions-package.zip -d azure-functions-deploy
-        echo "INFO: Package structure:"
-        find azure-functions-deploy -type f | head -20
+        ls -la azure-functions-deploy/
 
     - name: Setup Python
       uses: actions/setup-python@v5
@@ -268,247 +181,20 @@ jobs:
       run: |
         npm install -g azure-functions-core-tools@4 --unsafe-perm true
 
-    - name: Login to Azure
-      uses: azure/login@v2
+    - name: Deploy to Azure Functions
+      uses: Azure/functions-action@v1
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+        package: ./azure-functions-deploy
+        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+        scm-do-build-during-deployment: true
+        enable-oryx-build: true
 
-    - name: Configure Function App for V2 Python Model
-      run: |
-        echo "Setting AzureWebJobsFeatureFlags for Python v2 model..."
-        # This enables function discovery for @app.route() decorators
-        # Without this, no functions are found and deployment fails with 400
-
-    - name: Verify Function App Configuration
-      run: |
-        echo "Verifying function app is ready for deployment..."
-        # Check if we can reach the function app
-        if curl -f -s https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/ > /dev/null; then
-          echo "SUCCESS: Function app is responding"
-        else
-          echo "ERROR: Function app is not responding - deployment may fail"
-          exit 1
-        fi
-
-    - name: Validate Azure Storage Connection String
-      run: |
-        echo "INFO: Validating Azure Storage connection string..."
-
-        # Get the storage connection string from environment variable
-        STORAGE_CONNECTION_STRING="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}"
-
-        # Check if the storage connection string secret is set and not empty
-        if [ -z "$STORAGE_CONNECTION_STRING" ]; then
-          echo "ERROR: CRITICAL ERROR: AZURE_STORAGE_CONNECTION_STRING secret is empty or not set!"
-          echo ""
-          echo "INFO: Required GitHub Secrets:"
-          echo "  • AZURE_STORAGE_CONNECTION_STRING: Your Azure Storage account connection string"
-          echo "  • AZURE_CREDENTIALS: Azure service principal credentials"
-          echo ""
-          echo "INFO How to fix:"
-          echo "1. Go to Azure Portal → Your Storage Account → Access Keys"
-          echo "2. Copy the connection string"
-          echo "3. Go to GitHub → Settings → Secrets → Actions"
-          echo "4. Add/Update AZURE_STORAGE_CONNECTION_STRING with the connection string"
-          exit 1
-        fi
-
-        # Check if the secret contains placeholder values
-        if [[ "$STORAGE_CONNECTION_STRING" == "***" ]] || [[ "$STORAGE_CONNECTION_STRING" == "your-storage-connection-string" ]] || [[ "$STORAGE_CONNECTION_STRING" == "change-me" ]]; then
-          echo "❌ CRITICAL ERROR: AZURE_STORAGE_CONNECTION_STRING contains placeholder value!"
-          echo "Current value: $STORAGE_CONNECTION_STRING"
-          echo ""
-          echo "📋 Required GitHub Secrets:"
-          echo "  • AZURE_STORAGE_CONNECTION_STRING: Your Azure Storage account connection string"
-          echo ""
-          echo "INFO How to fix:"
-          echo "1. Go to Azure Portal → Your Storage Account → Access Keys"
-          echo "2. Copy the connection string"
-          echo "3. Go to GitHub → Settings → Secrets → Actions"
-          echo "4. Add/Update AZURE_STORAGE_CONNECTION_STRING with the connection string"
-          exit 1
-        fi
-
-        # Basic validation of the connection string format
-        if [[ "$STORAGE_CONNECTION_STRING" != *"DefaultEndpointsProtocol="* ]]; then
-          echo "⚠️  WARNING: Storage connection string format may be invalid"
-          echo "   Expected format: DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...;EndpointSuffix=..."
-          echo "   Current value starts with: ${STORAGE_CONNECTION_STRING:0:50}..."
-        else
-          echo "✅ Storage connection string format appears valid"
-          echo "✅ Storage connection string is properly configured"
-        fi
-
-    - name: Configure App Settings for ZIP Deployment
-      run: |
-        echo "⚙️ Configuring app settings for ZIP deployment..."
-
-        # Set required Azure Functions settings for Python v2 model
-        echo "Setting up Azure Functions Python v2 configuration..."
-
-        # Update app settings directly using Azure CLI with secret reference
-        echo "📝 Updating app settings..."
-        az functionapp config appsettings set \
-          --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
-          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-          --settings \
-            WEBSITE_RUN_FROM_PACKAGE=1 \
-            FUNCTIONS_WORKER_RUNTIME=python \
-            AzureWebJobsStorage="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
-            WEBSITE_CONTENTAZUREFILECONNECTIONSTRING="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
-            WEBSITE_CONTENTSHARE="${{ env.AZURE_FUNCTIONAPP_NAME }}" \
-            AzureWebJobsFeatureFlags=EnableWorkerIndexing \
-            SCM_DO_BUILD_DURING_DEPLOYMENT=true \
-            ENABLE_ORYX_BUILD=true \
-            FUNCTIONS_EXTENSION_VERSION=~4 \
-            PYTHON_ISOLATE_WORKER_DEPENDENCIES=1 \
-            PYTHON_ENABLE_WORKER_EXTENSIONS=1 \
-            FUNCTIONS_V2_COMPATIBILITY_MODE=false \
-            WEBSITE_PYTHON_ISOLATE_WORKER_DEPENDENCIES=1 \
-            WEBSITE_FUNCTIONS_WORKER_RUNTIME_VERSION=~4 \
-          --output none
-
-        echo "✅ App settings configured for ZIP deployment and Python v2 model"
-
-    - name: Verify App Settings
-      run: |
-        echo "🔍 Verifying app settings configuration..."
-        echo "Current app settings:"
-        az functionapp config appsettings list \
-          --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
-          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-          --query "[?contains(name, 'WEBSITE_') || contains(name, 'AzureWebJobs') || contains(name, 'FUNCTIONS_')]" \
-          --output table
-        
-        echo ""
-        echo "SUCCESS: App settings verified - ready for deployment"
-
-    - name: Deploy to Azure Functions (Azure CLI Method)
-      run: |
-        echo "INFO: Deploying Azure Functions using Azure CLI..."
-
-        # Verify the package exists and has content
-        if [ ! -f azure-functions-package.zip ]; then
-          echo "ERROR: azure-functions-package.zip not found!"
-          exit 1
-        fi
-
-        PACKAGE_SIZE=$(du -h azure-functions-package.zip | cut -f1)
-        echo "INFO: Package size: $PACKAGE_SIZE"
-
-        # Check if package contains required files
-        echo "INFO: Verifying package contents..."
-        if unzip -l azure-functions-package.zip | grep -q "function_app.py"; then
-          echo "SUCCESS: function_app.py found in package"
-        else
-          echo "ERROR: function_app.py missing from package!"
-          exit 1
-        fi
-
-        if unzip -l azure-functions-package.zip | grep -q "__init__.py"; then
-          echo "SUCCESS: __init__.py found in package"
-        else
-          echo "ERROR: __init__.py missing from package!"
-          exit 1
-        fi
-
-        # Deploy using Azure CLI ZIP push
-        echo "INFO: Uploading deployment package..."
-        az functionapp deployment source config-zip \
-          --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
-          --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-          --src azure-functions-package.zip \
-          --build-remote true \
-          --timeout 600 \
-          --output none
-
-        echo "SUCCESS: Azure Functions deployment initiated!"
-        echo "INFO: Deployment may take a few minutes to complete..."
-
-    - name: Check Deployment Status
-      run: |
-        echo "Checking deployment status..."
-        # Wait a moment for deployment to settle
-        sleep 30
-
-        # Check if functions are responding
-        echo "Testing simple test endpoint..."
-        TEST_RESPONSE=$(curl -s -w "HTTPSTATUS:%{http_code}" ${{ env.AZURE_FUNCTIONAPP_BASE_URL }}/api/test 2>/dev/null)
-        TEST_BODY=$(echo "$TEST_RESPONSE" | sed 's/HTTPSTATUS.*//')
-        TEST_CODE=$(echo "$TEST_RESPONSE" | grep -o "HTTPSTATUS:[0-9]*" | cut -d: -f2)
-
-        echo "Test endpoint response code: $TEST_CODE"
-        echo "Test endpoint response body: $TEST_BODY"
-
-        echo "Testing health endpoint..."
-        HEALTH_RESPONSE=$(curl -s -w "HTTPSTATUS:%{http_code}" ${{ env.AZURE_FUNCTIONAPP_BASE_URL }}/api/health 2>/dev/null)
-        HEALTH_BODY=$(echo "$HEALTH_RESPONSE" | sed 's/HTTPSTATUS.*//')
-        HEALTH_CODE=$(echo "$HEALTH_RESPONSE" | grep -o "HTTPSTATUS:[0-9]*" | cut -d: -f2)
-
-        echo "Health check response code: $HEALTH_CODE"
-        echo "Health check response body: $HEALTH_BODY"
-
-        if [ "$TEST_CODE" = "200" ] && echo "$TEST_BODY" | grep -q "Function discovery working"; then
-          echo "SUCCESS: Function discovery working - test endpoint responded"
-          if [ "$HEALTH_CODE" = "200" ] && echo "$HEALTH_BODY" | grep -q "healthy"; then
-            echo "SUCCESS: Azure Functions deployment successful - health check passed"
-          else
-            echo "WARNING: Test endpoint works but health endpoint failed"
-            echo "   This suggests function discovery is working but health function has issues"
-          fi
-        else
-          echo "ERROR: Azure Functions deployment failed - function discovery not working"
-          echo "Test Status: $TEST_CODE"
-          echo "Test Response: $TEST_BODY"
-          echo "Health Status: $HEALTH_CODE"
-          echo "Health Response: $HEALTH_BODY"
-
-          echo ""
-          echo "INFO: Attempting to diagnose the issue..."
-
-          # Check if the function app is responding at all
-          echo "Testing basic function app connectivity..."
-          BASIC_RESPONSE=$(curl -s -w "HTTPSTATUS:%{http_code}" ${{ env.AZURE_FUNCTIONAPP_BASE_URL }}/ 2>/dev/null)
-          BASIC_CODE=$(echo "$BASIC_RESPONSE" | grep -o "HTTPSTATUS:[0-9]*" | cut -d: -f2)
-          echo "Basic connectivity status: $BASIC_CODE"
-
-          # Try to get host status
-          echo "Attempting to get host status..."
-          HOST_STATUS=$(curl -s ${{ env.AZURE_FUNCTIONAPP_BASE_URL }}/admin/host/status 2>/dev/null || echo "Could not retrieve host status")
-          echo "Host status response: $HOST_STATUS"
-
-          # Check function list endpoint
-          echo "Checking function list..."
-          FUNC_LIST=$(curl -s ${{ env.AZURE_FUNCTIONAPP_BASE_URL }}/admin/functions 2>/dev/null || echo "Could not retrieve function list")
-          echo "Function list response: $FUNC_LIST"
-
-          echo ""
-          echo "INFO Possible issues:"
-          echo "1. Function host not starting (check Azure Portal logs)"
-          echo "2. Function discovery failed (check if functions are registered)"
-          echo "3. Runtime errors in function_app.py (check import/dependency issues)"
-          echo "4. Authentication issues (health endpoint should be anonymous)"
-          echo "5. WEBSITE_RUN_FROM_PACKAGE configuration issues"
-
-          exit 1
-        fi
-
-    # Alternative OIDC-based deployment (recommended for security)
-    # Uncomment the following and comment out the above deployment step
-    # when you have OIDC configured in Azure
-    #
-    # - name: Deploy to Azure Functions (OIDC)
-    #   uses: Azure/functions-action@v1
-    #   with:
-    #     app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-    #     package: ./azure-functions-deploy
-    #     # Remove publish-profile when using OIDC
-        
     - name: Verify deployment
       run: |
         echo "Verifying Azure Functions deployment..."
         curl -f ${{ env.AZURE_FUNCTIONAPP_BASE_URL }}/api/health || exit 1
-        echo "SUCCESS: Azure Functions deployed successfully!"
+        echo "✅ Azure Functions deployed successfully!"
 
   # Deploy Frontend to OVHcloud
   deploy-frontend:
@@ -516,34 +202,34 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test-frontend, deploy-functions]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Download frontend artifacts
       uses: actions/download-artifact@v4
       with:
         name: frontend-build
         path: ${{ env.FRONTEND_BUILD_PATH }}
-        
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
-        
+
     - name: Create OVHcloud deployment package
       run: |
         # Create a deployment package for OVHcloud
         tar -czf tcdynamics-frontend.tar.gz -C ${{ env.FRONTEND_BUILD_PATH }} .
-        
+
     - name: Deploy to OVHcloud
       run: |
-        echo "INFO: Deploying frontend to OVHcloud..."
-        echo "INFO: Deployment package created: tcdynamics-frontend.tar.gz"
-        echo "INFO: Package size: $(du -h tcdynamics-frontend.tar.gz | cut -f1)"
+        echo "🚀 Deploying frontend to OVHcloud..."
+        echo "📦 Deployment package created: tcdynamics-frontend.tar.gz"
+        echo "📁 Package size: $(du -h tcdynamics-frontend.tar.gz | cut -f1)"
         echo ""
-        echo "INFO: Manual deployment steps for OVHcloud:"
+        echo "📋 Manual deployment steps for OVHcloud:"
         echo "1. Upload tcdynamics-frontend.tar.gz to your OVHcloud hosting"
         echo "2. Extract the files to your web directory"
         echo "3. Configure your web server to serve the React app"
@@ -551,7 +237,7 @@ jobs:
         echo ""
         echo "🔗 Frontend will be available at: https://tcdynamics.fr"
         echo "🔗 Backend API: https://func-tcdynamics-contact.azurewebsites.net/api"
-        
+
     - name: Upload OVHcloud deployment package
       uses: actions/upload-artifact@v4
       with:
@@ -565,37 +251,43 @@ jobs:
     runs-on: ubuntu-latest
     needs: [deploy-functions, deploy-frontend]
     if: always() && github.ref == 'refs/heads/main'
-    
+
     steps:
     - name: Deployment Summary
       run: |
-        echo "INFO: TCDynamics Hybrid Deployment Summary"
-        echo "======================================"
+        echo "🎉 TCDynamics Hybrid Deployment Summary"
+        echo "======================================="
         echo ""
-        echo "INFO: Deployment Date: $(date)"
-        echo "INFO: Repository: ${{ github.repository }}"
-        echo "INFO: Branch: ${{ github.ref_name }}"
-        echo "INFO: Commit: ${{ github.sha }}"
+        echo "📅 Deployment Date: $(date)"
+        echo "🔗 Repository: ${{ github.repository }}"
+        echo "🌿 Branch: ${{ github.ref_name }}"
+        echo "📝 Commit: ${{ github.sha }}"
         echo ""
-        echo "SUCCESS: Components Deployed:"
+        echo "✅ Components Deployed:"
         echo "  • React Frontend → OVHcloud (https://tcdynamics.fr)"
         echo "  • Azure Functions → func-tcdynamics-contact"
         echo ""
-        echo "INFO: Environment Variables Required:"
-        echo "  • ZOHO_EMAIL (Azure Functions)"
-        echo "  • ZOHO_PASSWORD (Azure Functions)"
-        echo "  • VITE_AZURE_FUNCTIONS_URL (Frontend)"
+        echo "🔧 Authentication Method: Publish Profile"
         echo ""
-        echo "INFO: Deployment Status:"
+        echo "🔗 Endpoints:"
+        echo "  • Frontend: https://tcdynamics.fr"
+        echo "  • API: https://func-tcdynamics-contact.azurewebsites.net/api"
+        echo "  • Health: https://func-tcdynamics-contact.azurewebsites.net/api/health"
+        echo ""
+        echo "📊 Deployment Status:"
         echo "  • Frontend Tests: ${{ needs.deploy-frontend.result }}"
         echo "  • Functions Tests: ${{ needs.deploy-functions.result }}"
         echo "  • Functions Deploy: ${{ needs.deploy-functions.result }}"
         echo "  • Frontend Deploy: ${{ needs.deploy-frontend.result }}"
-        
+
     - name: Notify on Failure
       if: failure()
       run: |
-        echo "ERROR: Deployment failed!"
+        echo "❌ Deployment failed!"
         echo "Please check the logs and fix any issues before retrying."
+        echo ""
+        echo "🔧 Common fixes:"
+        echo "1. Check Azure credentials and permissions"
+        echo "2. Verify Function App configuration"
+        echo "3. Check AZURE_DEPLOYMENT_FIX.md for troubleshooting"
         exit 1
-
