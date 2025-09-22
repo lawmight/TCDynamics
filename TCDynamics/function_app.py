@@ -3,8 +3,6 @@ import logging
 import os
 import json
 import time
-from datetime import datetime
-import requests
 
 # Handle optional imports that might fail
 try:
@@ -52,6 +50,9 @@ try:
     # Log function registration for debugging
     logging.info("Registering functions...")
 
+    # Log function registration status
+    logging.info("Function registration completed")
+
 except Exception as e:
     logging.error(f"Failed to initialize Azure Functions app: {str(e)}")
     logging.error(f"Error type: {type(e).__name__}")
@@ -65,15 +66,16 @@ def test_function(req: func.HttpRequest) -> func.HttpResponse:
     """Simple test function to verify function discovery"""
     logging.info('Test function called')
     try:
+        # Very simple response
         return func.HttpResponse(
-            json.dumps({"status": "ok", "message": "Function discovery working", "timestamp": datetime.utcnow().isoformat()}),
+            '{"status": "ok", "message": "Function discovery working"}',
             status_code=200,
             headers={"Content-Type": "application/json"}
         )
     except Exception as e:
         logging.error(f"Test function error: {str(e)}")
         return func.HttpResponse(
-            json.dumps({"status": "error", "message": str(e)}),
+            '{"status": "error", "message": "' + str(e) + '"}',
             status_code=500,
             headers={"Content-Type": "application/json"}
         )
@@ -472,11 +474,11 @@ def health_check(req: func.HttpRequest) -> func.HttpResponse:
         health_data = {
             "status": "healthy",
             "uptime": uptime_seconds,
-            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "timestamp": "running",
             "python_version": python_version.split()[0] if python_version else "unknown",
             "function_count": function_count,
             "environment": os.getenv('FUNCTIONS_WORKER_RUNTIME', 'unknown'),
-            "azure_functions_version": "1.17.0"  # Known version for Azure Functions Python
+            "azure_functions_version": "1.17.0"
         }
 
         logging.info(f"Health check successful: status={health_data['status']}, uptime={uptime_seconds:.1f}s, functions={function_count}")
