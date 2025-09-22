@@ -1,6 +1,8 @@
 # 🚀 TCDynamics - WorkFlowAI
 
 > Solution d'automatisation intelligente pour les entreprises françaises
+>
+> 💡 **Recently Optimized**: Codebase cleaned and optimized for better performance
 
 [![React](https://img.shields.io/badge/React-18.3-blue.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue.svg)](https://www.typescriptlang.org/)
