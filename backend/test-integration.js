@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+// Load test environment
+require('dotenv').config({ path: './test.env' })
 const http = require('http')
 
 // Fonction pour tester une URL
