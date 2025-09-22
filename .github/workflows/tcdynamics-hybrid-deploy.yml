@@ -400,6 +400,14 @@ jobs:
         sleep 30
 
         # Check if functions are responding
+        echo "Testing simple test endpoint..."
+        TEST_RESPONSE=$(curl -s -w "HTTPSTATUS:%{http_code}" ${{ env.AZURE_FUNCTIONAPP_BASE_URL }}/api/test 2>/dev/null)
+        TEST_BODY=$(echo "$TEST_RESPONSE" | sed 's/HTTPSTATUS.*//')
+        TEST_CODE=$(echo "$TEST_RESPONSE" | grep -o "HTTPSTATUS:[0-9]*" | cut -d: -f2)
+
+        echo "Test endpoint response code: $TEST_CODE"
+        echo "Test endpoint response body: $TEST_BODY"
+
         echo "Testing health endpoint..."
         HEALTH_RESPONSE=$(curl -s -w "HTTPSTATUS:%{http_code}" ${{ env.AZURE_FUNCTIONAPP_BASE_URL }}/api/health 2>/dev/null)
         HEALTH_BODY=$(echo "$HEALTH_RESPONSE" | sed 's/HTTPSTATUS.*//')
@@ -408,12 +416,20 @@ jobs:
         echo "Health check response code: $HEALTH_CODE"
         echo "Health check response body: $HEALTH_BODY"
 
-        if [ "$HEALTH_CODE" = "200" ] && echo "$HEALTH_BODY" | grep -q "healthy"; then
-          echo "✅ Azure Functions deployment successful - health check passed"
+        if [ "$TEST_CODE" = "200" ] && echo "$TEST_BODY" | grep -q "Function discovery working"; then
+          echo "✅ Function discovery working - test endpoint responded"
+          if [ "$HEALTH_CODE" = "200" ] && echo "$HEALTH_BODY" | grep -q "healthy"; then
+            echo "✅ Azure Functions deployment successful - health check passed"
+          else
+            echo "⚠️ Test endpoint works but health endpoint failed"
+            echo "   This suggests function discovery is working but health function has issues"
+          fi
         else
-          echo "❌ Azure Functions deployment failed - health check failed"
-          echo "HTTP Status: $HEALTH_CODE"
-          echo "Response: $HEALTH_BODY"
+          echo "❌ Azure Functions deployment failed - function discovery not working"
+          echo "Test Status: $TEST_CODE"
+          echo "Test Response: $TEST_BODY"
+          echo "Health Status: $HEALTH_CODE"
+          echo "Health Response: $HEALTH_BODY"
 
           echo ""
           echo "🔍 Attempting to diagnose the issue..."

@@ -5,10 +5,24 @@ import json
 import time
 from datetime import datetime
 import requests
-from azure.cosmos import CosmosClient
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+
+# Handle optional imports that might fail
+try:
+    from azure.cosmos import CosmosClient
+    cosmos_available = True
+except ImportError as e:
+    logging.warning(f"Azure Cosmos DB not available: {e}")
+    cosmos_available = False
+    CosmosClient = None
+
+try:
+    import smtplib
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+    email_available = True
+except ImportError as e:
+    logging.warning(f"Email libraries not available: {e}")
+    email_available = False
 
 # Optional Stripe import (only if available)
 try:
@@ -26,10 +40,31 @@ app_start_time = time.time()
 # Log that the function app is being initialized
 logging.info("Initializing Azure Functions app...")
 
-func_app = func.FunctionApp()
+try:
+    func_app = func.FunctionApp()
+    logging.info("Azure Functions app initialized successfully")
 
-# Log successful initialization
-logging.info("Azure Functions app initialized successfully")
+    # Log function registration status
+    function_routes = [route for route in dir(func_app) if hasattr(getattr(func_app, route), 'route')]
+    logging.info(f"Function routes registered: {function_routes}")
+
+except Exception as e:
+    logging.error(f"Failed to initialize Azure Functions app: {str(e)}")
+    logging.error(f"Error type: {type(e).__name__}")
+    import traceback
+    logging.error(f"Traceback: {traceback.format_exc()}")
+    raise
+
+# Test function to verify function discovery
+@func_app.route(route="test", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+def test_function(req: func.HttpRequest) -> func.HttpResponse:
+    """Simple test function to verify function discovery"""
+    logging.info('Test function called')
+    return func.HttpResponse(
+        json.dumps({"status": "ok", "message": "Function discovery working"}),
+        status_code=200,
+        headers={"Content-Type": "application/json"}
+    )
 
 # Contact Form Function
 @func_app.route(route="ContactForm", methods=["POST"])
@@ -581,6 +616,10 @@ Ce message a été envoyé depuis le formulaire de contact TCDynamics.
 
 def store_contact_submission(name: str, email: str, company: str, message: str) -> None:
     """Store contact form submission in Cosmos DB"""
+    if not cosmos_available:
+        logging.warning("Cosmos DB not available, skipping database storage")
+        return
+
     try:
         # Get Cosmos DB configuration
         cosmos_connection = os.getenv('COSMOS_CONNECTION_STRING', '')
@@ -670,6 +709,10 @@ Cette demande a été envoyée depuis le formulaire de démonstration TCDynamics
 
 def store_demo_submission(name: str, email: str, company: str, phone: str, business_needs: str, timeline: str) -> None:
     """Store demo request in Cosmos DB"""
+    if not cosmos_available:
+        logging.warning("Cosmos DB not available, skipping database storage")
+        return
+
     try:
         # Get Cosmos DB configuration
         cosmos_connection = os.getenv('COSMOS_CONNECTION_STRING', '')
@@ -710,6 +753,10 @@ def store_demo_submission(name: str, email: str, company: str, phone: str, busin
 
 def store_chat_conversation(user_message: str, ai_response: str, conversation_id: str) -> None:
     """Store chat conversation in Cosmos DB"""
+    if not cosmos_available:
+        logging.warning("Cosmos DB not available, skipping database storage")
+        return
+
     try:
         # Get Cosmos DB configuration
         cosmos_connection = os.getenv('COSMOS_CONNECTION_STRING', '')
