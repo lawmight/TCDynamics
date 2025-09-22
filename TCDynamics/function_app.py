@@ -70,6 +70,17 @@ try:
     # Log function registration status
     logging.info("Function registration completed")
 
+    # Verify function discovery
+    try:
+        functions = func_app.get_functions()
+        logging.info(f"✅ Successfully discovered {len(functions)} functions:")
+        for i, func_info in enumerate(functions):
+            name = func_info.get_function_name()
+            is_http = func_info.is_http_function()
+            logging.info(f"  Function {i+1}: {name} (HTTP: {is_http})")
+    except Exception as e:
+        logging.error(f"❌ Failed to discover functions: {e}")
+
 except Exception as e:
     logging.error(f"Failed to initialize Azure Functions app: {str(e)}")
     logging.error(f"Error type: {type(e).__name__}")
