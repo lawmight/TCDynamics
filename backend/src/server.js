@@ -177,7 +177,15 @@ app.use(notFoundHandler)
 app.use(errorHandler)
 
 // Démarrage du serveur
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
+  console.log('🚀 Serveur TCDynamics démarré', {
+    port: PORT,
+    environment: process.env.NODE_ENV,
+    emailConfigured: !!process.env.EMAIL_USER,
+    frontendUrl: process.env.FRONTEND_URL,
+    apiDocsUrl: `http://localhost:${PORT}/api-docs`,
+    openApiUrl: `http://localhost:${PORT}/api-docs.json`,
+  })
   logger.info('🚀 Serveur TCDynamics démarré', {
     port: PORT,
     environment: process.env.NODE_ENV,
@@ -186,14 +194,6 @@ app.listen(PORT, () => {
     apiDocsUrl: `http://localhost:${PORT}/api-docs`,
     openApiUrl: `http://localhost:${PORT}/api-docs.json`,
   })
-
-  // Logs pour la console aussi
-  // // console.log(`🚀 Serveur TCDynamics démarré sur le port ${PORT}`)
-  // // console.log(`📧 Email configuré: ${process.env.EMAIL_USER}`)
-  // // console.log(`�� Frontend URL: ${process.env.FRONTEND_URL}`)
-  // // console.log(`🔒 Environnement: ${process.env.NODE_ENV}`)
-  // // console.log(`📚 Documentation API: process.env.API_URL || 'process.env.API_URL || 'http://localhost:${PORT}/api-docs`)''
-  // // console.log(`🔗 Spécification OpenAPI: process.env.API_URL || 'process.env.API_URL || 'http://localhost:${PORT}/api-docs.json`)''
 })
 
 // Gestion gracieuse de l'arrêt
