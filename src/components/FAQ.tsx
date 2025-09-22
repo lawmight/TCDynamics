@@ -11,7 +11,9 @@ const AccordionContext = createContext<AccordionContextType | null>(null)
 const useAccordion = () => {
   const context = useContext(AccordionContext)
   if (!context) {
-    throw new Error('Accordion components must be used within an Accordion provider')
+    throw new Error(
+      'Accordion components must be used within an Accordion provider'
+    )
   }
   return context
 }
@@ -20,7 +22,7 @@ const useAccordion = () => {
 const Accordion = ({
   children,
   type = 'single',
-  collapsible = true
+  collapsible = true,
 }: {
   children: React.ReactNode
   type?: 'single' | 'multiple'
@@ -55,7 +57,11 @@ const Accordion = ({
 
   return (
     <AccordionContext.Provider value={{ openItems, toggleItem }}>
-      <div className="space-y-4" role="region" aria-label="Questions fréquentes">
+      <div
+        className="space-y-4"
+        role="region"
+        aria-label="Questions fréquentes"
+      >
         {children}
       </div>
     </AccordionContext.Provider>
@@ -338,7 +344,10 @@ const FAQ = () => {
                     value={faq.id}
                     className="border border-primary/10 rounded-lg px-6 py-2 hover:border-primary/30 transition-colors"
                   >
-                    <AccordionTrigger value={faq.id} className="text-left hover:no-underline group py-6">
+                    <AccordionTrigger
+                      value={faq.id}
+                      className="text-left hover:no-underline group py-6"
+                    >
                       <div className="flex items-center gap-4 flex-1">
                         <div className="p-2 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors flex-shrink-0">
                           <IconComponent className="w-5 h-5 text-primary" />

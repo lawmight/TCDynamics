@@ -28,6 +28,6 @@ export function useToggle(initialState: boolean = false): UseToggleReturn {
     open,
     close,
     toggle,
-    setOpen
+    setOpen,
   }
 }

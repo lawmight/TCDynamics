@@ -11,9 +11,11 @@ This document outlines all environment variables required for the TCDynamics app
 ## Environment Variables
 
 ### Client-Side Configuration
+
 These variables are exposed to the browser and must be prefixed with `VITE_`.
 
 #### Required
+
 ```bash
 VITE_AZURE_FUNCTIONS_URL=https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api
 VITE_NODE_ENV=development
@@ -21,6 +23,7 @@ VITE_APP_VERSION=1.0.0
 ```
 
 #### Optional
+
 ```bash
 # Analytics
 VITE_GA_TRACKING_ID=GA_MEASUREMENT_ID
@@ -33,9 +36,11 @@ VITE_ENABLE_CACHE=true
 ```
 
 ### Server-Side Configuration
+
 These variables are used by Azure Functions and are kept server-side only.
 
 #### Azure OpenAI (Required for AI Chat)
+
 ```bash
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
 AZURE_OPENAI_KEY=your-azure-openai-key
@@ -43,34 +48,40 @@ AZURE_OPENAI_DEPLOYMENT=gpt-35-turbo
 ```
 
 #### Azure Vision (Required for Document Processing)
+
 ```bash
 AZURE_VISION_ENDPOINT=https://your-vision-resource.cognitiveservices.azure.com/
 AZURE_VISION_KEY=your-azure-vision-key
 ```
 
 #### Email Configuration (Required for Contact Forms)
+
 ```bash
 ZOHO_EMAIL=contact@tcdynamics.fr
 ZOHO_PASSWORD=your-zoho-app-password
 ```
 
 #### Database (Optional, for advanced features)
+
 ```bash
 COSMOS_CONNECTION_STRING=your-cosmos-connection-string
 ```
 
 #### Security (Required)
+
 ```bash
 ADMIN_KEY=change-this-to-a-secure-random-string-at-least-32-characters-long
 FRONTEND_URL=https://tcdynamics.fr
 ```
 
 #### Monitoring (Optional)
+
 ```bash
 APPLICATIONINSIGHTS_CONNECTION_STRING=your-app-insights-connection-string
 ```
 
 #### Azure Functions (Required for local development)
+
 ```bash
 AzureWebJobsStorage=UseDevelopmentStorage=true
 ```
@@ -78,11 +89,13 @@ AzureWebJobsStorage=UseDevelopmentStorage=true
 ## Security Best Practices
 
 ### Development
+
 - Use different values for development and production
 - Never commit real secrets to version control
 - Use `.env` files (add to `.gitignore`)
 
 ### Production
+
 - Use Azure Key Vault for sensitive data
 - Enable Azure Managed Identities
 - Rotate keys regularly
@@ -96,6 +109,7 @@ AzureWebJobsStorage=UseDevelopmentStorage=true
 4. Update your Azure Functions configuration to reference Key Vault secrets
 
 Example Key Vault references:
+
 ```
 AZURE_OPENAI_KEY=@Microsoft.KeyVault(SecretUri=https://your-vault.vault.azure.net/secrets/azure-openai-key/)
 ```

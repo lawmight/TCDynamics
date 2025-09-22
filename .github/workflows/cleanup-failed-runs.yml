@@ -1,7 +1,7 @@
 name: Cleanup Failed Workflow Runs
 
 on:
-  workflow_dispatch:  # Manual trigger
+  workflow_dispatch: # Manual trigger
 
 permissions:
   actions: write

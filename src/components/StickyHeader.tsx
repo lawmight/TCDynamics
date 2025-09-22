@@ -6,7 +6,11 @@ import { useThrottle } from '@/hooks/useThrottle'
 
 const StickyHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false)
-  const { isOpen: isMobileMenuOpen, toggle: toggleMobileMenu, close: closeMobileMenu } = useToggle()
+  const {
+    isOpen: isMobileMenuOpen,
+    toggle: toggleMobileMenu,
+    close: closeMobileMenu,
+  } = useToggle()
   const mobileMenuId = useId()
 
   const navigationItems = [
@@ -100,7 +104,11 @@ const StickyHeader = () => {
               onClick={toggleMobileMenu}
               aria-expanded={isMobileMenuOpen}
               aria-controls={mobileMenuId}
-              aria-label={isMobileMenuOpen ? 'Fermer le menu de navigation' : 'Ouvrir le menu de navigation'}
+              aria-label={
+                isMobileMenuOpen
+                  ? 'Fermer le menu de navigation'
+                  : 'Ouvrir le menu de navigation'
+              }
             >
               {isMobileMenuOpen ? (
                 <X className="w-5 h-5" />

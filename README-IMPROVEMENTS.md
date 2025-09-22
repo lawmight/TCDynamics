@@ -9,10 +9,12 @@ The TCDynamics codebase has been completely refactored to address security vulne
 ## 📋 Issues Addressed
 
 ### ✅ 1. API Client Architecture
+
 **Before:** Direct fetch calls, inconsistent error handling, no retry logic
 **After:** Centralized TypeScript API client with comprehensive error handling
 
 #### Key Improvements:
+
 - **Centralized API Client**: Single source of truth for all API calls
 - **Type Safety**: Full TypeScript support with Zod validation schemas
 - **Retry Logic**: Exponential backoff with configurable retry attempts
@@ -20,10 +22,12 @@ The TCDynamics codebase has been completely refactored to address security vulne
 - **Request/Response Metadata**: Performance tracking and debugging information
 
 ### ✅ 2. Security Hardening
+
 **Before:** No input validation, permissive CORS, missing sanitization
 **After:** Comprehensive security layer with validation and protection
 
 #### Key Improvements:
+
 - **Input Sanitization**: XSS prevention and data cleaning for all inputs
 - **Rate Limiting**: Per-endpoint rate limiting to prevent abuse
 - **Content Validation**: AI prompt and image data security validation
@@ -31,10 +35,12 @@ The TCDynamics codebase has been completely refactored to address security vulne
 - **Security Headers**: Comprehensive HTTP security headers
 
 ### ✅ 3. Configuration Management
+
 **Before:** Scattered environment variables, no validation
 **After:** Centralized configuration with validation and error handling
 
 #### Key Improvements:
+
 - **Environment Validation**: Zod schemas for all environment variables
 - **Centralized Config**: Single configuration manager
 - **Azure Key Vault Ready**: Prepared for secure secret management
@@ -42,10 +48,12 @@ The TCDynamics codebase has been completely refactored to address security vulne
 - **Configuration Documentation**: Comprehensive setup guide
 
 ### ✅ 4. Performance Optimization
+
 **Before:** No caching, basic error handling, synchronous operations
 **After:** Smart caching, performance monitoring, and optimization
 
 #### Key Improvements:
+
 - **Smart Caching**: TTL-based caching with performance tracking
 - **Performance Monitoring**: Real-time metrics and statistics
 - **Resource Pooling**: Connection and resource management
@@ -53,10 +61,12 @@ The TCDynamics codebase has been completely refactored to address security vulne
 - **Browser Performance API**: Core Web Vitals integration
 
 ### ✅ 5. Testing Infrastructure
+
 **Before:** Basic component tests, no API integration tests
 **After:** Comprehensive test suite with mocking and coverage
 
 #### Key Improvements:
+
 - **API Integration Tests**: Full coverage of all API endpoints
 - **Security Tests**: Validation of security utilities
 - **Configuration Tests**: Environment variable testing
@@ -64,10 +74,12 @@ The TCDynamics codebase has been completely refactored to address security vulne
 - **Test Utilities**: Reusable testing helpers and patterns
 
 ### ✅ 6. Documentation Generation
+
 **Before:** Basic inline comments, no API documentation
 **After:** Complete OpenAPI specification and comprehensive documentation
 
 #### Key Improvements:
+
 - **OpenAPI 3.0 Specification**: Complete API documentation
 - **Interactive Documentation**: Swagger UI ready
 - **Usage Examples**: Code samples for all endpoints
@@ -134,75 +146,75 @@ TCDynamics/                       # Azure Functions (backend)
 ### API Client (`src/api/azureServices.ts`)
 
 ```typescript
-import { contactAPI, chatAPI, visionAPI } from '@/api/azureServices';
+import { contactAPI, chatAPI, visionAPI } from '@/api/azureServices'
 
 // Contact form with validation and error handling
 const result = await contactAPI.submitContactForm({
   name: 'John Doe',
   email: 'john@example.com',
   message: 'Hello world!',
-});
+})
 
 // AI chat with security validation
 const chatResult = await chatAPI.sendSimpleMessage(
   'How can I automate my business?',
   'session-123'
-);
+)
 
 // Document processing with rate limiting
 const visionResult = await visionAPI.processDocument({
   imageData: 'data:image/jpeg;base64,...',
   analyzeText: true,
-});
+})
 ```
 
 ### Security Utilities (`src/utils/security.ts`)
 
 ```typescript
-import { sanitizeInput, rateLimiters, contentSecurity } from '@/utils/security';
+import { sanitizeInput, rateLimiters, contentSecurity } from '@/utils/security'
 
 // Input sanitization
-const cleanName = sanitizeInput.text('<script>alert("xss")</script>John');
+const cleanName = sanitizeInput.text('<script>alert("xss")</script>John')
 
 // Rate limiting check
 if (rateLimiters.contact.isRateLimited(userId)) {
-  return { success: false, message: 'Rate limit exceeded' };
+  return { success: false, message: 'Rate limit exceeded' }
 }
 
 // Content validation
-const isSafe = contentSecurity.validatePrompt(userPrompt);
+const isSafe = contentSecurity.validatePrompt(userPrompt)
 ```
 
 ### Performance Monitoring (`src/utils/performance.ts`)
 
 ```typescript
-import { performanceMonitor, smartCache } from '@/utils/performance';
+import { performanceMonitor, smartCache } from '@/utils/performance'
 
 // Measure function execution
 const result = await performanceMonitor.measureAsync(
   'api.call',
   () => apiCall(),
   { endpoint: '/contact' }
-);
+)
 
 // Cache management
-smartCache.set('user.data', userData, 300000); // 5 minutes TTL
-const cachedData = smartCache.get('user.data');
+smartCache.set('user.data', userData, 300000) // 5 minutes TTL
+const cachedData = smartCache.get('user.data')
 ```
 
 ### Configuration Management (`src/utils/config.ts`)
 
 ```typescript
-import { config } from '@/utils/config';
+import { config } from '@/utils/config'
 
 // Access validated configuration
-const apiUrl = config.functionsBaseUrl;
-const isDev = config.isDevelopment;
+const apiUrl = config.functionsBaseUrl
+const isDev = config.isDevelopment
 
 // Validate required configuration
-const { valid, missing } = config.validateRequiredConfigs();
+const { valid, missing } = config.validateRequiredConfigs()
 if (!valid) {
-  console.error('Missing configuration:', missing);
+  console.error('Missing configuration:', missing)
 }
 ```
 
@@ -252,13 +264,13 @@ src/
 
 ### Before vs After Comparison
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| API Response Time | Variable | < 30ms (cached) | 90% faster |
-| Error Rate | High | < 1% | 95% reduction |
-| Security Incidents | Potential | None | 100% prevention |
-| Code Coverage | ~30% | > 85% | 250% increase |
-| Type Safety | Partial | Complete | 100% coverage |
+| Metric             | Before    | After           | Improvement     |
+| ------------------ | --------- | --------------- | --------------- |
+| API Response Time  | Variable  | < 30ms (cached) | 90% faster      |
+| Error Rate         | High      | < 1%            | 95% reduction   |
+| Security Incidents | Potential | None            | 100% prevention |
+| Code Coverage      | ~30%      | > 85%           | 250% increase   |
+| Type Safety        | Partial   | Complete        | 100% coverage   |
 
 ### Performance Monitoring
 
@@ -272,16 +284,19 @@ The system now provides real-time performance metrics:
 ## 🔒 Security Enhancements
 
 ### Input Validation
+
 - **XSS Prevention**: HTML sanitization for all user inputs
 - **SQL Injection Prevention**: Parameterized queries (backend)
 - **Content Validation**: AI prompt and image security checks
 
 ### Rate Limiting
+
 - **Per-Endpoint Limits**: Different limits for different operations
 - **Sliding Window**: Time-based rate limiting
 - **Graceful Degradation**: Clear error messages for rate limits
 
 ### Authentication & Authorization
+
 - **CORS Security**: Strict origin validation
 - **Request Validation**: Comprehensive input validation
 - **Session Management**: Secure session ID validation
@@ -291,6 +306,7 @@ The system now provides real-time performance metrics:
 ### Environment Setup
 
 1. **Development**:
+
    ```bash
    cp .env.example .env
    # Edit .env with development values
@@ -335,7 +351,7 @@ performanceMonitor.recordMetric('api.response_time', 150, {
   endpoint: '/contact',
   method: 'POST',
   statusCode: 200,
-});
+})
 ```
 
 ### Error Tracking
@@ -347,17 +363,17 @@ console.error('API Error:', {
   error: error.message,
   timestamp: new Date().toISOString(),
   userAgent: navigator.userAgent,
-});
+})
 ```
 
 ### Health Checks
 
 ```typescript
 // API health monitoring
-const health = await healthAPI.checkHealth();
+const health = await healthAPI.checkHealth()
 if (!health.success) {
   // Alert system administrators
-  alertSystem.sendAlert('API Unhealthy', health.errors);
+  alertSystem.sendAlert('API Unhealthy', health.errors)
 }
 ```
 
@@ -366,18 +382,20 @@ if (!health.success) {
 ### For Existing Code
 
 1. **Update Imports**:
+
    ```typescript
    // Before
-   import { contactAPI } from '@/api/azureServices';
+   import { contactAPI } from '@/api/azureServices'
 
    // After (no changes needed - backward compatible)
-   import { contactAPI } from '@/api/azureServices';
+   import { contactAPI } from '@/api/azureServices'
    ```
 
 2. **Update Hooks**:
+
    ```typescript
    // Hooks automatically use new API client
-   const { submitForm, isSubmitting, response } = useContactForm();
+   const { submitForm, isSubmitting, response } = useContactForm()
    ```
 
 3. **Environment Variables**:
@@ -396,24 +414,28 @@ if (!health.success) {
 ## 🎯 Best Practices Implemented
 
 ### Code Quality
+
 - **TypeScript**: 100% type coverage
 - **ESLint**: Configured with React and TypeScript rules
 - **Prettier**: Consistent code formatting
 - **Husky**: Pre-commit hooks for quality checks
 
 ### Security
+
 - **Input Validation**: Zod schemas for all inputs
 - **XSS Prevention**: DOMPurify for HTML sanitization
 - **Rate Limiting**: Token bucket algorithm
 - **CORS**: Strict origin validation
 
 ### Performance
+
 - **Code Splitting**: Lazy loading for large modules
 - **Caching**: Smart caching with TTL
 - **Bundle Optimization**: Tree shaking and minification
 - **Performance Monitoring**: Real-time metrics
 
 ### Testing
+
 - **Unit Tests**: 100% coverage for utilities
 - **Integration Tests**: API endpoint testing
 - **E2E Tests**: User journey validation
@@ -422,12 +444,14 @@ if (!health.success) {
 ## 📚 Documentation
 
 ### API Documentation
+
 - **OpenAPI 3.0**: Complete API specification
 - **Swagger UI**: Interactive API documentation
 - **Code Examples**: Usage examples for all endpoints
 - **Error Codes**: Comprehensive error documentation
 
 ### Developer Documentation
+
 - **Setup Guide**: Environment configuration
 - **Migration Guide**: Upgrade instructions
 - **Best Practices**: Development guidelines
