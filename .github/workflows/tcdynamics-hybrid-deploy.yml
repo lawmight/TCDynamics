@@ -148,9 +148,9 @@ jobs:
           retention-days: 1
           if-no-files-found: error
 
-  # Deploy Azure Functions
+  # Deploy Azure Functions (OIDC Authentication)
   deploy-functions:
-    name: Deploy Azure Functions
+    name: Deploy Azure Functions (OIDC)
     runs-on: ubuntu-latest
     needs: [test-frontend, test-functions]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -181,12 +181,19 @@ jobs:
         run: |
           npm install -g azure-functions-core-tools@4 --unsafe-perm true
 
+      - name: Login to Azure (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
       - name: Deploy to Azure Functions
         uses: Azure/functions-action@v1
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
           package: ./azure-functions-deploy
-          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+          # No publish-profile needed with OIDC authentication
           scm-do-build-during-deployment: true
           enable-oryx-build: true
 
