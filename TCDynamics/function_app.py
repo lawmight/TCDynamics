@@ -28,8 +28,13 @@ except ImportError as e:
 try:
     import stripe
     stripe_available = True
-    # Configure Stripe if available
-    stripe.api_key = os.getenv('STRIPE_SECRET_KEY', 'sk_test_...')
+    # Configure Stripe if available - only set API key if environment variable exists
+    stripe_key = os.getenv('STRIPE_SECRET_KEY')
+    if stripe_key and stripe_key != 'sk_test_...':
+        stripe.api_key = stripe_key
+        logging.info("Stripe configured successfully")
+    else:
+        logging.warning("Stripe API key not configured - payment functions will not work")
 except ImportError:
     stripe_available = False
     logging.warning("Stripe not available - payment functions will not work")
@@ -43,6 +48,9 @@ logging.info("Initializing Azure Functions app...")
 try:
     func_app = func.FunctionApp()
     logging.info("Azure Functions app initialized successfully")
+
+    # Log function registration for debugging
+    logging.info("Registering functions...")
 
 except Exception as e:
     logging.error(f"Failed to initialize Azure Functions app: {str(e)}")
