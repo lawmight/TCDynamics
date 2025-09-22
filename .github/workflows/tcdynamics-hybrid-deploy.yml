@@ -322,9 +322,6 @@ jobs:
           echo "✅ Storage connection string is properly configured"
         fi
 
-        # Store the connection string for use in later steps
-        echo "STORAGE_CONNECTION_STRING=$STORAGE_CONNECTION_STRING" >> $GITHUB_ENV
-
     - name: Configure App Settings for ZIP Deployment
       run: |
         echo "⚙️ Configuring app settings for ZIP deployment..."
@@ -340,15 +337,16 @@ jobs:
           --query "[?name=='WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'].value | [0]" \
           --output tsv 2>/dev/null || echo "")
 
-        if [ "$CURRENT_SETTINGS" = "$STORAGE_CONNECTION_STRING" ]; then
+        # Check if settings are already correct by comparing with secret directly
+        if [ "$CURRENT_SETTINGS" = "${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" ]; then
           echo "✅ App settings already correctly configured"
           echo "   WEBSITE_CONTENTAZUREFILECONNECTIONSTRING is properly set"
         else
           echo "⚠️ App settings need to be updated"
           echo "   Current WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: $CURRENT_SETTINGS"
-          echo "   Expected: ${STORAGE_CONNECTION_STRING:0:50}..."
+          echo "   Expected: [storage connection string configured]"
 
-          # Update app settings directly using Azure CLI to avoid JSON file issues
+          # Update app settings directly using Azure CLI with secret reference
           echo "📝 Updating app settings..."
           az functionapp config appsettings set \
             --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
@@ -356,9 +354,9 @@ jobs:
             --settings \
               WEBSITE_RUN_FROM_PACKAGE=1 \
               FUNCTIONS_WORKER_RUNTIME=python \
-              AzureWebJobsStorage="$STORAGE_CONNECTION_STRING" \
-              WEBSITE_CONTENTAZUREFILECONNECTIONSTRING="$STORAGE_CONNECTION_STRING" \
-              WEBSITE_CONTENTSHARE="$AZURE_FUNCTIONAPP_NAME" \
+              AzureWebJobsStorage="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
+              WEBSITE_CONTENTAZUREFILECONNECTIONSTRING="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
+              WEBSITE_CONTENTSHARE="${{ env.AZURE_FUNCTIONAPP_NAME }}" \
               AzureWebJobsFeatureFlags=EnableWorkerIndexing \
             --output none
 
