@@ -348,25 +348,18 @@ jobs:
           echo "   Current WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: $CURRENT_SETTINGS"
           echo "   Expected: ${STORAGE_CONNECTION_STRING:0:50}..."
 
-          # Create a temporary settings file to avoid command line length issues
-          # Use the validated storage connection string from environment variable
-          cat > /tmp/appsettings.json << 'EOF'
-          {
-            "WEBSITE_RUN_FROM_PACKAGE": "1",
-            "FUNCTIONS_WORKER_RUNTIME": "python",
-            "AzureWebJobsStorage": "'${STORAGE_CONNECTION_STRING}'",
-            "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "'${STORAGE_CONNECTION_STRING}'",
-            "WEBSITE_CONTENTSHARE": "'${AZURE_FUNCTIONAPP_NAME}'",
-            "AzureWebJobsFeatureFlags": "EnableWorkerIndexing"
-          }
-          EOF
-
-          # Update app settings using JSON file
+          # Update app settings directly using Azure CLI to avoid JSON file issues
           echo "📝 Updating app settings..."
           az functionapp config appsettings set \
             --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
             --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-            --settings @/tmp/appsettings.json \
+            --settings \
+              WEBSITE_RUN_FROM_PACKAGE=1 \
+              FUNCTIONS_WORKER_RUNTIME=python \
+              AzureWebJobsStorage="$STORAGE_CONNECTION_STRING" \
+              WEBSITE_CONTENTAZUREFILECONNECTIONSTRING="$STORAGE_CONNECTION_STRING" \
+              WEBSITE_CONTENTSHARE="$AZURE_FUNCTIONAPP_NAME" \
+              AzureWebJobsFeatureFlags=EnableWorkerIndexing \
             --output none
 
           echo "✅ App settings configured for ZIP deployment and Python v2 model"
