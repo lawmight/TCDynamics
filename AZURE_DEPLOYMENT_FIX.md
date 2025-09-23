@@ -12,21 +12,37 @@ Error:     Failed to fetch Kudu App Settings.
 getaddrinfo ENOTFOUND func-tcdynamics-contact-bjgwe4aaaza9dpbk.scm.francecentral-01.azurewebsites.net
 ```
 
-## Root Cause
+## Root Cause Analysis
 
-DNS resolution failure for the Azure Functions SCM (Source Control Manager) endpoint. This is a common issue with Azure Functions deployments from GitHub Actions.
+The deployment failure is due to DNS resolution issues for the Azure Functions SCM endpoint. However, the improved diagnostics now reveal that the **function app itself may not exist** in Azure.
+
+### Possible Causes
+
+1. **Function App Deleted**: The Azure Function App was accidentally deleted
+2. **Wrong Function App Name**: Environment variable `AZURE_FUNCTIONAPP_NAME` points to non-existent app
+3. **Wrong Region/Subscription**: Function app exists but in different Azure region or subscription
+4. **DNS/Network Issues**: Temporary DNS resolution problems (less likely)
 
 ## Solutions Implemented
 
-### 1. DNS Resolution Diagnostics
+### 1. Function App Existence Check
 
-Added a diagnostic step that:
+Added comprehensive diagnostics that first verify if the Azure Function App exists:
 
-- Tests DNS resolution for the SCM endpoint
-- Falls back to Google DNS (8.8.8.8) if default DNS fails
-- Verifies SCM endpoint connectivity before deployment
+- **DNS Resolution Test**: Checks if the function app URL resolves
+- **Connectivity Test**: Verifies if the function app responds to requests
+- **Clear Error Messages**: Provides specific guidance when function app doesn't exist
+- **Creation Instructions**: Shows exact Azure CLI commands to recreate missing function apps
 
-### 2. Proxy Configuration Support
+### 3. SCM Endpoint Diagnostics
+
+Separate check for SCM endpoint accessibility:
+
+- Tests SCM DNS resolution
+- Verifies SCM connectivity (when authentication allows)
+- Continues deployment even if SCM check fails (as it's authentication-protected)
+
+### 4. Proxy Configuration Support
 
 Added environment variables for corporate networks:
 
@@ -56,17 +72,24 @@ If you want to enable the Azure CLI fallback, add these secrets:
 
 ## Troubleshooting Steps
 
-### Manual DNS Testing
+### Function App Existence Check
+
+The workflow now automatically checks if your function app exists. If it fails, you'll see detailed error messages with specific solutions.
+
+### Manual Verification
 
 ```bash
-# Test DNS resolution
-nslookup func-tcdynamics-contact-bjgwe4aaaza9dpbk.scm.francecentral-01.azurewebsites.net
+# 1. Check if function app URL resolves
+nslookup func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net 8.8.8.8
 
-# Test with specific DNS server
-nslookup func-tcdynamics-contact-bjgwe4aaaza9dpbk.scm.francecentral-01.azurewebsites.net 8.8.8.8
+# 2. Test function app connectivity
+curl -I https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net
 
-# Test connectivity
-curl -I https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.scm.francecentral-01.azurewebsites.net
+# 3. List your Azure function apps
+az functionapp list --query '[].{name:name, location:location, rg:resourceGroup}' -o table
+
+# 4. Check specific function app details
+az functionapp show --name func-tcdynamics-contact-bjgwe4aaaza9dpbk --resource-group YOUR_RESOURCE_GROUP
 ```
 
 ### Azure Portal Checks
