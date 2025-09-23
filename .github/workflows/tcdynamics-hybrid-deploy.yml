@@ -66,7 +66,7 @@ jobs:
       - name: Build frontend
         run: npm run build
         env:
-          VITE_AZURE_FUNCTIONS_URL: https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api
+          VITE_AZURE_FUNCTIONS_URL: ${{ env.AZURE_FUNCTIONAPP_BASE_URL }}/api
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -257,11 +257,15 @@ jobs:
 
       - name: Deploy to Azure Functions (Primary: Azure CLI)
         id: cli-deploy
+        env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         run: |
           echo "🚀 Deploying Azure Functions using Azure CLI..."
 
           # Check if Azure CLI credentials are available
-          if [ -z "${{ secrets.AZURE_CLIENT_ID }}" ] || [ -z "${{ secrets.AZURE_CLIENT_SECRET }}" ] || [ -z "${{ secrets.AZURE_TENANT_ID }}" ]; then
+          if [ -z "$AZURE_CLIENT_ID" ] || [ -z "$AZURE_CLIENT_SECRET" ] || [ -z "$AZURE_TENANT_ID" ]; then
             echo "❌ Azure CLI credentials not configured, cannot deploy"
             echo ""
             echo "🔧 To fix this, add these secrets to your GitHub repository:"
@@ -279,7 +283,7 @@ jobs:
 
           # Login to Azure
           echo "🔐 Logging in to Azure..."
-          az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+          az login --service-principal -u "$AZURE_CLIENT_ID" -p "$AZURE_CLIENT_SECRET" --tenant "$AZURE_TENANT_ID"
 
           # Set the subscription (if needed)
           # az account set --subscription YOUR_SUBSCRIPTION_ID
