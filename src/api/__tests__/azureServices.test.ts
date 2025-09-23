@@ -139,7 +139,7 @@ describe('Azure Services API Client', () => {
 
       expect(result.success).toBe(false)
       expect(result.errors).toBeDefined()
-      expect(result.errors!.length).toBeGreaterThan(0)
+      expect(result.errors?.length).toBeGreaterThan(0)
       expect(fetchMock).toHaveBeenCalled()
     })
 
@@ -177,7 +177,7 @@ describe('Azure Services API Client', () => {
       expect(result.success).toBe(false)
       expect(result.message).toBeDefined()
       expect(result.errors).toBeDefined()
-      expect(result.errors!.length).toBeGreaterThan(0)
+      expect(result.errors?.length).toBeGreaterThan(0)
     })
   })
 
@@ -265,7 +265,10 @@ describe('Azure Services API Client', () => {
     }
 
     it('should send chat message successfully', async () => {
-      const mockResponse: ApiResponse<{ message: string; usage: any }> = {
+      const mockResponse: ApiResponse<{
+        message: string
+        usage: { totalTokens: number }
+      }> = {
         success: true,
         data: {
           message: 'Hello! How can I help you?',
@@ -361,7 +364,7 @@ describe('Azure Services API Client', () => {
     }
 
     it('should process document successfully', async () => {
-      const mockResponse: ApiResponse<{ data: any }> = {
+      const mockResponse: ApiResponse<{ text: string }> = {
         success: true,
         data: { text: 'Extracted text from image' },
       }

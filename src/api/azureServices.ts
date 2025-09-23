@@ -24,7 +24,7 @@ const getFunctionsBaseUrl = (): string => {
 
 // ========== TYPE DEFINITIONS ==========
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean
   data?: T
   message?: string
@@ -81,7 +81,21 @@ export interface VisionRequest {
 }
 
 export interface VisionResponse {
-  data: any // Vision API response structure
+  data: {
+    description?: string
+    categories?: Array<{ name: string; score: number }>
+    color?: {
+      dominantColors?: string[]
+      accentColor?: string
+      isBlackAndWhite?: boolean
+    }
+    tags?: Array<{ name: string; confidence: number }>
+    metadata?: {
+      requestId?: string
+      modelVersion?: string
+      timestamp?: string
+    }
+  }
 }
 
 export interface PaymentIntentRequest {
@@ -188,7 +202,7 @@ const chatRequestSchema = z.object({
     .string()
     .min(1, "L'ID de session est requis")
     .refine(
-      contentSecurity.validateSessionId,
+      val => contentSecurity.validateSessionId(val),
       "Format d'ID de session invalide"
     ),
   temperature: z.number().min(0).max(2).optional(),

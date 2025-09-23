@@ -43,10 +43,36 @@ const PageLoader = () => (
 )
 
 // Error handler for the ErrorBoundary
-const handleAppError = (error: Error, errorInfo: any) => {
+const handleAppError = (
+  error: Error,
+  errorInfo: { componentStack: string }
+) => {
   // Report to monitoring service
-  if (typeof window !== 'undefined' && (window as any).performanceMonitor) {
-    ;(window as any).performanceMonitor.recordMetric('error.app', 1, {
+  if (
+    typeof window !== 'undefined' &&
+    (
+      window as Window & {
+        performanceMonitor?: {
+          recordMetric: (
+            name: string,
+            value: number,
+            data: Record<string, unknown>
+          ) => void
+        }
+      }
+    ).performanceMonitor
+  ) {
+    ;(
+      window as Window & {
+        performanceMonitor?: {
+          recordMetric: (
+            name: string,
+            value: number,
+            data: Record<string, unknown>
+          ) => void
+        }
+      }
+    ).performanceMonitor.recordMetric('error.app', 1, {
       error: error.message,
       componentStack: errorInfo.componentStack,
       severity: 'high',

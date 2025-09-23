@@ -25,7 +25,7 @@ on:
       - 'requirements.txt'
 
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '20'
   PYTHON_VERSION: '3.11'
   AZURE_FUNCTIONAPP_NAME: 'func-tcdynamics-contact'
   AZURE_FUNCTIONAPP_PACKAGE_PATH: './TCDynamics'
