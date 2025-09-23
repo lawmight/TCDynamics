@@ -86,7 +86,9 @@ except Exception as e:
     logging.error(f"Error type: {type(e).__name__}")
     import traceback
     logging.error(f"Traceback: {traceback.format_exc()}")
-    raise
+    # DON'T raise here - this prevents the entire module from loading
+    # Just log the error and continue with limited functionality
+    logging.warning("Azure Functions app initialization failed - some features may not work")
 
 # Test function to verify function discovery
 @func_app.route(route="test", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
