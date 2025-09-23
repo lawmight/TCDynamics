@@ -186,7 +186,40 @@ jobs:
         run: |
           npm install -g azure-functions-core-tools@4 --unsafe-perm true
 
+      - name: DNS Resolution Check
+        run: |
+          echo "🔍 Checking DNS resolution for SCM endpoint..."
+          echo "Testing: ${{ env.AZURE_FUNCTIONAPP_NAME }}.scm.francecentral-01.azurewebsites.net"
+
+          # Test DNS resolution
+          if nslookup ${{ env.AZURE_FUNCTIONAPP_NAME }}.scm.francecentral-01.azurewebsites.net; then
+            echo "✅ DNS resolution successful"
+          else
+            echo "❌ DNS resolution failed - trying alternative DNS"
+            # Try with Google's DNS
+            if nslookup ${{ env.AZURE_FUNCTIONAPP_NAME }}.scm.francecentral-01.azurewebsites.net 8.8.8.8; then
+              echo "✅ DNS resolution successful with Google DNS"
+              echo "nameserver 8.8.8.8" > /tmp/resolv.conf.backup
+              echo "nameserver 8.8.4.4" >> /tmp/resolv.conf.backup
+              sudo cp /etc/resolv.conf /etc/resolv.conf.backup
+              sudo cp /tmp/resolv.conf.backup /etc/resolv.conf
+              echo "🔄 Switched to Google DNS"
+            else
+              echo "❌ DNS resolution failed completely"
+              exit 1
+            fi
+          fi
+
+          # Test connectivity to SCM endpoint
+          echo "Testing SCM endpoint connectivity..."
+          if curl -I --max-time 30 --retry 3 https://${{ env.AZURE_FUNCTIONAPP_NAME }}.scm.francecentral-01.azurewebsites.net; then
+            echo "✅ SCM endpoint is accessible"
+          else
+            echo "⚠️ SCM endpoint not accessible, but continuing with deployment..."
+          fi
+
       - name: Deploy to Azure Functions
+        id: functions-action-deploy
         uses: Azure/functions-action@v1
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
@@ -194,6 +227,29 @@ jobs:
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
           scm-do-build-during-deployment: true
           enable-oryx-build: true
+        env:
+          # Set proxy if needed (uncomment if in corporate network)
+          # HTTPS_PROXY: ${{ secrets.HTTPS_PROXY }}
+          # HTTP_PROXY: ${{ secrets.HTTP_PROXY }}
+          # NO_PROXY: .azurewebsites.net,.azure.net,.windows.net,.microsoft.com
+
+      - name: Alternative Azure CLI Deployment (if functions-action fails)
+        if: failure() && steps.functions-action-deploy.outcome == 'failure'
+        run: |
+          echo "🔄 Functions action failed, trying Azure CLI deployment..."
+
+          # Login to Azure (using publish profile approach)
+          echo "Logging in to Azure..."
+          az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+
+          # Deploy using Azure CLI
+          echo "Deploying function app..."
+          az functionapp deployment source config-zip \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
+            --src ./azure-functions-deploy/azure-functions-package.zip
+
+          echo "✅ Alternative deployment completed"
 
       - name: Verify deployment
         run: |
