@@ -27,7 +27,7 @@ on:
 env:
   NODE_VERSION: '20'
   PYTHON_VERSION: '3.11'
-  AZURE_FUNCTIONAPP_NAME: 'func-tcdynamics-contact'
+  AZURE_FUNCTIONAPP_NAME: 'func-tcdynamics-contact-bjgwe4aaaza9dpbk'
   AZURE_FUNCTIONAPP_PACKAGE_PATH: './TCDynamics'
   FRONTEND_BUILD_PATH: './dist'
   AZURE_FUNCTIONAPP_BASE_URL: 'https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net'
@@ -186,36 +186,73 @@ jobs:
         run: |
           npm install -g azure-functions-core-tools@4 --unsafe-perm true
 
-      - name: DNS Resolution Check
+      - name: Function App Existence Check
         run: |
-          echo "🔍 Checking DNS resolution for SCM endpoint..."
-          echo "Testing: ${{ env.AZURE_FUNCTIONAPP_NAME }}.scm.francecentral-01.azurewebsites.net"
+          echo "🔍 Checking if Azure Function App exists..."
+          echo "Function App Name: ${{ env.AZURE_FUNCTIONAPP_NAME }}"
+          echo "Expected URL: https://${{ env.AZURE_FUNCTIONAPP_NAME }}.francecentral-01.azurewebsites.net"
 
-          # Test DNS resolution
-          if nslookup ${{ env.AZURE_FUNCTIONAPP_NAME }}.scm.francecentral-01.azurewebsites.net; then
-            echo "✅ DNS resolution successful"
-          else
-            echo "❌ DNS resolution failed - trying alternative DNS"
-            # Try with Google's DNS
-            if nslookup ${{ env.AZURE_FUNCTIONAPP_NAME }}.scm.francecentral-01.azurewebsites.net 8.8.8.8; then
-              echo "✅ DNS resolution successful with Google DNS"
-              echo "nameserver 8.8.8.8" > /tmp/resolv.conf.backup
-              echo "nameserver 8.8.4.4" >> /tmp/resolv.conf.backup
-              sudo cp /etc/resolv.conf /etc/resolv.conf.backup
-              sudo cp /tmp/resolv.conf.backup /etc/resolv.conf
-              echo "🔄 Switched to Google DNS"
+          # Test if the function app URL resolves
+          if nslookup ${{ env.AZURE_FUNCTIONAPP_NAME }}.francecentral-01.azurewebsites.net 8.8.8.8; then
+            echo "✅ Function app URL resolves - app likely exists"
+
+            # Test basic connectivity
+            if curl -I --max-time 10 --connect-timeout 5 https://${{ env.AZURE_FUNCTIONAPP_NAME }}.francecentral-01.azurewebsites.net; then
+              echo "✅ Function app is responding"
             else
-              echo "❌ DNS resolution failed completely"
-              exit 1
+              echo "⚠️ Function app URL resolves but app is not responding"
+              echo "This might be normal for cold-started functions"
             fi
+          else
+            echo "❌ CRITICAL: Function app URL does not resolve"
+            echo ""
+            echo "🚨 POSSIBLE CAUSES:"
+            echo "1. Function app was deleted or never created"
+            echo "2. Function app is in a different region"
+            echo "3. Function app name changed"
+            echo "4. Azure subscription or resource group changed"
+            echo ""
+            echo "🔧 SOLUTIONS:"
+            echo "1. Check Azure Portal for existing function apps"
+            echo "2. Verify the correct function app name and region"
+            echo "3. Update AZURE_FUNCTIONAPP_NAME in workflow if needed"
+            echo "4. Recreate function app if it was deleted"
+            echo ""
+            echo "📋 To check existing function apps:"
+            echo "az functionapp list --query '[].{name:name, location:location, rg:resourceGroup}' -o table"
+            echo ""
+            echo "🔨 To create the function app if it doesn't exist:"
+            echo "az functionapp create \\"
+            echo "  --resource-group YOUR_RESOURCE_GROUP \\"
+            echo "  --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \\"
+            echo "  --storage-account YOUR_STORAGE_ACCOUNT \\"
+            echo "  --consumption-plan-location francecentral \\"
+            echo "  --runtime python \\"
+            echo "  --runtime-version 3.11 \\"
+            echo "  --functions-version 4"
+            echo ""
+            exit 1
           fi
 
-          # Test connectivity to SCM endpoint
-          echo "Testing SCM endpoint connectivity..."
-          if curl -I --max-time 30 --retry 3 https://${{ env.AZURE_FUNCTIONAPP_NAME }}.scm.francecentral-01.azurewebsites.net; then
-            echo "✅ SCM endpoint is accessible"
+      - name: SCM Endpoint Check
+        run: |
+          echo "🔍 Checking SCM endpoint accessibility..."
+          echo "SCM URL: https://${{ env.AZURE_FUNCTIONAPP_NAME }}.scm.francecentral-01.azurewebsites.net"
+
+          # Test SCM endpoint DNS resolution
+          if nslookup ${{ env.AZURE_FUNCTIONAPP_NAME }}.scm.francecentral-01.azurewebsites.net 8.8.8.8; then
+            echo "✅ SCM endpoint DNS resolves"
+
+            # Test SCM connectivity (this might require authentication)
+            if curl -I --max-time 10 --connect-timeout 5 https://${{ env.AZURE_FUNCTIONAPP_NAME }}.scm.francecentral-01.azurewebsites.net; then
+              echo "✅ SCM endpoint is accessible"
+            else
+              echo "⚠️ SCM endpoint resolves but is not accessible"
+              echo "This is normal if authentication is required"
+            fi
           else
-            echo "⚠️ SCM endpoint not accessible, but continuing with deployment..."
+            echo "❌ SCM endpoint DNS resolution failed"
+            echo "This might be expected - continuing with deployment anyway"
           fi
 
       - name: Deploy to Azure Functions
