@@ -1,4 +1,4 @@
-name: TCDynamics Hybrid Deployment (Publish Profile)
+name: "TCDynamics Hybrid Deployment (Publish Profile)"
 
 permissions:
   contents: read
@@ -155,7 +155,7 @@ jobs:
 
   # Deploy Azure Functions (Publish Profile Authentication)
   deploy-functions:
-    name: Deploy Azure Functions (Publish Profile)
+    name: "Deploy Azure Functions (Publish Profile)"
     runs-on: ubuntu-latest
     needs: [test-frontend, test-functions]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -255,7 +255,7 @@ jobs:
             echo "This might be expected - continuing with deployment anyway"
           fi
 
-      - name: Deploy to Azure Functions (Primary: Azure CLI)
+      - name: "Deploy to Azure Functions (Primary: Azure CLI)"
         id: cli-deploy
         run: |
           echo "🚀 Deploying Azure Functions using Azure CLI..."
@@ -293,7 +293,7 @@ jobs:
 
           echo "✅ Azure Functions deployed successfully using Azure CLI!"
 
-      - name: Fallback: Azure Functions Action (if CLI fails)
+      - name: "Fallback: Azure Functions Action (if CLI fails)"
         id: functions-action-deploy
         if: failure() && steps.cli-deploy.outcome == 'failure'
         uses: Azure/functions-action@v1
