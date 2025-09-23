@@ -255,8 +255,47 @@ jobs:
             echo "This might be expected - continuing with deployment anyway"
           fi
 
-      - name: Deploy to Azure Functions
+      - name: Deploy to Azure Functions (Primary: Azure CLI)
+        id: cli-deploy
+        run: |
+          echo "🚀 Deploying Azure Functions using Azure CLI..."
+
+          # Check if Azure CLI credentials are available
+          if [ -z "${{ secrets.AZURE_CLIENT_ID }}" ] || [ -z "${{ secrets.AZURE_CLIENT_SECRET }}" ] || [ -z "${{ secrets.AZURE_TENANT_ID }}" ]; then
+            echo "❌ Azure CLI credentials not configured, cannot deploy"
+            echo ""
+            echo "🔧 To fix this, add these secrets to your GitHub repository:"
+            echo "  - AZURE_CLIENT_ID: Service principal client ID"
+            echo "  - AZURE_CLIENT_SECRET: Service principal secret"
+            echo "  - AZURE_TENANT_ID: Azure tenant ID"
+            echo "  - AZURE_RESOURCE_GROUP: rg-TCDynamics"
+            echo ""
+            echo "📋 How to create a service principal:"
+            echo "1. az ad sp create-for-rbac --name 'GitHub-Actions-Deploy' --role contributor --scopes /subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/rg-TCDynamics"
+            echo "2. Copy the appId, password, and tenant from the output"
+            echo "3. Add them as GitHub secrets"
+            exit 1
+          fi
+
+          # Login to Azure
+          echo "🔐 Logging in to Azure..."
+          az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+
+          # Set the subscription (if needed)
+          # az account set --subscription YOUR_SUBSCRIPTION_ID
+
+          # Deploy the function app
+          echo "📦 Deploying function app package..."
+          az functionapp deployment source config-zip \
+            --resource-group rg-TCDynamics \
+            --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
+            --src ./azure-functions-deploy/azure-functions-package.zip
+
+          echo "✅ Azure Functions deployed successfully using Azure CLI!"
+
+      - name: Fallback: Azure Functions Action (if CLI fails)
         id: functions-action-deploy
+        if: failure() && steps.cli-deploy.outcome == 'failure'
         uses: Azure/functions-action@v1
         with:
           app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
@@ -264,24 +303,11 @@ jobs:
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
           scm-do-build-during-deployment: true
           enable-oryx-build: true
-
-      - name: Alternative Azure CLI Deployment (if functions-action fails)
-        if: failure() && steps.functions-action-deploy.outcome == 'failure'
-        run: |
-          echo "🔄 Functions action failed, trying Azure CLI deployment..."
-
-          # Login to Azure (using publish profile approach)
-          echo "Logging in to Azure..."
-          az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
-
-          # Deploy using Azure CLI
-          echo "Deploying function app..."
-          az functionapp deployment source config-zip \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
-            --src ./azure-functions-deploy/azure-functions-package.zip
-
-          echo "✅ Alternative deployment completed"
+        env:
+          # Set proxy if needed (uncomment if in corporate network)
+          # HTTPS_PROXY: ${{ secrets.HTTPS_PROXY }}
+          # HTTP_PROXY: ${{ secrets.HTTP_PROXY }}
+          # NO_PROXY: .azurewebsites.net,.azure.net,.windows.net,.microsoft.com
 
       - name: Verify deployment
         run: |
@@ -401,7 +427,8 @@ jobs:
           echo "📊 Deployment Status:"
           echo "  • Frontend Tests: ${{ needs.deploy-frontend.result }}"
           echo "  • Functions Tests: ${{ needs.deploy-functions.result }}"
-          echo "  • Functions Deploy: ${{ needs.deploy-functions.result }}"
+          echo "  • Functions CLI Deploy: ${{ steps.cli-deploy.outcome }}"
+          echo "  • Functions Action Deploy: ${{ steps.functions-action-deploy.outcome }}"
           echo "  • Frontend Deploy: ${{ needs.deploy-frontend.result }}"
 
       - name: Notify on Failure
