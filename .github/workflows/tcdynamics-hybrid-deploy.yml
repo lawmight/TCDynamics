@@ -306,8 +306,8 @@ jobs:
           PUBLISH_URL="func-tcdynamics-contact.scm.azurewebsites.net"
 
           # Extract credentials (simplified - in production use proper XML parsing)
-          USERNAME="$func-tcdynamics-contact"
-          PASSWORD="$PUBLISH_PROFILE"  # This is not correct - needs proper parsing
+          USERNAME="func-tcdynamics-contact"
+          PASSWORD="extracted_from_publish_profile"  # This needs proper XML parsing
 
           echo "🔗 Deploying to: https://$PUBLISH_URL/api/zipdeploy"
 
