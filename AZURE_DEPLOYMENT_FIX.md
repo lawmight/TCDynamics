@@ -9,19 +9,19 @@ Error: ENOTFOUND
 Error: Execution Exception (state: ValidateAzureResource) (step: Invocation)
 Error:   When request Azure resource at ValidateAzureResource, Get Function App Settings : Failed to acquire app settings from https://<scmsite>/api/settings with publish-profile
 Error:     Failed to fetch Kudu App Settings.
-getaddrinfo ENOTFOUND func-tcdynamics-contact-bjgwe4aaaza9dpbk.scm.francecentral-01.azurewebsites.net
+getaddrinfo ENOTFOUND func-tcdynamics-contact.scm.azurewebsites.net
 ```
 
 ## Root Cause Analysis
 
-The deployment failure is due to DNS resolution issues for the Azure Functions SCM endpoint. However, the improved diagnostics now reveal that the **function app itself may not exist** in Azure.
+The deployment failure was due to **incorrect function app configuration**. The workflow was configured to deploy to `func-tcdynamics-contact-bjgwe4aaaza9dpbk` but the actual function app name was `func-tcdynamics-contact`.
 
-### Possible Causes
+### Root Cause Details
 
-1. **Function App Deleted**: The Azure Function App was accidentally deleted
-2. **Wrong Function App Name**: Environment variable `AZURE_FUNCTIONAPP_NAME` points to non-existent app
-3. **Wrong Region/Subscription**: Function app exists but in different Azure region or subscription
-4. **DNS/Network Issues**: Temporary DNS resolution problems (less likely)
+- **Expected Name**: `func-tcdynamics-contact-bjgwe4aaaza9dpbk`
+- **Actual Name**: `func-tcdynamics-contact`
+- **URL Format**: Should be `func-tcdynamics-contact.azurewebsites.net` (not with region suffix)
+- **Status**: Function app exists and is running in France Central region
 
 ## Solutions Implemented
 
@@ -80,16 +80,16 @@ The workflow now automatically checks if your function app exists. If it fails, 
 
 ```bash
 # 1. Check if function app URL resolves
-nslookup func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net 8.8.8.8
+nslookup func-tcdynamics-contact.azurewebsites.net 8.8.8.8
 
 # 2. Test function app connectivity
-curl -I https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net
+curl -I https://func-tcdynamics-contact.azurewebsites.net
 
 # 3. List your Azure function apps
 az functionapp list --query '[].{name:name, location:location, rg:resourceGroup}' -o table
 
 # 4. Check specific function app details
-az functionapp show --name func-tcdynamics-contact-bjgwe4aaaza9dpbk --resource-group YOUR_RESOURCE_GROUP
+az functionapp show --name func-tcdynamics-contact --resource-group rg-TCDynamics
 ```
 
 ### Azure Portal Checks
