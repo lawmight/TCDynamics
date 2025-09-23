@@ -227,11 +227,6 @@ jobs:
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
           scm-do-build-during-deployment: true
           enable-oryx-build: true
-        env:
-          # Set proxy if needed (uncomment if in corporate network)
-          # HTTPS_PROXY: ${{ secrets.HTTPS_PROXY }}
-          # HTTP_PROXY: ${{ secrets.HTTP_PROXY }}
-          # NO_PROXY: .azurewebsites.net,.azure.net,.windows.net,.microsoft.com
 
       - name: Alternative Azure CLI Deployment (if functions-action fails)
         if: failure() && steps.functions-action-deploy.outcome == 'failure'
