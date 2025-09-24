@@ -18,13 +18,6 @@
     }
   },
   "functionTimeout": "00:10:00",
-  "customHandler": {
-    "description": {
-      "defaultExecutablePath": "python3",
-      "workingDirectory": "",
-      "arguments": []
-    }
-  },
   "python": {
     "enableWorkerIndexing": true
   }
