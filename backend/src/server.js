@@ -31,8 +31,10 @@ const {
 const {
   errorHandler,
   notFoundHandler,
-  collectMetrics,
 } = require('./middleware/errorHandler')
+
+// Import des middlewares de monitoring
+const { collectMetrics } = require('./routes/monitoring')
 
 // Import du middleware CSRF
 const { csrfToken, csrfProtection } = require('./middleware/csrf')
