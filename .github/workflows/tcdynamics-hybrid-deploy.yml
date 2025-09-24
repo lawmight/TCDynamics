@@ -2,6 +2,7 @@ name: "TCDynamics Hybrid Deployment (Publish Profile)"
 
 permissions:
   contents: read
+  id-token: write
 
 on:
   push:
@@ -261,34 +262,24 @@ jobs:
             echo "This might be expected - continuing with deployment anyway"
           fi
 
+      - name: "Login to Azure using OIDC"
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
       - name: "Deploy to Azure Functions (Primary: Azure CLI)"
         id: cli-deploy
         run: |
           echo "🚀 Deploying Azure Functions using Azure CLI..."
 
-          # Check if Azure CLI credentials are available
-          if [ -z "${{ secrets.AZURE_CLIENT_ID }}" ] || [ -z "${{ secrets.AZURE_CLIENT_SECRET }}" ] || [ -z "${{ secrets.AZURE_TENANT_ID }}" ]; then
-            echo "❌ Azure CLI credentials not configured, cannot deploy"
-            echo ""
-            echo "🔧 To fix this, add these secrets to your GitHub repository:"
-            echo "  - AZURE_CLIENT_ID: Service principal client ID"
-            echo "  - AZURE_CLIENT_SECRET: Service principal secret"
-            echo "  - AZURE_TENANT_ID: Azure tenant ID"
-            echo "  - AZURE_RESOURCE_GROUP: rg-TCDynamics"
-            echo ""
-            echo "📋 How to create a service principal:"
-            echo "1. az ad sp create-for-rbac --name 'GitHub-Actions-Deploy' --role contributor --scopes /subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/rg-TCDynamics"
-            echo "2. Copy the appId, password, and tenant from the output"
-            echo "3. Add them as GitHub secrets"
+          # Check if we're logged in to Azure
+          if ! az account show > /dev/null 2>&1; then
+            echo "❌ Not logged in to Azure, cannot deploy"
+            echo "Check that Azure OIDC login worked properly"
             exit 1
           fi
-
-          # Login to Azure
-          echo "🔐 Logging in to Azure..."
-          az login --service-principal -u "${{ secrets.AZURE_CLIENT_ID }}" -p "${{ secrets.AZURE_CLIENT_SECRET }}" --tenant "${{ secrets.AZURE_TENANT_ID }}"
-
-          # Set the subscription (if needed)
-          # az account set --subscription YOUR_SUBSCRIPTION_ID
 
           # Deploy the function app
           echo "📦 Deploying function app package..."
