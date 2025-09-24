@@ -2,6 +2,7 @@ const express = require('express')
 const { createTransporter, emailTemplates } = require('../config/email')
 const { validateData, demoSchema } = require('../utils/validation')
 const { formRateLimit } = require('../middleware/security')
+const { asyncHandler } = require('../middleware/errorHandler')
 
 const router = express.Router()
 
@@ -72,7 +73,7 @@ router.post(
   '/demo',
   formRateLimit,
   validateData(demoSchema),
-  async (req, res) => {
+  asyncHandler(async (req, res) => {
     try {
       const { firstName, lastName, email, phone, company, employees, needs } =
         req.body
@@ -121,7 +122,7 @@ router.post(
           "Une erreur est survenue lors de l'enregistrement de votre demande. Veuillez réessayer plus tard.",
       })
     }
-  }
+  })
 )
 
 module.exports = router
