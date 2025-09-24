@@ -22,7 +22,7 @@ info:
     url: https://tcdynamics.fr
 
 servers:
-  - url: https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api
+  - url: https://func-tcdynamics-contact.azurewebsites.net/api
     description: Production server
   - url: http://localhost:7071/api
     description: Local development server

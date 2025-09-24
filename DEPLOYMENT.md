@@ -16,7 +16,7 @@ Create a `.env` file in the root directory:
 
 ```bash
 # Azure Functions Configuration
-VITE_AZURE_FUNCTIONS_URL=https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api
+VITE_AZURE_FUNCTIONS_URL=https://func-tcdynamics-contact.azurewebsites.net/api
 
 # Azure OpenAI Configuration (for AI features)
 VITE_AZURE_OPENAI_ENDPOINT=your-azure-openai-endpoint
@@ -156,9 +156,9 @@ This workflow handles:
 ### Health Checks
 
 - **Frontend**: https://tcdynamics.fr
-- **Azure Functions**: https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api/health
-- **Contact Form**: https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api/ContactForm
-- **Demo Form**: https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api/DemoForm
+- **Azure Functions**: https://func-tcdynamics-contact.azurewebsites.net/api/health
+- **Contact Form**: https://func-tcdynamics-contact.azurewebsites.net/api/ContactForm
+- **Demo Form**: https://func-tcdynamics-contact.azurewebsites.net/api/DemoForm
 
 ## Security Notes
 

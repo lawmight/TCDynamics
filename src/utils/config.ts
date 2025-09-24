@@ -3,6 +3,9 @@
 
 import { z } from 'zod'
 
+const DEFAULT_FUNCTIONS_BASE_URL =
+  'https://func-tcdynamics-contact.azurewebsites.net/api'
+
 // ========== ENVIRONMENT VARIABLE SCHEMAS ==========
 
 const clientConfigSchema = z.object({
@@ -91,8 +94,7 @@ class ConfigManager {
     // Apply safe defaults for missing or invalid values
     return {
       VITE_AZURE_FUNCTIONS_URL:
-        env.VITE_AZURE_FUNCTIONS_URL ||
-        'https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api',
+        env.VITE_AZURE_FUNCTIONS_URL || DEFAULT_FUNCTIONS_BASE_URL,
       VITE_NODE_ENV:
         (env.VITE_NODE_ENV as 'development' | 'production' | 'test') ||
         'development',
@@ -347,10 +349,7 @@ class ConfigManager {
   }
 
   get functionsBaseUrl(): string {
-    return (
-      this.client.VITE_AZURE_FUNCTIONS_URL ||
-      'https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api'
-    )
+    return this.client.VITE_AZURE_FUNCTIONS_URL || DEFAULT_FUNCTIONS_BASE_URL
   }
 
   // ========== UTILITY METHODS ==========

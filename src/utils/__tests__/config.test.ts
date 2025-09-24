@@ -315,13 +315,13 @@ describe('Configuration Management', () => {
       vi.doMock('../config', () => ({
         config: {
           functionsBaseUrl:
-            'https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api',
+            'https://func-tcdynamics-contact.azurewebsites.net/api',
         },
       }))
 
       const { config: mockConfig } = await import('../config')
       expect(mockConfig.functionsBaseUrl).toBe(
-        'https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api'
+        'https://func-tcdynamics-contact.azurewebsites.net/api'
       )
     })
   })
