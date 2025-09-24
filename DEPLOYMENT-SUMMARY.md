@@ -108,7 +108,7 @@ FRONTEND_URL=https://tcdynamics.fr
 Create `.env.production`:
 
 ```bash
-VITE_AZURE_FUNCTIONS_URL=https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api
+VITE_AZURE_FUNCTIONS_URL=https://func-tcdynamics-contact.azurewebsites.net/api
 VITE_NODE_ENV=production
 VITE_APP_VERSION=2.0.0
 VITE_ENABLE_ANALYTICS=true
@@ -126,7 +126,7 @@ After deployment, verify these endpoints:
 
 ### API Health Checks
 
-- **Base URL:** https://func-tcdynamics-contact-bjgwe4aaaza9dpbk.francecentral-01.azurewebsites.net/api
+- **Base URL:** https://func-tcdynamics-contact.azurewebsites.net/api
 - **Health:** `/health` - Should return `{"status": "healthy"}`
 - **Contact:** `/ContactForm` - Should accept POST requests
 - **Demo:** `/DemoForm` - Should accept POST requests

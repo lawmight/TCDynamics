@@ -18,9 +18,7 @@ const API_CONFIG = {
 } as const
 
 // Get functions base URL from config
-const getFunctionsBaseUrl = (): string => {
-  return config.functionsBaseUrl
-}
+const getFunctionsBaseUrl = (): string => config.functionsBaseUrl
 
 // ========== TYPE DEFINITIONS ==========
 

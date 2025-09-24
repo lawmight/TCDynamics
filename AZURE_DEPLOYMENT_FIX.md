@@ -14,11 +14,11 @@ getaddrinfo ENOTFOUND func-tcdynamics-contact.scm.azurewebsites.net
 
 ## Root Cause Analysis
 
-The deployment failure was due to **incorrect function app configuration**. The workflow was configured to deploy to `func-tcdynamics-contact-bjgwe4aaaza9dpbk` but the actual function app name was `func-tcdynamics-contact`.
+The deployment failure was due to **incorrect function app configuration**. The workflow was configured to deploy to `func-tcdynamics-contact-bjgwe4aaaza9dpbk` while the actual function app name was `func-tcdynamics-contact`.
 
 ### Root Cause Details
 
-- **Expected Name**: `func-tcdynamics-contact-bjgwe4aaaza9dpbk`
+- **Misconfigured Name**: `func-tcdynamics-contact-bjgwe4aaaza9dpbk` (legacy DNS alias that no longer resolves)
 - **Actual Name**: `func-tcdynamics-contact`
 - **URL Format**: Should be `func-tcdynamics-contact.azurewebsites.net` (not with region suffix)
 - **Status**: Function app exists and is running in France Central region
