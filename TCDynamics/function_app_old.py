@@ -1,5 +1,43 @@
 import azure.functions as func
 import logging
+import json
+import os
+import time
+import datetime
+import requests
+import stripe
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from azure.cosmos import CosmosClient, exceptions
+
+# Handle optional imports with availability flags
+try:
+    import requests
+    requests_available = True
+except ImportError:
+    requests_available = False
+
+try:
+    import stripe
+    stripe_available = True
+except ImportError:
+    stripe_available = False
+
+try:
+    from azure.cosmos import CosmosClient, exceptions
+    cosmos_available = True
+except ImportError:
+    cosmos_available = False
+
+try:
+    import datetime
+    datetime_available = True
+except ImportError:
+    datetime_available = False
+
+# Track application start time for uptime calculation
+app_start_time = time.time()
 
 # Initialize Azure Functions app
 # Individual functions are now in separate directories (v2 model)
