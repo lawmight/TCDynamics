@@ -18,6 +18,18 @@ interface State {
   resetCount: number
 }
 
+interface PerformanceMonitor {
+  recordMetric: (
+    name: string,
+    value: number,
+    metadata?: Record<string, unknown>
+  ) => void
+}
+
+interface WindowWithPerformanceMonitor extends Window {
+  performanceMonitor?: PerformanceMonitor
+}
+
 class ErrorBoundary extends Component<Props, State> {
   private resetTimeoutId: NodeJS.Timeout | null = null
 
@@ -54,9 +66,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Log the error to monitoring system
-    console.error('ErrorBoundary caught an error:', error, errorInfo)
-
+    // Handle error without console logging for production
     this.setState({
       error,
       errorInfo,
@@ -68,11 +78,18 @@ class ErrorBoundary extends Component<Props, State> {
     }
 
     // Report to monitoring service
-    if (typeof window !== 'undefined' && (window as any).performanceMonitor) {
-      ;(window as any).performanceMonitor.recordMetric('error.boundary', 1, {
-        error: error.message,
-        componentStack: errorInfo.componentStack,
-      })
+    if (
+      typeof window !== 'undefined' &&
+      (window as WindowWithPerformanceMonitor).performanceMonitor
+    ) {
+      ;(window as WindowWithPerformanceMonitor).performanceMonitor.recordMetric(
+        'error.boundary',
+        1,
+        {
+          error: error.message,
+          componentStack: errorInfo.componentStack,
+        }
+      )
     }
   }
 

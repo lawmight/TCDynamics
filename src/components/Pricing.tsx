@@ -90,17 +90,17 @@ const Pricing = () => {
   }
 
   const handlePaymentSuccess = (subscriptionId: string) => {
-    console.log('Payment successful:', subscriptionId)
+    // Log successful payment (removed console.log for production)
     // Ici vous pouvez rediriger vers une page de succès ou mettre à jour l'UI
     alert(
-      'Abonnement créé avec succès ! Vous recevrez un email de confirmation.'
+      `Abonnement créé avec succès ! ID: ${subscriptionId}. Vous recevrez un email de confirmation.`
     )
     setShowCheckout(false)
     setSelectedPlan(null)
   }
 
   const handlePaymentError = (error: string) => {
-    console.error('Payment error:', error)
+    // Handle payment error (removed console.error for production)
     alert(`Erreur lors du paiement: ${error}`)
   }
 

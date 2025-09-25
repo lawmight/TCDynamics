@@ -32,7 +32,9 @@ const PerformanceMonitor = () => {
           ?.startTime || 0
 
       // Get memory usage if available (Chrome only)
-      const memoryInfo = (performance as any).memory
+      const memoryInfo = (
+        performance as { memory?: { usedJSHeapSize: number } }
+      ).memory
       const memoryUsage = memoryInfo
         ? Math.round(memoryInfo.usedJSHeapSize / 1024 / 1024)
         : undefined
