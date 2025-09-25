@@ -576,7 +576,7 @@ class SmartCache {
 
 // ========== RESOURCE POOLING ==========
 
-// TODO: ResourcePool class - currently unused but may be needed for future resource management
+// ResourcePool class - Reserved for future resource management implementation if needed
 /*
 class ResourcePool<T> {
   private available: T[] = []
