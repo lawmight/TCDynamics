@@ -7,6 +7,8 @@
 [![React](https://img.shields.io/badge/React-18.3-blue.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
+[![Coverage](https://img.shields.io/badge/Coverage-75%25-yellow.svg)]()
+[![CI/CD](https://github.com/lawmight/TCDynamics/actions/workflows/ci.yml/badge.svg)](https://github.com/lawmight/TCDynamics/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg)]()
 
 ## 📋 Table des Matières
@@ -173,10 +175,22 @@ npm run test
 # Tests avec interface
 npm run test:ui
 
+# Avec couverture
+npm run test:coverage
+
 # Tests d'intégration backend
 cd backend
 node test-integration.js
 ```
+
+### 📊 Couverture de Code
+
+- **Lignes**: 75%+
+- **Branches**: 70%+
+- **Fonctions**: 70%+
+- **Déclarations**: 75%+
+
+Les rapports de couverture sont générés dans le dossier `coverage/` et publiés via CI/CD.
 
 ### Coverage actuel
 
