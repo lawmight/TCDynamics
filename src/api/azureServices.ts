@@ -213,7 +213,7 @@ class ApiError extends Error {
   constructor(
     message: string,
     public statusCode: number,
-    public response?: any
+    public response?: unknown
   ) {
     super(message)
     this.name = 'ApiError'
@@ -222,11 +222,15 @@ class ApiError extends Error {
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-const isNetworkError = (error: any): boolean => {
-  return error.name === 'TypeError' && error.message.includes('fetch')
+const isNetworkError = (error: unknown): boolean => {
+  return (
+    error instanceof Error &&
+    error.name === 'TypeError' &&
+    error.message.includes('fetch')
+  )
 }
 
-const isRetryableError = (error: any): boolean => {
+const isRetryableError = (error: unknown): boolean => {
   if (isNetworkError(error)) return true
   if (error instanceof ApiError) {
     return [408, 429, 500, 502, 503, 504].includes(error.statusCode)
@@ -239,7 +243,7 @@ const isRetryableError = (error: any): boolean => {
 // Use the smart cache from performance utils
 const apiCache = {
   get: (key: string) => smartCache.get(key),
-  set: (key: string, data: any) =>
+  set: (key: string, data: unknown) =>
     smartCache.set(key, data, API_CONFIG.cacheTTL),
   clear: () => smartCache.clear(),
 }
@@ -686,7 +690,7 @@ export const healthAPI = {
 export const apiUtils = {
   clearCache: () => apiCache.clear(),
   setCacheEnabled: (enabled: boolean) => {
-    ;(API_CONFIG as any).cacheEnabled = enabled
+    API_CONFIG.cacheEnabled = enabled
     if (!enabled) apiCache.clear()
   },
   getCacheStats: () => ({
