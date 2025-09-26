@@ -1,4 +1,4 @@
-// Deployment fix: Triggering rebuild to fix production assets
+// FIXED: Using simple navigation to prevent black page
 import { lazy, Suspense } from 'react'
 import { Toaster } from '@/components/ui/toaster'
 import { Toaster as Sonner } from '@/components/ui/sonner'
@@ -6,8 +6,9 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import ErrorBoundary from './components/ErrorBoundary'
-import MobileNavigation from './components/MobileNavigation'
-import StickyHeader from './components/StickyHeader'
+import SimpleNavigation from './components/SimpleNavigation'
+// import MobileNavigation from './components/MobileNavigation' // DISABLED: Causes black page
+// import StickyHeader from './components/StickyHeader' // DISABLED: Causes black page
 import OfflineIndicator from './components/OfflineIndicator'
 import PerformanceMonitor from './components/PerformanceMonitor'
 import LazyAIChatbot from './components/LazyAIChatbot'
@@ -87,8 +88,10 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <MobileNavigation />
-        <StickyHeader />
+        <SimpleNavigation />
+        {/* DISABLED: MobileNavigation and StickyHeader cause black page */}
+        {/* <MobileNavigation /> */}
+        {/* <StickyHeader /> */}
         <OfflineIndicator />
         <PerformanceMonitor />
         <LazyAIChatbot />
