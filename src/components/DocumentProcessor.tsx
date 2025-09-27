@@ -102,7 +102,7 @@ const DocumentProcessor = () => {
         })
 
         // Appeler l'API Vision
-        const result = await visionAPI.processDocument(base64)
+        const result = await visionAPI.processDocument({ imageData: base64 })
 
         if (!result.success) {
           throw new Error(result.message || 'Erreur lors du traitement')
