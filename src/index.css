@@ -4,26 +4,26 @@
 
 @layer base {
   :root {
-    /* Prime Intellect Inspired Dark Theme */
-    --background: 0deg 0% 4%;
-    --foreground: 0deg 0% 98%;
-    --card: 0deg 0% 6%;
-    --card-foreground: 0deg 0% 98%;
-    --popover: 0deg 0% 6%;
-    --popover-foreground: 0deg 0% 98%;
+    /* Light Theme (Default) */
+    --background: 0deg 0% 100%;
+    --foreground: 0deg 0% 9%;
+    --card: 0deg 0% 100%;
+    --card-foreground: 0deg 0% 9%;
+    --popover: 0deg 0% 100%;
+    --popover-foreground: 0deg 0% 9%;
     --primary: 200deg 95% 48%; /* sky-500 */
     --primary-foreground: 0deg 0% 100%;
     --primary-glow: 200deg 95% 60%; /* sky-400 */
-    --secondary: 0deg 0% 16%;
-    --secondary-foreground: 0deg 0% 98%;
-    --muted: 0deg 0% 16%;
-    --muted-foreground: 0deg 0% 64%;
-    --accent: 0deg 0% 16%;
-    --accent-foreground: 0deg 0% 98%;
+    --secondary: 0deg 0% 96%;
+    --secondary-foreground: 0deg 0% 9%;
+    --muted: 0deg 0% 96%;
+    --muted-foreground: 0deg 0% 45%;
+    --accent: 0deg 0% 96%;
+    --accent-foreground: 0deg 0% 9%;
     --destructive: 0deg 84% 60%;
     --destructive-foreground: 0deg 0% 98%;
-    --border: 0deg 0% 16%;
-    --input: 0deg 0% 16%;
+    --border: 0deg 0% 89%;
+    --input: 0deg 0% 89%;
     --ring: 200deg 95% 48%;
     --chart-1: 200deg 95% 48%;
     --chart-2: 142deg 76% 45%;
@@ -45,9 +45,9 @@
     );
     --gradient-hero: linear-gradient(
       135deg,
-      hsl(0deg 0% 6%) 0%,
-      hsl(0deg 0% 8%) 50%,
-      hsl(0deg 0% 10%) 100%
+      hsl(0deg 0% 100%) 0%,
+      hsl(0deg 0% 98%) 50%,
+      hsl(0deg 0% 96%) 100%
     );
     --gradient-card: linear-gradient(
       135deg,
@@ -68,6 +68,7 @@
   }
 
   .dark {
+    /* Dark Theme (Alternative) */
     --background: 0deg 0% 4%;
     --foreground: 0deg 0% 98%;
     --card: 0deg 0% 6%;
@@ -92,6 +93,14 @@
     --chart-3: 25deg 95% 61%;
     --chart-4: 262deg 83% 58%;
     --chart-5: 330deg 81% 60%;
+    
+    /* Dark theme gradients */
+    --gradient-hero: linear-gradient(
+      135deg,
+      hsl(0deg 0% 6%) 0%,
+      hsl(0deg 0% 8%) 50%,
+      hsl(0deg 0% 10%) 100%
+    );
   }
 }
 
@@ -274,7 +283,7 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--background));
+  background: hsl(var(--muted));
 }
 
 ::-webkit-scrollbar-thumb {
