@@ -70,7 +70,7 @@ describe('ErrorBoundary', () => {
   it('resets error state when reset button is clicked', async () => {
     const user = userEvent.setup()
     const { rerender } = render(
-      <ErrorBoundary>
+      <ErrorBoundary resetOnPropsChange={false}>
         <ThrowError shouldThrow={true} />
       </ErrorBoundary>
     )

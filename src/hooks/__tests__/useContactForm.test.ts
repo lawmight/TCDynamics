@@ -28,10 +28,10 @@ describe('useContactForm', () => {
       message: 'Message envoyé avec succès',
     }
 
-    ;(fetch as any).mockResolvedValueOnce({
+    ;(fetch as jest.MockedFunction<typeof fetch>).mockResolvedValueOnce({
       ok: true,
       json: async () => mockResponse,
-    })
+    } as Response)
 
     const { result } = renderHook(() => useContactForm())
 
@@ -48,7 +48,9 @@ describe('useContactForm', () => {
   })
 
   it('should handle errors', async () => {
-    ;(fetch as any).mockRejectedValueOnce(new Error('Network error'))
+    ;(fetch as jest.MockedFunction<typeof fetch>).mockRejectedValueOnce(
+      new Error('Network error')
+    )
 
     const { result } = renderHook(() => useContactForm())
 
@@ -71,10 +73,10 @@ describe('useContactForm', () => {
       errors: ['response.text is not a function'],
     }
 
-    ;(fetch as any).mockResolvedValueOnce({
+    ;(fetch as jest.MockedFunction<typeof fetch>).mockResolvedValueOnce({
       ok: false,
       json: async () => mockResponse,
-    })
+    } as Response)
 
     const { result } = renderHook(() => useContactForm())
 
