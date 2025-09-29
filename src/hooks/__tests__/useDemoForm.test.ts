@@ -28,10 +28,10 @@ describe('useDemoForm', () => {
       message: 'Demande de démo enregistrée',
     }
 
-    ;(fetch as any).mockResolvedValueOnce({
+    ;(fetch as jest.MockedFunction<typeof fetch>).mockResolvedValueOnce({
       ok: true,
       json: async () => mockResponse,
-    })
+    } as Response)
 
     const { result } = renderHook(() => useDemoForm())
 
@@ -52,7 +52,9 @@ describe('useDemoForm', () => {
   })
 
   it('should handle network errors', async () => {
-    ;(fetch as any).mockRejectedValueOnce(new Error('Network error'))
+    ;(fetch as jest.MockedFunction<typeof fetch>).mockRejectedValueOnce(
+      new Error('Network error')
+    )
 
     const { result } = renderHook(() => useDemoForm())
 
@@ -80,10 +82,10 @@ describe('useDemoForm', () => {
       ],
     }
 
-    ;(fetch as any).mockResolvedValueOnce({
+    ;(fetch as jest.MockedFunction<typeof fetch>).mockResolvedValueOnce({
       ok: false,
       json: async () => mockResponse,
-    })
+    } as Response)
 
     const { result } = renderHook(() => useDemoForm())
 

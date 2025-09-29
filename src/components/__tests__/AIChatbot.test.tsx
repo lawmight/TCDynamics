@@ -15,6 +15,7 @@ vi.mock('lucide-react', () => ({
   Loader2: vi.fn(() =>
     React.createElement('svg', { 'data-testid': 'mock-icon' })
   ),
+  X: vi.fn(() => React.createElement('svg', { 'data-testid': 'mock-icon' })),
 }))
 
 // Mock the chat API
