@@ -426,7 +426,7 @@ export const contactAPI = {
     const validatedData = validateAndSanitize(contactFormSchema, data)
 
     try {
-      const response = await apiRequest<ApiResponse>('/ContactForm', {
+      const response = await apiRequest<ApiResponse>('/contactform', {
         method: 'POST',
         body: JSON.stringify(validatedData),
       })
@@ -460,7 +460,7 @@ export const demoAPI = {
     const validatedData = validateAndSanitize(demoFormSchema, data)
 
     try {
-      const response = await apiRequest<ApiResponse>('/DemoForm', {
+      const response = await apiRequest<ApiResponse>('/demoform', {
         method: 'POST',
         body: JSON.stringify(validatedData),
       })

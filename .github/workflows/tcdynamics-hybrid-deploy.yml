@@ -262,10 +262,10 @@ jobs:
             echo "This might be expected - continuing with deployment anyway"
           fi
 
-      - name: "Deploy to Azure Functions (Primary: Azure CLI)"
+      - name: "Deploy to Azure Functions (Primary: Azure Functions Core Tools)"
         id: cli-deploy
         run: |
-          echo "🚀 Deploying Azure Functions using Azure CLI..."
+          echo "🚀 Deploying Azure Functions using Azure Functions Core Tools..."
 
           # Check if Azure CLI credentials are available
           if [ -z "${{ secrets.AZURE_CLIENT_ID }}" ] || [ -z "${{ secrets.AZURE_CLIENT_SECRET }}" ] || [ -z "${{ secrets.AZURE_TENANT_ID }}" ]; then
@@ -284,14 +284,12 @@ jobs:
           echo "🔐 Logging in to Azure..."
           az login --service-principal -u "${{ secrets.AZURE_CLIENT_ID }}" -p "${{ secrets.AZURE_CLIENT_SECRET }}" --tenant "${{ secrets.AZURE_TENANT_ID }}"
 
-          # Deploy the function app
-          echo "📦 Deploying function app package..."
-          az functionapp deployment source config-zip \
-            --resource-group rg-TCDynamics \
-            --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
-            --src ./azure-functions-deploy/azure-functions-package.zip
+          # Deploy using Azure Functions Core Tools (supports Python v2 model)
+          echo "📦 Deploying function app using func CLI..."
+          cd TCDynamics
+          func azure functionapp publish ${{ env.AZURE_FUNCTIONAPP_NAME }} --python
 
-          echo "✅ Azure Functions deployed successfully using Azure CLI!"
+          echo "✅ Azure Functions deployed successfully!"
 
       - name: "Fallback: Manual ZIP Deploy (if CLI fails)"
         id: functions-action-deploy
