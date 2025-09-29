@@ -4,7 +4,7 @@
 import { z } from 'zod'
 
 const DEFAULT_FUNCTIONS_BASE_URL =
-  'https://func-tcdynamics-contact.azurewebsites.net/api'
+  'https://func-tcdynamics-contact.azurewebsites.net'
 
 // ========== ENVIRONMENT VARIABLE SCHEMAS ==========
 
