@@ -17,6 +17,21 @@ vi.mock('canvas-confetti', () => ({
   default: vi.fn(),
 }))
 
+vi.mock('lucide-react', () => ({
+  CheckCircle: ({ className }: { className?: string }) => (
+    <div className={className} data-testid="check-circle" />
+  ),
+  Mail: ({ className }: { className?: string }) => (
+    <div className={className} data-testid="mail" />
+  ),
+  Download: ({ className }: { className?: string }) => (
+    <div className={className} data-testid="download" />
+  ),
+  ArrowRight: ({ className }: { className?: string }) => (
+    <div className={className} data-testid="arrow-right" />
+  ),
+}))
+
 const renderWithRouter = (component: React.ReactElement) => {
   return render(<BrowserRouter>{component}</BrowserRouter>)
 }
@@ -123,7 +138,7 @@ describe('CheckoutSuccess', () => {
     mockUseSearchParams.mockReturnValue([searchParams])
 
     // Mock window.location.href
-    delete (window as any).location
+    delete (window as unknown as { location: unknown }).location
     window.location = { href: '' } as Location
 
     renderWithRouter(<CheckoutSuccess />)

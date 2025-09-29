@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
-import { MessageCircle, Send, Bot, User, Loader2 } from 'lucide-react'
+import { Send, Bot, User, Loader2, X } from 'lucide-react'
 import { chatAPI } from '@/api/azureServices'
 import { logger } from '@/utils/logger'
 import { useToggle } from '@/hooks/useToggle'
@@ -113,11 +113,7 @@ const AIChatbot = () => {
           aria-controls={chatbotId}
           aria-label={isOpen ? 'Fermer le chatbot IA' : 'Ouvrir le chatbot IA'}
         >
-          {isOpen ? (
-            <MessageCircle className="w-6 h-6" />
-          ) : (
-            <Bot className="w-6 h-6" />
-          )}
+          {isOpen ? <X className="w-6 h-6" /> : <Bot className="w-6 h-6" />}
         </Button>
       </div>
 
