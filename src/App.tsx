@@ -15,8 +15,6 @@ import LazyAIChatbot from './components/LazyAIChatbot'
 
 // Lazy load pages for better performance
 const Index = lazy(() => import('./pages/Index'))
-const Checkout = lazy(() => import('./pages/Checkout'))
-const CheckoutSuccess = lazy(() => import('./pages/CheckoutSuccess'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 const queryClient = new QueryClient({
@@ -99,8 +97,6 @@ const App = () => (
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/checkout/success" element={<CheckoutSuccess />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Check, X, Phone, MapPin } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import StripeCheckout from '@/components/StripeCheckout'
 
 const pricingPlans = [
   {
@@ -87,21 +86,6 @@ const Pricing = () => {
   const handlePlanSelect = (planName: string) => {
     setSelectedPlan(planName)
     setShowCheckout(true)
-  }
-
-  const handlePaymentSuccess = (subscriptionId: string) => {
-    // Log successful payment (removed console.log for production)
-    // Ici vous pouvez rediriger vers une page de succès ou mettre à jour l'UI
-    alert(
-      `Abonnement créé avec succès ! ID: ${subscriptionId}. Vous recevrez un email de confirmation.`
-    )
-    setShowCheckout(false)
-    setSelectedPlan(null)
-  }
-
-  const handlePaymentError = (error: string) => {
-    // Handle payment error (removed console.error for production)
-    alert(`Erreur lors du paiement: ${error}`)
   }
 
   return (
@@ -223,11 +207,20 @@ const Pricing = () => {
                   ✕
                 </Button>
               </div>
-              <StripeCheckout
-                plan={selectedPlan as 'starter' | 'professional' | 'enterprise'}
-                onSuccess={handlePaymentSuccess}
-                onError={handlePaymentError}
-              />
+              <div className="p-8 text-center">
+                <p className="text-muted-foreground mb-4">
+                  Contactez-nous pour finaliser votre abonnement {selectedPlan}
+                </p>
+                <Button
+                  onClick={() => {
+                    window.location.href = '/#contact'
+                    setShowCheckout(false)
+                  }}
+                  className="w-full"
+                >
+                  Nous contacter
+                </Button>
+              </div>
             </div>
           </div>
         )}
