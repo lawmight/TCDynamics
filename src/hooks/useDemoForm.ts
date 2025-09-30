@@ -1,9 +1,15 @@
 import { useState } from 'react'
-import {
-  demoAPI,
-  type DemoFormData,
-  type ApiResponse,
-} from '@/api/azureServices'
+import { API_ENDPOINTS, apiRequest, type ApiResponse } from '@/utils/apiConfig'
+
+interface DemoFormData {
+  name: string
+  email: string
+  phone?: string
+  company?: string
+  employeeCount?: string
+  industry?: string
+  message?: string
+}
 
 export const useDemoForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -13,11 +19,25 @@ export const useDemoForm = () => {
     setIsSubmitting(true)
     setResponse(null)
 
-    const result = await demoAPI.submitDemoForm(data)
-    setResponse(result)
-
-    setIsSubmitting(false)
-    return result
+    try {
+      const result = await apiRequest<ApiResponse>(API_ENDPOINTS.demo, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      })
+      setResponse(result)
+      setIsSubmitting(false)
+      return result
+    } catch (error) {
+      const errorResponse: ApiResponse = {
+        success: false,
+        message:
+          error instanceof Error ? error.message : 'Une erreur est survenue',
+        errors: [error instanceof Error ? error.message : 'Erreur inconnue'],
+      }
+      setResponse(errorResponse)
+      setIsSubmitting(false)
+      return errorResponse
+    }
   }
 
   const clearResponse = () => {
