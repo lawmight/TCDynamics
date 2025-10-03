@@ -28,10 +28,7 @@ const {
 } = require('./utils/logger')
 
 // Import des middlewares d'erreur
-const {
-  errorHandler,
-  notFoundHandler,
-} = require('./middleware/errorHandler')
+const { errorHandler, notFoundHandler } = require('./middleware/errorHandler')
 
 // Import des middlewares de monitoring
 const { collectMetrics } = require('./routes/monitoring')

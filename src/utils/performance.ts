@@ -9,7 +9,7 @@ interface PerformanceMetric {
   name: string
   value: number
   timestamp: number
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 interface ApiCallMetrics {
@@ -36,7 +36,7 @@ class PerformanceMonitor {
   recordMetric(
     name: string,
     value: number,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): void {
     const metric: PerformanceMetric = {
       name,
@@ -57,6 +57,7 @@ class PerformanceMonitor {
 
     // Log in development
     if (config.isDevelopment && config.client.VITE_ENABLE_DEBUG_LOGGING) {
+      // eslint-disable-next-line no-console
       console.log(`[PERF] ${name}: ${value}ms`, metadata)
     }
   }
@@ -94,7 +95,7 @@ class PerformanceMonitor {
   async measureAsync<T>(
     name: string,
     fn: () => Promise<T>,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<T> {
     const start = performance.now()
     try {
@@ -116,7 +117,7 @@ class PerformanceMonitor {
   /**
    * Measure execution time of a synchronous function
    */
-  measure<T>(name: string, fn: () => T, metadata?: Record<string, any>): T {
+  measure<T>(name: string, fn: () => T, metadata?: Record<string, unknown>): T {
     const start = performance.now()
     try {
       const result = fn()
@@ -239,7 +240,7 @@ class PerformanceMonitor {
 
 // ========== ENHANCED CACHE IMPLEMENTATION ==========
 
-interface CacheEntry<T = any> {
+interface CacheEntry<T = unknown> {
   data: T
   timestamp: number
   ttl: number
@@ -276,7 +277,7 @@ class SmartCache {
   /**
    * Calculate approximate size of data in bytes
    */
-  private calculateSize(data: any): number {
+  private calculateSize(data: unknown): number {
     if (typeof data === 'string') {
       return data.length * 2 // UTF-16 characters
     }
@@ -327,7 +328,8 @@ class SmartCache {
 
     // Then, if still over limit, evict LRU entries
     while (targetSize > this.config.maxSize && this.lruQueue.length > 0) {
-      const oldestKey = this.lruQueue.pop()!
+      const oldestKey = this.lruQueue.pop()
+      if (!oldestKey) break
       const entry = this.cache.get(oldestKey)
       if (entry) {
         this.currentSize -= entry.size
@@ -666,8 +668,12 @@ export let smartCache = new SmartCache(performanceMonitor, createCacheConfig())
 const updateCacheConfig = () => {
   try {
     // This will be called after config initialization
-    if (typeof window !== 'undefined' && (window as any).config) {
-      const config = (window as any).config
+    if (
+      typeof window !== 'undefined' &&
+      (window as Record<string, unknown>).config
+    ) {
+      const config = (window as Record<string, unknown>)
+        .config as typeof import('./config').config
       const newCacheConfig: CacheConfig = {
         maxSize: config.client.VITE_CACHE_MAX_SIZE || 1000,
         defaultTTL: config.client.VITE_CACHE_DEFAULT_TTL || 300000,
@@ -683,6 +689,7 @@ const updateCacheConfig = () => {
       })
     }
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.warn('Failed to update cache configuration:', error)
     performanceMonitor.recordMetric('cache.config.update_failed', 1, {
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -768,7 +775,7 @@ export const performanceUtils = {
   /**
    * Debounce function calls
    */
-  debounce<T extends (...args: any[]) => any>(
+  debounce<T extends (...args: never[]) => unknown>(
     func: T,
     wait: number
   ): (...args: Parameters<T>) => void {
@@ -782,7 +789,7 @@ export const performanceUtils = {
   /**
    * Throttle function calls
    */
-  throttle<T extends (...args: any[]) => any>(
+  throttle<T extends (...args: never[]) => unknown>(
     func: T,
     limit: number
   ): (...args: Parameters<T>) => void {
@@ -828,7 +835,7 @@ export const browserPerformance = {
     lcp?: number
   }> {
     return new Promise(resolve => {
-      const vitals: any = {}
+      const vitals: Record<string, number> = {}
 
       // Cumulative Layout Shift
       new PerformanceObserver(entryList => {

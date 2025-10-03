@@ -81,8 +81,8 @@ class ConfigManager {
   private isInitialized = false
 
   constructor() {
-    this.clientConfig = {} as any
-    this.serverConfig = {} as any
+    this.clientConfig = {} as z.infer<typeof clientConfigSchema>
+    this.serverConfig = {} as z.infer<typeof serverConfigSchema>
   }
 
   /**
@@ -175,6 +175,7 @@ class ConfigManager {
       const clientValidation = clientConfigSchema.safeParse(safeClientConfig)
 
       if (!clientValidation.success) {
+        // eslint-disable-next-line no-console
         console.warn(
           'Client configuration validation failed, using safe defaults:',
           clientValidation.error.issues
@@ -189,6 +190,7 @@ class ConfigManager {
       const serverValidation = serverConfigSchema.safeParse(safeServerConfig)
 
       if (!serverValidation.success) {
+        // eslint-disable-next-line no-console
         console.warn(
           'Server configuration validation failed, using safe defaults:',
           serverValidation.error.issues
@@ -206,6 +208,7 @@ class ConfigManager {
         window.dispatchEvent(new CustomEvent('configLoaded', { detail: this }))
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Configuration initialization failed:', error)
 
       // Fallback to safe defaults even if validation completely fails
@@ -213,10 +216,12 @@ class ConfigManager {
         this.clientConfig = this.getSafeClientConfig()
         this.serverConfig = this.getSafeServerConfig()
         this.isInitialized = true
+        // eslint-disable-next-line no-console
         console.warn(
           'Using safe configuration defaults due to initialization failure'
         )
       } catch (fallbackError) {
+        // eslint-disable-next-line no-console
         console.error('Even fallback configuration failed:', fallbackError)
         throw new Error(
           `Configuration initialization completely failed: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -325,6 +330,7 @@ class ConfigManager {
       },
     }
 
+    // eslint-disable-next-line no-console
     console.log('Configuration Status:', status)
   }
 
@@ -399,7 +405,7 @@ class ConfigManager {
   /**
    * Get a safe configuration summary (without secrets)
    */
-  getSafeConfigSummary(): Record<string, any> {
+  getSafeConfigSummary(): Record<string, unknown> {
     return {
       environment: this.client.VITE_NODE_ENV,
       version: this.client.VITE_APP_VERSION,
@@ -483,6 +489,7 @@ export const envHelpers = {
 if (typeof window !== 'undefined') {
   // Client-side initialization
   config.initialize().catch(error => {
+    // eslint-disable-next-line no-console
     console.error('Failed to initialize client configuration:', error)
   })
 }

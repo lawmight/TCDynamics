@@ -95,6 +95,7 @@ describe('Security Utilities', () => {
       vi.useFakeTimers()
 
       // Clear rate limiter state between tests
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const limiter = rateLimiters.contact as any
       if (limiter && limiter.limits) {
         limiter.limits.clear()
@@ -407,15 +408,18 @@ describe('Security Utilities', () => {
     })
 
     describe('logSecurityEvent', () => {
+      // eslint-disable-next-line no-console
       const originalConsoleWarn = console.warn
       let consoleWarnMock: vi.MockedFunction<typeof console.warn>
 
       beforeEach(() => {
         consoleWarnMock = vi.fn()
+        // eslint-disable-next-line no-console
         console.warn = consoleWarnMock
       })
 
       afterEach(() => {
+        // eslint-disable-next-line no-console
         console.warn = originalConsoleWarn
       })
 

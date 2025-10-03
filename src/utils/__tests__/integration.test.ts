@@ -50,6 +50,7 @@ describe('Integration Tests', () => {
 
   describe('Configuration Integration', () => {
     it('should initialize configuration with safe defaults', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const configInstance = new (config.constructor as any)()
       await configInstance.initialize()
 
@@ -60,11 +61,13 @@ describe('Integration Tests', () => {
     })
 
     it('should handle configuration validation errors gracefully', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const configInstance = new (config.constructor as any)()
 
       // Mock a validation failure
       vi.spyOn(configInstance, 'getSafeClientConfig').mockReturnValue({
         VITE_AZURE_FUNCTIONS_URL: 'invalid-url',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         VITE_NODE_ENV: 'development' as any,
         VITE_APP_VERSION: '1.0.0',
         VITE_FEATURE_ENABLE_ANALYTICS: true,
@@ -104,6 +107,7 @@ describe('Integration Tests', () => {
         cleanupInterval: 60000,
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const testCache = new (smartCache.constructor as any)(
         performanceMonitor,
         config
@@ -208,6 +212,7 @@ describe('Integration Tests', () => {
       expect(isDevelopment()).toBe(true) // Vitest sets import.meta.env.DEV = true in test environment
 
       // Mock Node.js environment
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (global as any).window
       Object.defineProperty(global, 'process', {
         value: { env: { NODE_ENV: 'test' } },
@@ -272,6 +277,7 @@ describe('Integration Tests', () => {
   describe('End-to-End Integration', () => {
     it('should work together without conflicts', async () => {
       // Initialize config
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const configInstance = new (config.constructor as any)()
       await configInstance.initialize()
 

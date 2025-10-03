@@ -507,8 +507,9 @@ export const securityUtils = {
   /**
    * Log security events
    */
-  logSecurityEvent: (event: string, details: any): void => {
+  logSecurityEvent: (event: string, details: unknown): void => {
     const timestamp = new Date().toISOString()
+    // eslint-disable-next-line no-console
     console.warn(`[SECURITY] ${timestamp} - ${event}:`, details)
   },
 }
