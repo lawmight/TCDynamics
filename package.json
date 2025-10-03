@@ -21,7 +21,9 @@
     "bug-fix:apply": "node scripts/auto-bug-fixer.js --fix",
     "bug-monitor": "node scripts/bug-monitor.js",
     "bug-monitor:issues": "node scripts/bug-monitor.js --create-issues",
-    "verify-bugbots": "node scripts/verify-bugbots.js"
+    "verify-bugbots": "node scripts/verify-bugbots.js",
+    "verify": "npm run lint && npm run type-check && npm run test -- --run",
+    "verify:exercise": "eslint src/utils/math.ts src/utils/__tests__/math.test.ts --ext ts,tsx && tsc --noEmit --pretty false --skipLibCheck && vitest --run src/utils/__tests__/math.test.ts"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
