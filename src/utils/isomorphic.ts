@@ -174,7 +174,10 @@ export const storageUtils = {
     }
 
     // In-memory storage for Node.js/testing
-    return (globalThis as any).__MEMORY_STORAGE__?.[key] || null
+    return (
+      (globalThis as Record<string, Record<string, string>>)
+        .__MEMORY_STORAGE__?.[key] || null
+    )
   },
 
   /**
@@ -189,10 +192,11 @@ export const storageUtils = {
       }
     } else {
       // In-memory storage for Node.js/testing
-      if (!(globalThis as any).__MEMORY_STORAGE__) {
-        ;(globalThis as any).__MEMORY_STORAGE__ = {}
+      const storage = globalThis as Record<string, Record<string, string>>
+      if (!storage.__MEMORY_STORAGE__) {
+        storage.__MEMORY_STORAGE__ = {}
       }
-      ;(globalThis as any).__MEMORY_STORAGE__[key] = value
+      storage.__MEMORY_STORAGE__[key] = value
     }
   },
 
@@ -208,8 +212,9 @@ export const storageUtils = {
       }
     } else {
       // In-memory storage for Node.js/testing
-      if ((globalThis as any).__MEMORY_STORAGE__) {
-        delete (globalThis as any).__MEMORY_STORAGE__[key]
+      const storage = globalThis as Record<string, Record<string, string>>
+      if (storage.__MEMORY_STORAGE__) {
+        delete storage.__MEMORY_STORAGE__[key]
       }
     }
   },
@@ -235,7 +240,7 @@ export const timerUtils = {
     }
 
     // Fallback
-    return setTimeout(callback, delay) as any
+    return setTimeout(callback, delay) as unknown as NodeJS.Timeout
   },
 
   /**
@@ -251,7 +256,7 @@ export const timerUtils = {
     ) {
       window.clearTimeout(timeoutId as number)
     } else {
-      clearTimeout(timeoutId as any)
+      clearTimeout(timeoutId as unknown as NodeJS.Timeout)
     }
   },
 
@@ -271,7 +276,7 @@ export const timerUtils = {
     }
 
     // Fallback
-    return setInterval(callback, delay) as any
+    return setInterval(callback, delay) as unknown as NodeJS.Timeout
   },
 
   /**
@@ -287,7 +292,7 @@ export const timerUtils = {
     ) {
       window.clearInterval(intervalId as number)
     } else {
-      clearInterval(intervalId as any)
+      clearInterval(intervalId as unknown as NodeJS.Timeout)
     }
   },
 }
@@ -346,8 +351,9 @@ export const consoleUtils = {
   /**
    * Log message only in development
    */
-  devLog: (...args: any[]): void => {
+  devLog: (...args: unknown[]): void => {
     if (isDevelopment()) {
+      // eslint-disable-next-line no-console
       console.log('[DEV]', ...args)
     }
   },
@@ -355,8 +361,9 @@ export const consoleUtils = {
   /**
    * Log warning only in development
    */
-  devWarn: (...args: any[]): void => {
+  devWarn: (...args: unknown[]): void => {
     if (isDevelopment()) {
+      // eslint-disable-next-line no-console
       console.warn('[DEV]', ...args)
     }
   },
@@ -364,19 +371,28 @@ export const consoleUtils = {
   /**
    * Log error with additional context
    */
-  error: (error: Error | string, context?: Record<string, any>): void => {
+  error: (error: Error | string, context?: Record<string, unknown>): void => {
     const errorMessage = error instanceof Error ? error.message : error
     const contextInfo = context ? ` Context: ${JSON.stringify(context)}` : ''
 
+    // eslint-disable-next-line no-console
     console.error(`[ERROR] ${errorMessage}${contextInfo}`)
 
     // In browser, also log to monitoring if available
     if (
       isBrowser() &&
       typeof window !== 'undefined' &&
-      (window as any).performanceMonitor
+      (window as Record<string, unknown>).performanceMonitor
     ) {
-      ;(window as any).performanceMonitor.recordMetric('error.runtime', 1, {
+      const perfMonitor = (window as Record<string, unknown>)
+        .performanceMonitor as {
+        recordMetric: (
+          name: string,
+          value: number,
+          metadata?: Record<string, unknown>
+        ) => void
+      }
+      perfMonitor.recordMetric('error.runtime', 1, {
         error: errorMessage,
         context,
         environment: isBrowser() ? 'browser' : isNode() ? 'node' : 'unknown',
@@ -390,9 +406,10 @@ export const consoleUtils = {
   perf: (
     name: string,
     duration: number,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): void => {
     if (isDevelopment()) {
+      // eslint-disable-next-line no-console
       console.log(`[PERF] ${name}: ${duration}ms`, metadata || '')
     }
   },

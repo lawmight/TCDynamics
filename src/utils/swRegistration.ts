@@ -31,9 +31,11 @@ export const registerServiceWorker = async (): Promise<void> => {
         // console.log('📨 Message from service worker:', event.data)
       })
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('❌ Service Worker registration failed:', error)
     }
   } else {
+    // eslint-disable-next-line no-console
     console.warn('⚠️ Service Workers not supported in this browser')
   }
 }
@@ -47,6 +49,7 @@ export const unregisterServiceWorker = async (): Promise<void> => {
         // // console.log('✅ Service Worker unregistered successfully');
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('❌ Service Worker unregistration failed:', error)
     }
   }
@@ -79,6 +82,7 @@ if (typeof window !== 'undefined') {
 
 export const triggerInstallPrompt = async (): Promise<boolean> => {
   if (!deferredPrompt) {
+    // eslint-disable-next-line no-console
     console.warn('⚠️ No install prompt available')
     return false
   }
@@ -101,7 +105,7 @@ export const triggerInstallPrompt = async (): Promise<boolean> => {
 export const isPWA = (): boolean => {
   return (
     window.matchMedia('(display-mode: standalone)').matches ||
-    (window.navigator as any).standalone === true
+    (window.navigator as { standalone?: boolean }).standalone === true
   )
 }
 

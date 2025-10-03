@@ -138,8 +138,9 @@ export function usePageTracking(pageName: string) {
     })
 
     // Track time on page when leaving
+    const startTimeValue = startTime.current
     return () => {
-      const timeSpent = Math.round((Date.now() - startTime.current) / 1000)
+      const timeSpent = Math.round((Date.now() - startTimeValue) / 1000)
       analytics.trackTimeOnPage(pageName, timeSpent)
     }
   }, [pageName])

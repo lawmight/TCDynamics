@@ -46,7 +46,7 @@ class OptimizedPerformanceMonitor {
   recordMetric(
     name: string,
     value: number,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): void {
     if (!this.shouldSample(name)) {
       return // Skip sampling
@@ -66,7 +66,9 @@ class OptimizedPerformanceMonitor {
   /**
    * Record API call with performance monitoring
    */
-  recordApiCall(metrics: any): void {
+  recordApiCall(
+    metrics: Omit<import('./performance').ApiCallMetrics, 'timestamp'>
+  ): void {
     if (!this.shouldSample(`api.${metrics.endpoint}`)) {
       return // Skip sampling
     }
@@ -217,7 +219,7 @@ export const optimizedPerformanceUtils = {
   /**
    * Debounce function calls with performance tracking
    */
-  debounce: <T extends (...args: any[]) => any>(
+  debounce: <T extends (...args: never[]) => unknown>(
     func: T,
     wait: number,
     options?: { leading?: boolean; trailing?: boolean }
@@ -270,7 +272,7 @@ export const optimizedPerformanceUtils = {
   /**
    * Throttle function calls with performance tracking
    */
-  throttle: <T extends (...args: any[]) => any>(
+  throttle: <T extends (...args: never[]) => unknown>(
     func: T,
     limit: number
   ): ((...args: Parameters<T>) => void) => {
