@@ -29,24 +29,28 @@ class Logger {
 
   debug(message: string, data?: unknown): void {
     if (this.shouldLog(LogLevel.DEBUG)) {
+      // eslint-disable-next-line no-console
       console.debug(this.formatMessage('DEBUG', message), data)
     }
   }
 
   info(message: string, data?: unknown): void {
     if (this.shouldLog(LogLevel.INFO)) {
+      // eslint-disable-next-line no-console
       console.info(this.formatMessage('INFO', message), data)
     }
   }
 
   warn(message: string, data?: unknown): void {
     if (this.shouldLog(LogLevel.WARN)) {
+      // eslint-disable-next-line no-console
       console.warn(this.formatMessage('WARN', message), data)
     }
   }
 
   error(message: string, error?: unknown): void {
     if (this.shouldLog(LogLevel.ERROR)) {
+      // eslint-disable-next-line no-console
       console.error(this.formatMessage('ERROR', message), error)
 
       // En production, envoyer à un service de monitoring
