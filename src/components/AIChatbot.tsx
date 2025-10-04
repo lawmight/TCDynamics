@@ -1,13 +1,13 @@
-import { useState, useRef, useEffect, useId } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Badge } from '@/components/ui/badge'
-import { Send, Bot, User, Loader2, X } from 'lucide-react'
 import { chatAPI } from '@/api/azureServices'
-import { logger } from '@/utils/logger'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { useToggle } from '@/hooks/useToggle'
+import { logger } from '@/utils/logger'
+import { Bot, Loader2, Send, User, X } from 'lucide-react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
 
 interface Message {
   id: string
@@ -25,6 +25,7 @@ const AIChatbot = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const liveRegionId = useId()
   const chatbotId = useId()
+  const previousFocusRef = useRef<HTMLElement | null>(null)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -44,6 +45,82 @@ const AIChatbot = () => {
       }
     }
   }, [messages, liveRegionId])
+
+  // Handle ESC key and focus management
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen) {
+        event.preventDefault()
+        close()
+      }
+    }
+
+    if (isOpen) {
+      // Store the currently focused element
+      previousFocusRef.current = document.activeElement as HTMLElement
+
+      // Add ESC key listener
+      document.addEventListener('keydown', handleKeyDown)
+
+      // Focus the first focusable element in the chatbot
+      const chatbotElement = document.getElementById(chatbotId)
+      if (chatbotElement) {
+        const focusableElements = chatbotElement.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
+        const firstFocusable = focusableElements[0] as HTMLElement
+        if (firstFocusable) {
+          firstFocusable.focus()
+        }
+      }
+    } else {
+      // Restore focus when closing
+      if (previousFocusRef.current) {
+        previousFocusRef.current.focus()
+        previousFocusRef.current = null
+      }
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isOpen, close, chatbotId])
+
+  // Focus trap function
+  const handleFocusTrap = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (!isOpen) return
+
+      const chatbotElement = document.getElementById(chatbotId)
+      if (!chatbotElement) return
+
+      const focusableElements = chatbotElement.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+
+      const firstElement = focusableElements[0] as HTMLElement
+      const lastElement = focusableElements[
+        focusableElements.length - 1
+      ] as HTMLElement
+
+      if (event.key === 'Tab') {
+        if (event.shiftKey) {
+          // Shift + Tab
+          if (document.activeElement === firstElement) {
+            event.preventDefault()
+            lastElement?.focus()
+          }
+        } else {
+          // Tab
+          if (document.activeElement === lastElement) {
+            event.preventDefault()
+            firstElement?.focus()
+          }
+        }
+      }
+    },
+    [isOpen, chatbotId]
+  )
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading || isConnecting) return
@@ -74,8 +151,7 @@ const AIChatbot = () => {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content:
-          data.message || data.response || 'Réponse reçue du service IA.',
+        content: data.message || 'Réponse reçue du service IA.',
         timestamp: new Date(),
       }
 
@@ -133,6 +209,7 @@ const AIChatbot = () => {
           role="dialog"
           aria-labelledby="chatbot-title"
           aria-describedby="chatbot-description"
+          onKeyDown={handleFocusTrap}
         >
           <Card className="h-full flex flex-col bg-card/95 backdrop-blur-sm border-primary/20">
             <CardHeader className="pb-4 bg-primary/5">

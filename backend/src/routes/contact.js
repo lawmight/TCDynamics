@@ -2,6 +2,7 @@ const express = require('express')
 const { createTransporter, emailTemplates } = require('../config/email')
 const { validateData, contactSchema } = require('../utils/validation')
 const { formRateLimit } = require('../middleware/security')
+const { logger } = require('../utils/logger')
 
 const router = express.Router()
 
@@ -19,7 +20,7 @@ router.post(
 
       // Vérifier la connexion
       await transporter.verify()
-      console.log('✅ Serveur email Zoho prêt - contact@workflowai.fr')
+      logger.info('Serveur email Zoho prêt', { emailService: 'contact@workflowai.fr' })
 
       // Préparer l'email
       const emailData = emailTemplates.contact({
@@ -38,7 +39,7 @@ router.post(
         ...emailData,
       })
 
-      console.log('�� Email envoyé:', info.messageId)
+      logger.info('Email envoyé avec succès', { messageId: info.messageId, recipient: email })
 
       // Réponse de succès
       res.status(200).json({
@@ -48,7 +49,7 @@ router.post(
         messageId: info.messageId,
       })
     } catch (error) {
-      console.error("❌ Erreur lors de l'envoi de l'email:", error)
+      logger.error("Erreur lors de l'envoi de l'email de contact", { error: error.message, email })
 
       res.status(500).json({
         success: false,

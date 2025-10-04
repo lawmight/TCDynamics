@@ -1,6 +1,11 @@
 // src/utils/isomorphic.ts
 // Utilities for handling browser vs Node.js compatibility
 
+import { logger } from './logger'
+
+// Declare web worker global for TypeScript
+declare const importScripts: (...urls: string[]) => void
+
 /**
  * Check if we're running in a browser environment
  */
@@ -347,18 +352,14 @@ export const consoleUtils = {
    * Log message only in development
    */
   devLog: (...args: any[]): void => {
-    if (isDevelopment()) {
-      console.log('[DEV]', ...args)
-    }
+    logger.debug('Development log', { args })
   },
 
   /**
    * Log warning only in development
    */
   devWarn: (...args: any[]): void => {
-    if (isDevelopment()) {
-      console.warn('[DEV]', ...args)
-    }
+    logger.warn('Development warning', { args })
   },
 
   /**
@@ -366,9 +367,11 @@ export const consoleUtils = {
    */
   error: (error: Error | string, context?: Record<string, any>): void => {
     const errorMessage = error instanceof Error ? error.message : error
-    const contextInfo = context ? ` Context: ${JSON.stringify(context)}` : ''
 
-    console.error(`[ERROR] ${errorMessage}${contextInfo}`)
+    logger.error('Application error', {
+      message: errorMessage,
+      context,
+    })
 
     // In browser, also log to monitoring if available
     if (
@@ -392,8 +395,9 @@ export const consoleUtils = {
     duration: number,
     metadata?: Record<string, any>
   ): void => {
-    if (isDevelopment()) {
-      console.log(`[PERF] ${name}: ${duration}ms`, metadata || '')
-    }
+    logger.info(`Performance: ${name}`, {
+      duration: `${duration}ms`,
+      metadata,
+    })
   },
 }

@@ -1,4 +1,4 @@
-const { logError } = require('../utils/logger')
+const { logError, logger } = require('../utils/logger')
 
 // Error types
 class ValidationError extends Error {
@@ -142,13 +142,13 @@ const handleDatabaseError = error => {
   }
 
   // Log database errors
-  console.error('Database error:', error)
+  logger.error('Database error', { error: error.message, code: error.code })
   return new Error('Erreur de base de données')
 }
 
 // Email error handler
 const handleEmailError = error => {
-  console.error('Email service error:', error)
+  logger.error('Email service error', { error: error.message })
   return new Error("Erreur lors de l'envoi de l'email")
 }
 

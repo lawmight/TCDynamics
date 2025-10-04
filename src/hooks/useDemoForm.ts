@@ -1,5 +1,6 @@
-import { useState } from 'react'
 import { API_ENDPOINTS, apiRequest, type ApiResponse } from '@/utils/apiConfig'
+import { logger } from '@/utils/logger'
+import { useState } from 'react'
 
 interface DemoFormData {
   name: string
@@ -20,10 +21,26 @@ export const useDemoForm = () => {
     setResponse(null)
 
     try {
-      const result = await apiRequest<ApiResponse>(API_ENDPOINTS.demo, {
-        method: 'POST',
-        body: JSON.stringify(data),
-      })
+      // Try Azure Functions first, fallback to Node.js backend
+      let result: ApiResponse
+
+      try {
+        result = await apiRequest<ApiResponse>(API_ENDPOINTS.azureDemo, {
+          method: 'POST',
+          body: JSON.stringify(data),
+        })
+      } catch (azureError) {
+        // Fallback to Node.js backend if Azure Functions fail
+        logger.warn(
+          'Azure Functions not available, falling back to Node.js backend',
+          azureError
+        )
+        result = await apiRequest<ApiResponse>(API_ENDPOINTS.demo, {
+          method: 'POST',
+          body: JSON.stringify(data),
+        })
+      }
+
       setResponse(result)
       setIsSubmitting(false)
       return result

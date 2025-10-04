@@ -1,5 +1,5 @@
-import { renderHook, act } from '@testing-library/react'
-import { vi } from 'vitest'
+import { act, renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useDemoForm } from '../useDemoForm'
 
 // Mock fetch
@@ -28,7 +28,9 @@ describe('useDemoForm', () => {
       message: 'Demande de démo enregistrée',
     }
 
-    ;(fetch as jest.MockedFunction<typeof fetch>).mockResolvedValueOnce({
+    ;(
+      fetch as ReturnType<typeof vi.mocked<typeof fetch>>
+    ).mockResolvedValueOnce({
       ok: true,
       json: async () => mockResponse,
     } as Response)
@@ -37,13 +39,12 @@ describe('useDemoForm', () => {
 
     await act(async () => {
       await result.current.submitForm({
-        firstName: 'Jean',
-        lastName: 'Dupont',
+        name: 'Jean Dupont',
         email: 'jean.dupont@example.com',
         company: 'Test Company',
         phone: '01 23 45 67 89',
-        employees: '25',
-        needs: "Besoin d'automatisation",
+        employeeCount: '25',
+        message: "Besoin d'automatisation",
       })
     })
 
@@ -52,16 +53,14 @@ describe('useDemoForm', () => {
   })
 
   it('should handle network errors', async () => {
-    ;(fetch as jest.MockedFunction<typeof fetch>).mockRejectedValueOnce(
-      new Error('Network error')
-    )
+    vi.mocked(fetch).mockRejectedValueOnce(new Error('Network error'))
+    vi.mocked(fetch).mockRejectedValueOnce(new Error('Network error'))
 
     const { result } = renderHook(() => useDemoForm())
 
     await act(async () => {
       await result.current.submitForm({
-        firstName: 'Jean',
-        lastName: 'Dupont',
+        name: 'Jean Dupont',
         email: 'jean.dupont@example.com',
         company: 'Test Company',
       })
@@ -82,7 +81,9 @@ describe('useDemoForm', () => {
       ],
     }
 
-    ;(fetch as jest.MockedFunction<typeof fetch>).mockResolvedValueOnce({
+    ;(
+      fetch as ReturnType<typeof vi.mocked<typeof fetch>>
+    ).mockResolvedValueOnce({
       ok: false,
       json: async () => mockResponse,
     } as Response)
@@ -91,8 +92,7 @@ describe('useDemoForm', () => {
 
     await act(async () => {
       await result.current.submitForm({
-        firstName: 'Jean',
-        lastName: 'Dupont',
+        name: 'Jean Dupont',
         email: 'jean.dupont@example.com',
         company: 'Test Company',
       })

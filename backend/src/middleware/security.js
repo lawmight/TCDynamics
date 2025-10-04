@@ -1,5 +1,6 @@
 const rateLimit = require('express-rate-limit')
 const helmet = require('helmet')
+const { logger } = require('../utils/logger')
 
 // Rate limiting pour les formulaires
 const formRateLimit = rateLimit({
@@ -59,7 +60,12 @@ const validateIP = (req, res, next) => {
   // Log suspicious activity
   if (req.headers['user-agent'] && req.headers['user-agent'].includes('bot')) {
     // Log bot activity for monitoring
-    console.log(`Bot detected: ${clientIP} - ${req.headers['user-agent']}`)
+    logger.security('Bot activity detected', {
+      ip: clientIP,
+      userAgent: req.headers['user-agent'],
+      path: req.path,
+      method: req.method
+    })
   }
 
   next()

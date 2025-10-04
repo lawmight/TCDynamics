@@ -1,21 +1,21 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Badge } from '@/components/ui/badge'
-import { useDemoForm } from '@/hooks/useDemoForm'
 import { useContactForm } from '@/hooks/useContactForm'
+import { useDemoForm } from '@/hooks/useDemoForm'
 import {
+  Building,
+  Calendar,
+  Car,
+  CheckCircle,
+  Clock,
+  Mail,
   MapPin,
   Phone,
-  Mail,
-  Clock,
-  Calendar,
-  Users,
-  CheckCircle,
-  Building,
-  Car,
   Train,
+  Users,
 } from 'lucide-react'
 
 const Contact = () => {
@@ -161,17 +161,20 @@ const Contact = () => {
                 {/* Demo Form */}
                 <form
                   className="space-y-4"
+                  role="form"
+                  aria-label="Formulaire de demande de démonstration"
                   onSubmit={async e => {
                     e.preventDefault()
                     const formData = new FormData(e.currentTarget)
+                    const firstName = formData.get('firstName') as string
+                    const lastName = formData.get('lastName') as string
                     const data = {
-                      firstName: formData.get('firstName') as string,
-                      lastName: formData.get('lastName') as string,
+                      name: `${firstName} ${lastName}`.trim(),
                       email: formData.get('email') as string,
                       phone: formData.get('phone') as string,
                       company: formData.get('company') as string,
-                      employees: formData.get('employees') as string,
-                      needs: formData.get('needs') as string,
+                      employeeCount: formData.get('employees') as string,
+                      message: formData.get('needs') as string,
                     }
 
                     const result = await demoForm.submitForm(data)
@@ -183,59 +186,84 @@ const Contact = () => {
                 >
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium mb-2 block">
+                      <label
+                        htmlFor="firstName"
+                        className="text-sm font-medium mb-2 block"
+                      >
                         Prénom *
                       </label>
                       <Input
+                        id="firstName"
                         name="firstName"
                         placeholder="Jean"
                         className="bg-background/50"
                         required
+                        aria-required="true"
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium mb-2 block">
+                      <label
+                        htmlFor="lastName"
+                        className="text-sm font-medium mb-2 block"
+                      >
                         Nom *
                       </label>
                       <Input
+                        id="lastName"
                         name="lastName"
                         placeholder="Dupont"
                         className="bg-background/50"
                         required
+                        aria-required="true"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium mb-2 block">
+                    <label
+                      htmlFor="email"
+                      className="text-sm font-medium mb-2 block"
+                    >
                       Email professionnel *
                     </label>
                     <Input
+                      id="email"
                       name="email"
                       type="email"
                       placeholder="jean.dupont@entreprise.fr"
                       className="bg-background/50"
                       required
+                      aria-required="true"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium mb-2 block">
+                      <label
+                        htmlFor="phone"
+                        className="text-sm font-medium mb-2 block"
+                      >
                         Téléphone
                       </label>
                       <Input
+                        id="phone"
                         name="phone"
+                        type="tel"
                         placeholder="01 23 45 67 89"
                         className="bg-background/50"
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium mb-2 block">
+                      <label
+                        htmlFor="employees"
+                        className="text-sm font-medium mb-2 block"
+                      >
                         Nb employés
                       </label>
                       <Input
+                        id="employees"
                         name="employees"
+                        type="number"
                         placeholder="ex: 25"
                         className="bg-background/50"
                       />
@@ -243,22 +271,31 @@ const Contact = () => {
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium mb-2 block">
+                    <label
+                      htmlFor="company"
+                      className="text-sm font-medium mb-2 block"
+                    >
                       Entreprise *
                     </label>
                     <Input
+                      id="company"
                       name="company"
                       placeholder="Nom de votre entreprise"
                       className="bg-background/50"
                       required
+                      aria-required="true"
                     />
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium mb-2 block">
+                    <label
+                      htmlFor="needs"
+                      className="text-sm font-medium mb-2 block"
+                    >
                       Besoins spécifiques
                     </label>
                     <Textarea
+                      id="needs"
                       name="needs"
                       placeholder="Décrivez brièvement vos processus à automatiser..."
                       className="bg-background/50 min-h-[100px]"
@@ -270,6 +307,11 @@ const Contact = () => {
                     size="lg"
                     variant="hero"
                     disabled={demoForm.isSubmitting}
+                    aria-label={
+                      demoForm.isSubmitting
+                        ? 'Envoi de la demande de démonstration en cours'
+                        : 'Réserver ma démonstration gratuite'
+                    }
                   >
                     {demoForm.isSubmitting ? (
                       'Envoi en cours...'
@@ -284,6 +326,7 @@ const Contact = () => {
 
                 {demoForm.response && (
                   <div
+                    role="alert"
                     className={`p-4 rounded-lg mt-4 ${
                       demoForm.response.success
                         ? 'bg-green-100 text-green-800 border border-green-200'

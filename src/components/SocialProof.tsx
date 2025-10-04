@@ -1,17 +1,17 @@
-import { Card, CardContent } from '@/components/ui/card'
+import { AnimatedCounter } from '@/components/ui/animated-counter'
 import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 import {
+  ArrowRight,
+  CheckCircle,
   Clock,
+  MapPin,
+  Shield,
+  Star,
   TrendingUp,
   Users,
-  Shield,
-  MapPin,
-  Star,
-  CheckCircle,
-  ArrowRight,
 } from 'lucide-react'
-import { AnimatedCounter } from '@/components/ui/animated-counter'
-import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 
 const SocialProof = () => {
   const { ref: sectionRef, isIntersecting } = useIntersectionObserver({
@@ -231,7 +231,7 @@ const SocialProof = () => {
                 <div className="flex items-center gap-3">
                   <img
                     src={testimonial.image}
-                    alt=""
+                    alt={`Photo de ${testimonial.author}, ${testimonial.position} chez ${testimonial.company}`}
                     className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20"
                   />
                   <div>

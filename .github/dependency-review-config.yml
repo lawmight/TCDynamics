@@ -1,0 +1,36 @@
+# Dependency Review Configuration for TCDynamics
+# https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/about-dependency-review
+
+fail_on_severity: moderate
+# Options: low, moderate, high, critical
+
+allow_licenses:
+  - MIT
+  - ISC
+  - BSD-3-Clause
+  - BSD-2-Clause
+  - Apache-2.0
+  - CC0-1.0
+  - 0BSD
+
+deny_licenses:
+  - MS-PL
+  - GPL-3.0
+  - LGPL-2.1
+  - AGPL-3.0
+
+vulnerability_check: true
+license_check: true
+fail_on_scopes:
+  - runtime
+
+# Allow specific packages with known issues (if needed)
+allow_package_rules:
+  # Example: Allow a package with a known vulnerability
+  # - package_name: "example-package"
+  #   reason: "This package has a vulnerability but is necessary for our use case"
+
+# Deny specific packages
+deny_package_rules:
+  - package_name: "colors"
+    reason: "This package has security issues and is unmaintained"

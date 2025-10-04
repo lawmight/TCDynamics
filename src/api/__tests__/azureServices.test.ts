@@ -1,15 +1,15 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
+  apiUtils,
+  chatAPI,
   contactAPI,
   demoAPI,
-  chatAPI,
-  visionAPI,
   healthAPI,
-  apiUtils,
+  visionAPI,
+  type ApiResponse,
+  type ChatRequest,
   type ContactFormData,
   type DemoFormData,
-  type ChatRequest,
-  type ApiResponse,
 } from '../azureServices'
 
 // Mock fetch globally
@@ -104,7 +104,7 @@ describe('Azure Services API Client', () => {
       const result = await contactAPI.submitContactForm(validContactData)
 
       expect(fetchMock).toHaveBeenCalledWith(
-        'https://test-api.com/ContactForm',
+        'https://test-api.com/contactform',
         expect.objectContaining({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -207,7 +207,7 @@ describe('Azure Services API Client', () => {
       const result = await demoAPI.submitDemoForm(validDemoData)
 
       expect(fetchMock).toHaveBeenCalledWith(
-        'https://test-api.com/DemoForm',
+        'https://test-api.com/demoform',
         expect.objectContaining({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
