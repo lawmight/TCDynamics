@@ -1,7 +1,12 @@
 #!/usr/bin/env node
 
-const { execSync } = require('child_process');
-const path = require('path');
+import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 function runCommand(command, description, cwd = process.cwd()) {
   try {
@@ -44,7 +49,6 @@ function main() {
   const functionsPath = path.join(process.cwd(), 'TCDynamics');
   try {
     // Check if requirements.txt exists
-    const fs = require('fs');
     if (fs.existsSync(path.join(functionsPath, 'requirements.txt'))) {
       runCommand('pip install -r requirements.txt --quiet', 'Installing Python dependencies', functionsPath);
       runCommand('python -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || true', 'Running Python linting', functionsPath);
@@ -63,6 +67,6 @@ function main() {
   console.log('\n✅ All pre-push checks passed!');
 }
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   main();
 }

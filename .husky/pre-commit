@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Quick pre-commit checks (fast feedback)
 echo "🔍 Running pre-commit checks..."
 
