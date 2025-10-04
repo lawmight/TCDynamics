@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Brain, MessageSquare, FileText, Zap, ArrowRight } from 'lucide-react'
+import { ArrowRight, Brain, FileText, MessageSquare, Zap } from 'lucide-react'
+import { useState } from 'react'
 import DocumentProcessor from './DocumentProcessor'
 
 const AIDemo = () => {
@@ -122,6 +122,7 @@ const AIDemo = () => {
             value={activeTab}
             onValueChange={setActiveTab}
             className="w-full"
+            aria-label="Fonctionnalités de démonstration IA"
           >
             <TabsList className="grid w-full grid-cols-2 mb-8 bg-card/50 backdrop-blur-sm">
               {demoFeatures.map(feature => {
@@ -131,6 +132,7 @@ const AIDemo = () => {
                     key={feature.id}
                     value={feature.id}
                     className="flex items-center gap-3 py-4 font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                    aria-label={`Démonstration de ${feature.title}`}
                   >
                     <IconComponent className="w-5 h-5" />
                     <div className="text-left">
@@ -195,7 +197,10 @@ const AIDemo = () => {
                         </Badge>
                       </div>
 
-                      <Button className="w-full group font-mono">
+                      <Button
+                        className="w-full group font-mono"
+                        aria-label="Ouvrir le chatbot IA pour tester les fonctionnalités"
+                      >
                         Tester le Chatbot
                         <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                       </Button>

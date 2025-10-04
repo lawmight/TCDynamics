@@ -3,10 +3,25 @@
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
+// Azure Functions endpoints (when using Azure Functions backend)
+const FUNCTIONS_BASE_URL =
+  import.meta.env.VITE_AZURE_FUNCTIONS_URL ||
+  'https://func-tcdynamics-contact.azurewebsites.net'
+
 export const API_ENDPOINTS = {
+  // Node.js backend endpoints (fallback)
   contact: `${API_BASE_URL}/api/contact`,
   demo: `${API_BASE_URL}/api/demo`,
   health: `${API_BASE_URL}/health`,
+
+  // Azure Functions endpoints
+  azureContact: `${FUNCTIONS_BASE_URL}/contactform`,
+  azureDemo: `${FUNCTIONS_BASE_URL}/demoform`,
+  azureChat: `${FUNCTIONS_BASE_URL}/chat`,
+  azureVision: `${FUNCTIONS_BASE_URL}/vision`,
+  azureHealth: `${FUNCTIONS_BASE_URL}/health`,
+  azurePaymentIntent: `${FUNCTIONS_BASE_URL}/create-payment-intent`,
+  azureSubscription: `${FUNCTIONS_BASE_URL}/create-subscription`,
 }
 
 export interface ApiResponse {

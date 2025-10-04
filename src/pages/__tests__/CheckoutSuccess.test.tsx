@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { BrowserRouter, useSearchParams } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import CheckoutSuccess from '../CheckoutSuccess'
 
 // Mock react-router-dom
@@ -81,7 +81,9 @@ describe('CheckoutSuccess', () => {
 
     renderWithRouter(<CheckoutSuccess />)
 
-    expect(screen.getByText(/Prochaines étapes/i)).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: /Prochaines étapes/i })
+    ).toBeInTheDocument()
 
     // Check all next steps are rendered
     expect(screen.getByText(/Vérifiez votre email/i)).toBeInTheDocument()
@@ -139,7 +141,10 @@ describe('CheckoutSuccess', () => {
 
     // Mock window.location.href
     delete (window as unknown as { location: unknown }).location
-    window.location = { href: '' } as Location
+    Object.defineProperty(window, 'location', {
+      value: { href: '' },
+      writable: true,
+    })
 
     renderWithRouter(<CheckoutSuccess />)
 
@@ -168,7 +173,7 @@ describe('CheckoutSuccess', () => {
 
     renderWithRouter(<CheckoutSuccess />)
 
-    expect(screen.getByText(/Merci pour votre confiance/i)).toBeInTheDocument()
+    expect(screen.getByText('Merci pour votre confiance !')).toBeInTheDocument()
   })
 
   it('triggers confetti animation on mount', async () => {

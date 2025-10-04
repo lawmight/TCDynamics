@@ -2,6 +2,7 @@
 // Configuration management with validation and environment variable handling
 
 import { z } from 'zod'
+import { logger } from './logger'
 
 const DEFAULT_FUNCTIONS_BASE_URL =
   'https://func-tcdynamics-contact.azurewebsites.net'
@@ -175,9 +176,11 @@ class ConfigManager {
       const clientValidation = clientConfigSchema.safeParse(safeClientConfig)
 
       if (!clientValidation.success) {
-        console.warn(
-          'Client configuration validation failed, using safe defaults:',
-          clientValidation.error.issues
+        logger.warn(
+          'Client configuration validation failed, using safe defaults',
+          {
+            issues: clientValidation.error.issues,
+          }
         )
         this.clientConfig = safeClientConfig
       } else {
@@ -189,9 +192,11 @@ class ConfigManager {
       const serverValidation = serverConfigSchema.safeParse(safeServerConfig)
 
       if (!serverValidation.success) {
-        console.warn(
-          'Server configuration validation failed, using safe defaults:',
-          serverValidation.error.issues
+        logger.warn(
+          'Server configuration validation failed, using safe defaults',
+          {
+            issues: serverValidation.error.issues,
+          }
         )
         this.serverConfig = safeServerConfig
       } else {
@@ -206,18 +211,18 @@ class ConfigManager {
         window.dispatchEvent(new CustomEvent('configLoaded', { detail: this }))
       }
     } catch (error) {
-      console.error('Configuration initialization failed:', error)
+      logger.error('Configuration initialization failed', error)
 
       // Fallback to safe defaults even if validation completely fails
       try {
         this.clientConfig = this.getSafeClientConfig()
         this.serverConfig = this.getSafeServerConfig()
         this.isInitialized = true
-        console.warn(
+        logger.warn(
           'Using safe configuration defaults due to initialization failure'
         )
       } catch (fallbackError) {
-        console.error('Even fallback configuration failed:', fallbackError)
+        logger.error('Even fallback configuration failed', fallbackError)
         throw new Error(
           `Configuration initialization completely failed: ${error instanceof Error ? error.message : 'Unknown error'}`
         )
@@ -325,7 +330,7 @@ class ConfigManager {
       },
     }
 
-    console.log('Configuration Status:', status)
+    logger.info('Configuration status check completed', status)
   }
 
   // ========== GETTERS ==========
@@ -483,6 +488,6 @@ export const envHelpers = {
 if (typeof window !== 'undefined') {
   // Client-side initialization
   config.initialize().catch(error => {
-    console.error('Failed to initialize client configuration:', error)
+    logger.error('Failed to initialize client configuration', error)
   })
 }

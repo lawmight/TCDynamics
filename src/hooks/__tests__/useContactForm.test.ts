@@ -1,5 +1,5 @@
-import { renderHook, act } from '@testing-library/react'
-import { vi } from 'vitest'
+import { act, renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useContactForm } from '../useContactForm'
 
 // Mock fetch
@@ -28,7 +28,9 @@ describe('useContactForm', () => {
       message: 'Message envoyé avec succès',
     }
 
-    ;(fetch as jest.MockedFunction<typeof fetch>).mockResolvedValueOnce({
+    ;(
+      fetch as ReturnType<typeof vi.mocked<typeof fetch>>
+    ).mockResolvedValueOnce({
       ok: true,
       json: async () => mockResponse,
     } as Response)
@@ -48,9 +50,8 @@ describe('useContactForm', () => {
   })
 
   it('should handle errors', async () => {
-    ;(fetch as jest.MockedFunction<typeof fetch>).mockRejectedValueOnce(
-      new Error('Network error')
-    )
+    vi.mocked(fetch).mockRejectedValueOnce(new Error('Network error'))
+    vi.mocked(fetch).mockRejectedValueOnce(new Error('Network error'))
 
     const { result } = renderHook(() => useContactForm())
 
@@ -73,7 +74,9 @@ describe('useContactForm', () => {
       errors: ['response.text is not a function'],
     }
 
-    ;(fetch as jest.MockedFunction<typeof fetch>).mockResolvedValueOnce({
+    ;(
+      fetch as ReturnType<typeof vi.mocked<typeof fetch>>
+    ).mockResolvedValueOnce({
       ok: false,
       json: async () => mockResponse,
     } as Response)

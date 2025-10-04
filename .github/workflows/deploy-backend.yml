@@ -1,0 +1,303 @@
+name: "Deploy Backend Stack"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - 'docker-compose.yml'
+      - 'nginx.conf'
+      - '.env.example'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Build and push Docker images
+  build-and-push:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    outputs:
+      backend-image: ${{ steps.meta-backend.outputs.tags }}
+      frontend-image: ${{ steps.meta-frontend.outputs.tags }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for backend
+        id: meta-backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backend
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Extract metadata for frontend
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.frontend
+          push: true
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # Deploy to OVHcloud VPS
+  deploy-to-ovh:
+    name: Deploy to OVHcloud
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to OVHcloud VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.OVHCLOUD_HOST }}
+          username: ${{ secrets.OVHCLOUD_USER }}
+          key: ${{ secrets.OVHCLOUD_SSH_KEY }}
+          port: ${{ secrets.OVHCLOUD_PORT || 22 }}
+          script: |
+            # Navigate to project directory
+            cd /opt/tcdynamics
+
+            # Backup current environment
+            echo "📦 Creating backup..."
+            mkdir -p backups
+            if [ -f "docker-compose.yml" ]; then
+              cp docker-compose.yml backups/docker-compose.yml.$(date +%Y%m%d_%H%M%S)
+            fi
+
+            # Pull latest code (if using git)
+            if [ -d ".git" ]; then
+              git pull origin main
+            fi
+
+      - name: Copy docker-compose and environment files
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.OVHCLOUD_HOST }}
+          username: ${{ secrets.OVHCLOUD_USER }}
+          key: ${{ secrets.OVHCLOUD_SSH_KEY }}
+          port: ${{ secrets.OVHCLOUD_PORT || 22 }}
+          source: "docker-compose.yml,nginx.conf,.env.production"
+          target: "/opt/tcdynamics"
+          strip_components: 0
+
+      - name: Update Docker images and deploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.OVHCLOUD_HOST }}
+          username: ${{ secrets.OVHCLOUD_USER }}
+          key: ${{ secrets.OVHCLOUD_SSH_KEY }}
+          port: ${{ secrets.OVHCLOUD_PORT || 22 }}
+          script: |
+            cd /opt/tcdynamics
+
+            # Login to GitHub Container Registry
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+
+            # Pull latest images
+            echo "📥 Pulling latest Docker images..."
+            docker-compose pull
+
+            # Stop existing containers gracefully
+            echo "🛑 Stopping existing containers..."
+            docker-compose down --timeout 30
+
+            # Remove unused images (optional, to save disk space)
+            docker image prune -f
+
+            # Start new containers
+            echo "🚀 Starting new containers..."
+            docker-compose up -d
+
+            # Wait for services to be healthy
+            echo "⏳ Waiting for services to be healthy..."
+            sleep 30
+
+            # Check container status
+            docker-compose ps
+
+            # Verify backend health
+            echo "🔍 Checking backend health..."
+            for i in {1..10}; do
+              if curl -f --max-time 10 http://localhost:3001/health; then
+                echo "✅ Backend is healthy!"
+                break
+              else
+                echo "⏳ Backend not ready yet, retrying in 10 seconds..."
+                sleep 10
+              fi
+            done
+
+            # Verify frontend is accessible
+            echo "🔍 Checking frontend accessibility..."
+            if curl -f --max-time 10 http://localhost:80; then
+              echo "✅ Frontend is accessible!"
+            else
+              echo "⚠️ Frontend check failed, but deployment may still be successful"
+            fi
+
+  # Run post-deployment tests
+  post-deployment-tests:
+    name: Post-Deployment Tests
+    runs-on: ubuntu-latest
+    needs: deploy-to-ovh
+    if: success()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Test deployed backend API
+        run: |
+          echo "Testing deployed backend API..."
+          # Test health endpoint
+          if curl -f --max-time 30 ${{ secrets.OVHCLOUD_BACKEND_URL }}/health; then
+            echo "✅ Backend health check passed!"
+          else
+            echo "❌ Backend health check failed!"
+            exit 1
+          fi
+
+      - name: Test deployed frontend
+        run: |
+          echo "Testing deployed frontend..."
+          # Test frontend is serving
+          if curl -f --max-time 30 -I ${{ secrets.OVHCLOUD_FRONTEND_URL }} | grep -q "200\|302"; then
+            echo "✅ Frontend is responding!"
+          else
+            echo "❌ Frontend check failed!"
+            exit 1
+          fi
+
+  # Database migration (if needed)
+  database-migration:
+    name: Database Migration
+    runs-on: ubuntu-latest
+    needs: deploy-to-ovh
+    if: success()
+
+    steps:
+      - name: Run database migrations
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.OVHCLOUD_HOST }}
+          username: ${{ secrets.OVHCLOUD_USER }}
+          key: ${{ secrets.OVHCLOUD_SSH_KEY }}
+          port: ${{ secrets.OVHCLOUD_PORT || 22 }}
+          script: |
+            cd /opt/tcdynamics
+
+            # Run database migrations if migration script exists
+            if [ -f "backend/migrate.sh" ]; then
+              echo "🗄️ Running database migrations..."
+              chmod +x backend/migrate.sh
+              ./backend/migrate.sh
+            else
+              echo "ℹ️ No migration script found, skipping migrations"
+            fi
+
+  # Cleanup and notifications
+  cleanup-notification:
+    name: Cleanup and Notification
+    runs-on: ubuntu-latest
+    needs: [deploy-to-ovh, post-deployment-tests, database-migration]
+    if: always()
+
+    steps:
+      - name: Deployment Summary
+        run: |
+          echo "🎉 Backend Stack Deployment Summary"
+          echo "==================================="
+          echo ""
+          echo "📅 Deployment Date: $(date)"
+          echo "🔗 Repository: ${{ github.repository }}"
+          echo "🌿 Branch: ${{ github.ref_name }}"
+          echo "📝 Commit: ${{ github.sha }}"
+          echo ""
+          echo "🚀 Deployment Status:"
+          echo "  • Docker Images: ${{ needs.build-and-push.result }}"
+          echo "  • OVH Deployment: ${{ needs.deploy-to-ovh.result }}"
+          echo "  • Post-Deploy Tests: ${{ needs.post-deployment-tests.result }}"
+          echo "  • DB Migration: ${{ needs.database-migration.result }}"
+          echo ""
+          echo "🔗 Endpoints:"
+          echo "  • Frontend: ${{ secrets.OVHCLOUD_FRONTEND_URL }}"
+          echo "  • Backend API: ${{ secrets.OVHCLOUD_BACKEND_URL }}"
+          echo "  • Health Check: ${{ secrets.OVHCLOUD_BACKEND_URL }}/health"
+
+      - name: Notify on Slack (if configured)
+        if: always() && env.SLACK_WEBHOOK != ''
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Backend deployment failed!"
+          echo "Please check the logs above and fix any issues."
+          echo ""
+          echo "🔧 Common issues:"
+          echo "1. Check OVHcloud server connectivity"
+          echo "2. Verify SSH keys and permissions"
+          echo "3. Check Docker and docker-compose installation"
+          echo "4. Review environment variables"
+          exit 1

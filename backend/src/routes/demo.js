@@ -2,6 +2,7 @@ const express = require('express')
 const { createTransporter, emailTemplates } = require('../config/email')
 const { validateData, demoSchema } = require('../utils/validation')
 const { formRateLimit } = require('../middleware/security')
+const { logger } = require('../utils/logger')
 
 const router = express.Router()
 
@@ -20,7 +21,7 @@ router.post(
 
       // Vérifier la connexion
       await transporter.verify()
-      console.log('✅ Serveur email Zoho prêt pour la démo - contact@workflowai.fr')
+      logger.info('Serveur email Zoho prêt pour la démo', { emailService: 'contact@workflowai.fr' })
 
       // Préparer l'email
       const emailData = emailTemplates.demo({
@@ -41,7 +42,7 @@ router.post(
         ...emailData,
       })
 
-      console.log('�� Email de démo envoyé:', info.messageId)
+      logger.info('Email de démo envoyé avec succès', { messageId: info.messageId, recipient: email })
 
       // Réponse de succès
       res.status(200).json({
@@ -51,7 +52,7 @@ router.post(
         messageId: info.messageId,
       })
     } catch (error) {
-      console.error("❌ Erreur lors de l'envoi de la demande de démo:", error)
+      logger.error("Erreur lors de l'envoi de la demande de démo", { error: error.message, email })
 
       res.status(500).json({
         success: false,

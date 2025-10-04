@@ -1,0 +1,19 @@
+# Azure Functions runtime
+azure-functions==1.17.0
+
+# Azure SDK
+azure-core==1.30.0
+azure-cosmos==4.5.1
+azure-ai-vision-imageanalysis==1.0.0b2
+
+# OpenAI
+openai==1.35.13
+
+# Email
+# Note: smtplib is built-in, no need to install
+
+# Stripe
+stripe==10.7.0
+
+# Additional utilities
+python-dotenv==1.0.0

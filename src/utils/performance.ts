@@ -1,7 +1,7 @@
 // src/utils/performance.ts
 // Performance monitoring and optimization utilities
 
-import { config } from './config'
+import { logger } from './logger'
 
 // ========== PERFORMANCE METRICS ==========
 
@@ -55,10 +55,11 @@ class PerformanceMonitor {
     // Notify observers
     this.observers.forEach(observer => observer(metric))
 
-    // Log in development
-    if (config.isDevelopment && config.client.VITE_ENABLE_DEBUG_LOGGING) {
-      console.log(`[PERF] ${name}: ${value}ms`, metadata)
-    }
+    // Log performance metrics
+    logger.info(`Performance: ${name}`, {
+      duration: `${value}ms`,
+      metadata,
+    })
   }
 
   /**
@@ -327,7 +328,8 @@ class SmartCache {
 
     // Then, if still over limit, evict LRU entries
     while (targetSize > this.config.maxSize && this.lruQueue.length > 0) {
-      const oldestKey = this.lruQueue.pop()!
+      const oldestKey = this.lruQueue.pop()
+      if (!oldestKey) continue
       const entry = this.cache.get(oldestKey)
       if (entry) {
         this.currentSize -= entry.size
@@ -603,7 +605,8 @@ class ResourcePool<T> {
       'resource.acquire',
       async () => {
         if (this.available.length > 0) {
-          const resource = this.available.pop()!
+          const resource = this.available.pop()
+          if (!resource) throw new Error('Failed to acquire resource from pool')
           this.inUse.add(resource)
           return resource
         }
@@ -833,13 +836,14 @@ export const browserPerformance = {
       // Cumulative Layout Shift
       new PerformanceObserver(entryList => {
         const entries = entryList.getEntries()
-        vitals.cls = entries[entries.length - 1].value
+        vitals.cls = (entries[entries.length - 1] as any).value
       }).observe({ entryTypes: ['layout-shift'] })
 
       // First Input Delay
       new PerformanceObserver(entryList => {
         const entries = entryList.getEntries()
-        vitals.fid = entries[0].processingStart - entries[0].startTime
+        vitals.fid =
+          (entries[0] as any).processingStart - (entries[0] as any).startTime
       }).observe({ entryTypes: ['first-input'] })
 
       // Largest Contentful Paint
