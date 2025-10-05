@@ -4,8 +4,8 @@
 # Core Azure Functions runtime
 azure-functions==1.17.0
 
-# Azure SDK - pinned versions for compatibility
-azure-core>=1.31.0,<2.0.0
+# Azure SDK - compatible with azure-functions==1.17.0
+azure-core>=1.30.0,<2.0.0
 azure-cosmos==4.5.1
 azure-ai-vision-imageanalysis==1.0.0b2
 
