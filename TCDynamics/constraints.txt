@@ -1,0 +1,31 @@
+# Azure Functions Python constraints to avoid version conflicts
+# These versions are known to work together
+
+# Core Azure Functions runtime
+azure-functions==1.17.0
+
+# Azure SDK - pinned versions for compatibility
+azure-core>=1.31.0,<2.0.0
+azure-cosmos==4.5.1
+azure-ai-vision-imageanalysis==1.0.0b2
+
+# OpenAI - pinned to avoid breaking changes
+openai>=1.35.0,<2.0.0
+
+# Stripe - pinned version
+stripe>=10.7.0,<11.0.0
+
+# Python-dotenv - stable version
+python-dotenv>=1.0.0,<2.0.0
+
+# Additional constraints for security and compatibility
+requests>=2.31.0,<3.0.0
+urllib3>=1.26.0,<2.0.0
+certifi>=2023.0.0
+charset-normalizer>=3.0.0,<4.0.0
+idna>=3.0.0,<4.0.0
+
+# Azure Functions specific constraints
+typing-extensions>=4.0.0,<5.0.0
+six>=1.16.0,<2.0.0
+python-dateutil>=2.8.0,<3.0.0
