@@ -32,6 +32,9 @@ COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
 # Copier le code source
 COPY --chown=nodejs:nodejs . .
 
+# Copier le script de health check
+COPY --chown=nodejs:nodejs healthcheck.js .
+
 # Créer les dossiers nécessaires
 RUN mkdir -p /app/logs /app/tmp && \
     chown -R nodejs:nodejs /app/logs /app/tmp
@@ -50,34 +53,9 @@ ENV PM2_SECRET_KEY=your_pm2_secret_key
 # Configuration PM2
 COPY --chown=nodejs:nodejs ecosystem.config.js ./
 
-# Health check amélioré
+# Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD node -e "
-    const http = require('http');
-    const options = {
-      hostname: 'localhost',
-      port: 3001,
-      path: '/health',
-      method: 'GET',
-      timeout: 5000
-    };
-
-    const req = http.request(options, (res) => {
-      if (res.statusCode === 200) {
-        process.exit(0);
-      } else {
-        process.exit(1);
-      }
-    });
-
-    req.on('error', () => process.exit(1));
-    req.on('timeout', () => {
-      req.destroy();
-      process.exit(1);
-    });
-
-    req.end();
-  "
+  CMD node healthcheck.js
 
 # Démarrer l'application avec PM2
 CMD ["pm2-runtime", "start", "ecosystem.config.js", "--env", "production"]

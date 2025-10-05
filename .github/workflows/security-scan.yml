@@ -1,4 +1,4 @@
-name: "Security Scan"
+name: 'Security Scan'
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ['javascript', 'typescript', 'python']
+        language: ['javascript', 'python']
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
         # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
 
@@ -46,8 +46,8 @@ jobs:
           # Details on CodeQL's query packs refer to : https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
           # queries: security-extended,security-and-quality
 
-      - name: Setup Node.js for JavaScript/TypeScript
-        if: matrix.language == 'javascript' || matrix.language == 'typescript'
+      - name: Setup Node.js for JavaScript
+        if: matrix.language == 'javascript'
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -59,8 +59,8 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install dependencies for JavaScript/TypeScript
-        if: matrix.language == 'javascript' || matrix.language == 'typescript'
+      - name: Install dependencies for JavaScript
+        if: matrix.language == 'javascript'
         run: |
           npm ci
           cd backend && npm ci
@@ -78,7 +78,7 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
-          category: "/language:${{matrix.language}}"
+          category: '/language:${{matrix.language}}'
 
   # Snyk Security Scan
   snyk-security:
@@ -106,24 +106,20 @@ jobs:
 
       - name: Run Snyk to check for vulnerabilities in root dependencies
         uses: snyk/actions/node@master
-        continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: --severity-threshold=high --fail-on=upgradable
 
       - name: Run Snyk to check for vulnerabilities in backend dependencies
-        uses: snyk/actions/node@master
-        continue-on-error: true
         working-directory: backend
+        run: |
+          npx snyk test --severity-threshold=high --fail-on=upgradable
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high --fail-on=upgradable
 
       - name: Run Snyk for Python dependencies
         uses: snyk/actions/python@master
-        continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
@@ -132,7 +128,6 @@ jobs:
 
       - name: Run Snyk Infrastructure as Code (IaC) scan
         uses: snyk/actions/iac@master
-        continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
@@ -249,7 +244,7 @@ jobs:
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
-          base: main
+          base: ${{ github.event.pull_request.base.ref || github.ref_name }}
           head: HEAD
           extra_args: --debug --only-verified
 
@@ -257,7 +252,15 @@ jobs:
   security-summary:
     name: Security Audit Summary
     runs-on: ubuntu-latest
-    needs: [codeql-analysis, snyk-security, container-security, dependency-review, license-check, secrets-detection]
+    needs:
+      [
+        codeql-analysis,
+        snyk-security,
+        container-security,
+        dependency-review,
+        license-check,
+        secrets-detection,
+      ]
     if: always()
 
     steps:
@@ -330,7 +333,7 @@ jobs:
             }
 
       - name: Notify on critical security findings
-        if: contains(needs.*.result, 'failure') && env.SLACK_WEBHOOK != ''
+        if: contains(needs.*.result, 'failure') && env.SLACK_WEBHOOK_URL != ''
         uses: 8398a7/action-slack@v3
         with:
           status: failure
