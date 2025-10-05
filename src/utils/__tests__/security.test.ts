@@ -426,8 +426,8 @@ describe('Security Utilities', () => {
         securityUtils.logSecurityEvent(event, details)
 
         expect(consoleWarnMock).toHaveBeenCalledWith(
-          expect.stringContaining('[SECURITY]'),
-          details
+          expect.stringContaining('WARN: Security event:'),
+          { details }
         )
       })
     })

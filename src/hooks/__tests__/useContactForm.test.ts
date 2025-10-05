@@ -50,7 +50,8 @@ describe('useContactForm', () => {
   })
 
   it('should handle errors', async () => {
-    vi.mocked(fetch).mockRejectedValueOnce(new Error('Network error'))
+    // Mock both Azure Functions and Node.js backend to fail
+    vi.mocked(fetch).mockRejectedValue(new Error('Network error'))
 
     const { result } = renderHook(() => useContactForm())
 

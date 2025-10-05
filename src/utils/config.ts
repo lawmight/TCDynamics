@@ -445,6 +445,7 @@ class ConfigManager {
 
 // ========== SINGLETON INSTANCE ==========
 
+export { ConfigManager }
 export const config = new ConfigManager()
 
 // ========== ENVIRONMENT VARIABLE HELPERS ==========
