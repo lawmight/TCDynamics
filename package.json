@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "description": "TCDynamics React frontend - deployment with function discovery",
+  "license": "Proprietary",
   "type": "module",
   "scripts": {
     "dev": "vite",
