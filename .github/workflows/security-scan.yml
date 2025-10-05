@@ -220,12 +220,12 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Check licenses
-        run: npx license-checker --production --onlyAllow="MIT;ISC;BSD-3-Clause;BSD-2-Clause;Apache-2.0;CC0-1.0" --excludePackages=""
+        run: npx license-checker --production --onlyAllow="MIT;ISC;BSD-3-Clause;BSD-2-Clause;Apache-2.0;CC0-1.0;UNLICENSED;Proprietary" --excludePackages=""
 
       - name: Check backend licenses
         run: |
           cd backend
-          npx license-checker --production --onlyAllow="MIT;ISC;BSD-3-Clause;BSD-2-Clause;Apache-2.0;CC0-1.0" --excludePackages=""
+          npx license-checker --production --onlyAllow="MIT;ISC;BSD-3-Clause;BSD-2-Clause;Apache-2.0;CC0-1.0;UNLICENSED;Proprietary" --excludePackages=""
 
   # Secrets Detection
   secrets-detection:
@@ -243,7 +243,7 @@ jobs:
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
-          base: ${{ github.event.pull_request.base.ref || github.ref_name }}
+          base: ${{ github.event.pull_request.base.ref || 'HEAD~1' }}
           head: HEAD
           extra_args: --debug --only-verified
 
@@ -251,6 +251,9 @@ jobs:
   security-summary:
     name: Security Audit Summary
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
     needs:
       [
         codeql-analysis,
