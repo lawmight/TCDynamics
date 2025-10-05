@@ -125,7 +125,7 @@ const Contact = () => {
 
         <div className="grid lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
           {/* Demo Request Form */}
-          <div className="fade-in-up" style={{ animationDelay: '0.2s' }}>
+          <div className="fade-in-up fade-delay-02">
             <Card className="bg-card/60 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-all duration-300">
               <CardHeader>
                 <div className="flex items-center gap-3 mb-2">
@@ -354,10 +354,7 @@ const Contact = () => {
           {/* Contact Information & General Form */}
           <div className="space-y-8">
             {/* Contact Info Cards */}
-            <div
-              className="grid grid-cols-1 sm:grid-cols-2 gap-4 fade-in-up"
-              style={{ animationDelay: '0.4s' }}
-            >
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 fade-in-up fade-delay-04">
               {contactInfo.map((info, index) => {
                 const IconComponent = info.icon
                 return (
@@ -393,10 +390,7 @@ const Contact = () => {
             </div>
 
             {/* General Contact Form */}
-            <Card
-              className="bg-card/60 backdrop-blur-sm border-primary/20 fade-in-up"
-              style={{ animationDelay: '0.6s' }}
-            >
+            <Card className="bg-card/60 backdrop-blur-sm border-primary/20 fade-in-up fade-delay-06">
               <CardHeader>
                 <div className="flex items-center gap-3 mb-2">
                   <div className="p-2 bg-primary/10 rounded-full">
@@ -540,10 +534,7 @@ const Contact = () => {
             </Card>
 
             {/* Local Office Highlight */}
-            <Card
-              className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20 fade-in-up"
-              style={{ animationDelay: '0.8s' }}
-            >
+            <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20 fade-in-up fade-delay-08">
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
                   <div className="p-3 bg-primary/20 rounded-full">
@@ -585,10 +576,7 @@ const Contact = () => {
         </div>
 
         {/* Bottom Trust Indicators */}
-        <div
-          className="text-center mt-16 fade-in-up"
-          style={{ animationDelay: '1s' }}
-        >
+        <div className="text-center mt-16 fade-in-up fade-delay-10">
           <div className="flex flex-wrap justify-center gap-6 text-sm font-mono text-muted-foreground">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-primary" />

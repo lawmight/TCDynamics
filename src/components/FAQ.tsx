@@ -1,4 +1,16 @@
-import React, { createContext, useContext, useState, useId } from 'react'
+import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
+import {
+  CheckCircle,
+  Clock,
+  Gift,
+  HeadphonesIcon,
+  Phone,
+  Shield,
+  Users,
+  Wrench,
+} from 'lucide-react'
+import React, { createContext, useContext, useId, useState } from 'react'
 
 // Accordion Context for state management
 interface AccordionContextType {
@@ -163,18 +175,6 @@ const AccordionContent = ({
     </div>
   )
 }
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import {
-  Shield,
-  Wrench,
-  HeadphonesIcon,
-  Gift,
-  Clock,
-  Users,
-  CheckCircle,
-  Phone,
-} from 'lucide-react'
 
 const FAQ = () => {
   const faqs = [
@@ -331,10 +331,7 @@ const FAQ = () => {
 
         {/* FAQ Accordion */}
         <div className="max-w-4xl mx-auto">
-          <Card
-            className="bg-card/60 backdrop-blur-sm border-primary/20 p-8 fade-in-up"
-            style={{ animationDelay: '0.2s' }}
-          >
+          <Card className="bg-card/60 backdrop-blur-sm border-primary/20 p-8 fade-in-up fade-delay-02">
             <Accordion type="single" collapsible className="space-y-4">
               {allFaqs.map(faq => {
                 const IconComponent = faq.icon
@@ -412,10 +409,7 @@ const FAQ = () => {
         </div>
 
         {/* Contact CTA */}
-        <div
-          className="text-center mt-12 fade-in-up"
-          style={{ animationDelay: '0.4s' }}
-        >
+        <div className="text-center mt-12 fade-in-up fade-delay-04">
           <div className="bg-card/30 backdrop-blur-sm rounded-2xl border border-primary/20 p-8 max-w-2xl mx-auto">
             <div className="flex items-center justify-center gap-3 mb-4">
               <Phone className="w-6 h-6 text-primary" />

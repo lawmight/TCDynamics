@@ -221,6 +221,38 @@ a,
   animation: fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.4s forwards;
 }
 
+/* Animation delay classes for CSP compliance */
+.fade-delay-00 {
+  animation-delay: 0s;
+}
+.fade-delay-01 {
+  animation-delay: 0.1s;
+}
+.fade-delay-02 {
+  animation-delay: 0.2s;
+}
+.fade-delay-03 {
+  animation-delay: 0.3s;
+}
+.fade-delay-04 {
+  animation-delay: 0.4s;
+}
+.fade-delay-05 {
+  animation-delay: 0.5s;
+}
+.fade-delay-06 {
+  animation-delay: 0.6s;
+}
+.fade-delay-08 {
+  animation-delay: 0.8s;
+}
+.fade-delay-10 {
+  animation-delay: 1s;
+}
+.fade-delay-20 {
+  animation-delay: 2s;
+}
+
 /* Stagger animations for lists */
 .stagger-fade > * {
   opacity: 0;

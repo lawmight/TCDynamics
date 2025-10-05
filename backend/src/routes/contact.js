@@ -20,7 +20,9 @@ router.post(
 
       // Vérifier la connexion
       await transporter.verify()
-      logger.info('Serveur email Zoho prêt', { emailService: 'contact@workflowai.fr' })
+      logger.info('Serveur email Zoho prêt', {
+        emailService: 'contact@workflowai.fr',
+      })
 
       // Préparer l'email
       const emailData = emailTemplates.contact({
@@ -39,7 +41,11 @@ router.post(
         ...emailData,
       })
 
-      logger.info('Email envoyé avec succès', { messageId: info.messageId, recipient: email })
+      logger.info('Email envoyé avec succès', {
+        messageId: info.messageId,
+        sender: email,
+        recipient: process.env.EMAIL_USER,
+      })
 
       // Réponse de succès
       res.status(200).json({
@@ -49,7 +55,11 @@ router.post(
         messageId: info.messageId,
       })
     } catch (error) {
-      logger.error("Erreur lors de l'envoi de l'email de contact", { error: error.message, email })
+      logger.error("Erreur lors de l'envoi de l'email de contact", {
+        error: error.message,
+        submitterEmail: email ?? 'unknown',
+        action: 'send_contact_email',
+      })
 
       res.status(500).json({
         success: false,

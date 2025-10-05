@@ -103,8 +103,15 @@ const HowItWorks = () => {
             return (
               <div
                 key={index}
-                className="relative fade-in-up"
-                style={{ animationDelay: `${index * 0.2}s` }}
+                className={`relative fade-in-up ${
+                  index === 0
+                    ? 'fade-delay-00'
+                    : index === 1
+                      ? 'fade-delay-02'
+                      : index === 2
+                        ? 'fade-delay-04'
+                        : ''
+                }`}
               >
                 <Card className="h-full bg-card/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-all duration-300 group hover:scale-105">
                   <CardContent className="p-8">
@@ -159,10 +166,7 @@ const HowItWorks = () => {
         </div>
 
         {/* Bottom CTA */}
-        <div
-          className="text-center mt-16 fade-in-up"
-          style={{ animationDelay: '0.6s' }}
-        >
+        <div className="text-center mt-16 fade-in-up fade-delay-06">
           <p className="text-lg text-muted-foreground font-mono mb-6">
             Prêt à automatiser votre entreprise ?
           </p>

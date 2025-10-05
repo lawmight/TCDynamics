@@ -41,14 +41,8 @@ const AIDemo = () => {
       {/* Background Network Patterns */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-1/4 left-1/6 w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-        <div
-          className="absolute top-1/2 right-1/4 w-1 h-1 bg-primary-glow rounded-full animate-pulse"
-          style={{ animationDelay: '1s' }}
-        ></div>
-        <div
-          className="absolute bottom-1/4 left-1/3 w-1.5 h-1.5 bg-primary rounded-full animate-pulse"
-          style={{ animationDelay: '2s' }}
-        ></div>
+        <div className="absolute top-1/2 right-1/4 w-1 h-1 bg-primary-glow rounded-full animate-pulse fade-delay-10"></div>
+        <div className="absolute bottom-1/4 left-1/3 w-1.5 h-1.5 bg-primary rounded-full animate-pulse fade-delay-20"></div>
 
         {/* Connection Lines */}
         <svg

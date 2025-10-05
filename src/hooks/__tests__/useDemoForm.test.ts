@@ -54,7 +54,6 @@ describe('useDemoForm', () => {
 
   it('should handle network errors', async () => {
     vi.mocked(fetch).mockRejectedValueOnce(new Error('Network error'))
-    vi.mocked(fetch).mockRejectedValueOnce(new Error('Network error'))
 
     const { result } = renderHook(() => useDemoForm())
 

@@ -1,120 +1,103 @@
 {
-    "version": "0.2.0",
-    "configurations": [
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug React Frontend (Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/src",
+      "sourceMaps": true,
+      "preLaunchTask": "Frontend: Start Development Server"
+    },
+    {
+      "name": "Debug React Frontend (Edge)",
+      "type": "msedge",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/src",
+      "sourceMaps": true,
+      "preLaunchTask": "Frontend: Start Development Server"
+    },
+    {
+      "name": "Debug Node.js Backend",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/src/server.js",
+      "skipFiles": ["<node_internals>/**"],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "console": "integratedTerminal",
+      "preLaunchTask": "Backend: Start Development Server"
+    },
+    {
+      "name": "Debug Node.js Backend (Attach)",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "skipFiles": ["<node_internals>/**"],
+      "restart": true
+    },
+    {
+      "name": "Debug Jest Tests",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": ["--runInBand", "--watchAll=false"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Debug Jest Tests (Backend)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/node_modules/.bin/jest",
+      "args": ["--runInBand", "--watchAll=false"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "cwd": "${workspaceFolder}/backend"
+    },
+    {
+      "name": "Attach to Python Functions",
+      "type": "debugpy",
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": 9091
+      },
+      "preLaunchTask": "func: host start"
+    },
+    {
+      "name": "Debug Python Functions Locally",
+      "type": "debugpy",
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": 9091
+      },
+      "pathMappings": [
         {
-            "name": "Launch React Frontend",
-            "type": "chrome",
-            "request": "launch",
-            "url": "http://localhost:5173",
-            "webRoot": "${workspaceFolder}/src",
-            "sourceMapPathOverrides": {
-                "webpack:///src/*": "${webRoot}/*"
-            },
-            "preLaunchTask": "Frontend: Start Development Server"
-        },
-        {
-            "name": "Debug React Frontend (Chrome)",
-            "type": "chrome",
-            "request": "launch",
-            "url": "http://localhost:5173",
-            "webRoot": "${workspaceFolder}/src",
-            "sourceMaps": true,
-            "preLaunchTask": "Frontend: Start Development Server"
-        },
-        {
-            "name": "Debug React Frontend (Edge)",
-            "type": "msedge",
-            "request": "launch",
-            "url": "http://localhost:5173",
-            "webRoot": "${workspaceFolder}/src",
-            "sourceMaps": true,
-            "preLaunchTask": "Frontend: Start Development Server"
-        },
-        {
-            "name": "Debug Node.js Backend",
-            "type": "node",
-            "request": "launch",
-            "program": "${workspaceFolder}/backend/src/server.js",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "env": {
-                "NODE_ENV": "development"
-            },
-            "console": "integratedTerminal",
-            "preLaunchTask": "Backend: Start Development Server"
-        },
-        {
-            "name": "Debug Node.js Backend (Attach)",
-            "type": "node",
-            "request": "attach",
-            "port": 9229,
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "restart": true
-        },
-        {
-            "name": "Debug Jest Tests",
-            "type": "node",
-            "request": "launch",
-            "program": "${workspaceFolder}/node_modules/.bin/jest",
-            "args": [
-                "--runInBand",
-                "--watchAll=false"
-            ],
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen"
-        },
-        {
-            "name": "Debug Jest Tests (Backend)",
-            "type": "node",
-            "request": "launch",
-            "program": "${workspaceFolder}/backend/node_modules/.bin/jest",
-            "args": [
-                "--runInBand",
-                "--watchAll=false"
-            ],
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen",
-            "cwd": "${workspaceFolder}/backend"
-        },
-        {
-            "name": "Attach to Python Functions",
-            "type": "debugpy",
-            "request": "attach",
-            "connect": {
-                "host": "localhost",
-                "port": 9091
-            },
-            "preLaunchTask": "func: host start"
-        },
-        {
-            "name": "Debug Python Functions Locally",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "azure.functions",
-            "args": [
-                "host",
-                "start"
-            ],
-            "cwd": "${workspaceFolder}/TCDynamics",
-            "preLaunchTask": "pip install (functions)"
-        },
-    ],
-    "compounds": [
-        {
-            "name": "Full Stack Debug",
-            "configurations": [
-                "Launch React Frontend",
-                "Debug Node.js Backend"
-            ],
-            "presentation": {
-                "hidden": false,
-                "group": "",
-                "order": 1
-            },
-            "stopAll": true
+          "localRoot": "${workspaceFolder}/TCDynamics",
+          "remoteRoot": "."
         }
-    ]
+      ],
+      "preLaunchTask": "func: host start (debug)"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack Debug",
+      "configurations": [
+        "Debug React Frontend (Chrome)",
+        "Debug Node.js Backend"
+      ],
+      "presentation": {
+        "hidden": false,
+        "group": "",
+        "order": 1
+      },
+      "stopAll": true
+    }
+  ]
 }

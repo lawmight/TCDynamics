@@ -1,14 +1,14 @@
-import {
-  FileText,
-  MessageSquare,
-  BarChart3,
-  Shield,
-  ArrowRight,
-  Zap,
-  Brain,
-  Lock,
-} from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import {
+  ArrowRight,
+  BarChart3,
+  Brain,
+  FileText,
+  Lock,
+  MessageSquare,
+  Shield,
+  Zap,
+} from 'lucide-react'
 
 const Features = () => {
   const features = [
@@ -67,14 +67,8 @@ const Features = () => {
       {/* Background Network Patterns */}
       <div className="absolute inset-0 opacity-40">
         <div className="absolute top-1/6 left-1/5 w-1 h-1 bg-primary rounded-full animate-pulse"></div>
-        <div
-          className="absolute top-2/3 right-1/4 w-1.5 h-1.5 bg-primary-glow rounded-full animate-pulse"
-          style={{ animationDelay: '2s' }}
-        ></div>
-        <div
-          className="absolute bottom-1/3 left-1/2 w-1 h-1 bg-primary rounded-full animate-pulse"
-          style={{ animationDelay: '1s' }}
-        ></div>
+        <div className="absolute top-2/3 right-1/4 w-1.5 h-1.5 bg-primary-glow rounded-full animate-pulse fade-delay-20"></div>
+        <div className="absolute bottom-1/3 left-1/2 w-1 h-1 bg-primary rounded-full animate-pulse fade-delay-10"></div>
 
         {/* Subtle connection lines */}
         <svg
@@ -140,8 +134,17 @@ const Features = () => {
           {features.map((feature, index) => (
             <div
               key={index}
-              className="group relative bg-card/30 backdrop-blur-sm border border-border rounded-lg p-8 hover:bg-card/50 transition-all duration-500 hover:border-primary/30 fade-in-up"
-              style={{ animationDelay: feature.delay }}
+              className={`group relative bg-card/30 backdrop-blur-sm border border-border rounded-lg p-8 hover:bg-card/50 transition-all duration-500 hover:border-primary/30 fade-in-up ${
+                feature.delay === '0s'
+                  ? 'fade-delay-00'
+                  : feature.delay === '0.1s'
+                    ? 'fade-delay-01'
+                    : feature.delay === '0.2s'
+                      ? 'fade-delay-02'
+                      : feature.delay === '0.3s'
+                        ? 'fade-delay-03'
+                        : ''
+              }`}
             >
               {/* Icon Header */}
               <div className="flex items-center gap-4 mb-6">

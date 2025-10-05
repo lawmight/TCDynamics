@@ -114,7 +114,13 @@ VITE_ANALYTICS_HOTJAR_ID=
 
 ## Azure Functions Local Settings (TCDynamics/local.settings.json)
 
-Update your `TCDynamics/local.settings.json` file:
+Update your `TCDynamics/local.settings.json` file with the following configuration values:
+
+- **Azure OpenAI**: Endpoint, API key, and deployment name for AI services
+- **Azure Vision**: Endpoint and API key for computer vision services
+- **Email Service**: Zoho email credentials for SMTP notifications
+- **Database**: Cosmos DB connection string and container names
+- **Stripe (Optional)**: Payment processing keys for billing features
 
 ```json
 {
@@ -122,28 +128,18 @@ Update your `TCDynamics/local.settings.json` file:
   "Values": {
     "FUNCTIONS_WORKER_RUNTIME": "python",
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-
-    // Azure OpenAI
     "AZURE_OPENAI_ENDPOINT": "https://your-openai-service.openai.azure.com/",
     "AZURE_OPENAI_KEY": "your-openai-key-here",
     "AZURE_OPENAI_DEPLOYMENT": "gpt-35-turbo",
-
-    // Azure Vision
     "AZURE_VISION_ENDPOINT": "https://your-vision-service.cognitiveservices.azure.com/",
     "AZURE_VISION_KEY": "your-vision-key-here",
-
-    // Email Service
     "ZOHO_EMAIL": "contact@tcdynamics.fr",
     "ZOHO_PASSWORD": "your-zoho-app-password",
-
-    // Database
     "COSMOS_CONNECTION_STRING": "AccountEndpoint=https://your-cosmos-account.documents.azure.com:443/;AccountKey=your-cosmos-account-key;",
     "COSMOS_DATABASE": "tcdynamics",
     "COSMOS_CONTAINER_CONTACTS": "contacts",
     "COSMOS_CONTAINER_DEMOS": "demo_requests",
     "COSMOS_CONTAINER_CONVERSATIONS": "conversations",
-
-    // Stripe (Optional)
     "STRIPE_PUBLISHABLE_KEY": "pk_test_your-stripe-publishable-key",
     "STRIPE_SECRET_KEY": "sk_test_your-stripe-secret-key"
   }

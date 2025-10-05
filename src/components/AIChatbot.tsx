@@ -16,6 +16,64 @@ interface Message {
   timestamp: Date
 }
 
+// Helper function to get truly focusable elements
+const getFocusableElements = (root: Element): HTMLElement[] => {
+  const elements = root.querySelectorAll(
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+  )
+
+  return Array.from(elements).filter(element => {
+    const el = element as HTMLElement
+
+    // Skip disabled elements
+    const isFormElement = ['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA'].includes(
+      el.tagName
+    )
+    if (isFormElement && (el as HTMLFormElement).disabled) return false
+
+    // Skip hidden input types
+    if (el.tagName === 'INPUT' && el.getAttribute('type') === 'hidden')
+      return false
+
+    // Skip aria-hidden elements
+    if (el.getAttribute('aria-hidden') === 'true') return false
+
+    // Skip elements with hidden attribute
+    if (el.hasAttribute('hidden')) return false
+
+    // Check if element is inside a disabled fieldset
+    let parent = el.parentElement
+    while (parent) {
+      if (parent.tagName === 'FIELDSET' && parent.hasAttribute('disabled')) {
+        return false
+      }
+      parent = parent.parentElement
+    }
+
+    // Check visibility using computed style
+    const computedStyle = window.getComputedStyle(el)
+    if (
+      computedStyle.display === 'none' ||
+      computedStyle.visibility === 'hidden'
+    ) {
+      return false
+    }
+
+    // Check if element is actually visible in the DOM
+    // offsetParent is null for elements that are not visible
+    if (el.offsetParent === null && computedStyle.position !== 'fixed') {
+      return false
+    }
+
+    // Additional check for dimensions (elements with 0 width/height might not be focusable)
+    if (el.offsetWidth === 0 && el.offsetHeight === 0) {
+      return false
+    }
+
+    return true
+  }) as HTMLElement[]
+}
+
 const AIChatbot = () => {
   const { isOpen, toggle, close } = useToggle()
   const [messages, setMessages] = useState<Message[]>([])
@@ -65,10 +123,8 @@ const AIChatbot = () => {
       // Focus the first focusable element in the chatbot
       const chatbotElement = document.getElementById(chatbotId)
       if (chatbotElement) {
-        const focusableElements = chatbotElement.querySelectorAll(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        )
-        const firstFocusable = focusableElements[0] as HTMLElement
+        const focusableElements = getFocusableElements(chatbotElement)
+        const firstFocusable = focusableElements[0]
         if (firstFocusable) {
           firstFocusable.focus()
         }
@@ -94,9 +150,7 @@ const AIChatbot = () => {
       const chatbotElement = document.getElementById(chatbotId)
       if (!chatbotElement) return
 
-      const focusableElements = chatbotElement.querySelectorAll(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      )
+      const focusableElements = getFocusableElements(chatbotElement)
 
       const firstElement = focusableElements[0] as HTMLElement
       const lastElement = focusableElements[

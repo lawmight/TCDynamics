@@ -1,8 +1,10 @@
+#!/usr/bin/env sh
+set -e
 # Quick pre-commit checks (fast feedback)
 echo "🔍 Running pre-commit checks..."
 
 # Run lint-staged (ESLint + Prettier)
-npx lint-staged
+npx lint-staged || exit 1
 
 # Type check TypeScript files
 echo "🔧 Checking TypeScript types..."

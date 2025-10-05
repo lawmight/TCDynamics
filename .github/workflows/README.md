@@ -117,7 +117,7 @@ sudo chown $USER:$USER /opt/tcdynamics
 
 # Clone repository (optional, workflows handle deployment)
 cd /opt/tcdynamics
-git clone https://github.com/your-org/tcdynamics.git .
+git clone https://github.com/lawmight/TCDynamics.git .
 ```
 
 ### 3. Configure Environment
@@ -127,6 +127,8 @@ git clone https://github.com/your-org/tcdynamics.git .
 cp env.production.template backend/.env.production
 # Edit backend/.env.production with your actual values
 ```
+
+> **IMPORTANT: Never commit `backend/.env.production` to version control!** This file contains sensitive production secrets. Ensure `backend/.env.production` is listed in your `.gitignore` file to prevent accidental commits of secrets.
 
 ### 4. Setup SSH Key for Deployment
 
@@ -184,7 +186,7 @@ graph TD
 ## Cost Optimization
 
 - **Parallel Jobs**: Workflows run tests in parallel to reduce execution time
-- **Conditional Execution**: Security scans only run on pushes, not every PR
+- **Conditional Execution**: Security scans run on pushes and pull requests
 - **Artifact Retention**: Build artifacts are retained for only 1 day
 - **Caching**: NPM and Docker layer caching reduces build times
 
