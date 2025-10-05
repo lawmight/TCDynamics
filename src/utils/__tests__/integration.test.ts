@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { config } from '../config'
-import { performanceMonitor, smartCache, cacheTelemetry } from '../performance'
+import { config, ConfigManager } from '../config'
+import {
+  performanceMonitor,
+  smartCache,
+  cacheTelemetry,
+  SmartCache,
+} from '../performance'
 import { securityHeaders } from '../security'
 import {
   isBrowser,
@@ -50,7 +55,7 @@ describe('Integration Tests', () => {
 
   describe('Configuration Integration', () => {
     it('should initialize configuration with safe defaults', async () => {
-      const configInstance = new (config.constructor as any)()
+      const configInstance = new ConfigManager()
       await configInstance.initialize()
 
       expect(configInstance.client).toBeDefined()
@@ -60,7 +65,7 @@ describe('Integration Tests', () => {
     })
 
     it('should handle configuration validation errors gracefully', async () => {
-      const configInstance = new (config.constructor as any)()
+      const configInstance = new ConfigManager()
 
       // Mock a validation failure
       vi.spyOn(configInstance, 'getSafeClientConfig').mockReturnValue({
@@ -104,10 +109,7 @@ describe('Integration Tests', () => {
         cleanupInterval: 60000,
       }
 
-      const testCache = new (smartCache.constructor as any)(
-        performanceMonitor,
-        config
-      )
+      const testCache = new SmartCache(performanceMonitor, config)
 
       // Fill cache with data
       for (let i = 0; i < 50; i++) {

@@ -258,7 +258,7 @@ describe('Logger sanitizeData', () => {
       },
     }
 
-    const sanitized = (logger as any).sanitizeData(deepObject)
+    const sanitized = logger.testSanitizeData(deepObject)
     expect(sanitized).toEqual({
       level1: {
         level2: {

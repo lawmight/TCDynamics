@@ -663,6 +663,7 @@ const createCacheConfig = (): CacheConfig => ({
 })
 
 // Initialize cache with default config, will be updated when config loads
+export { SmartCache }
 export let smartCache = new SmartCache(performanceMonitor, createCacheConfig())
 
 // Update cache configuration when config is available
