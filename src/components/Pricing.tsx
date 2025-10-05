@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { Check, X, Phone, MapPin } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Check, MapPin, Phone, X } from 'lucide-react'
+import { useState } from 'react'
 
 const pricingPlans = [
   {
@@ -118,8 +118,15 @@ const Pricing = () => {
               key={index}
               className={`relative bg-card/30 border-primary/20 backdrop-blur-sm hover:border-primary/40 transition-all duration-300 fade-in-up ${
                 plan.popular ? 'ring-2 ring-primary/50 scale-105' : ''
+              } ${
+                index === 0
+                  ? 'fade-delay-00'
+                  : index === 1
+                    ? 'fade-delay-02'
+                    : index === 2
+                      ? 'fade-delay-04'
+                      : ''
               }`}
-              style={{ animationDelay: `${index * 0.2}s` }}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">

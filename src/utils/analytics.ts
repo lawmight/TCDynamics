@@ -130,6 +130,9 @@ export function usePageTracking(pageName: string) {
   const startTime = useRef(Date.now())
 
   useEffect(() => {
+    // Capture the start time for this page view
+    const pageStartTime = startTime.current
+
     // Track page view
     analytics.trackEvent({
       category: 'Navigation',
@@ -139,7 +142,7 @@ export function usePageTracking(pageName: string) {
 
     // Track time on page when leaving
     return () => {
-      const timeSpent = Math.round((Date.now() - startTime.current) / 1000)
+      const timeSpent = Math.round((Date.now() - pageStartTime) / 1000)
       analytics.trackTimeOnPage(pageName, timeSpent)
     }
   }, [pageName])

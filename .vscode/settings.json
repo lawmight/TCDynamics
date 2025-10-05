@@ -1,153 +1,149 @@
 {
-    // TypeScript Configuration
-    "typescript.preferences.importModuleSpecifier": "relative",
-    "typescript.suggest.autoImports": true,
-    "typescript.updateImportsOnFileMove.enabled": "always",
-    "typescript.preferences.preferTypeOnlyAutoImports": true,
+  // TypeScript Configuration
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.suggest.autoImports": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.preferences.preferTypeOnlyAutoImports": true,
 
-    // JavaScript Configuration
-    "javascript.preferences.importModuleSpecifier": "relative",
-    "javascript.suggest.autoImports": true,
-    "javascript.updateImportsOnFileMove.enabled": "always",
+  // JavaScript Configuration
+  "javascript.preferences.importModuleSpecifier": "relative",
+  "javascript.suggest.autoImports": true,
+  "javascript.updateImportsOnFileMove.enabled": "always",
 
-    // ESLint Configuration
-    "eslint.workingDirectories": ["src", "backend"],
-    "eslint.validate": [
-        "javascript",
-        "javascriptreact",
-        "typescript",
-        "typescriptreact"
-    ],
-    "eslint.codeAction.showDocumentation": {
-        "enable": true
-    },
-    "eslint.format.enable": true,
+  // ESLint Configuration
+  "eslint.workingDirectories": ["src", "backend"],
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.codeAction.showDocumentation": {
+    "enable": true
+  },
+  "eslint.format.enable": true,
 
-    // Prettier Configuration
-    "prettier.configPath": ".prettierrc",
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true,
-    "editor.formatOnPaste": true,
-    "[typescript]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[typescriptreact]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[javascript]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[javascriptreact]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[json]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[jsonc]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[css]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[html]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[python]": {
-        "editor.defaultFormatter": "ms-python.black-formatter"
-    },
+  // Prettier Configuration
+  "prettier.configPath": ".prettierrc",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
 
-    // Tailwind CSS
-    "tailwindCSS.includeLanguages": {
-        "typescript": "javascript",
-        "typescriptreact": "HTML"
-    },
-    "editor.quickSuggestions": {
-        "strings": true
-    },
-    "tailwindCSS.experimental.classRegex": [
-        ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
-        ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
-    ],
+  // Tailwind CSS
+  "tailwindCSS.includeLanguages": {
+    "typescript": "javascript",
+    "typescriptreact": "HTML"
+  },
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+  ],
 
-    // Testing Configuration
-    "jest.runMode": "on-demand",
-    "jest.showCoverageOnLoad": true,
-    "jest.coverageFormatter": "GutterFormatter",
+  // Testing Configuration
+  "jest.runMode": "on-demand",
+  "jest.showCoverageOnLoad": true,
+  "jest.coverageFormatter": "GutterFormatter",
 
-    // Git Configuration
-    "git.autofetch": true,
-    "git.confirmSync": false,
-    "git.enableSmartCommit": true,
+  // Git Configuration
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
 
-    // Editor Configuration
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": "explicit",
-        "source.organizeImports": "explicit"
-    },
-    "editor.suggestSelection": "first",
-    "editor.tabSize": 2,
-    "editor.insertSpaces": true,
-    "editor.detectIndentation": false,
-    "files.eol": "\n",
+  // Editor Configuration
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "editor.suggestSelection": "first",
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "files.eol": "\n",
 
-    // File Associations
-    "files.associations": {
-        "*.css": "css",
-        "*.scss": "scss",
-        "*.mdx": "markdown",
-        "Dockerfile*": "dockerfile"
-    },
+  // File Associations
+  "files.associations": {
+    "*.css": "css",
+    "*.scss": "scss",
+    "*.mdx": "markdown",
+    "Dockerfile*": "dockerfile"
+  },
 
-    // Search Configuration
-    "search.exclude": {
-        "**/node_modules": true,
-        "**/dist": true,
-        "**/.next": true,
-        "**/.nuxt": true,
-        "**/build": true,
-        "**/coverage": true,
-        "**/.venv": true,
-        "**/__pycache__": true,
-        "**/*.log": true
-    },
+  // Search Configuration
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.next": true,
+    "**/.nuxt": true,
+    "**/build": true,
+    "**/coverage": true,
+    "**/.venv": true,
+    "**/__pycache__": true,
+    "**/*.log": true
+  },
 
-    // Python Configuration (Azure Functions)
-    "python.defaultInterpreterPath": ".venv/Scripts/python",
-    "python.terminal.activateEnvironment": true,
-    "python.linting.enabled": true,
-    "python.linting.pylintEnabled": true,
-    "python.formatting.provider": "black",
+  // Python Configuration (Azure Functions)
+  "python.terminal.activateEnvironment": true,
 
-    // Azure Functions (existing)
-    "azureFunctions.deploySubpath": "TCDynamics",
-    "azureFunctions.scmDoBuildDuringDeployment": true,
-    "azureFunctions.pythonVenv": ".venv",
-    "azureFunctions.projectLanguage": "Python",
-    "azureFunctions.projectRuntime": "~4",
-    "debug.internalConsoleOptions": "neverOpen",
-    "azureFunctions.projectLanguageModel": 2,
+  // Azure Functions (existing)
+  "azureFunctions.deploySubpath": "TCDynamics",
+  "azureFunctions.scmDoBuildDuringDeployment": true,
+  "azureFunctions.pythonVenv": ".venv",
+  "azureFunctions.projectLanguage": "Python",
+  "azureFunctions.projectRuntime": "~4",
+  "debug.internalConsoleOptions": "neverOpen",
+  "azureFunctions.projectLanguageModel": 2,
 
-    // Docker Configuration
-    "docker.showStartPage": false,
+  // Docker Configuration
+  "docker.showStartPage": false,
 
-    // YAML Configuration
-    "yaml.schemas": {
-        "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml",
-        "https://json.schemastore.org/github-action.json": ".github/action.yml"
-    },
+  // YAML Configuration
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml",
+    "https://json.schemastore.org/github-action.json": ".github/action.yml"
+  },
 
-    // Performance & Monitoring
-    "performance-monitor.showStatusBarItem": true,
+  // Performance & Monitoring
+  "performance-monitor.showStatusBarItem": true,
 
-    // Todo Tree
-    "todo-tree.tree.showScanModeButton": false,
-    "todo-tree.general.tags": [
-        "BUG",
-        "HACK",
-        "FIXME",
-        "TODO",
-        "XXX",
-        "[ ]",
-        "[x]"
-    ]
+  // Todo Tree
+  "todo-tree.tree.showScanModeButton": false,
+  "todo-tree.general.tags": [
+    "BUG",
+    "HACK",
+    "FIXME",
+    "TODO",
+    "XXX",
+    "[ ]",
+    "[x]"
+  ]
 }

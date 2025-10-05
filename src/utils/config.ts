@@ -82,8 +82,8 @@ class ConfigManager {
   private isInitialized = false
 
   constructor() {
-    this.clientConfig = {} as any
-    this.serverConfig = {} as any
+    this.clientConfig = {} as z.infer<typeof clientConfigSchema>
+    this.serverConfig = {} as z.infer<typeof serverConfigSchema>
   }
 
   /**
@@ -404,7 +404,24 @@ class ConfigManager {
   /**
    * Get a safe configuration summary (without secrets)
    */
-  getSafeConfigSummary(): Record<string, any> {
+  getSafeConfigSummary(): {
+    environment: string
+    version: string
+    functionsUrl: string
+    features: {
+      analytics: boolean
+      debugLogging: boolean
+      cache: boolean
+      performanceSampling: boolean
+      securityStrict: boolean
+    }
+    services: {
+      openai: boolean
+      vision: boolean
+      email: boolean
+      database: boolean
+    }
+  } {
     return {
       environment: this.client.VITE_NODE_ENV,
       version: this.client.VITE_APP_VERSION,

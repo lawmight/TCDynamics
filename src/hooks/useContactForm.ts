@@ -28,6 +28,16 @@ export const useContactForm = () => {
           body: JSON.stringify(data),
         })
       } catch (azureError) {
+        // Only fallback for network errors and service unavailable
+        const shouldFallback =
+          !(azureError instanceof Response) ||
+          azureError.status === 503 ||
+          azureError.status >= 500
+
+        if (!shouldFallback) {
+          throw azureError // Surface validation/client errors directly
+        }
+
         // Fallback to Node.js backend if Azure Functions fail
         logger.warn(
           'Azure Functions not available, falling back to Node.js backend',

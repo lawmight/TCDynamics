@@ -30,37 +30,153 @@ class Logger {
   }
 
   // Sanitize messages to avoid logging sensitive data
-  private sanitizeMessage(message: string): string {
+  sanitizeMessage(message: string): string {
     // Remove potential sensitive patterns
-    return message
-      .replace(/\b\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4}\b/g, '[REDACTED CARD]') // Credit cards
-      .replace(/\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/g, '[REDACTED SSN]') // SSN
-      .replace(
-        /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
-        '[REDACTED EMAIL]'
-      ) // Email
-      .replace(/\b\d{10,15}\b/g, '[REDACTED PHONE]') // Phone numbers
+    return (
+      message
+        .replace(/\b\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4}\b/g, '[REDACTED CARD]') // Credit cards
+        // Phone numbers: common formats with optional +, separators, and proper digit counts
+        .replace(
+          /(?<![0-9])(?:\+?1?[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}(?:\s*x\d+)?(?![0-9])/gi,
+          '[REDACTED PHONE]'
+        )
+        // US SSN: ddd-dd-dddd format only (avoiding overly broad 9-digit matches)
+        .replace(/\b\d{3}-\d{2}-\d{4}\b/g, '[REDACTED SSN]')
+        // Email addresses: case-insensitive
+        .replace(
+          /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/gi,
+          '[REDACTED EMAIL]'
+        )
+    )
   }
 
   // Sanitize error objects to avoid logging sensitive data
   private sanitizeError(error: unknown): string {
     if (error instanceof Error) {
-      return error.message // Only log the message, not the stack trace in production
+      const message = error.message
+      // Include stack trace in non-production or when in debug mode
+      if (!this.isProduction || this.level <= LogLevel.DEBUG) {
+        const stack = error.stack
+        if (stack) {
+          return `${message}\n${stack}`
+        }
+      }
+      return message
     }
     return String(error)
   }
 
-  // Sanitize data objects to avoid logging sensitive information
-  private sanitizeData(data?: unknown): unknown {
-    if (!data || typeof data !== 'object') return data
+  // Configurable list of sensitive keys that should be fully redacted
+  private readonly SENSITIVE_KEYS = new Set([
+    'password',
+    'token',
+    'secret',
+    'key',
+    'apikey',
+    'auth',
+    'authorization',
+    'bearer',
+    'jwt',
+    'session',
+    'cookie',
+    'creditcard',
+    'cardnumber',
+    'cvv',
+    'pin',
+    'ssn',
+    'socialsecurity',
+    'privatekey',
+    'certificate',
+  ])
 
-    // For production, return minimal safe data
-    if (this.isProduction) {
-      return '[DATA REDACTED FOR SECURITY]'
+  // Maximum depth for object traversal to prevent huge objects
+  private readonly MAX_DEPTH = 3
+
+  // Maximum string length for previews
+  private readonly MAX_STRING_LENGTH = 50
+
+  // Sanitize data objects to avoid logging sensitive information
+  protected sanitizeData(data?: unknown, depth: number = 0): unknown {
+    if (data === null || data === undefined) return data
+
+    // Prevent infinite recursion and huge objects
+    if (depth > this.MAX_DEPTH) {
+      return '<MAX_DEPTH_REACHED>'
     }
 
-    // In development, return the data as-is (could add more sanitization here if needed)
-    return data
+    const dataType = typeof data
+
+    switch (dataType) {
+      case 'string':
+        return this.sanitizeString(data as string)
+      case 'number':
+        return '<number>'
+      case 'boolean':
+        return '<boolean>'
+      case 'function':
+        return '<function>'
+      case 'symbol':
+        return '<symbol>'
+      case 'bigint':
+        return '<bigint>'
+      default:
+        break
+    }
+
+    // Handle arrays
+    if (Array.isArray(data)) {
+      return data.map(item => this.sanitizeData(item, depth + 1))
+    }
+
+    // Handle objects (including Dates, RegExp, etc.)
+    if (data instanceof Date) {
+      return '<Date>'
+    }
+
+    if (data instanceof RegExp) {
+      return '<RegExp>'
+    }
+
+    if (data instanceof Error) {
+      return `<Error: ${this.sanitizeString(data.message)}>`
+    }
+
+    // Handle plain objects
+    if (typeof data === 'object') {
+      const sanitized: Record<string, unknown> = {}
+
+      for (const [key, value] of Object.entries(data)) {
+        const lowerKey = key.toLowerCase()
+
+        // Check if this is a sensitive key
+        if (
+          this.SENSITIVE_KEYS.has(lowerKey) ||
+          lowerKey.includes('password') ||
+          lowerKey.includes('secret') ||
+          lowerKey.includes('token') ||
+          lowerKey.includes('key')
+        ) {
+          sanitized[key] = '<REDACTED>'
+        } else {
+          sanitized[key] = this.sanitizeData(value, depth + 1)
+        }
+      }
+
+      return sanitized
+    }
+
+    // Fallback for unknown types
+    return `<${dataType}>`
+  }
+
+  private sanitizeString(str: string): string {
+    if (str.length <= this.MAX_STRING_LENGTH) {
+      return str
+    }
+
+    // For long strings, show a preview with length indicator
+    const preview = str.substring(0, this.MAX_STRING_LENGTH - 3)
+    return `${preview}... (${str.length} chars)`
   }
 
   // Only log to console in development, never in production for security
@@ -69,6 +185,7 @@ class Logger {
     ...args: unknown[]
   ): void {
     if (!this.isProduction) {
+      // eslint-disable-next-line no-console
       console[level](...args)
     }
   }
@@ -142,3 +259,13 @@ class Logger {
 export const logger = new Logger(
   import.meta.env.DEV ? LogLevel.DEBUG : LogLevel.INFO
 )
+
+// Export class and method for testing
+export { Logger }
+export const sanitizeMessage = (message: string): string => {
+  const tempLogger = new Logger(LogLevel.INFO)
+  // Access private method for testing
+  return (
+    tempLogger as Logger & { sanitizeMessage: (msg: string) => string }
+  ).sanitizeMessage(message)
+}

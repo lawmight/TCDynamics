@@ -14,10 +14,19 @@ allow_licenses:
   - 0BSD
 
 deny_licenses:
-  - MS-PL
+  - GPL-2.0
+  - GPL-2.0-only
+  - GPL-2.0-or-later
   - GPL-3.0
   - LGPL-2.1
+  - LGPL-3.0
+  - LGPL-3.0-only
+  - LGPL-3.0-or-later
+  - AGPL-1.0
   - AGPL-3.0
+  - AGPL-3.0-only
+  - AGPL-3.0-or-later
+  - MS-PL
 
 vulnerability_check: true
 license_check: true
@@ -32,5 +41,5 @@ allow_package_rules:
 
 # Deny specific packages
 deny_package_rules:
-  - package_name: "colors"
-    reason: "This package has security issues and is unmaintained"
+  - package_name: 'colors'
+    reason: 'This package has security issues and is unmaintained'

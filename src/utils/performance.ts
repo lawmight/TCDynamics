@@ -9,7 +9,7 @@ interface PerformanceMetric {
   name: string
   value: number
   timestamp: number
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 interface ApiCallMetrics {
@@ -36,7 +36,7 @@ class PerformanceMonitor {
   recordMetric(
     name: string,
     value: number,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): void {
     const metric: PerformanceMetric = {
       name,
@@ -95,7 +95,7 @@ class PerformanceMonitor {
   async measureAsync<T>(
     name: string,
     fn: () => Promise<T>,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<T> {
     const start = performance.now()
     try {
@@ -117,7 +117,7 @@ class PerformanceMonitor {
   /**
    * Measure execution time of a synchronous function
    */
-  measure<T>(name: string, fn: () => T, metadata?: Record<string, any>): T {
+  measure<T>(name: string, fn: () => T, metadata?: Record<string, unknown>): T {
     const start = performance.now()
     try {
       const result = fn()
@@ -240,7 +240,7 @@ class PerformanceMonitor {
 
 // ========== ENHANCED CACHE IMPLEMENTATION ==========
 
-interface CacheEntry<T = any> {
+interface CacheEntry<T = unknown> {
   data: T
   timestamp: number
   ttl: number
@@ -277,7 +277,7 @@ class SmartCache {
   /**
    * Calculate approximate size of data in bytes
    */
-  private calculateSize(data: any): number {
+  private calculateSize(data: unknown): number {
     if (typeof data === 'string') {
       return data.length * 2 // UTF-16 characters
     }
@@ -669,8 +669,11 @@ export let smartCache = new SmartCache(performanceMonitor, createCacheConfig())
 const updateCacheConfig = () => {
   try {
     // This will be called after config initialization
-    if (typeof window !== 'undefined' && (window as any).config) {
-      const config = (window as any).config
+    if (
+      typeof window !== 'undefined' &&
+      (window as Window & { config?: unknown }).config
+    ) {
+      const config = (window as Window & { config?: unknown }).config
       const newCacheConfig: CacheConfig = {
         maxSize: config.client.VITE_CACHE_MAX_SIZE || 1000,
         defaultTTL: config.client.VITE_CACHE_DEFAULT_TTL || 300000,
@@ -686,7 +689,7 @@ const updateCacheConfig = () => {
       })
     }
   } catch (error) {
-    console.warn('Failed to update cache configuration:', error)
+    logger.warn('Failed to update cache configuration', { error })
     performanceMonitor.recordMetric('cache.config.update_failed', 1, {
       error: error instanceof Error ? error.message : 'Unknown error',
     })
@@ -771,7 +774,7 @@ export const performanceUtils = {
   /**
    * Debounce function calls
    */
-  debounce<T extends (...args: any[]) => any>(
+  debounce<T extends (...args: unknown[]) => unknown>(
     func: T,
     wait: number
   ): (...args: Parameters<T>) => void {
@@ -785,7 +788,7 @@ export const performanceUtils = {
   /**
    * Throttle function calls
    */
-  throttle<T extends (...args: any[]) => any>(
+  throttle<T extends (...args: unknown[]) => unknown>(
     func: T,
     limit: number
   ): (...args: Parameters<T>) => void {
@@ -831,19 +834,27 @@ export const browserPerformance = {
     lcp?: number
   }> {
     return new Promise(resolve => {
-      const vitals: any = {}
+      const vitals: { cls?: number; fid?: number; lcp?: number } = {}
 
       // Cumulative Layout Shift
       new PerformanceObserver(entryList => {
         const entries = entryList.getEntries()
-        vitals.cls = (entries[entries.length - 1] as any).value
+        if (entries.length > 0) {
+          vitals.cls = (
+            entries[entries.length - 1] as PerformanceEntry & { value: number }
+          ).value
+        }
       }).observe({ entryTypes: ['layout-shift'] })
-
       // First Input Delay
       new PerformanceObserver(entryList => {
         const entries = entryList.getEntries()
-        vitals.fid =
-          (entries[0] as any).processingStart - (entries[0] as any).startTime
+        if (entries.length > 0) {
+          const firstEntry = entries[0] as PerformanceEntry & {
+            processingStart: number
+            startTime: number
+          }
+          vitals.fid = firstEntry.processingStart - firstEntry.startTime
+        }
       }).observe({ entryTypes: ['first-input'] })
 
       // Largest Contentful Paint

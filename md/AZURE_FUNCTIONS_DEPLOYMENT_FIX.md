@@ -145,15 +145,13 @@ func --version
 ```bash
 cd TCDynamics
 
-# Create proper local.settings.json with real values
+# Create local.settings.json and replace placeholder values with real credentials
 cat > local.settings.json << 'EOF'
 {
   "IsEncrypted": false,
   "Values": {
     "FUNCTIONS_WORKER_RUNTIME": "python",
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-
-    // ADD REAL VALUES HERE:
     "AZURE_OPENAI_ENDPOINT": "https://your-openai-service.openai.azure.com/",
     "AZURE_OPENAI_KEY": "your-openai-key",
     "AZURE_OPENAI_DEPLOYMENT": "gpt-35-turbo",
@@ -310,15 +308,12 @@ az functionapp show --name func-tcdynamics-contact --resource-group rg-TCDynamic
 
 #### Step 5.1: Update Frontend Environment Variables
 
+**Security Note:** All AI/service keys (Azure OpenAI, Vision API, etc.) must be stored as server-side environment variables in the Azure Functions configuration and accessed by the frontend via proxied backend endpoints. Never expose these keys in frontend environment variables or client-side code.
+
 Verify `.env` file or build environment has:
 
 ```bash
 VITE_AZURE_FUNCTIONS_URL=https://func-tcdynamics-contact.azurewebsites.net/api
-VITE_AZURE_OPENAI_ENDPOINT=https://your-openai-service.openai.azure.com/
-VITE_AZURE_OPENAI_KEY=your-openai-key
-VITE_AZURE_OPENAI_DEPLOYMENT=gpt-35-turbo
-VITE_AZURE_VISION_ENDPOINT=https://your-vision-service.cognitiveservices.azure.com/
-VITE_AZURE_VISION_KEY=your-vision-key
 VITE_STRIPE_PUBLISHABLE_KEY=your-stripe-key
 ```
 

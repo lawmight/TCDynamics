@@ -112,9 +112,7 @@ jobs:
           args: --severity-threshold=high --fail-on=upgradable
 
       - name: Run Snyk to check for vulnerabilities in backend dependencies
-        working-directory: backend
-        run: |
-          npx snyk test --severity-threshold=high --fail-on=upgradable
+        run: cd backend && npx snyk test --severity-threshold=high --fail-on=upgradable
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
@@ -225,8 +223,9 @@ jobs:
         run: npx license-checker --production --onlyAllow="MIT;ISC;BSD-3-Clause;BSD-2-Clause;Apache-2.0;CC0-1.0" --excludePackages=""
 
       - name: Check backend licenses
-        working-directory: backend
-        run: npx license-checker --production --onlyAllow="MIT;ISC;BSD-3-Clause;BSD-2-Clause;Apache-2.0;CC0-1.0" --excludePackages=""
+        run: |
+          cd backend
+          npx license-checker --production --onlyAllow="MIT;ISC;BSD-3-Clause;BSD-2-Clause;Apache-2.0;CC0-1.0" --excludePackages=""
 
   # Secrets Detection
   secrets-detection:

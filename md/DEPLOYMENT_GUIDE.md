@@ -113,36 +113,35 @@ backend/
    npm install --production
    ```
 
-4. **Create `.env` file:**
+4. **Configure environment variables:**
+
+   **⚠️ SECURITY WARNING:** Never commit `.env` files to version control! The `.env` file is already in `.gitignore`.
 
    ```bash
+   # Copy the template and edit it
+   cp env.example .env
    nano .env
    ```
 
-   Paste this content:
+   **Required changes:**
+   - `EMAIL_USER`: Set your Zoho email address
+   - `EMAIL_PASS`: Set your Zoho app password (generate a new one in Zoho settings)
+   - `JWT_SECRET`: Generate a secure 32+ character secret
 
-   ```env
-   # Server Configuration
-   PORT=3001
-   NODE_ENV=production
+   **Generate secure secrets:**
 
-   # Email Configuration (Zoho)
-   EMAIL_HOST=smtp.zoho.com
-   EMAIL_PORT=587
-   EMAIL_SECURE=false
-   EMAIL_USER=contact@workflowai.fr
-   EMAIL_PASS=gsdSk4MQk3ck
-
-   # Security
-   JWT_SECRET=your_very_long_secure_random_string_here_at_least_32_characters
-   RATE_LIMIT_WINDOW_MS=900000
-   RATE_LIMIT_MAX_REQUESTS=5
-
-   # URLs
-   FRONTEND_URL=https://tcdynamics.fr
-   BACKEND_URL=https://tcdynamics.fr/api
-   ALLOWED_ORIGINS=https://tcdynamics.fr,https://www.tcdynamics.fr
+   ```bash
+   # Generate a secure JWT secret (32 characters)
+   openssl rand -hex 32
    ```
+
+   **⚠️ IMMEDIATE ACTION REQUIRED:** The email password shown in this guide was exposed. Generate a new app password in your Zoho account immediately and update your `.env` file.
+
+   **Zoho App Password Setup:**
+   1. Log into your Zoho account
+   2. Go to Settings → Security → App passwords
+   3. Generate a new app password for "TCDynamics Backend"
+   4. Use this new password in your `.env` file
 
    **Save:** Press `Ctrl+X`, then `Y`, then `Enter`
 
@@ -263,7 +262,7 @@ sudo systemctl reload nginx
 
 Open browser: https://tcdynamics.fr
 
-- Should load WorkFlowAI homepage
+- Should load TCDynamics homepage
 - No console errors
 
 ### **2. Test Backend Health**

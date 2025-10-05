@@ -1,6 +1,8 @@
 // Service Worker Registration Utility
 // Handles PWA installation and service worker lifecycle
 
+import { logger } from './logger'
+
 export const registerServiceWorker = async (): Promise<void> => {
   if ('serviceWorker' in navigator) {
     try {
@@ -31,10 +33,10 @@ export const registerServiceWorker = async (): Promise<void> => {
         // console.log('📨 Message from service worker:', event.data)
       })
     } catch (error) {
-      console.error('❌ Service Worker registration failed:', error)
+      logger.error('Service Worker registration failed', { error })
     }
   } else {
-    console.warn('⚠️ Service Workers not supported in this browser')
+    logger.warn('Service Workers not supported in this browser')
   }
 }
 
@@ -47,7 +49,7 @@ export const unregisterServiceWorker = async (): Promise<void> => {
         // // console.log('✅ Service Worker unregistered successfully');
       }
     } catch (error) {
-      console.error('❌ Service Worker unregistration failed:', error)
+      logger.error('Service Worker unregistration failed', { error })
     }
   }
 }
@@ -79,7 +81,7 @@ if (typeof window !== 'undefined') {
 
 export const triggerInstallPrompt = async (): Promise<boolean> => {
   if (!deferredPrompt) {
-    console.warn('⚠️ No install prompt available')
+    logger.warn('No install prompt available')
     return false
   }
 
@@ -101,7 +103,8 @@ export const triggerInstallPrompt = async (): Promise<boolean> => {
 export const isPWA = (): boolean => {
   return (
     window.matchMedia('(display-mode: standalone)').matches ||
-    (window.navigator as any).standalone === true
+    (window.navigator as Navigator & { standalone?: boolean }).standalone ===
+      true
   )
 }
 

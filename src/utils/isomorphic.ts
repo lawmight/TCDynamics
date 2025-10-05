@@ -6,6 +6,25 @@ import { logger } from './logger'
 // Declare web worker global for TypeScript
 declare const importScripts: (...urls: string[]) => void
 
+// Extended global object for isomorphic storage
+interface ExtendedGlobal {
+  __MEMORY_STORAGE__?: Record<string, string>
+}
+
+// Timer types for Node.js compatibility
+type TimerId = ReturnType<typeof setTimeout> | number
+
+// Extended window object for performance monitoring
+interface ExtendedWindow extends Window {
+  performanceMonitor?: {
+    recordMetric: (
+      name: string,
+      value: number,
+      metadata?: Record<string, unknown>
+    ) => void
+  }
+}
+
 /**
  * Check if we're running in a browser environment
  */
@@ -179,7 +198,7 @@ export const storageUtils = {
     }
 
     // In-memory storage for Node.js/testing
-    return (globalThis as any).__MEMORY_STORAGE__?.[key] || null
+    return (globalThis as ExtendedGlobal).__MEMORY_STORAGE__?.[key] || null
   },
 
   /**
@@ -194,10 +213,11 @@ export const storageUtils = {
       }
     } else {
       // In-memory storage for Node.js/testing
-      if (!(globalThis as any).__MEMORY_STORAGE__) {
-        ;(globalThis as any).__MEMORY_STORAGE__ = {}
+      if (!(globalThis as ExtendedGlobal).__MEMORY_STORAGE__) {
+        ;(globalThis as ExtendedGlobal).__MEMORY_STORAGE__ = {}
       }
-      ;(globalThis as any).__MEMORY_STORAGE__[key] = value
+      const memoryStorage = (globalThis as ExtendedGlobal).__MEMORY_STORAGE__
+      memoryStorage[key] = value
     }
   },
 
@@ -213,8 +233,9 @@ export const storageUtils = {
       }
     } else {
       // In-memory storage for Node.js/testing
-      if ((globalThis as any).__MEMORY_STORAGE__) {
-        delete (globalThis as any).__MEMORY_STORAGE__[key]
+      if ((globalThis as ExtendedGlobal).__MEMORY_STORAGE__) {
+        const memoryStorage = (globalThis as ExtendedGlobal).__MEMORY_STORAGE__
+        delete memoryStorage[key]
       }
     }
   },
@@ -240,7 +261,7 @@ export const timerUtils = {
     }
 
     // Fallback
-    return setTimeout(callback, delay) as any
+    return setTimeout(callback, delay) as TimerId
   },
 
   /**
@@ -256,7 +277,7 @@ export const timerUtils = {
     ) {
       window.clearTimeout(timeoutId as number)
     } else {
-      clearTimeout(timeoutId as any)
+      clearTimeout(timeoutId as NodeJS.Timeout | number)
     }
   },
 
@@ -276,7 +297,7 @@ export const timerUtils = {
     }
 
     // Fallback
-    return setInterval(callback, delay) as any
+    return setInterval(callback, delay) as TimerId
   },
 
   /**
@@ -292,7 +313,7 @@ export const timerUtils = {
     ) {
       window.clearInterval(intervalId as number)
     } else {
-      clearInterval(intervalId as any)
+      clearInterval(intervalId as NodeJS.Timeout | number)
     }
   },
 }
@@ -351,21 +372,21 @@ export const consoleUtils = {
   /**
    * Log message only in development
    */
-  devLog: (...args: any[]): void => {
+  devLog: (...args: unknown[]): void => {
     logger.debug('Development log', { args })
   },
 
   /**
    * Log warning only in development
    */
-  devWarn: (...args: any[]): void => {
+  devWarn: (...args: unknown[]): void => {
     logger.warn('Development warning', { args })
   },
 
   /**
    * Log error with additional context
    */
-  error: (error: Error | string, context?: Record<string, any>): void => {
+  error: (error: Error | string, context?: Record<string, unknown>): void => {
     const errorMessage = error instanceof Error ? error.message : error
 
     logger.error('Application error', {
@@ -377,13 +398,17 @@ export const consoleUtils = {
     if (
       isBrowser() &&
       typeof window !== 'undefined' &&
-      (window as any).performanceMonitor
+      (window as ExtendedWindow).performanceMonitor
     ) {
-      ;(window as any).performanceMonitor.recordMetric('error.runtime', 1, {
-        error: errorMessage,
-        context,
-        environment: isBrowser() ? 'browser' : isNode() ? 'node' : 'unknown',
-      })
+      ;(window as ExtendedWindow).performanceMonitor?.recordMetric(
+        'error.runtime',
+        1,
+        {
+          error: errorMessage,
+          context,
+          environment: isBrowser() ? 'browser' : isNode() ? 'node' : 'unknown',
+        }
+      )
     }
   },
 
@@ -393,7 +418,7 @@ export const consoleUtils = {
   perf: (
     name: string,
     duration: number,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): void => {
     logger.info(`Performance: ${name}`, {
       duration: `${duration}ms`,

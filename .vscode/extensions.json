@@ -9,13 +9,11 @@
     "christian-kohler.path-intellisense",
 
     // React/TypeScript
-    "ms-vscode.vscode-json",
-    "ms-vscode.vscode-css-peek",
+    "pranaygp.vscode-css-peek",
     "zignd.html-css-class-completion",
-    "ms-vscode.vscode-css-intellisense",
 
     // Testing & Quality
-    "ms-vscode.vscode-jest",
+    "orta.vscode-jest",
     "ms-playwright.playwright",
     "ms-vscode.test-adapter-converter",
 
@@ -26,18 +24,15 @@
     "ms-python.pylint",
 
     // Git & Collaboration
-    "ms-vscode.vscode-git-graph",
+    "mhutchie.git-graph",
     "donjayamanne.githistory",
     "gruntfuggly.todo-tree",
 
     // Docker & Deployment
     "ms-azuretools.vscode-docker",
-    "ms-vscode.vscode-yaml",
+    "redhat.vscode-yaml",
 
     // Performance & Monitoring
-    "ms-vscode.vscode-performance-monitor",
-
-    // Cursor AI Integration
-    "cursor.cursor-mcp"
+    "ms-vscode.vscode-js-profile-flame"
   ]
 }

@@ -1,6 +1,6 @@
-import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Shield, MapPin, Users, GraduationCap, Phone, Flag } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
+import { Flag, GraduationCap, MapPin, Phone, Shield, Users } from 'lucide-react'
 
 const LocalAdvantages = () => {
   const advantages = [
@@ -154,8 +154,21 @@ const LocalAdvantages = () => {
             return (
               <div
                 key={index}
-                className="fade-in-up group"
-                style={{ animationDelay: `${index * 0.1}s` }}
+                className={`fade-in-up group ${
+                  index === 0
+                    ? 'fade-delay-00'
+                    : index === 1
+                      ? 'fade-delay-01'
+                      : index === 2
+                        ? 'fade-delay-02'
+                        : index === 3
+                          ? 'fade-delay-03'
+                          : index === 4
+                            ? 'fade-delay-04'
+                            : index === 5
+                              ? 'fade-delay-05'
+                              : ''
+                }`}
               >
                 <Card className="h-full bg-card/60 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/10">
                   <CardContent className="p-6">
@@ -204,7 +217,7 @@ const LocalAdvantages = () => {
         </div>
 
         {/* Trust Indicators */}
-        <div className="fade-in-up" style={{ animationDelay: '0.8s' }}>
+        <div className="fade-in-up fade-delay-08">
           <div className="bg-card/30 backdrop-blur-sm rounded-2xl border border-primary/20 p-8">
             <div className="text-center mb-8">
               <h3 className="text-2xl font-bold mb-4 text-gradient">
@@ -257,10 +270,7 @@ const LocalAdvantages = () => {
         </div>
 
         {/* Local Contact */}
-        <div
-          className="text-center mt-12 fade-in-up"
-          style={{ animationDelay: '1s' }}
-        >
+        <div className="text-center mt-12 fade-in-up fade-delay-10">
           <div className="inline-flex items-center gap-2 px-6 py-3 bg-primary/10 rounded-full border border-primary/20">
             <MapPin className="w-4 h-4 text-primary" />
             <span className="font-mono text-sm text-primary">

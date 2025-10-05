@@ -2,6 +2,7 @@
 // Security utilities for input sanitization, validation, and protection
 
 import DOMPurify from 'isomorphic-dompurify'
+import { logger } from './logger'
 
 // ========== INPUT SANITIZATION ==========
 
@@ -507,9 +508,8 @@ export const securityUtils = {
   /**
    * Log security events
    */
-  logSecurityEvent: (event: string, details: any): void => {
-    const timestamp = new Date().toISOString()
-    console.warn(`[SECURITY] ${timestamp} - ${event}:`, details)
+  logSecurityEvent: (event: string, details: unknown): void => {
+    logger.warn(`Security event: ${event}`, { details })
   },
 }
 

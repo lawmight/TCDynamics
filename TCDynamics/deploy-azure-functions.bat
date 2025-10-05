@@ -55,17 +55,16 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 
 echo 🔧 Testing functions locally...
-start /B func start --verbose
-set FUNC_PID=%!
+start /B func start --verbose --port 7071
 
 REM Wait a few seconds for functions to start
-timeout /t 5 /nobreak >nul
+timeout /t 10 /nobreak >nul
 
 echo 🧪 Testing health endpoint...
 curl -f http://localhost:7071/api/health >nul 2>&1
 if errorlevel 1 (
     echo ❌ Health endpoint not responding
-    taskkill /PID !FUNC_PID! /F >nul 2>&1
+    taskkill /IM func.exe /F >nul 2>&1
     pause
     exit /b 1
 ) else (
@@ -73,9 +72,8 @@ if errorlevel 1 (
 )
 
 REM Kill local functions
-taskkill /PID !FUNC_PID! /F >nul 2>&1
+taskkill /IM func.exe /F >nul 2>&1
 timeout /t 2 /nobreak >nul
-
 echo ☁️ Deploying to Azure Functions...
 func azure functionapp publish func-tcdynamics-contact --nozip
 
@@ -99,7 +97,9 @@ if errorlevel 1 (
 
 REM Test contact form endpoint
 echo Testing contact form endpoint...
-for /f "delims=" %%i in ('curl -s -X POST https://func-tcdynamics-contact.azurewebsites.net/api/contactform -H "Content-Type: application/json" -d "{"name":"Test User","email":"test@example.com","message":"Test message"}"') do set CONTACT_RESPONSE=%%i
+echo {"name":"Test User","email":"test@example.com","message":"Test message"} > temp_contact.json
+for /f "delims=" %%i in ('curl -s -X POST https://func-tcdynamics-contact.azurewebsites.net/api/contactform -H "Content-Type: application/json" -d @temp_contact.json') do set CONTACT_RESPONSE=%%i
+del temp_contact.json
 
 echo !CONTACT_RESPONSE! | findstr "success.*true" >nul
 if errorlevel 1 (
@@ -111,7 +111,9 @@ if errorlevel 1 (
 
 REM Test AI chat endpoint (if configured)
 echo Testing AI chat endpoint...
-for /f "delims=" %%i in ('curl -s -X POST https://func-tcdynamics-contact.azurewebsites.net/api/chat -H "Content-Type: application/json" -d "{"message":"Hello","sessionId":"test123"}"') do set CHAT_RESPONSE=%%i
+echo {"message":"Hello","sessionId":"test123"} > temp_chat.json
+for /f "delims=" %%i in ('curl -s -X POST https://func-tcdynamics-contact.azurewebsites.net/api/chat -H "Content-Type: application/json" -d @temp_chat.json') do set CHAT_RESPONSE=%%i
+del temp_chat.json
 
 echo !CHAT_RESPONSE! | findstr "success.*true" >nul
 if errorlevel 1 (
