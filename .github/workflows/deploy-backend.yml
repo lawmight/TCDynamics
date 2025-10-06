@@ -126,7 +126,7 @@ jobs:
             fi
 
       - name: Copy docker-compose and environment files
-        uses: appleboy/scp-action@v0.1.4
+        uses: appleboy/scp-action@v1.0.0
         with:
           host: ${{ secrets.OVHCLOUD_HOST }}
           username: ${{ secrets.OVHCLOUD_USER }}
