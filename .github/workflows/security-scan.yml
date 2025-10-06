@@ -117,6 +117,17 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
+      - name: Setup Python for Snyk
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Python dependencies for Snyk
+        run: |
+          cd TCDynamics
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
       - name: Run Snyk for Python dependencies
         uses: snyk/actions/python@master
         env:
@@ -154,6 +165,7 @@ jobs:
           load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          push: false
 
       - name: Build frontend image for scanning
         uses: docker/build-push-action@v5
@@ -164,6 +176,7 @@ jobs:
           load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          push: false
 
       - name: Scan backend image with Trivy
         uses: aquasecurity/trivy-action@master
@@ -187,8 +200,8 @@ jobs:
 
       - name: Create empty SARIF files if scans failed
         run: |
-          touch trivy-backend-results.sarif || echo '{"$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json", "version": "2.1.0", "runs": []}' > trivy-backend-results.sarif
-          touch trivy-frontend-results.sarif || echo '{"$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json", "version": "2.1.0", "runs": []}' > trivy-frontend-results.sarif
+          echo '{"$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json", "version": "2.1.0", "runs": []}' > trivy-backend-results.sarif
+          echo '{"$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json", "version": "2.1.0", "runs": []}' > trivy-frontend-results.sarif
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
