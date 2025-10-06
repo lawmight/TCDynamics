@@ -1,20 +1,26 @@
-import azure.functions as func
+"""
+Azure Functions app for TCDynamics - handles contact forms, demo requests,
+AI chat, document vision processing, and payment/subscription management.
+"""
+
+import sys
 import logging
 import json
 import os
 import uuid
+import re
 from datetime import datetime
 from typing import Dict, Any
 import smtplib
-from email.mime.text import MimeText
-from email.mime.multipart import MimeMultipart
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import azure.functions as func
 import openai
 from azure.ai.vision.imageanalysis import ImageAnalysisClient
 from azure.ai.vision.imageanalysis.models import VisualFeatures
 from azure.core.credentials import AzureKeyCredential
 import azure.cosmos as cosmos
 import stripe
-import sys
 
 # Configuration from environment variables
 AZURE_OPENAI_ENDPOINT = os.environ.get("AZURE_OPENAI_ENDPOINT")
@@ -35,6 +41,7 @@ STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY")
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
 
 # Initialize clients
+openai_client = None
 if AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_KEY:
     openai_client = openai.AzureOpenAI(
         azure_endpoint=AZURE_OPENAI_ENDPOINT,
@@ -42,10 +49,17 @@ if AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_KEY:
         api_version="2024-02-15-preview",
     )
 
+vision_client = None
 if AZURE_VISION_ENDPOINT and AZURE_VISION_KEY:
     vision_client = ImageAnalysisClient(
         endpoint=AZURE_VISION_ENDPOINT, credential=AzureKeyCredential(AZURE_VISION_KEY)
     )
+
+cosmos_client = None
+database = None
+contacts_container = None
+demos_container = None
+conversations_container = None
 
 if COSMOS_CONNECTION_STRING:
     cosmos_client = cosmos.CosmosClient.from_connection_string(COSMOS_CONNECTION_STRING)
@@ -70,12 +84,12 @@ def send_email_smtp(to_email: str, subject: str, body: str) -> bool:
         return False
 
     try:
-        msg = MimeMultipart()
+        msg = MIMEMultipart()
         msg["From"] = ZOHO_EMAIL
         msg["To"] = to_email
         msg["Subject"] = subject
 
-        msg.attach(MimeText(body, "plain"))
+        msg.attach(MIMEText(body, "plain"))
 
         # Use context manager to ensure SMTP connection is always closed
         with smtplib.SMTP("smtp.zoho.eu", 587) as server:
@@ -84,8 +98,8 @@ def send_email_smtp(to_email: str, subject: str, body: str) -> bool:
             text = msg.as_string()
             server.sendmail(ZOHO_EMAIL, to_email, text)
         return True
-    except Exception as e:
-        logging.error(f"Failed to send email: {str(e)}")
+    except (smtplib.SMTPAuthenticationError, smtplib.SMTPConnectError, OSError) as e:
+        logging.error("Failed to send email: %s", e)
         return False
 
 
@@ -96,13 +110,13 @@ def save_to_cosmos(container_client, data: Dict[str, Any]) -> str:
         data["timestamp"] = datetime.utcnow().isoformat()
         container_client.create_item(body=data)
         return data["id"]
-    except Exception as e:
-        logging.error(f"Failed to save to Cosmos: {str(e)}")
+    except (cosmos.exceptions.CosmosHttpResponseError, OSError, ValueError) as e:
+        logging.error("Failed to save to Cosmos: %s", e)
         return None
 
 
 @app.route(route="health", auth_level=func.AuthLevel.ANONYMOUS)
-def health_check(req: func.HttpRequest) -> func.HttpResponse:
+def health_check(_req: func.HttpRequest) -> func.HttpResponse:
     """Health check endpoint"""
     return func.HttpResponse(
         json.dumps(
@@ -142,12 +156,26 @@ def contact_form(req: func.HttpRequest) -> func.HttpResponse:
             "message": message,
             "type": "contact",
         }
+
+        if not COSMOS_CONNECTION_STRING:
+            logging.error("Cosmos DB not configured")
+            return func.HttpResponse(
+                json.dumps(
+                    {
+                        "success": False,
+                        "message": "Erreur lors de la sauvegarde des données",
+                    }
+                ),
+                status_code=500,
+                mimetype="application/json",
+            )
+
         message_id = save_to_cosmos(contacts_container, contact_data)
 
         # Check if save to Cosmos DB failed
         if not message_id:
             logging.error(
-                f"Failed to save contact form data to Cosmos DB for user {email}"
+                "Failed to save contact form data to Cosmos DB for user %s", email
             )
             return func.HttpResponse(
                 json.dumps(
@@ -187,8 +215,8 @@ ID de référence: {message_id}
             mimetype="application/json",
         )
 
-    except Exception as e:
-        logging.error(f"Contact form error: {str(e)}")
+    except (OSError, ValueError, json.JSONDecodeError) as e:
+        logging.error("Contact form error: %s", e)
         return func.HttpResponse(
             json.dumps({"success": False, "message": "Erreur serveur"}),
             status_code=500,
@@ -223,6 +251,15 @@ def demo_form(req: func.HttpRequest) -> func.HttpResponse:
             "businessNeeds": business_needs,
             "type": "demo_request",
         }
+
+        if not COSMOS_CONNECTION_STRING:
+            logging.error("Cosmos DB not configured")
+            return func.HttpResponse(
+                json.dumps({"success": False, "message": "Erreur serveur"}),
+                status_code=500,
+                mimetype="application/json",
+            )
+
         message_id = save_to_cosmos(demos_container, demo_data)
 
         # Send email notification
@@ -253,8 +290,8 @@ ID de référence: {message_id}
             mimetype="application/json",
         )
 
-    except Exception as e:
-        logging.error(f"Demo form error: {str(e)}")
+    except (OSError, ValueError, json.JSONDecodeError) as e:
+        logging.error("Demo form error: %s", e)
         return func.HttpResponse(
             json.dumps({"success": False, "message": "Erreur serveur"}),
             status_code=500,
@@ -277,7 +314,8 @@ def ai_chat(req: func.HttpRequest) -> func.HttpResponse:
                 mimetype="application/json",
             )
 
-        if not openai_client:
+        # Check if OpenAI client is configured
+        if not AZURE_OPENAI_ENDPOINT or not AZURE_OPENAI_KEY:
             return func.HttpResponse(
                 json.dumps({"success": False, "message": "Service IA non configuré"}),
                 status_code=503,
@@ -308,7 +346,10 @@ def ai_chat(req: func.HttpRequest) -> func.HttpResponse:
             "timestamp": datetime.utcnow().isoformat(),
             "type": "chat",
         }
-        save_to_cosmos(conversations_container, conversation_data)
+
+        # Only save to Cosmos DB if container is configured
+        if COSMOS_CONNECTION_STRING:
+            save_to_cosmos(conversations_container, conversation_data)
 
         return func.HttpResponse(
             json.dumps(
@@ -321,8 +362,8 @@ def ai_chat(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
         )
 
-    except Exception as e:
-        logging.error(f"AI chat error: {str(e)}")
+    except (OSError, ValueError, json.JSONDecodeError) as e:
+        logging.error("AI chat error: %s", e)
         return func.HttpResponse(
             json.dumps({"success": False, "message": "Erreur du service IA"}),
             status_code=500,
@@ -344,7 +385,16 @@ def ai_vision(req: func.HttpRequest) -> func.HttpResponse:
                 mimetype="application/json",
             )
 
-        if not vision_client:
+        # Basic URL validation
+        if not re.match(r"^https?://", image_url):
+            return func.HttpResponse(
+                json.dumps({"success": False, "message": "URL d'image invalide"}),
+                status_code=400,
+                mimetype="application/json",
+            )
+
+        # Check if vision_client is configured
+        if not AZURE_VISION_ENDPOINT or not AZURE_VISION_KEY:
             return func.HttpResponse(
                 json.dumps(
                     {"success": False, "message": "Service de vision non configuré"}
@@ -352,9 +402,9 @@ def ai_vision(req: func.HttpRequest) -> func.HttpResponse:
                 status_code=503,
                 mimetype="application/json",
             )
-
         # Analyze image using Azure Vision
         result = vision_client.analyze(
+            image_data=None,
             image_url=image_url,
             visual_features=[VisualFeatures.CAPTION, VisualFeatures.READ],
         )
@@ -362,7 +412,7 @@ def ai_vision(req: func.HttpRequest) -> func.HttpResponse:
         # Extract text and description
         caption = result.caption.content if result.caption else ""
         text = ""
-        if result.read:
+        if result.read and hasattr(result.read, "blocks") and result.read.blocks:
             for line in result.read.blocks[0].lines:
                 text += line.text + " "
 
@@ -378,8 +428,8 @@ def ai_vision(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
         )
 
-    except Exception as e:
-        logging.error(f"AI vision error: {str(e)}")
+    except (OSError, ValueError, json.JSONDecodeError) as e:
+        logging.error("AI vision error: %s", e)
         return func.HttpResponse(
             json.dumps({"success": False, "message": "Erreur du service de vision"}),
             status_code=500,
@@ -433,8 +483,8 @@ def create_payment_intent(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
         )
 
-    except Exception as e:
-        logging.error(f"Payment intent error: {str(e)}")
+    except (OSError, ValueError, json.JSONDecodeError) as e:
+        logging.error("Payment intent error: %s", e)
         return func.HttpResponse(
             json.dumps({"success": False, "message": "Erreur de paiement"}),
             status_code=500,
@@ -489,8 +539,8 @@ def create_subscription(req: func.HttpRequest) -> func.HttpResponse:
                         invoice.payment_intent, "client_secret"
                     ):
                         client_secret = invoice.payment_intent.client_secret
-        except Exception as e:
-            logging.warning(f"Could not retrieve client secret: {str(e)}")
+        except (OSError, ValueError, stripe.error.StripeError) as e:
+            logging.warning("Could not retrieve client secret: %s", e)
 
         response_data = {
             "success": True,
@@ -506,8 +556,8 @@ def create_subscription(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
         )
 
-    except Exception as e:
-        logging.error(f"Subscription error: {str(e)}")
+    except (OSError, ValueError, json.JSONDecodeError, stripe.error.StripeError) as e:
+        logging.error("Subscription error: %s", e)
         return func.HttpResponse(
             json.dumps({"success": False, "message": "Erreur d'abonnement"}),
             status_code=500,
