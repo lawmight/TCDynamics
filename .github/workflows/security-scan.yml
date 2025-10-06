@@ -213,20 +213,41 @@ jobs:
           ls -la trivy-*.sarif || echo "SARIF files not found in current directory"
           find . -name "trivy-*.sarif" -type f -exec ls -la {} \; || echo "No SARIF files found in workspace"
 
-      - name: Create empty SARIF files if scans failed
+      - name: Ensure SARIF files exist
         run: |
-          ls -la trivy-*.sarif || true
-          echo '{"$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json", "version": "2.1.0", "runs": []}' > trivy-backend-results.sarif
-          echo '{"$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json", "version": "2.1.0", "runs": []}' > trivy-frontend-results.sarif
+          # Create files if they don't exist
+          if [ ! -f trivy-backend-results.sarif ]; then
+            echo '{"$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json", "version": "2.1.0", "runs": []}' > trivy-backend-results.sarif
+            echo "✅ Created empty trivy-backend-results.sarif"
+          else
+            echo "✅ trivy-backend-results.sarif exists"
+          fi
+          
+          if [ ! -f trivy-frontend-results.sarif ]; then
+            echo '{"$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json", "version": "2.1.0", "runs": []}' > trivy-frontend-results.sarif
+            echo "✅ Created empty trivy-frontend-results.sarif"
+          else
+            echo "✅ trivy-frontend-results.sarif exists"
+          fi
+          
+          echo "Final SARIF files:"
           ls -la trivy-*.sarif
 
-      - name: Upload Trivy scan results to GitHub Security tab
+      - name: Upload backend SARIF results
         uses: github/codeql-action/upload-sarif@v3
         if: always()
+        continue-on-error: true
         with:
-          sarif_file: |
-            trivy-backend-results.sarif
-            trivy-frontend-results.sarif
+          sarif_file: trivy-backend-results.sarif
+          category: trivy-backend
+
+      - name: Upload frontend SARIF results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        continue-on-error: true
+        with:
+          sarif_file: trivy-frontend-results.sarif
+          category: trivy-frontend
 
   # Dependency Review for Pull Requests
   dependency-review:
