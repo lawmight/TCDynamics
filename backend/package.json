@@ -2,6 +2,7 @@
   "name": "tcdynamics-backend",
   "version": "1.0.0",
   "description": "Backend API pour TCDynamics",
+  "license": "MIT",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
