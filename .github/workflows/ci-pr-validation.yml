@@ -177,8 +177,8 @@ jobs:
           }
           EOF
 
-          # Run tests          name: Azure Functions
-          fail_ci_if_error: false
+          # Run tests
+          python -m pytest --cov=. --cov-report=xml
 
   # Integration Tests (Optional - only run if both backend and functions pass)
   integration-tests:
@@ -220,17 +220,21 @@ jobs:
       - name: Quality Gate Check
         run: |
           # Check if all required jobs passed
-          if [[ "${{ needs.test-frontend.result }}" != "success" ]]; then
+          FRONTEND_RESULT="${{ needs.test-frontend.result }}"
+          BACKEND_RESULT="${{ needs.test-backend.result }}"
+          FUNCTIONS_RESULT="${{ needs.test-functions.result }}"
+
+          if [[ "$FRONTEND_RESULT" != "success" ]]; then
             echo "❌ Frontend tests failed"
             exit 1
           fi
 
-          if [[ "${{ needs.test-backend.result }}" != "success" ]]; then
+          if [[ "$BACKEND_RESULT" != "success" ]]; then
             echo "❌ Backend tests failed"
             exit 1
           fi
 
-          if [[ "${{ needs.test-functions.result }}" != "success" ]]; then
+          if [[ "$FUNCTIONS_RESULT" != "success" ]]; then
             echo "❌ Functions tests failed"
             exit 1
           fi
