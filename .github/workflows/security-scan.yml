@@ -134,7 +134,9 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          file: docker-compose.yml
+          file: backend/Dockerfile,Dockerfile.frontend
+          command: test
+          sarif: true
 
   # Container Image Security Scan
   container-security:
@@ -195,10 +197,11 @@ jobs:
           output: 'trivy-frontend-results.sarif'
           severity: 'HIGH,CRITICAL'
 
-      - name: List generated SARIF files
+      - name: Verify SARIF files exist
         run: |
-          echo "Looking for SARIF files:"
-          find . -name "trivy-*.sarif" -type f || echo "No SARIF files found"
+          echo "Checking for SARIF files:"
+          ls -la trivy-*.sarif || echo "SARIF files not found in current directory"
+          find . -name "trivy-*.sarif" -type f -exec ls -la {} \; || echo "No SARIF files found in workspace"
 
       - name: Create empty SARIF files if scans failed
         run: |
