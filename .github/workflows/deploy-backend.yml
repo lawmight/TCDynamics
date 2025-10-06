@@ -103,7 +103,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Deploy to OVHcloud VPS
-        uses: appleboy/ssh-action@v1.0.0
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.OVHCLOUD_HOST }}
           username: ${{ secrets.OVHCLOUD_USER }}
@@ -137,7 +137,7 @@ jobs:
           strip_components: 0
 
       - name: Update Docker images and deploy
-        uses: appleboy/ssh-action@v1.0.0
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.OVHCLOUD_HOST }}
           username: ${{ secrets.OVHCLOUD_USER }}
@@ -241,7 +241,7 @@ jobs:
 
     steps:
       - name: Run database migrations
-        uses: appleboy/ssh-action@v1.0.0
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.OVHCLOUD_HOST }}
           username: ${{ secrets.OVHCLOUD_USER }}
