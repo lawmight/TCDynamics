@@ -4,6 +4,8 @@
 >
 > 💡 **Recently Optimized**: Codebase cleaned and optimized for better performance
 
+<!-- Test commit to verify security scans -->
+
 [![React](https://img.shields.io/badge/React-18.3-blue.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
