@@ -1,98 +1,162 @@
+import * as apiConfig from '@/utils/apiConfig'
 import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { useContactForm } from '../useContactForm'
+import { useContactForm, type ContactFormData } from '../useContactForm'
 
-// Mock fetch
-global.fetch = vi.fn()
+// Mock modules
+vi.mock('@/utils/apiConfig', async () => {
+  const actual = await vi.importActual('@/utils/apiConfig')
+  return {
+    ...actual,
+    apiRequest: vi.fn(),
+  }
+})
 
-// Mock environment variables
-vi.mock('import.meta', () => ({
-  env: {
-    VITE_API_URL: 'http://localhost:3001',
+vi.mock('@/utils/logger', () => ({
+  logger: {
+    warn: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
   },
 }))
 
-// Mock the CSRF token function
-vi.mock('../../utils/csrf', () => ({
-  getCsrfToken: vi.fn().mockResolvedValue('mock-csrf-token'),
-}))
-
 describe('useContactForm', () => {
+  const mockApiRequest = apiConfig.apiRequest as unknown as ReturnType<
+    typeof vi.fn
+  >
+
+  const mockContactData: ContactFormData = {
+    name: 'John Doe',
+    email: 'john@example.com',
+    phone: '+33123456789',
+    company: 'Test Corp',
+    message: 'Test message',
+  }
+
+  const mockSuccessResponse = {
+    success: true,
+    message: 'Message envoyé avec succès',
+    messageId: '123',
+  }
+
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
-  it('should submit form successfully', async () => {
-    const mockResponse = {
-      success: true,
-      message: 'Message envoyé avec succès',
-    }
-
-    ;(
-      fetch as ReturnType<typeof vi.mocked<typeof fetch>>
-    ).mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockResponse,
-    } as Response)
-
+  it('should initialize with correct default state', () => {
     const { result } = renderHook(() => useContactForm())
 
-    await act(async () => {
-      await result.current.submitForm({
-        name: 'Test User',
-        email: 'test@example.com',
-        message: 'Test message',
-      })
-    })
-
-    expect(result.current.response).toEqual(mockResponse)
     expect(result.current.isSubmitting).toBe(false)
+    expect(result.current.response).toBe(null)
+    expect(result.current.hasErrors).toBe(false)
+    expect(result.current.isSuccess).toBe(false)
+    expect(result.current.errors).toEqual([])
+    expect(result.current.message).toBe('')
   })
 
-  it('should handle errors', async () => {
-    // Mock both Azure Functions and Node.js backend to fail
-    vi.mocked(fetch).mockRejectedValue(new Error('Network error'))
+  it('should submit contact form successfully', async () => {
+    mockApiRequest.mockResolvedValueOnce(mockSuccessResponse)
+
+    const { result } = renderHook(() => useContactForm())
+
+    let response
+    await act(async () => {
+      response = await result.current.submitForm(mockContactData)
+    })
+
+    expect(response).toEqual(mockSuccessResponse)
+    expect(result.current.isSuccess).toBe(true)
+    expect(result.current.hasErrors).toBe(false)
+  })
+
+  it('should use Azure Functions as primary endpoint', async () => {
+    mockApiRequest.mockResolvedValueOnce(mockSuccessResponse)
 
     const { result } = renderHook(() => useContactForm())
 
     await act(async () => {
-      await result.current.submitForm({
-        name: 'Test User',
-        email: 'test@example.com',
-        message: 'Test message',
-      })
+      await result.current.submitForm(mockContactData)
     })
 
-    expect(result.current.response?.success).toBe(false)
-    expect(result.current.response?.message).toContain('Network error')
+    expect(mockApiRequest).toHaveBeenCalledWith(
+      apiConfig.API_ENDPOINTS.azureContact,
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify(mockContactData),
+      })
+    )
+  })
+
+  it('should fallback to Node.js backend on Azure failure', async () => {
+    const serverError = new Response(null, { status: 503 })
+    mockApiRequest
+      .mockRejectedValueOnce(serverError)
+      .mockResolvedValueOnce(mockSuccessResponse)
+
+    const { result } = renderHook(() => useContactForm())
+
+    await act(async () => {
+      await result.current.submitForm(mockContactData)
+    })
+
+    expect(mockApiRequest).toHaveBeenCalledTimes(2)
+    expect(mockApiRequest).toHaveBeenNthCalledWith(
+      2,
+      apiConfig.API_ENDPOINTS.contact,
+      expect.objectContaining({
+        method: 'POST',
+      })
+    )
+    expect(result.current.isSuccess).toBe(true)
   })
 
   it('should handle validation errors', async () => {
-    const mockResponse = {
-      success: false,
-      message: 'Validation error: response.text is not a function',
-      errors: ['response.text is not a function'],
-    }
-
-    ;(
-      fetch as ReturnType<typeof vi.mocked<typeof fetch>>
-    ).mockResolvedValueOnce({
-      ok: false,
-      json: async () => mockResponse,
-    } as Response)
+    const validationError = new Error('Email invalide')
+    mockApiRequest.mockRejectedValue(validationError)
 
     const { result } = renderHook(() => useContactForm())
 
     await act(async () => {
-      await result.current.submitForm({
-        name: 'Test User',
-        email: 'test@example.com',
-        message: 'Test message',
-      })
+      await result.current.submitForm(mockContactData)
     })
 
-    expect(result.current.response?.success).toBe(false)
-    expect(result.current.response?.errors).toBeDefined()
-    expect(result.current.isSubmitting).toBe(false)
+    expect(result.current.hasErrors).toBe(true)
+    expect(result.current.message).toBe('Email invalide')
+  })
+
+  it('should clear response', async () => {
+    mockApiRequest.mockResolvedValueOnce(mockSuccessResponse)
+
+    const { result } = renderHook(() => useContactForm())
+
+    await act(async () => {
+      await result.current.submitForm(mockContactData)
+    })
+
+    expect(result.current.response).not.toBe(null)
+
+    act(() => {
+      result.current.clearResponse()
+    })
+
+    expect(result.current.response).toBe(null)
+  })
+
+  it('should handle minimal contact data', async () => {
+    mockApiRequest.mockResolvedValueOnce(mockSuccessResponse)
+
+    const minimalData: ContactFormData = {
+      name: 'Jane',
+      email: 'jane@test.com',
+      message: 'Hello',
+    }
+
+    const { result } = renderHook(() => useContactForm())
+
+    await act(async () => {
+      await result.current.submitForm(minimalData)
+    })
+
+    expect(result.current.isSuccess).toBe(true)
   })
 })

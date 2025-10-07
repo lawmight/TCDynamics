@@ -1,80 +1,26 @@
 const Joi = require('joi')
+const { commonFields } = require('./validationHelpers')
 
 // Schéma de validation pour le formulaire de contact
+// Uses reusable validation helpers for consistency
 const contactSchema = Joi.object({
-  name: Joi.string().min(2).max(100).required().messages({
-    'string.min': 'Le nom doit contenir au moins 2 caractères',
-    'string.max': 'Le nom ne peut pas dépasser 100 caractères',
-    'any.required': 'Le nom est requis',
-  }),
-
-  email: Joi.string().email().required().messages({
-    'string.email': 'Veuillez fournir une adresse email valide',
-    'any.required': "L'email est requis",
-  }),
-
-  phone: Joi.string()
-    .pattern(/^[0-9\s\+\-\(\)]+$/)
-    .optional()
-    .allow('')
-    .messages({
-      'string.pattern.base':
-        'Le numéro de téléphone contient des caractères invalides',
-    }),
-
-  company: Joi.string().max(200).optional().allow('').messages({
-    'string.max': "Le nom de l'entreprise ne peut pas dépasser 200 caractères",
-  }),
-
-  message: Joi.string().min(10).max(2000).required().messages({
-    'string.min': 'Le message doit contenir au moins 10 caractères',
-    'string.max': 'Le message ne peut pas dépasser 2000 caractères',
-    'any.required': 'Le message est requis',
-  }),
+  name: commonFields.fullName(),
+  email: commonFields.email(),
+  phone: commonFields.phone(),
+  company: commonFields.company(false), // optional
+  message: commonFields.message(),
 })
 
 // Schéma de validation pour le formulaire de démo
+// Uses reusable validation helpers for consistency
 const demoSchema = Joi.object({
-  firstName: Joi.string().min(2).max(50).required().messages({
-    'string.min': 'Le prénom doit contenir au moins 2 caractères',
-    'string.max': 'Le prénom ne peut pas dépasser 50 caractères',
-    'any.required': 'Le prénom est requis',
-  }),
-
-  lastName: Joi.string().min(2).max(50).required().messages({
-    'string.min': 'Le nom doit contenir au moins 2 caractères',
-    'string.max': 'Le nom ne peut pas dépasser 50 caractères',
-    'any.required': 'Le nom est requis',
-  }),
-
-  email: Joi.string().email().required().messages({
-    'string.email': 'Veuillez fournir une adresse email valide',
-    'any.required': "L'email est requis",
-  }),
-
-  phone: Joi.string()
-    .pattern(/^[0-9\s\+\-\(\)]+$/)
-    .optional()
-    .allow('')
-    .messages({
-      'string.pattern.base':
-        'Le numéro de téléphone contient des caractères invalides',
-    }),
-
-  company: Joi.string().min(2).max(200).required().messages({
-    'string.min': "Le nom de l'entreprise doit contenir au moins 2 caractères",
-    'string.max': "Le nom de l'entreprise ne peut pas dépasser 200 caractères",
-    'any.required': "Le nom de l'entreprise est requis",
-  }),
-
-  employees: Joi.string().optional().allow('').messages({
-    'any.only': "Le nombre d'employés doit être une valeur valide",
-  }),
-
-  needs: Joi.string().max(1000).optional().allow('').messages({
-    'string.max':
-      'La description des besoins ne peut pas dépasser 1000 caractères',
-  }),
+  firstName: commonFields.firstName(),
+  lastName: commonFields.lastName(),
+  email: commonFields.email(),
+  phone: commonFields.phone(),
+  company: commonFields.company(true), // required
+  employees: commonFields.employees(),
+  needs: commonFields.notes(1000),
 })
 
 // Fonction de validation générique
