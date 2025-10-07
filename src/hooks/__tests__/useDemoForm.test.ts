@@ -1,105 +1,190 @@
+import * as apiConfig from '@/utils/apiConfig'
 import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { useDemoForm } from '../useDemoForm'
+import { useDemoForm, type DemoFormData } from '../useDemoForm'
 
-// Mock fetch
-global.fetch = vi.fn()
+// Mock modules
+vi.mock('@/utils/apiConfig', async () => {
+  const actual = await vi.importActual('@/utils/apiConfig')
+  return {
+    ...actual,
+    apiRequest: vi.fn(),
+  }
+})
 
-// Mock environment variables
-vi.mock('import.meta', () => ({
-  env: {
-    VITE_API_URL: 'http://localhost:3001',
+vi.mock('@/utils/logger', () => ({
+  logger: {
+    warn: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
   },
 }))
 
-// Mock the CSRF token function
-vi.mock('../../utils/csrf', () => ({
-  getCsrfToken: vi.fn().mockResolvedValue('mock-csrf-token'),
-}))
-
 describe('useDemoForm', () => {
+  const mockApiRequest = apiConfig.apiRequest as unknown as ReturnType<
+    typeof vi.fn
+  >
+
+  const mockDemoData: DemoFormData = {
+    name: 'Jane Smith',
+    email: 'jane@example.com',
+    phone: '+33987654321',
+    company: 'Demo Corp',
+    employeeCount: '50-200',
+    industry: 'Technology',
+    message: 'Interested in demo',
+  }
+
+  const mockSuccessResponse = {
+    success: true,
+    message: 'Demande de démo envoyée avec succès',
+    messageId: '456',
+  }
+
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
+  it('should initialize with correct default state', () => {
+    const { result } = renderHook(() => useDemoForm())
+
+    expect(result.current.isSubmitting).toBe(false)
+    expect(result.current.response).toBe(null)
+    expect(result.current.hasErrors).toBe(false)
+    expect(result.current.isSuccess).toBe(false)
+    expect(result.current.errors).toEqual([])
+    expect(result.current.message).toBe('')
+  })
+
   it('should submit demo form successfully', async () => {
-    const mockResponse = {
-      success: true,
-      message: 'Demande de démo enregistrée',
-    }
-
-    ;(
-      fetch as ReturnType<typeof vi.mocked<typeof fetch>>
-    ).mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockResponse,
-    } as Response)
+    mockApiRequest.mockResolvedValueOnce(mockSuccessResponse)
 
     const { result } = renderHook(() => useDemoForm())
 
+    let response
     await act(async () => {
-      await result.current.submitForm({
-        name: 'Jean Dupont',
-        email: 'jean.dupont@example.com',
-        company: 'Test Company',
-        phone: '01 23 45 67 89',
-        employeeCount: '25',
-        message: "Besoin d'automatisation",
-      })
+      response = await result.current.submitForm(mockDemoData)
     })
 
-    expect(result.current.response).toEqual(mockResponse)
-    expect(result.current.isSubmitting).toBe(false)
+    expect(response).toEqual(mockSuccessResponse)
+    expect(result.current.isSuccess).toBe(true)
+    expect(result.current.hasErrors).toBe(false)
   })
 
-  it('should handle network errors', async () => {
-    // Mock both Azure Functions and Node.js backend to fail
-    vi.mocked(fetch).mockRejectedValue(new Error('Network error'))
+  it('should use Azure Functions as primary endpoint', async () => {
+    mockApiRequest.mockResolvedValueOnce(mockSuccessResponse)
 
     const { result } = renderHook(() => useDemoForm())
 
     await act(async () => {
-      await result.current.submitForm({
-        name: 'Jean Dupont',
-        email: 'jean.dupont@example.com',
-        company: 'Test Company',
-      })
+      await result.current.submitForm(mockDemoData)
     })
 
-    expect(result.current.response?.success).toBe(false)
-    expect(result.current.response?.message).toContain('Network error')
+    expect(mockApiRequest).toHaveBeenCalledWith(
+      apiConfig.API_ENDPOINTS.azureDemo,
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify(mockDemoData),
+      })
+    )
   })
 
-  it('should handle server validation errors', async () => {
-    const mockResponse = {
-      success: false,
-      message:
-        "Validation error: email: Adresse email invalide, company: Le nom de l'entreprise doit contenir au moins 2 caractères",
-      errors: [
-        'email: Adresse email invalide',
-        "company: Le nom de l'entreprise doit contenir au moins 2 caractères",
-      ],
-    }
-
-    ;(
-      fetch as ReturnType<typeof vi.mocked<typeof fetch>>
-    ).mockResolvedValueOnce({
-      ok: false,
-      json: async () => mockResponse,
-    } as Response)
+  it('should fallback to Node.js backend on Azure failure', async () => {
+    const serverError = new Response(null, { status: 500 })
+    mockApiRequest
+      .mockRejectedValueOnce(serverError)
+      .mockResolvedValueOnce(mockSuccessResponse)
 
     const { result } = renderHook(() => useDemoForm())
 
     await act(async () => {
-      await result.current.submitForm({
-        name: 'Jean Dupont',
-        email: 'jean.dupont@example.com',
-        company: 'Test Company',
-      })
+      await result.current.submitForm(mockDemoData)
     })
 
-    expect(result.current.response?.success).toBe(false)
-    expect(result.current.response?.errors).toBeDefined()
-    expect(result.current.isSubmitting).toBe(false)
+    expect(mockApiRequest).toHaveBeenCalledTimes(2)
+    expect(mockApiRequest).toHaveBeenNthCalledWith(
+      2,
+      apiConfig.API_ENDPOINTS.demo,
+      expect.objectContaining({
+        method: 'POST',
+      })
+    )
+    expect(result.current.isSuccess).toBe(true)
+  })
+
+  it('should handle validation errors', async () => {
+    const validationError = new Error('Email invalide')
+    mockApiRequest.mockRejectedValue(validationError)
+
+    const { result } = renderHook(() => useDemoForm())
+
+    await act(async () => {
+      await result.current.submitForm(mockDemoData)
+    })
+
+    expect(result.current.hasErrors).toBe(true)
+    expect(result.current.message).toBe('Email invalide')
+  })
+
+  it('should clear response', async () => {
+    mockApiRequest.mockResolvedValueOnce(mockSuccessResponse)
+
+    const { result } = renderHook(() => useDemoForm())
+
+    await act(async () => {
+      await result.current.submitForm(mockDemoData)
+    })
+
+    expect(result.current.response).not.toBe(null)
+
+    act(() => {
+      result.current.clearResponse()
+    })
+
+    expect(result.current.response).toBe(null)
+  })
+
+  it('should handle minimal demo data', async () => {
+    mockApiRequest.mockResolvedValueOnce(mockSuccessResponse)
+
+    const minimalData: DemoFormData = {
+      name: 'John',
+      email: 'john@test.com',
+    }
+
+    const { result } = renderHook(() => useDemoForm())
+
+    await act(async () => {
+      await result.current.submitForm(minimalData)
+    })
+
+    expect(result.current.isSuccess).toBe(true)
+  })
+
+  it('should handle all optional fields', async () => {
+    mockApiRequest.mockResolvedValueOnce(mockSuccessResponse)
+
+    const fullData: DemoFormData = {
+      name: 'Full Name',
+      email: 'full@test.com',
+      phone: '+33111111111',
+      company: 'Full Company',
+      employeeCount: '1000+',
+      industry: 'Finance',
+      message: 'Full message here',
+    }
+
+    const { result } = renderHook(() => useDemoForm())
+
+    await act(async () => {
+      await result.current.submitForm(fullData)
+    })
+
+    expect(mockApiRequest).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        body: JSON.stringify(fullData),
+      })
+    )
   })
 })
