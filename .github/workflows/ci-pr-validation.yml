@@ -1,8 +1,6 @@
 name: 'CI - Pull Request Validation'
 
 on:
-  push:
-    branches: [test-ci-validation] # Temporary: allow pushes to test branch for CI validation
   pull_request:
     branches: [main, develop]
     paths:
