@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom'
-import { expect, afterEach, vi } from 'vitest'
-import { cleanup } from '@testing-library/react'
 import * as matchers from '@testing-library/jest-dom/matchers'
+import { cleanup } from '@testing-library/react'
+import { afterEach, expect, vi } from 'vitest'
 import './mocks/styles.css'
 
 // Extend Vitest's expect with jest-dom matchers
@@ -61,6 +61,28 @@ Object.defineProperty(window, 'location', {
     replace: vi.fn(),
     reload: vi.fn(),
   },
+})
+
+// Mock window.scrollTo
+window.scrollTo = vi.fn()
+
+// Mock window.scroll
+window.scroll = vi.fn()
+
+// Mock Element.prototype.scrollIntoView
+Element.prototype.scrollIntoView = vi.fn()
+
+// Mock document.getElementById
+const originalGetElementById = document.getElementById.bind(document)
+document.getElementById = vi.fn((id: string) => {
+  const element = originalGetElementById(id)
+  if (!element) {
+    // Return a mock element with scrollIntoView
+    return {
+      scrollIntoView: vi.fn(),
+    } as any
+  }
+  return element
 })
 
 // Cleanup after each test

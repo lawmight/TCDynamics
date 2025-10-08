@@ -18,7 +18,7 @@ class TestAzureFunctions:
         """Setup for each test"""
         # Reset environment variables
         for key in list(os.environ.keys()):
-            if key.startswith(('AZURE_', 'ZOHO_', 'COSMOS_', 'STRIPE_')):
+            if key.startswith(("AZURE_", "ZOHO_", "COSMOS_", "STRIPE_")):
                 del os.environ[key]
 
     @pytest.mark.asyncio
@@ -54,23 +54,28 @@ class TestAzureFunctions:
             "phone": "1234567890",
             "company": "Test Company",
             "message": "Test message",
-            "consent": True
+            "consent": True,
         }
 
         # Mock environment variables
-        with patch.dict('os.environ', {
-            'COSMOS_CONNECTION_STRING': 'test-connection-string',
-            'COSMOS_DATABASE': 'test-db',
-            'COSMOS_CONTAINER_CONTACTS': 'test-contacts',
-        }):
+        with patch.dict(
+            "os.environ",
+            {
+                "COSMOS_CONNECTION_STRING": "test-connection-string",
+                "COSMOS_DATABASE": "test-db",
+                "COSMOS_CONTAINER_CONTACTS": "test-contacts",
+            },
+        ):
             # Mock cosmos client
-            with patch('azure.cosmos.CosmosClient') as mock_cosmos:
+            with patch("azure.cosmos.CosmosClient") as mock_cosmos:
                 mock_container = Mock()
                 mock_container.create_item = Mock()
-                mock_cosmos.return_value.get_database_client.return_value.get_container_client.return_value = mock_container
+                mock_cosmos.return_value.get_database_client.return_value.get_container_client.return_value = (
+                    mock_container
+                )
 
                 # Mock email sending
-                with patch('function_app.send_email_smtp', return_value=True):
+                with patch("function_app.send_email_smtp", return_value=True):
                     response = await contact_form(mock_req)
 
                     assert response.status_code == 200
@@ -89,7 +94,7 @@ class TestAzureFunctions:
         mock_req.get_json.return_value = {
             "name": "",  # Missing
             "email": "test@example.com",
-            "message": "Test message"
+            "message": "Test message",
         }
 
         response = await contact_form(mock_req)
@@ -111,23 +116,28 @@ class TestAzureFunctions:
             "name": "Test User",
             "email": "test@example.com",
             "company": "Test Company",
-            "businessNeeds": "Need demo of features"
+            "businessNeeds": "Need demo of features",
         }
 
         # Mock environment variables
-        with patch.dict('os.environ', {
-            'COSMOS_CONNECTION_STRING': 'test-connection-string',
-            'COSMOS_DATABASE': 'test-db',
-            'COSMOS_CONTAINER_DEMOS': 'test-demos',
-        }):
+        with patch.dict(
+            "os.environ",
+            {
+                "COSMOS_CONNECTION_STRING": "test-connection-string",
+                "COSMOS_DATABASE": "test-db",
+                "COSMOS_CONTAINER_DEMOS": "test-demos",
+            },
+        ):
             # Mock cosmos client
-            with patch('azure.cosmos.CosmosClient') as mock_cosmos:
+            with patch("azure.cosmos.CosmosClient") as mock_cosmos:
                 mock_container = Mock()
                 mock_container.create_item = Mock()
-                mock_cosmos.return_value.get_database_client.return_value.get_container_client.return_value = mock_container
+                mock_cosmos.return_value.get_database_client.return_value.get_container_client.return_value = (
+                    mock_container
+                )
 
                 # Mock email sending
-                with patch('function_app.send_email_smtp', return_value=True):
+                with patch("function_app.send_email_smtp", return_value=True):
                     response = await demo_form(mock_req)
 
                     assert response.status_code == 200
@@ -144,33 +154,41 @@ class TestAzureFunctions:
         mock_req.method = "POST"
         mock_req.get_json.return_value = {
             "message": "Hello, how are you?",
-            "sessionId": "test-session-123"
+            "sessionId": "test-session-123",
         }
 
         # Mock OpenAI client
-        with patch.dict('os.environ', {
-            'AZURE_OPENAI_ENDPOINT': 'https://test.openai.azure.com',
-            'AZURE_OPENAI_API_KEY': 'test-key',
-            'AZURE_OPENAI_DEPLOYMENT': 'gpt-4',
-        }):
+        with patch.dict(
+            "os.environ",
+            {
+                "AZURE_OPENAI_ENDPOINT": "https://test.openai.azure.com",
+                "AZURE_OPENAI_API_KEY": "test-key",
+                "AZURE_OPENAI_DEPLOYMENT": "gpt-4",
+            },
+        ):
             # Mock OpenAI response
             mock_response = Mock()
             mock_response.choices = [Mock()]
             mock_response.choices[0].message.content = "I'm doing well, thank you!"
 
-            with patch('openai.AzureOpenAI') as mock_openai_class:
+            with patch("openai.AzureOpenAI") as mock_openai_class:
                 mock_openai = Mock()
                 mock_openai.chat.completions.create = Mock(return_value=mock_response)
                 mock_openai_class.return_value = mock_openai
 
                 # Mock cosmos for conversation saving
-                with patch.dict('os.environ', {
-                    'COSMOS_CONNECTION_STRING': 'test-connection-string',
-                    'COSMOS_CONTAINER_CONVERSATIONS': 'test-conversations',
-                }):
-                    with patch('azure.cosmos.CosmosClient') as mock_cosmos:
+                with patch.dict(
+                    "os.environ",
+                    {
+                        "COSMOS_CONNECTION_STRING": "test-connection-string",
+                        "COSMOS_CONTAINER_CONVERSATIONS": "test-conversations",
+                    },
+                ):
+                    with patch("azure.cosmos.CosmosClient") as mock_cosmos:
                         mock_container = Mock()
-                        mock_cosmos.return_value.get_database_client.return_value.get_container_client.return_value = mock_container
+                        mock_cosmos.return_value.get_database_client.return_value.get_container_client.return_value = (
+                            mock_container
+                        )
 
                         response = await ai_chat(mock_req)
 
@@ -190,7 +208,7 @@ class TestAzureFunctions:
         mock_req.method = "POST"
         mock_req.get_json.return_value = {
             "message": "Hello",
-            "sessionId": "test-session"
+            "sessionId": "test-session",
         }
 
         # No OpenAI environment variables
@@ -209,15 +227,16 @@ class TestAzureFunctions:
         # Mock request
         mock_req = Mock(spec=func.HttpRequest)
         mock_req.method = "POST"
-        mock_req.get_json.return_value = {
-            "imageUrl": "https://example.com/image.jpg"
-        }
+        mock_req.get_json.return_value = {"imageUrl": "https://example.com/image.jpg"}
 
         # Mock Vision client
-        with patch.dict('os.environ', {
-            'AZURE_VISION_ENDPOINT': 'https://test.vision.azure.com',
-            'AZURE_VISION_API_KEY': 'test-key',
-        }):
+        with patch.dict(
+            "os.environ",
+            {
+                "AZURE_VISION_ENDPOINT": "https://test.vision.azure.com",
+                "AZURE_VISION_API_KEY": "test-key",
+            },
+        ):
             # Mock vision response
             mock_result = Mock()
             mock_result.caption = Mock()
@@ -227,7 +246,9 @@ class TestAzureFunctions:
             mock_result.read.blocks[0].lines = [Mock()]
             mock_result.read.blocks[0].lines[0].text = "Extracted text"
 
-            with patch('azure.ai.vision.imageanalysis.ImageAnalysisClient') as mock_vision_class:
+            with patch(
+                "azure.ai.vision.imageanalysis.ImageAnalysisClient"
+            ) as mock_vision_class:
                 mock_vision = Mock()
                 mock_vision.analyze = Mock(return_value=mock_result)
                 mock_vision_class.return_value = mock_vision
@@ -248,9 +269,7 @@ class TestAzureFunctions:
         # Mock request with invalid URL
         mock_req = Mock(spec=func.HttpRequest)
         mock_req.method = "POST"
-        mock_req.get_json.return_value = {
-            "imageUrl": "invalid-url"
-        }
+        mock_req.get_json.return_value = {"imageUrl": "invalid-url"}
 
         response = await ai_vision(mock_req)
 
@@ -269,26 +288,29 @@ class TestAzureFunctions:
         mock_req.method = "POST"
         mock_req.get_json.return_value = {
             "amount": 1000,  # 10 EUR in cents
-            "currency": "eur"
+            "currency": "eur",
         }
 
         # Mock Stripe
-        with patch.dict('os.environ', {
-            'STRIPE_SECRET_KEY': 'sk_test_123',
-        }):
+        with patch.dict(
+            "os.environ",
+            {
+                "STRIPE_SECRET_KEY": "sk_test_123",
+            },
+        ):
             # Mock Stripe response
             mock_payment_intent = Mock()
-            mock_payment_intent.client_secret = 'pi_123_secret_456'
-            mock_payment_intent.id = 'pi_123'
+            mock_payment_intent.client_secret = "pi_123_secret_456"
+            mock_payment_intent.id = "pi_123"
 
-            with patch('stripe.PaymentIntent.create', return_value=mock_payment_intent):
+            with patch("stripe.PaymentIntent.create", return_value=mock_payment_intent):
                 response = await create_payment_intent(mock_req)
 
                 assert response.status_code == 200
                 body = json.loads(response.get_body())
                 assert body["success"] is True
-                assert body["clientSecret"] == 'pi_123_secret_456'
-                assert body["paymentIntentId"] == 'pi_123'
+                assert body["clientSecret"] == "pi_123_secret_456"
+                assert body["paymentIntentId"] == "pi_123"
 
     @pytest.mark.asyncio
     async def test_stripe_subscription(self):
@@ -300,36 +322,43 @@ class TestAzureFunctions:
         mock_req.method = "POST"
         mock_req.get_json.return_value = {
             "email": "test@example.com",
-            "priceId": "price_123"
+            "priceId": "price_123",
         }
 
         # Mock Stripe
-        with patch.dict('os.environ', {
-            'STRIPE_SECRET_KEY': 'sk_test_123',
-        }):
+        with patch.dict(
+            "os.environ",
+            {
+                "STRIPE_SECRET_KEY": "sk_test_123",
+            },
+        ):
             # Mock customer list
             mock_customer = Mock()
-            mock_customer.id = 'cus_123'
+            mock_customer.id = "cus_123"
 
             # Mock subscription
             mock_subscription = Mock()
-            mock_subscription.id = 'sub_123'
+            mock_subscription.id = "sub_123"
             mock_subscription.latest_invoice = Mock()
             mock_subscription.latest_invoice.payment_intent = Mock()
-            mock_subscription.latest_invoice.payment_intent.client_secret = 'pi_456_secret_789'
+            mock_subscription.latest_invoice.payment_intent.client_secret = (
+                "pi_456_secret_789"
+            )
 
-            with patch('stripe.Customer.list', return_value=Mock(data=[mock_customer])), \
-                 patch('stripe.Subscription.create', return_value=mock_subscription):
+            with patch(
+                "stripe.Customer.list", return_value=Mock(data=[mock_customer])
+            ), patch("stripe.Subscription.create", return_value=mock_subscription):
 
                 response = await create_subscription(mock_req)
 
                 assert response.status_code == 200
                 body = json.loads(response.get_body())
                 assert body["success"] is True
-                assert body["subscriptionId"] == 'sub_123'
-                assert body["clientSecret"] == 'pi_456_secret_789'
+                assert body["subscriptionId"] == "sub_123"
+                assert body["clientSecret"] == "pi_456_secret_789"
 
-    def test_environment_validation(self):
+    @pytest.mark.asyncio
+    async def test_environment_validation(self):
         """Test that required environment variables are properly handled"""
         from function_app import contact_form
 
@@ -339,7 +368,7 @@ class TestAzureFunctions:
         mock_req.get_json.return_value = {
             "name": "Test User",
             "email": "test@example.com",
-            "message": "Test message"
+            "message": "Test message",
         }
 
         # Test without Cosmos DB configured
