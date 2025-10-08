@@ -28,6 +28,41 @@ global.IntersectionObserver = class IntersectionObserver {
   unobserve() {}
 }
 
+// Mock ResizeObserver
+global.ResizeObserver = class ResizeObserver {
+  constructor() {}
+  disconnect() {}
+  observe() {}
+  unobserve() {}
+}
+
+// Mock performance.now for happy-dom
+Object.defineProperty(global, 'performance', {
+  writable: true,
+  value: {
+    now: () => Date.now(),
+  },
+})
+
+// Mock window.location for React Router tests
+Object.defineProperty(window, 'location', {
+  writable: true,
+  value: {
+    href: 'http://localhost:3000',
+    origin: 'http://localhost:3000',
+    protocol: 'http:',
+    host: 'localhost:3000',
+    hostname: 'localhost',
+    port: '3000',
+    pathname: '/',
+    search: '',
+    hash: '',
+    assign: vi.fn(),
+    replace: vi.fn(),
+    reload: vi.fn(),
+  },
+})
+
 // Cleanup after each test
 afterEach(() => {
   cleanup()

@@ -13,6 +13,7 @@ export default defineConfig({
     poolOptions: {
       forks: {
         singleFork: true,
+        isolate: false, // Prevent location teardown issues
       },
     },
     exclude: [

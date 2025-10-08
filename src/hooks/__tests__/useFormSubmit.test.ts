@@ -13,6 +13,7 @@ vi.mock('@/utils/apiConfig', async () => {
   }
 })
 
+// Mock logger
 vi.mock('@/utils/logger', () => ({
   logger: {
     warn: vi.fn(),

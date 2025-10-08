@@ -153,16 +153,21 @@ jobs:
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-      - name: Validate Azure Functions code
+      - name: Run Azure Functions tests
         run: |
-          # Validate Python code syntax
-          python -m py_compile function_app.py
-          python -m py_compile services/*.py
-          echo "✅ Azure Functions Python code validated successfully"
-          
-          # Note: Pytest unit tests will be added in Phase 2
-          # For now, we validate code compiles and service layer structure
-          echo "⏭️ Skipping pytest tests (to be added in Phase 2)"
+          # Install test dependencies
+          pip install pytest pytest-cov pytest-asyncio pytest-mock
+
+          # Run comprehensive test suite
+          pytest test_azure_functions.py -v --cov=. --cov-report=xml --tb=short
+        env:
+          # Mock environment variables for testing
+          AZURE_OPENAI_ENDPOINT: https://test.openai.azure.com
+          AZURE_OPENAI_API_KEY: test-key
+          AZURE_VISION_ENDPOINT: https://test.vision.azure.com
+          AZURE_VISION_API_KEY: test-key
+          COSMOS_CONNECTION_STRING: test-connection-string
+          STRIPE_SECRET_KEY: sk_test_123
         continue-on-error: false
 
   # Integration Tests (Optional - only run if both backend and functions pass)

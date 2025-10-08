@@ -10,9 +10,9 @@
     "build": "echo 'No build step needed for JS'",
     "lint": "eslint src/*.js src/**/*.js",
     "lint:fix": "eslint src/*.js src/**/*.js --fix",
-    "test": "jest --coverage",
+    "test": "jest --coverage --verbose",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
+    "test:coverage": "jest --coverage --verbose",
     "test:integration": "node test-integration.js"
   },
   "dependencies": {
