@@ -47,29 +47,31 @@ Object.defineProperty(global, 'performance', {
 })
 
 // Mock window.location for React Router tests
-Object.defineProperty(window, 'location', {
-  writable: true,
-  value: {
-    href: 'http://localhost:3000',
-    origin: 'http://localhost:3000',
-    protocol: 'http:',
-    host: 'localhost:3000',
-    hostname: 'localhost',
-    port: '3000',
-    pathname: '/',
-    search: '',
-    hash: '',
-    assign: vi.fn(),
-    replace: vi.fn(),
-    reload: vi.fn(),
-  },
-})
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'location', {
+    writable: true,
+    value: {
+      href: 'http://localhost:3000',
+      origin: 'http://localhost:3000',
+      protocol: 'http:',
+      host: 'localhost:3000',
+      hostname: 'localhost',
+      port: '3000',
+      pathname: '/',
+      search: '',
+      hash: '',
+      assign: vi.fn(),
+      replace: vi.fn(),
+      reload: vi.fn(),
+    },
+  })
 
-// Mock window.scrollTo
-window.scrollTo = vi.fn()
+  // Mock window.scrollTo
+  window.scrollTo = vi.fn()
 
-// Mock window.scroll
-window.scroll = vi.fn()
+  // Mock window.scroll
+  window.scroll = vi.fn()
+}
 
 // Mock Element.prototype.scrollIntoView
 Element.prototype.scrollIntoView = vi.fn()
