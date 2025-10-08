@@ -13,12 +13,14 @@ vi.mock('lucide-react', async () => {
 })
 
 // Mock des images
-Object.defineProperty(window.HTMLImageElement.prototype, 'src', {
-  set(src) {
-    // Mock pour éviter les erreurs de chargement d'images
-    this.setAttribute('src', src)
-  },
-})
+if (typeof window !== 'undefined' && window.HTMLImageElement) {
+  Object.defineProperty(window.HTMLImageElement.prototype, 'src', {
+    set(src) {
+      // Mock pour éviter les erreurs de chargement d'images
+      this.setAttribute('src', src)
+    },
+  })
+}
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
@@ -80,7 +82,7 @@ document.getElementById = vi.fn((id: string) => {
     // Return a mock element with scrollIntoView
     return {
       scrollIntoView: vi.fn(),
-    } as any
+    } as unknown as HTMLElement
   }
   return element
 })
