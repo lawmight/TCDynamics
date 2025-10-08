@@ -4,6 +4,8 @@
 fail_on_severity: moderate
 # Options: low, moderate, high, critical
 
+# Use allow_licenses (recommended approach - whitelist allowed licenses)
+# NOTE: Cannot specify both allow_licenses and deny_licenses
 allow_licenses:
   - MIT
   - ISC
@@ -12,21 +14,11 @@ allow_licenses:
   - Apache-2.0
   - CC0-1.0
   - 0BSD
+  - Unlicense
+  - Python-2.0
 
-deny_licenses:
-  - GPL-2.0
-  - GPL-2.0-only
-  - GPL-2.0-or-later
-  - GPL-3.0
-  - LGPL-2.1
-  - LGPL-3.0
-  - LGPL-3.0-only
-  - LGPL-3.0-or-later
-  - AGPL-1.0
-  - AGPL-3.0
-  - AGPL-3.0-only
-  - AGPL-3.0-or-later
-  - MS-PL
+# Denied licenses are implicitly anything NOT in allow_licenses
+# This blocks: GPL-*, LGPL-*, AGPL-*, MS-PL, and other copyleft licenses
 
 vulnerability_check: true
 license_check: true
