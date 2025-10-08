@@ -17,6 +17,11 @@ env:
   NODE_VERSION: '20'
   PYTHON_VERSION: '3.11'
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
 jobs:
   # Test Frontend (React/TypeScript)
   test-frontend:
@@ -230,4 +235,3 @@ jobs:
           fi
 
           echo "✅ All quality gates passed!"
-
