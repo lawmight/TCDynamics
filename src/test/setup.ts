@@ -13,14 +13,12 @@ vi.mock('lucide-react', async () => {
 })
 
 // Mock des images
-if (typeof window !== 'undefined' && window.HTMLImageElement) {
-  Object.defineProperty(window.HTMLImageElement.prototype, 'src', {
-    set(src) {
-      // Mock pour éviter les erreurs de chargement d'images
-      this.setAttribute('src', src)
-    },
-  })
-}
+Object.defineProperty(window.HTMLImageElement.prototype, 'src', {
+  set(src) {
+    // Mock pour éviter les erreurs de chargement d'images
+    this.setAttribute('src', src)
+  },
+})
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
@@ -46,32 +44,14 @@ Object.defineProperty(global, 'performance', {
   },
 })
 
-// Mock window.location for React Router tests
-if (typeof window !== 'undefined') {
-  Object.defineProperty(window, 'location', {
-    writable: true,
-    value: {
-      href: 'http://localhost:3000',
-      origin: 'http://localhost:3000',
-      protocol: 'http:',
-      host: 'localhost:3000',
-      hostname: 'localhost',
-      port: '3000',
-      pathname: '/',
-      search: '',
-      hash: '',
-      assign: vi.fn(),
-      replace: vi.fn(),
-      reload: vi.fn(),
-    },
-  })
+// jsdom provides window.location by default - no need to mock it
+// Tests that need specific location values should set them in the test itself
 
-  // Mock window.scrollTo
-  window.scrollTo = vi.fn()
+// Mock window.scrollTo
+window.scrollTo = vi.fn()
 
-  // Mock window.scroll
-  window.scroll = vi.fn()
-}
+// Mock window.scroll
+window.scroll = vi.fn()
 
 // Mock Element.prototype.scrollIntoView
 Element.prototype.scrollIntoView = vi.fn()

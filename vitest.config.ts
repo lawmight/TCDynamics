@@ -5,17 +5,7 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: 'happy-dom',
-    environmentOptions: {
-      happyDOM: {
-        settings: {
-          disableJavaScriptEvaluation: false,
-          disableJavaScriptFileLoading: false,
-          disableCSSFileLoading: true,
-          enableFileSystemHttpRequests: false,
-        },
-      },
-    },
+    environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     globals: true,
     css: true,
