@@ -17,11 +17,6 @@ env:
   NODE_VERSION: '20'
   PYTHON_VERSION: '3.11'
 
-permissions:
-  contents: read
-  issues: write
-  pull-requests: write
-
 jobs:
   # Test Frontend (React/TypeScript)
   test-frontend:
@@ -113,8 +108,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run backend unit tests with Jest
-        run: npm run test:coverage
+      - name: Run backend tests
+        run: npm test
         env:
           NODE_ENV: test
           POSTGRES_HOST: localhost
@@ -158,22 +153,23 @@ jobs:
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-      - name: Run Azure Functions tests
+      - name: Test Azure Functions
         run: |
-          # Install test dependencies
-          pip install pytest pytest-cov pytest-asyncio pytest-mock
+          # Create test environment
+          cat > local.settings.json << EOF
+          {
+            "IsEncrypted": false,
+            "Values": {
+              "FUNCTIONS_WORKER_RUNTIME": "python",
+              "AzureWebJobsStorage": "UseDevelopmentStorage=true"
+            }
+          }
+          EOF
 
-          # Run comprehensive test suite
-          pytest test_azure_functions.py -v --cov=. --cov-report=xml --tb=short
+          # Run tests
+          python -m pytest --cov=. --cov-report=xml
         env:
-          # Mock environment variables for testing
-          AZURE_OPENAI_ENDPOINT: https://test.openai.azure.com
-          AZURE_OPENAI_API_KEY: test-key
-          AZURE_VISION_ENDPOINT: https://test.vision.azure.com
-          AZURE_VISION_API_KEY: test-key
-          COSMOS_CONNECTION_STRING: test-connection-string
-          STRIPE_SECRET_KEY: sk_test_123
-        continue-on-error: true
+          CI: true
 
   # Integration Tests (Optional - only run if both backend and functions pass)
   integration-tests:
@@ -215,25 +211,31 @@ jobs:
       - name: Quality Gate Check
         run: |
           # Check if all required jobs passed
-          FRONTEND_RESULT="${{ needs.test-frontend.result }}"
-          BACKEND_RESULT="${{ needs.test-backend.result }}"
-          FUNCTIONS_RESULT="${{ needs.test-functions.result }}"
-
-          if [[ "$FRONTEND_RESULT" != "success" ]]; then
+          if [[ "${{ needs.test-frontend.result }}" != "success" ]]; then
             echo "❌ Frontend tests failed"
             exit 1
           fi
 
-          # TEMPORARY: Allow backend test failures due to monitoring test logic issues
-          # TODO: Fix backend monitoring test assertions and re-enable this check
-          if [[ "$BACKEND_RESULT" != "success" ]]; then
-            echo "⚠️ Backend tests failed (temporarily allowed - monitoring test logic issues)"
-            # exit 1  # Commented out temporarily
+          if [[ "${{ needs.test-backend.result }}" != "success" ]]; then
+            echo "❌ Backend tests failed"
+            exit 1
           fi
 
-          if [[ "$FUNCTIONS_RESULT" != "success" ]]; then
+          if [[ "${{ needs.test-functions.result }}" != "success" ]]; then
             echo "❌ Functions tests failed"
             exit 1
           fi
 
-          echo "✅ Critical quality gates passed! (Backend tests temporarily allowed to fail)"
+          echo "✅ All quality gates passed!"
+
+      - name: Comment PR on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '❌ **CI Quality Gate Failed**\n\nSome tests failed. Please review the failed jobs above and fix the issues before merging.'
+            })
