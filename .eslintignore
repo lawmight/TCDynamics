@@ -1,0 +1,5 @@
+backend/coverage/
+coverage/
+**/lcov-report/**
+**/dist/**
+**/node_modules/**
