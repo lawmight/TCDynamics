@@ -1,0 +1,192 @@
+name: 'Monthly Security Audit'
+
+on:
+  schedule:
+    # Run on the first Monday of every month at 9 AM UTC
+    - cron: '0 9 1-7 * 1'
+  workflow_dispatch:
+    inputs:
+      severity:
+        description: 'Minimum severity level to check'
+        required: false
+        default: 'moderate'
+        type: choice
+        options:
+          - low
+          - moderate
+          - high
+          - critical
+
+env:
+  NODE_VERSION: '20'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  security-audit:
+    name: Monthly Security Audit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd backend && npm ci
+          cd ../TCDynamics
+          python -m pip install --upgrade pip
+          pip install safety
+
+      - name: Run comprehensive security audit
+        run: |
+          npm run security-audit:report
+        env:
+          SEVERITY: ${{ github.event.inputs.severity || 'moderate' }}
+
+      - name: Upload security report
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-audit-report-${{ github.run_number }}
+          path: security-audit-report.json
+          retention-days: 90
+
+      - name: Check for critical vulnerabilities
+        id: critical-check
+        run: |
+          if npm run security-audit:critical; then
+            echo "critical_vulnerabilities=false" >> $GITHUB_OUTPUT
+          else
+            echo "critical_vulnerabilities=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create security issue if critical vulnerabilities found
+        if: steps.critical-check.outputs.critical_vulnerabilities == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '🚨 Monthly Security Audit - Critical Vulnerabilities Found'
+            const body = `
+            ## Monthly Security Audit Results
+            
+            **Date**: ${new Date().toISOString().split('T')[0]}
+            **Severity Level**: ${{ github.event.inputs.severity || 'moderate' }}
+            **Status**: ❌ Critical vulnerabilities detected
+            
+            ### Action Required
+            
+            Critical security vulnerabilities have been detected during the monthly security audit. Please review the security report and address these issues immediately.
+            
+            ### Next Steps
+            
+            1. Review the security audit report (attached as artifact)
+            2. Run \`npm run security-audit:fix\` to attempt automatic fixes
+            3. Manually address any remaining critical vulnerabilities
+            4. Test all changes thoroughly
+            5. Close this issue once all vulnerabilities are resolved
+            
+            ### Security Report
+            
+            The detailed security report is available in the workflow artifacts.
+            
+            ---
+            
+            *This issue was automatically created by the monthly security audit workflow.*
+            `
+            
+            // Check if issue already exists
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['security', 'monthly-audit', 'critical'],
+              state: 'open'
+            })
+            
+            const existingIssue = issues.data.find(issue => 
+              issue.title.includes('Monthly Security Audit') && 
+              issue.title.includes('Critical Vulnerabilities')
+            )
+            
+            if (!existingIssue) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['security', 'monthly-audit', 'critical', 'high-priority']
+              })
+            }
+
+      - name: Create security summary issue
+        if: steps.critical-check.outputs.critical_vulnerabilities == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '✅ Monthly Security Audit - All Clear'
+            const body = `
+            ## Monthly Security Audit Results
+            
+            **Date**: ${new Date().toISOString().split('T')[0]}
+            **Severity Level**: ${{ github.event.inputs.severity || 'moderate' }}
+            **Status**: ✅ No critical vulnerabilities detected
+            
+            ### Summary
+            
+            The monthly security audit completed successfully with no critical vulnerabilities found.
+            
+            ### Security Report
+            
+            The detailed security report is available in the workflow artifacts.
+            
+            ### Recommendations
+            
+            - Continue regular security monitoring
+            - Keep dependencies updated
+            - Review security policies quarterly
+            - Consider implementing additional security measures
+            
+            ---
+            
+            *This summary was automatically generated by the monthly security audit workflow.*
+            `
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['security', 'monthly-audit', 'success']
+            })
+
+      - name: Update security dashboard
+        run: |
+          echo "## Security Audit Summary" >> $GITHUB_STEP_SUMMARY
+          echo "**Date**: $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "**Severity Level**: ${{ github.event.inputs.severity || 'moderate' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Critical Vulnerabilities**: ${{ steps.critical-check.outputs.critical_vulnerabilities }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "- Security Report: \`security-audit-report-${{ github.run_number }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.critical-check.outputs.critical_vulnerabilities }}" == "true" ]; then
+            echo "🚨 **Action Required**: Critical vulnerabilities detected. Please review the security report and address issues immediately." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ **All Clear**: No critical vulnerabilities detected. Continue regular security monitoring." >> $GITHUB_STEP_SUMMARY
+          fi

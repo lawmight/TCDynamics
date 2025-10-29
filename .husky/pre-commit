@@ -10,3 +10,41 @@ npx lint-staged || exit 1
 echo "🔧 Checking TypeScript types..."
 npm run type-check
 
+# Security checks
+echo "🔒 Running security checks..."
+
+# Frontend security audit (only high/critical)
+echo "📦 Checking frontend dependencies..."
+npm audit --audit-level=high || {
+  echo "❌ Frontend security audit failed - high/critical vulnerabilities found"
+  echo "💡 Run 'npm audit fix' to fix automatically fixable issues"
+  exit 1
+}
+
+# Backend security audit (only high/critical)
+echo "📦 Checking backend dependencies..."
+cd backend
+npm audit --audit-level=high || {
+  echo "❌ Backend security audit failed - high/critical vulnerabilities found"
+  echo "💡 Run 'npm audit fix' to fix automatically fixable issues"
+  exit 1
+}
+cd ..
+
+# Python security check (if safety is available)
+echo "🐍 Checking Python dependencies..."
+if command -v safety >/dev/null 2>&1; then
+  cd TCDynamics
+  safety check --severity=high || {
+    echo "❌ Python security audit failed - high/critical vulnerabilities found"
+    echo "💡 Run 'pip install --upgrade <package>' to fix issues"
+    exit 1
+  }
+  cd ..
+else
+  echo "⚠️  Safety not installed - skipping Python security check"
+  echo "💡 Install with: pip install safety"
+fi
+
+echo "✅ All security checks passed!"
+

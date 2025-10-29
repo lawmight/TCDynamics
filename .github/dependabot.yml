@@ -1,107 +1,135 @@
+# Dependabot Configuration for TCDynamics
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
 version: 2
 updates:
-  # Frontend dependencies
-  - package-ecosystem: 'npm'
-    directory: '/'
+  # Frontend dependencies (React/TypeScript)
+  - package-ecosystem: "npm"
+    directory: "/"
     schedule:
-      interval: 'daily'
-      time: '06:00'
-      timezone: 'UTC'
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Paris"
     open-pull-requests-limit: 10
     reviewers:
-      - 'Tomco'
+      - "lawmight"
     assignees:
-      - 'Tomco'
+      - "lawmight"
     commit-message:
-      prefix: 'chore'
-      include: 'scope'
+      prefix: "chore"
+      include: "scope"
     labels:
-      - 'dependencies'
-      - 'frontend'
-      - 'auto-update'
+      - "dependencies"
+      - "frontend"
+      - "security"
     ignore:
-      # Ignore major version updates for now
-      - dependency-name: '*'
-        update-types: ['version-update:semver-major']
-    groups:
-      # Group minor and patch updates together
-      frontend-dependencies:
-        patterns:
-          - '*'
-        update-types:
-          - 'minor'
-          - 'patch'
+      # Ignore major version updates that might break things
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    # Allow security updates even if they're major
+    allow:
+      - dependency-type: "direct"
+        update-type: "security"
+      - dependency-type: "indirect"
+        update-type: "security"
 
-  # Backend dependencies
-  - package-ecosystem: 'npm'
-    directory: '/backend'
+  # Backend dependencies (Node.js)
+  - package-ecosystem: "npm"
+    directory: "/backend"
     schedule:
-      interval: 'daily'
-      time: '06:00'
-      timezone: 'UTC'
-    open-pull-requests-limit: 10
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Paris"
+    open-pull-requests-limit: 5
     reviewers:
-      - 'Tomco'
+      - "lawmight"
     assignees:
-      - 'Tomco'
+      - "lawmight"
     commit-message:
-      prefix: 'chore'
-      include: 'scope'
+      prefix: "chore"
+      include: "scope"
     labels:
-      - 'dependencies'
-      - 'backend'
-      - 'auto-update'
+      - "dependencies"
+      - "backend"
+      - "security"
     ignore:
-      # Ignore major version updates for now
-      - dependency-name: '*'
-        update-types: ['version-update:semver-major']
-    groups:
-      # Group minor and patch updates together
-      backend-dependencies:
-        patterns:
-          - '*'
-        update-types:
-          - 'minor'
-          - 'patch'
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    allow:
+      - dependency-type: "direct"
+        update-type: "security"
+      - dependency-type: "indirect"
+        update-type: "security"
+
+  # Python dependencies (Azure Functions)
+  - package-ecosystem: "pip"
+    directory: "/TCDynamics"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Paris"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "lawmight"
+    assignees:
+      - "lawmight"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "python"
+      - "security"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    allow:
+      - dependency-type: "direct"
+        update-type: "security"
+      - dependency-type: "indirect"
+        update-type: "security"
 
   # GitHub Actions
-  - package-ecosystem: 'github-actions'
-    directory: '/'
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
-      interval: 'weekly'
-      day: 'monday'
-      time: '09:00'
-      timezone: 'UTC'
-    open-pull-requests-limit: 5
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Paris"
+    open-pull-requests-limit: 3
     reviewers:
-      - 'Tomco'
+      - "lawmight"
     assignees:
-      - 'Tomco'
+      - "lawmight"
     commit-message:
-      prefix: 'ci'
-      include: 'scope'
+      prefix: "ci"
+      include: "scope"
     labels:
-      - 'github-actions'
-      - 'ci/cd'
-      - 'auto-update'
+      - "dependencies"
+      - "github-actions"
+      - "ci/cd"
 
   # Docker dependencies
-  - package-ecosystem: 'docker'
-    directory: '/'
+  - package-ecosystem: "docker"
+    directory: "/"
     schedule:
-      interval: 'weekly'
-      day: 'monday'
-      time: '09:00'
-      timezone: 'UTC'
-    open-pull-requests-limit: 5
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Paris"
+    open-pull-requests-limit: 3
     reviewers:
-      - 'Tomco'
+      - "lawmight"
     assignees:
-      - 'Tomco'
+      - "lawmight"
     commit-message:
-      prefix: 'chore'
-      include: 'scope'
+      prefix: "chore"
+      include: "scope"
     labels:
-      - 'docker'
-      - 'infrastructure'
-      - 'auto-update'
+      - "dependencies"
+      - "docker"
+      - "security"
