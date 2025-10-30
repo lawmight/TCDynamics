@@ -1,0 +1,54 @@
+# Cache directories
+.cache/
+.npm/
+.npm-global/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+.local/
+
+# Personal shell files
+.bash_history
+.zsh_history
+.python_history
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.cursor/
+
+# System files
+.DS_Store
+Thumbs.db
+.motd_shown
+.sudo_as_admin_successful
+.landscape/
+
+# Claude and config files (if they contain sensitive data)
+.claude/
+.claude.json
+.claude.json.backup
+.config/
+
+# Logs
+*.log
+logs/
+mcp-logs-*/
+
+# OS-specific
+.profile
+.bash_logout
+.bashrc
+
+# Git
+.git/
