@@ -1,15 +1,12 @@
-name: 'Deploy MVP'
+name: 'Deploy MVP to Vercel'
 
 on:
   push:
     branches: [main]
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,28 +17,16 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install root deps
+      - name: Install dependencies
         run: npm install
 
       - name: Build frontend
         run: cd apps/frontend && npm install && npm run build
-        env:
-          VITE_AZURE_FUNCTIONS_URL: ${{ secrets.AZURE_FUNCTIONAPP_BASE_URL }}
 
-      - name: Package Azure Functions
-        run: |
-          cd apps/functions || exit 0
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt || true
-          zip -r ../azure-functions-package.zip . -x "*.pyc" "__pycache__/*" "*.git*" "local.settings.json"
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
         with:
-          name: mvp-artifacts
-          path: |
-            apps/frontend/dist
-            azure-functions-package.zip
-
-      - name: Deploy step (placeholder)
-        run: echo "Deploy the frontend (OVH) and functions (Azure) here or call your deployment script"
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./apps/frontend

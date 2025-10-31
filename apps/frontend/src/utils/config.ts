@@ -4,14 +4,13 @@
 import { z } from 'zod'
 import { logger } from './logger'
 
-const DEFAULT_FUNCTIONS_BASE_URL =
-  'https://func-tcdynamics-contact.azurewebsites.net'
+const DEFAULT_API_BASE_URL = '/api' // Use relative URLs for Vercel API routes
 
 // ========== ENVIRONMENT VARIABLE SCHEMAS ==========
 
 const clientConfigSchema = z.object({
   // API URLs
-  VITE_AZURE_FUNCTIONS_URL: z.union([z.string(), z.undefined()]).optional(),
+  VITE_API_URL: z.union([z.string(), z.undefined()]).optional(),
 
   // Environment
   VITE_NODE_ENV: z
@@ -94,8 +93,7 @@ class ConfigManager {
 
     // Apply safe defaults for missing or invalid values
     return {
-      VITE_AZURE_FUNCTIONS_URL:
-        env.VITE_AZURE_FUNCTIONS_URL || DEFAULT_FUNCTIONS_BASE_URL,
+      VITE_API_URL: env.VITE_API_URL || DEFAULT_API_BASE_URL,
       VITE_NODE_ENV:
         (env.VITE_NODE_ENV as 'development' | 'production' | 'test') ||
         'development',
@@ -305,9 +303,7 @@ class ConfigManager {
     const status = {
       client: {
         environment: this.clientConfig.VITE_NODE_ENV,
-        functionsUrl: this.clientConfig.VITE_AZURE_FUNCTIONS_URL
-          ? 'configured'
-          : 'default',
+        apiUrl: this.clientConfig.VITE_API_URL ? 'configured' : 'default',
         analytics: this.clientConfig.VITE_FEATURE_ENABLE_ANALYTICS,
         debugLogging: this.clientConfig.VITE_FEATURE_ENABLE_DEBUG_LOGGING,
         cache: this.clientConfig.VITE_FEATURE_ENABLE_CACHE,
@@ -353,8 +349,8 @@ class ConfigManager {
     return this.client.VITE_NODE_ENV === 'production'
   }
 
-  get functionsBaseUrl(): string {
-    return this.client.VITE_AZURE_FUNCTIONS_URL || DEFAULT_FUNCTIONS_BASE_URL
+  get apiBaseUrl(): string {
+    return this.client.VITE_API_URL || DEFAULT_API_BASE_URL
   }
 
   // ========== UTILITY METHODS ==========
@@ -372,8 +368,8 @@ class ConfigManager {
     const missing: string[] = []
 
     // Check client-side required configs
-    if (!this.client.VITE_AZURE_FUNCTIONS_URL) {
-      missing.push('VITE_AZURE_FUNCTIONS_URL')
+    if (!this.client.VITE_API_URL) {
+      missing.push('VITE_API_URL')
     }
 
     // Check server-side required configs (only if we're on server)
@@ -425,7 +421,7 @@ class ConfigManager {
     return {
       environment: this.client.VITE_NODE_ENV,
       version: this.client.VITE_APP_VERSION,
-      functionsUrl: this.functionsBaseUrl,
+      apiUrl: this.apiBaseUrl,
       features: {
         analytics: this.client.VITE_FEATURE_ENABLE_ANALYTICS,
         debugLogging: this.client.VITE_FEATURE_ENABLE_DEBUG_LOGGING,
