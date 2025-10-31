@@ -21,10 +21,10 @@ jobs:
           cache: 'npm'
 
       - name: Install root deps
-        run: npm ci
+        run: npm install
 
       - name: Build frontend
-        run: cd apps/frontend && npm ci && npm run build
+        run: cd apps/frontend && npm install && npm run build
         env:
           VITE_AZURE_FUNCTIONS_URL: ${{ secrets.AZURE_FUNCTIONAPP_BASE_URL }}
 
