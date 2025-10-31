@@ -36,7 +36,7 @@ jobs:
           zip -r ../azure-functions-package.zip . -x "*.pyc" "__pycache__/*" "*.git*" "local.settings.json"
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: mvp-artifacts
           path: |
