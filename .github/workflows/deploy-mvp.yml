@@ -1,0 +1,47 @@
+name: 'Deploy MVP'
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install root deps
+        run: npm ci
+
+      - name: Build frontend
+        run: cd apps/frontend && npm ci && npm run build
+        env:
+          VITE_AZURE_FUNCTIONS_URL: ${{ secrets.AZURE_FUNCTIONAPP_BASE_URL }}
+
+      - name: Package Azure Functions
+        run: |
+          cd apps/functions || exit 0
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt || true
+          zip -r ../azure-functions-package.zip . -x "*.pyc" "__pycache__/*" "*.git*" "local.settings.json"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mvp-artifacts
+          path: |
+            apps/frontend/dist
+            azure-functions-package.zip
+
+      - name: Deploy step (placeholder)
+        run: echo "Deploy the frontend (OVH) and functions (Azure) here or call your deployment script"
