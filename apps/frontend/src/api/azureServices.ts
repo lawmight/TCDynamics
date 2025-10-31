@@ -17,8 +17,8 @@ const API_CONFIG = {
   cacheTTL: config.client.VITE_CACHE_DEFAULT_TTL || 300000, // 5 minutes
 } as const
 
-// Get functions base URL from config
-const getFunctionsBaseUrl = (): string => config.functionsBaseUrl
+// Get API base URL from config
+const getApiBaseUrl = (): string => config.apiBaseUrl
 
 // ========== TYPE DEFINITIONS ==========
 
@@ -255,7 +255,7 @@ async function apiRequest<T>(
   options: RequestInit,
   retriesLeft: number = API_CONFIG.retries
 ): Promise<T> {
-  const baseUrl = getFunctionsBaseUrl()
+  const baseUrl = getApiBaseUrl()
   const url = `${baseUrl}${endpoint}`
   const method = options.method || 'GET'
   const cacheKey = `${method}:${url}:${JSON.stringify(options.body || {})}`
