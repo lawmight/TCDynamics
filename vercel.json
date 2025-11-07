@@ -10,7 +10,7 @@
     }
   ],
   "functions": {
-    "apps/frontend/api/**/*.js": {
+    "api/**/*.js": {
       "maxDuration": 10
     }
   }
