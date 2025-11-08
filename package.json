@@ -39,6 +39,9 @@
     "deploy:functions": "cd apps/functions && func azure functionapp publish",
     "deploy:frontend": "cd apps/frontend && npm run build"
   },
+  "dependencies": {
+    "stripe": "^17.4.0"
+  },
   "devDependencies": {
     "concurrently": "^8.2.2"
   },

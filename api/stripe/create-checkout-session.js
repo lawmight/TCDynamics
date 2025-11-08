@@ -3,7 +3,14 @@
  * This replaces the backend route for MVP deployment
  */
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+// Check if Stripe key is configured
+if (!process.env.STRIPE_SECRET_KEY) {
+  console.error('STRIPE_SECRET_KEY is not configured in environment variables');
+}
+
+const stripe = process.env.STRIPE_SECRET_KEY
+  ? require('stripe')(process.env.STRIPE_SECRET_KEY)
+  : null;
 
 // Enable CORS
 const allowCors = fn => async (req, res) => {
@@ -32,7 +39,19 @@ const handler = async (req, res) => {
   }
 
   try {
+    // Check if Stripe is properly initialized
+    if (!stripe) {
+      console.error('Stripe is not initialized - missing STRIPE_SECRET_KEY');
+      return res.status(500).json({
+        success: false,
+        message: 'Payment service is not configured',
+        error: 'STRIPE_NOT_CONFIGURED'
+      });
+    }
+
     const { priceId, planName } = req.body;
+
+    console.log('Received request:', { priceId, planName });
 
     if (!priceId || !planName) {
       return res.status(400).json({
@@ -78,11 +97,17 @@ const handler = async (req, res) => {
     });
   } catch (error) {
     console.error('Error creating Stripe checkout session:', error);
+    console.error('Error stack:', error.stack);
+    console.error('Environment check:', {
+      hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
+      keyStart: process.env.STRIPE_SECRET_KEY ? process.env.STRIPE_SECRET_KEY.substring(0, 7) : 'NOT_SET'
+    });
 
     return res.status(500).json({
       success: false,
       message: 'Failed to create checkout session',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      error: error.message || 'Unknown error occurred',
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined,
     });
   }
 };
