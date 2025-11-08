@@ -1,18 +1,16 @@
 // Simple API configuration using environment variables
 // This replaces the complex azureServices.ts for Node.js backend
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
-
 // Azure Functions endpoints (when using Azure Functions backend)
 const FUNCTIONS_BASE_URL =
   import.meta.env.VITE_AZURE_FUNCTIONS_URL ||
   'https://func-tcdynamics-contact.azurewebsites.net'
 
 export const API_ENDPOINTS = {
-  // Node.js backend endpoints (fallback)
-  contact: `${API_BASE_URL}/api/contact`,
-  demo: `${API_BASE_URL}/api/demo`,
-  health: `${API_BASE_URL}/health`,
+  // Node.js backend endpoints (using relative URLs for deployment compatibility)
+  contact: `/api/contact`,
+  demo: `/api/demo`,
+  health: `/health`,
 
   // Azure Functions endpoints
   azureContact: `${FUNCTIONS_BASE_URL}/contactform`,

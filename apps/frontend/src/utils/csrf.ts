@@ -8,9 +8,8 @@ export const getCsrfToken = async (): Promise<string> => {
   }
 
   try {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/csrf-token`
-    )
+    // Use relative URL for API calls to work on any deployment
+    const response = await fetch(`/api/csrf-token`)
     if (response.ok) {
       const data = await response.json()
       csrfToken = data.csrfToken

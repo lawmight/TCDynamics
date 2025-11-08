@@ -119,9 +119,9 @@ export interface CreateCheckoutSessionResponse {
   error?: string
 }
 
-// Base API URL
+// Base API URL - using empty string for relative URLs to work on any deployment
 const getApiUrl = () => {
-  return import.meta.env.VITE_API_URL || 'http://localhost:3000'
+  return '' // Use relative URLs for all API calls
 }
 
 /**

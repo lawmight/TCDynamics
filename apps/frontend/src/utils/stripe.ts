@@ -65,18 +65,14 @@ export const createCheckoutSession = async (
   params: CreateCheckoutSessionParams
 ): Promise<CheckoutSessionResponse> => {
   try {
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000'
-
-    const response = await fetch(
-      `${apiUrl}/api/stripe/create-checkout-session`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(params),
-      }
-    )
+    // Use relative URL for API calls to work on any deployment
+    const response = await fetch(`/api/stripe/create-checkout-session`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(params),
+    })
 
     const data = await response.json()
 
@@ -148,9 +144,8 @@ export const getCheckoutSession = async (
   sessionId: string
 ): Promise<CheckoutSession | null> => {
   try {
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000'
-
-    const response = await fetch(`${apiUrl}/api/stripe/session/${sessionId}`, {
+    // Use relative URL for API calls to work on any deployment
+    const response = await fetch(`/api/stripe/session/${sessionId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
