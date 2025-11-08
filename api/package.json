@@ -1,0 +1,8 @@
+{
+  "name": "tcdynamics-api",
+  "version": "1.0.0",
+  "description": "Serverless API functions for TCDynamics",
+  "dependencies": {
+    "stripe": "^17.4.0"
+  }
+}
