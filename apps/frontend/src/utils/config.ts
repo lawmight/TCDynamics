@@ -28,6 +28,11 @@ const clientConfigSchema = z.object({
   VITE_FEATURE_ENABLE_ANALYTICS: z.boolean().default(false),
   VITE_FEATURE_ENABLE_DEBUG_LOGGING: z.boolean().default(false),
   VITE_FEATURE_ENABLE_CACHE: z.boolean().default(true),
+  VITE_FEATURE_ENABLE_AI_CHAT: z.boolean().default(false),
+  VITE_FEATURE_ENABLE_AI_VISION: z.boolean().default(false),
+  VITE_FEATURE_ENABLE_CONTACT_FORM: z.boolean().default(true),
+  VITE_FEATURE_ENABLE_DEMO_FORM: z.boolean().default(true),
+  VITE_FEATURE_ENABLE_AZURE_FUNCTIONS: z.boolean().default(false),
 
   // Cache configuration (numbers)
   VITE_CACHE_MAX_SIZE: z.number().int().positive().default(1000),
@@ -105,6 +110,15 @@ class ConfigManager {
       VITE_FEATURE_ENABLE_DEBUG_LOGGING:
         env.VITE_FEATURE_ENABLE_DEBUG_LOGGING === 'true',
       VITE_FEATURE_ENABLE_CACHE: env.VITE_FEATURE_ENABLE_CACHE !== 'false', // Default true
+      VITE_FEATURE_ENABLE_AI_CHAT: env.VITE_FEATURE_ENABLE_AI_CHAT === 'true',
+      VITE_FEATURE_ENABLE_AI_VISION:
+        env.VITE_FEATURE_ENABLE_AI_VISION === 'true',
+      VITE_FEATURE_ENABLE_CONTACT_FORM:
+        env.VITE_FEATURE_ENABLE_CONTACT_FORM !== 'false', // Default true
+      VITE_FEATURE_ENABLE_DEMO_FORM:
+        env.VITE_FEATURE_ENABLE_DEMO_FORM !== 'false', // Default true
+      VITE_FEATURE_ENABLE_AZURE_FUNCTIONS:
+        env.VITE_FEATURE_ENABLE_AZURE_FUNCTIONS === 'true',
       VITE_CACHE_MAX_SIZE: Math.max(
         100,
         parseInt(env.VITE_CACHE_MAX_SIZE || '1000', 10)
@@ -236,7 +250,7 @@ class ConfigManager {
 
     // Client-side variables (prefixed with VITE_)
     const clientVars = [
-      'VITE_AZURE_FUNCTIONS_URL',
+      'VITE_API_URL',
       'VITE_NODE_ENV',
       'VITE_APP_VERSION',
       'VITE_ANALYTICS_GA_TRACKING_ID',
@@ -244,6 +258,11 @@ class ConfigManager {
       'VITE_FEATURE_ENABLE_ANALYTICS',
       'VITE_FEATURE_ENABLE_DEBUG_LOGGING',
       'VITE_FEATURE_ENABLE_CACHE',
+      'VITE_FEATURE_ENABLE_AI_CHAT',
+      'VITE_FEATURE_ENABLE_AI_VISION',
+      'VITE_FEATURE_ENABLE_CONTACT_FORM',
+      'VITE_FEATURE_ENABLE_DEMO_FORM',
+      'VITE_FEATURE_ENABLE_AZURE_FUNCTIONS',
       'VITE_CACHE_MAX_SIZE',
       'VITE_CACHE_DEFAULT_TTL',
       'VITE_CACHE_CLEANUP_INTERVAL',
