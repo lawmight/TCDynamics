@@ -3,14 +3,29 @@
  * This replaces the backend route for MVP deployment
  */
 
+// Enhanced logging for debugging
+console.log('Environment check at startup:', {
+  hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
+  keyPrefix: process.env.STRIPE_SECRET_KEY ? process.env.STRIPE_SECRET_KEY.substring(0, 10) : 'NOT_SET',
+  vercelEnv: process.env.VERCEL_ENV,
+  nodeEnv: process.env.NODE_ENV
+});
+
 // Check if Stripe key is configured
 if (!process.env.STRIPE_SECRET_KEY) {
-  console.error('STRIPE_SECRET_KEY is not configured in environment variables');
+  console.error('❌ STRIPE_SECRET_KEY is not configured in environment variables');
+  console.error('Available env keys:', Object.keys(process.env).filter(k => k.includes('STRIPE')));
 }
 
 const stripe = process.env.STRIPE_SECRET_KEY
   ? require('stripe')(process.env.STRIPE_SECRET_KEY)
   : null;
+
+if (stripe) {
+  console.log('✅ Stripe initialized successfully');
+} else {
+  console.error('❌ Stripe initialization failed');
+}
 
 // Enable CORS
 const allowCors = fn => async (req, res) => {
@@ -41,11 +56,17 @@ const handler = async (req, res) => {
   try {
     // Check if Stripe is properly initialized
     if (!stripe) {
-      console.error('Stripe is not initialized - missing STRIPE_SECRET_KEY');
+      console.error('❌ Stripe is not initialized - missing STRIPE_SECRET_KEY');
+      console.error('Environment variables available:', Object.keys(process.env).filter(k => k.includes('STRIPE')));
       return res.status(500).json({
         success: false,
-        message: 'Payment service is not configured',
-        error: 'STRIPE_NOT_CONFIGURED'
+        message: 'Payment service is not configured. Please add STRIPE_SECRET_KEY to Vercel environment variables for Preview deployments.',
+        error: 'STRIPE_NOT_CONFIGURED',
+        debugInfo: {
+          vercelEnv: process.env.VERCEL_ENV,
+          hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
+          availableStripeVars: Object.keys(process.env).filter(k => k.includes('STRIPE'))
+        }
       });
     }
 
@@ -84,7 +105,7 @@ const handler = async (req, res) => {
       allow_promotion_codes: true,
     });
 
-    console.log('Stripe checkout session created:', {
+    console.log('✅ Stripe checkout session created:', {
       sessionId: session.id,
       planName,
       priceId,
@@ -96,11 +117,12 @@ const handler = async (req, res) => {
       url: session.url,
     });
   } catch (error) {
-    console.error('Error creating Stripe checkout session:', error);
+    console.error('❌ Error creating Stripe checkout session:', error);
     console.error('Error stack:', error.stack);
     console.error('Environment check:', {
       hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
-      keyStart: process.env.STRIPE_SECRET_KEY ? process.env.STRIPE_SECRET_KEY.substring(0, 7) : 'NOT_SET'
+      keyStart: process.env.STRIPE_SECRET_KEY ? process.env.STRIPE_SECRET_KEY.substring(0, 7) : 'NOT_SET',
+      vercelEnv: process.env.VERCEL_ENV
     });
 
     return res.status(500).json({
