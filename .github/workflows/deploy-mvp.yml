@@ -18,7 +18,10 @@ jobs:
           cache: 'npm'
           cache-dependency-path: apps/frontend/package-lock.json
 
-      # Skip monorepo install - go directly to frontend
+      # Install root dependencies (needed for serverless functions)
+      - name: Install root dependencies
+        run: npm install
+
       - name: Install frontend dependencies
         working-directory: ./apps/frontend
         run: npm ci

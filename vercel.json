@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npm run build:frontend",
+  "buildCommand": "npm install && npm run build:frontend",
   "outputDirectory": "apps/frontend/dist",
   "framework": "vite",
   "rewrites": [
@@ -11,6 +11,7 @@
   ],
   "functions": {
     "api/**/*.js": {
+      "runtime": "nodejs20.x",
       "maxDuration": 10
     }
   }
