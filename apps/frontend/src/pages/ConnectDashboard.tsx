@@ -12,6 +12,21 @@
  * the controller pattern for account management.
  */
 
+import {
+  ArrowRight,
+  CheckCircle,
+  CreditCard,
+  ExternalLink,
+  Plus,
+  RefreshCw,
+  Settings,
+  Store,
+  User,
+  XCircle,
+} from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -33,20 +48,6 @@ import {
   type ConnectedAccount,
   type CreateAccountParams,
 } from '@/utils/stripeConnect'
-import {
-  ArrowRight,
-  CheckCircle,
-  CreditCard,
-  ExternalLink,
-  Plus,
-  RefreshCw,
-  Settings,
-  Store,
-  User,
-  XCircle,
-} from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 
 const ConnectDashboard = () => {
   const navigate = useNavigate()
@@ -224,12 +225,12 @@ const ConnectDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/50 py-8">
       <div className="container mx-auto px-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="mx-auto max-w-7xl">
           {/* Header */}
           <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex items-center justify-between">
               <div>
-                <h1 className="text-4xl font-bold text-foreground mb-2">
+                <h1 className="mb-2 text-4xl font-bold text-foreground">
                   Stripe Connect Dashboard
                 </h1>
                 <p className="text-xl text-muted-foreground">
@@ -244,7 +245,7 @@ const ConnectDashboard = () => {
                   size="sm"
                 >
                   <RefreshCw
-                    className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`}
+                    className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`}
                   />
                   Refresh Status
                 </Button>
@@ -253,43 +254,41 @@ const ConnectDashboard = () => {
 
             {/* API Version Info */}
             <Badge variant="outline" className="mb-4">
-              <CreditCard className="w-3 h-3 mr-1" />
+              <CreditCard className="mr-1 h-3 w-3" />
               Stripe API v2025-09-30.clover
             </Badge>
           </div>
 
           {/* Error/Success Messages */}
           {error && (
-            <Card className="mb-6 bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800">
+            <Card className="mb-6 border-destructive/40 bg-card/60 backdrop-blur-sm">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
-                  <XCircle className="w-5 h-5 text-red-600" />
-                  <p className="text-red-800 dark:text-red-400">{error}</p>
+                  <XCircle className="h-5 w-5 text-destructive" />
+                  <p className="text-destructive-foreground">{error}</p>
                 </div>
               </CardContent>
             </Card>
           )}
 
           {success && (
-            <Card className="mb-6 bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800">
+            <Card className="mb-6 border-primary/40 bg-card/60 backdrop-blur-sm">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  <p className="text-green-800 dark:text-green-400">
-                    {success}
-                  </p>
+                  <CheckCircle className="h-5 w-5 text-primary" />
+                  <p className="text-foreground">{success}</p>
                 </div>
               </CardContent>
             </Card>
           )}
 
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid gap-8 lg:grid-cols-3">
             {/* Create New Account */}
             <div className="lg:col-span-1">
-              <Card className="bg-card/60 backdrop-blur-sm border-primary/20">
+              <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Plus className="w-5 h-5 text-primary" />
+                    <Plus className="h-5 w-5 text-primary" />
                     Create New Account
                   </CardTitle>
                   <CardDescription>
@@ -329,23 +328,23 @@ const ConnectDashboard = () => {
                   >
                     {isCreatingAccount ? (
                       <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
                         Creating Account...
                       </>
                     ) : (
                       <>
-                        <Plus className="w-4 h-4 mr-2" />
+                        <Plus className="mr-2 h-4 w-4" />
                         Create Account
                       </>
                     )}
                   </Button>
 
                   {/* Account Features Info */}
-                  <div className="pt-4 border-t border-border">
-                    <h4 className="font-semibold mb-2 text-sm">
+                  <div className="border-t border-border pt-4">
+                    <h4 className="mb-2 text-sm font-semibold">
                       Account Features:
                     </h4>
-                    <ul className="text-xs text-muted-foreground space-y-1">
+                    <ul className="space-y-1 text-xs text-muted-foreground">
                       <li>• Platform controls fee collection</li>
                       <li>• Stripe handles disputes & losses</li>
                       <li>• Full dashboard access</li>
@@ -357,10 +356,10 @@ const ConnectDashboard = () => {
 
             {/* Accounts List */}
             <div className="lg:col-span-2">
-              <Card className="bg-card/60 backdrop-blur-sm border-primary/20">
+              <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <User className="w-5 h-5 text-primary" />
+                    <User className="h-5 w-5 text-primary" />
                     Connected Accounts ({accounts.length})
                   </CardTitle>
                   <CardDescription>
@@ -369,12 +368,12 @@ const ConnectDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   {accounts.length === 0 ? (
-                    <div className="text-center py-8">
-                      <User className="w-16 h-16 text-muted-foreground/50 mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold mb-2">
+                    <div className="py-8 text-center">
+                      <User className="mx-auto mb-4 h-16 w-16 text-muted-foreground/50" />
+                      <h3 className="mb-2 text-lg font-semibold">
                         No accounts yet
                       </h3>
-                      <p className="text-muted-foreground mb-4">
+                      <p className="mb-4 text-muted-foreground">
                         Create your first connected account to get started
                       </p>
                     </div>
@@ -388,17 +387,20 @@ const ConnectDashboard = () => {
                         return (
                           <Card
                             key={account.id}
-                            className="bg-muted/30 border-border/50"
+                            className="border-border/50 bg-muted/30"
                           >
                             <CardContent className="p-4">
-                              <div className="flex items-center justify-between mb-3">
+                              <div className="mb-3 flex items-center justify-between">
                                 <div>
                                   <h3 className="font-semibold">
                                     {account.email}
                                     {isDemoAccount(account.id) && (
-                                      <span className="ml-2 text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded">
+                                      <Badge
+                                        variant="secondary"
+                                        className="ml-2 text-xs"
+                                      >
                                         DEMO
-                                      </span>
+                                      </Badge>
                                     )}
                                   </h3>
                                   <p className="text-sm text-muted-foreground">
@@ -410,7 +412,7 @@ const ConnectDashboard = () => {
                                 </Badge>
                               </div>
 
-                              <div className="grid grid-cols-2 gap-4 mb-4">
+                              <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div className="text-sm">
                                   <span className="text-muted-foreground">
                                     Country:
@@ -451,7 +453,7 @@ const ConnectDashboard = () => {
                                 </div>
                               </div>
 
-                              <div className="flex gap-2 flex-wrap">
+                              <div className="flex flex-wrap gap-2">
                                 {status === 'incomplete' && (
                                   <Button
                                     onClick={() =>
@@ -466,7 +468,7 @@ const ConnectDashboard = () => {
                                         : ''
                                     }
                                   >
-                                    <ExternalLink className="w-4 h-4 mr-2" />
+                                    <ExternalLink className="mr-2 h-4 w-4" />
                                     Start Onboarding
                                   </Button>
                                 )}
@@ -485,7 +487,7 @@ const ConnectDashboard = () => {
                                         : ''
                                     }
                                   >
-                                    <RefreshCw className="w-4 h-4 mr-2" />
+                                    <RefreshCw className="mr-2 h-4 w-4" />
                                     Continue Onboarding
                                   </Button>
                                 )}
@@ -499,7 +501,7 @@ const ConnectDashboard = () => {
                                       size="sm"
                                       variant="default"
                                     >
-                                      <Settings className="w-4 h-4 mr-2" />
+                                      <Settings className="mr-2 h-4 w-4" />
                                       Manage Products
                                     </Button>
                                     <Button
@@ -509,9 +511,9 @@ const ConnectDashboard = () => {
                                       size="sm"
                                       variant="outline"
                                     >
-                                      <Store className="w-4 h-4 mr-2" />
+                                      <Store className="mr-2 h-4 w-4" />
                                       View Storefront
-                                      <ArrowRight className="w-4 h-4 ml-2" />
+                                      <ArrowRight className="ml-2 h-4 w-4" />
                                     </Button>
                                   </>
                                 )}
@@ -528,29 +530,29 @@ const ConnectDashboard = () => {
           </div>
 
           {/* API Configuration Notice */}
-          <Card className="mt-8 bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+          <Card className="mt-8 border-primary/20 bg-card/60 backdrop-blur-sm">
             <CardContent className="p-6">
               <div className="flex items-start gap-3">
-                <Settings className="w-5 h-5 text-blue-600 mt-0.5" />
+                <Settings className="mt-0.5 h-5 w-5 text-primary" />
                 <div>
-                  <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                  <h3 className="mb-2 font-semibold text-foreground">
                     Configuration Required
                   </h3>
-                  <p className="text-blue-800 dark:text-blue-200 text-sm mb-3">
+                  <p className="mb-3 text-sm text-muted-foreground">
                     To use this Stripe Connect integration, make sure you have
                     configured:
                   </p>
-                  <ul className="text-blue-800 dark:text-blue-200 text-sm space-y-1">
+                  <ul className="space-y-1 text-sm text-muted-foreground">
                     <li>
                       •{' '}
-                      <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">
+                      <code className="rounded bg-muted px-1 text-foreground">
                         STRIPE_SECRET_KEY
                       </code>{' '}
                       in your backend environment
                     </li>
                     <li>
                       •{' '}
-                      <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">
+                      <code className="rounded bg-muted px-1 text-foreground">
                         VITE_API_URL
                       </code>{' '}
                       in your frontend environment

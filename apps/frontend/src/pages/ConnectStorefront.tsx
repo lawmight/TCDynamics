@@ -13,6 +13,19 @@
  * or custom domain) for better user experience.
  */
 
+import {
+  ArrowLeft,
+  CheckCircle,
+  CreditCard,
+  Package,
+  RefreshCw,
+  Search,
+  ShoppingCart,
+  XCircle,
+} from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -29,18 +42,6 @@ import {
   redirectToConnectCheckout,
   type Product,
 } from '@/utils/stripeConnect'
-import {
-  ArrowLeft,
-  CheckCircle,
-  CreditCard,
-  Package,
-  RefreshCw,
-  Search,
-  ShoppingCart,
-  XCircle,
-} from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
 
 // Shopping cart item interface
 interface CartItem {
@@ -309,30 +310,30 @@ const ConnectStorefront = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/50 py-8">
       <div className="container mx-auto px-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="mx-auto max-w-7xl">
           {/* Header */}
           <div className="mb-8">
-            <div className="flex items-center gap-4 mb-4">
+            <div className="mb-4 flex items-center gap-4">
               <Button asChild variant="ghost" size="sm">
                 <Link to="/connect/dashboard">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  <ArrowLeft className="mr-2 h-4 w-4" />
                   Back to Dashboard
                 </Link>
               </Button>
             </div>
 
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex items-center justify-between">
               <div>
-                <h1 className="text-4xl font-bold text-foreground mb-2">
+                <h1 className="mb-2 text-4xl font-bold text-foreground">
                   Storefront
                 </h1>
                 <p className="text-xl text-muted-foreground">
                   Browse and purchase products from connected account:{' '}
                   {accountId}
                   {isDemoAccount(accountId) && (
-                    <span className="ml-2 text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded">
+                    <Badge variant="secondary" className="ml-2 text-xs">
                       DEMO
-                    </span>
+                    </Badge>
                   )}
                 </p>
               </div>
@@ -344,7 +345,7 @@ const ConnectStorefront = () => {
                   size="sm"
                 >
                   <RefreshCw
-                    className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`}
+                    className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
                   />
                   Refresh
                 </Button>
@@ -353,7 +354,7 @@ const ConnectStorefront = () => {
 
             {/* Search Bar */}
             <div className="relative mb-4">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
               <Input
                 placeholder="Search products..."
                 value={searchQuery}
@@ -364,31 +365,29 @@ const ConnectStorefront = () => {
 
             {/* API Info */}
             <Badge variant="outline">
-              <ShoppingCart className="w-3 h-3 mr-1" />
+              <ShoppingCart className="mr-1 h-3 w-3" />
               Connected Account Storefront
             </Badge>
           </div>
 
           {/* Error/Success Messages */}
           {error && (
-            <Card className="mb-6 bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800">
+            <Card className="mb-6 border-destructive/40 bg-card/60 backdrop-blur-sm">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
-                  <XCircle className="w-5 h-5 text-red-600" />
-                  <p className="text-red-800 dark:text-red-400">{error}</p>
+                  <XCircle className="h-5 w-5 text-destructive" />
+                  <p className="text-destructive-foreground">{error}</p>
                 </div>
               </CardContent>
             </Card>
           )}
 
           {success && (
-            <Card className="mb-6 bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800">
+            <Card className="mb-6 border-primary/40 bg-card/60 backdrop-blur-sm">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  <p className="text-green-800 dark:text-green-400">
-                    {success}
-                  </p>
+                  <CheckCircle className="h-5 w-5 text-primary" />
+                  <p className="text-foreground">{success}</p>
                 </div>
               </CardContent>
             </Card>
@@ -396,15 +395,15 @@ const ConnectStorefront = () => {
 
           {/* Demo Account Warning */}
           {accountId && isDemoAccount(accountId) && (
-            <Card className="mb-6 bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-800">
+            <Card className="mb-6 border-muted bg-card/60 backdrop-blur-sm">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
-                  <XCircle className="w-5 h-5 text-orange-600" />
+                  <XCircle className="h-5 w-5 text-muted-foreground" />
                   <div>
-                    <p className="text-orange-800 dark:text-orange-400 font-medium">
+                    <p className="font-medium text-foreground">
                       Demo Account Detected
                     </p>
-                    <p className="text-orange-700 dark:text-orange-300 text-sm">
+                    <p className="text-sm text-muted-foreground">
                       This is a demo account. Checkout is disabled. Please
                       create a real Stripe Connect account to test the full
                       functionality.
@@ -415,21 +414,21 @@ const ConnectStorefront = () => {
             </Card>
           )}
 
-          <div className="grid lg:grid-cols-4 gap-8">
+          <div className="grid gap-8 lg:grid-cols-4">
             {/* Shopping Cart */}
             <div className="lg:col-span-1">
-              <Card className="bg-card/60 backdrop-blur-sm border-primary/20 sticky top-8">
+              <Card className="sticky top-8 border-primary/20 bg-card/60 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <ShoppingCart className="w-5 h-5 text-primary" />
+                    <ShoppingCart className="h-5 w-5 text-primary" />
                     Cart ({getCartItemCount()})
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {cart.length === 0 ? (
-                    <div className="text-center py-8">
-                      <ShoppingCart className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
-                      <p className="text-muted-foreground text-sm">
+                    <div className="py-8 text-center">
+                      <ShoppingCart className="mx-auto mb-3 h-12 w-12 text-muted-foreground/50" />
+                      <p className="text-sm text-muted-foreground">
                         Your cart is empty
                       </p>
                     </div>
@@ -444,10 +443,10 @@ const ConnectStorefront = () => {
                         return (
                           <div
                             key={item.product.id}
-                            className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg"
+                            className="flex items-center gap-3 rounded-lg bg-muted/50 p-3"
                           >
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-medium text-sm truncate">
+                            <div className="min-w-0 flex-1">
+                              <h4 className="truncate text-sm font-medium">
                                 {item.product.name}
                               </h4>
                               <p className="text-xs text-muted-foreground">
@@ -470,7 +469,7 @@ const ConnectStorefront = () => {
                               >
                                 -
                               </Button>
-                              <span className="text-sm font-medium w-6 text-center">
+                              <span className="w-6 text-center text-sm font-medium">
                                 {item.quantity}
                               </span>
                               <Button
@@ -490,8 +489,8 @@ const ConnectStorefront = () => {
                         )
                       })}
 
-                      <div className="pt-4 border-t border-border">
-                        <div className="flex justify-between items-center mb-4">
+                      <div className="border-t border-border pt-4">
+                        <div className="mb-4 flex items-center justify-between">
                           <span className="font-semibold">Total:</span>
                           <span className="text-lg font-bold text-primary">
                             {formatConnectPrice(getCartTotal())}
@@ -513,17 +512,17 @@ const ConnectStorefront = () => {
                         >
                           {isCheckingOut ? (
                             <>
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                              <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
                               Processing...
                             </>
                           ) : accountId && isDemoAccount(accountId) ? (
                             <>
-                              <XCircle className="w-4 h-4 mr-2" />
+                              <XCircle className="mr-2 h-4 w-4" />
                               Demo Account
                             </>
                           ) : (
                             <>
-                              <CreditCard className="w-4 h-4 mr-2" />
+                              <CreditCard className="mr-2 h-4 w-4" />
                               Checkout
                             </>
                           )}
@@ -537,10 +536,10 @@ const ConnectStorefront = () => {
 
             {/* Products Grid */}
             <div className="lg:col-span-3">
-              <Card className="bg-card/60 backdrop-blur-sm border-primary/20">
+              <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Package className="w-5 h-5 text-primary" />
+                    <Package className="h-5 w-5 text-primary" />
                     Products ({filteredProducts.length})
                   </CardTitle>
                   <CardDescription>
@@ -549,16 +548,16 @@ const ConnectStorefront = () => {
                 </CardHeader>
                 <CardContent>
                   {isLoading ? (
-                    <div className="text-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                    <div className="py-8 text-center">
+                      <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
                       <p className="text-muted-foreground">
                         Loading products...
                       </p>
                     </div>
                   ) : filteredProducts.length === 0 ? (
-                    <div className="text-center py-8">
-                      <Package className="w-16 h-16 text-muted-foreground/50 mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold mb-2">
+                    <div className="py-8 text-center">
+                      <Package className="mx-auto mb-4 h-16 w-16 text-muted-foreground/50" />
+                      <h3 className="mb-2 text-lg font-semibold">
                         No products found
                       </h3>
                       <p className="text-muted-foreground">
@@ -568,7 +567,7 @@ const ConnectStorefront = () => {
                       </p>
                     </div>
                   ) : (
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                       {filteredProducts.map(product => {
                         const price = product.default_price
                         const amount =
@@ -582,7 +581,7 @@ const ConnectStorefront = () => {
                         return (
                           <Card
                             key={product.id}
-                            className="bg-muted/30 border-border/50 hover:shadow-lg transition-shadow"
+                            className="border-border/50 bg-muted/30 transition-shadow hover:shadow-lg"
                           >
                             <CardContent className="p-4">
                               {/* Product Image */}
@@ -591,25 +590,25 @@ const ConnectStorefront = () => {
                                   <img
                                     src={product.images[0]}
                                     alt={product.name}
-                                    className="w-full h-48 object-cover rounded-lg"
+                                    className="h-48 w-full rounded-lg object-cover"
                                     onError={e => {
                                       e.currentTarget.style.display = 'none'
                                     }}
                                   />
                                 </div>
                               ) : (
-                                <div className="mb-4 bg-muted rounded-lg h-48 flex items-center justify-center">
-                                  <Package className="w-12 h-12 text-muted-foreground/50" />
+                                <div className="mb-4 flex h-48 items-center justify-center rounded-lg bg-muted">
+                                  <Package className="h-12 w-12 text-muted-foreground/50" />
                                 </div>
                               )}
 
                               {/* Product Info */}
                               <div className="space-y-3">
                                 <div>
-                                  <h3 className="font-semibold text-lg mb-1">
+                                  <h3 className="mb-1 text-lg font-semibold">
                                     {product.name}
                                   </h3>
-                                  <p className="text-sm text-muted-foreground line-clamp-3">
+                                  <p className="line-clamp-3 text-sm text-muted-foreground">
                                     {product.description}
                                   </p>
                                 </div>
@@ -625,12 +624,12 @@ const ConnectStorefront = () => {
                                   >
                                     {isInCart ? (
                                       <>
-                                        <CheckCircle className="w-4 h-4 mr-2" />
+                                        <CheckCircle className="mr-2 h-4 w-4" />
                                         In Cart
                                       </>
                                     ) : (
                                       <>
-                                        <ShoppingCart className="w-4 h-4 mr-2" />
+                                        <ShoppingCart className="mr-2 h-4 w-4" />
                                         Add to Cart
                                       </>
                                     )}
@@ -649,19 +648,19 @@ const ConnectStorefront = () => {
           </div>
 
           {/* Store Information */}
-          <Card className="mt-8 bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+          <Card className="mt-8 border-primary/20 bg-card/60 backdrop-blur-sm">
             <CardContent className="p-6">
               <div className="flex items-start gap-3">
-                <ShoppingCart className="w-5 h-5 text-blue-600 mt-0.5" />
+                <ShoppingCart className="mt-0.5 h-5 w-5 text-primary" />
                 <div>
-                  <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                  <h3 className="mb-2 font-semibold text-foreground">
                     Connected Account Storefront
                   </h3>
-                  <p className="text-blue-800 dark:text-blue-200 text-sm mb-3">
+                  <p className="mb-3 text-sm text-muted-foreground">
                     This storefront displays products from a connected Stripe
                     account:
                   </p>
-                  <ul className="text-blue-800 dark:text-blue-200 text-sm space-y-1">
+                  <ul className="space-y-1 text-sm text-muted-foreground">
                     <li>
                       • Products are fetched using the Stripe-Account header
                     </li>
@@ -669,13 +668,13 @@ const ConnectStorefront = () => {
                     <li>• Platform earns revenue through transaction fees</li>
                     <li>
                       • Account ID in URL:{' '}
-                      <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">
+                      <code className="rounded bg-muted px-1 text-foreground">
                         {accountId}
                       </code>
                       {isDemoAccount(accountId) && (
-                        <span className="ml-2 text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded">
+                        <Badge variant="secondary" className="ml-2 text-xs">
                           DEMO
-                        </span>
+                        </Badge>
                       )}
                     </li>
                     <li>

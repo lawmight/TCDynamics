@@ -1,6 +1,7 @@
+import { Flag, GraduationCap, MapPin, Phone, Shield, Users } from 'lucide-react'
+
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { Flag, GraduationCap, MapPin, Phone, Shield, Users } from 'lucide-react'
 
 const LocalAdvantages = () => {
   const advantages = [
@@ -78,7 +79,7 @@ const LocalAdvantages = () => {
   ]
 
   return (
-    <section className="relative py-24 bg-gradient-to-b from-background to-background/50 overflow-hidden">
+    <section className="relative overflow-hidden bg-gradient-to-b from-background to-background/50 py-24">
       {/* French Flag Colors Background */}
       <div className="absolute inset-0 opacity-5">
         <div
@@ -91,9 +92,9 @@ const LocalAdvantages = () => {
       </div>
 
       {/* Network Pattern */}
-      <div className="absolute inset-0 opacity-3">
+      <div className="opacity-3 absolute inset-0">
         <svg
-          className="absolute inset-0 w-full h-full"
+          className="absolute inset-0 h-full w-full"
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
@@ -122,33 +123,33 @@ const LocalAdvantages = () => {
         </svg>
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container relative z-10 mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-16 fade-in-up">
-          <div className="inline-flex items-center gap-3 mb-6">
+        <div className="fade-in-up mb-16 text-center">
+          <div className="mb-6 inline-flex items-center gap-3">
             <div className="flex items-center gap-1">
-              <div className="w-4 h-6 bg-blue-600 rounded-sm"></div>
-              <div className="w-4 h-6 bg-white border border-gray-300 rounded-sm"></div>
-              <div className="w-4 h-6 bg-red-600 rounded-sm"></div>
+              <div className="h-6 w-4 rounded-sm bg-blue-600"></div>
+              <div className="h-6 w-4 rounded-sm border border-border bg-white"></div>
+              <div className="h-6 w-4 rounded-sm bg-red-600"></div>
             </div>
             <Badge
               variant="outline"
-              className="border-primary/40 text-primary font-mono"
+              className="border-primary/40 font-mono text-primary"
             >
               100% Français
             </Badge>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gradient">
+          <h2 className="text-gradient mb-6 text-4xl font-bold md:text-5xl">
             Vos avantages locaux
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-mono">
+          <p className="mx-auto max-w-3xl font-mono text-xl text-muted-foreground">
             WorkFlowAI, la solution d'IA française pour les entreprises
             françaises
           </p>
         </div>
 
         {/* Advantages Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto mb-16">
+        <div className="mx-auto mb-16 grid max-w-7xl gap-8 md:grid-cols-2 lg:grid-cols-3">
           {advantages.map((advantage, index) => {
             const IconComponent = advantage.icon
             return (
@@ -170,28 +171,28 @@ const LocalAdvantages = () => {
                               : ''
                 }`}
               >
-                <Card className="h-full bg-card/60 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/10">
+                <Card className="h-full border-primary/20 bg-card/60 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10">
                   <CardContent className="p-6">
                     {/* Icon and Badge */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="p-3 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors">
-                        <IconComponent className="w-6 h-6 text-primary" />
+                    <div className="mb-4 flex items-start justify-between">
+                      <div className="rounded-full bg-primary/10 p-3 transition-colors group-hover:bg-primary/20">
+                        <IconComponent className="h-6 w-6 text-primary" />
                       </div>
                       <Badge
                         variant="secondary"
-                        className="font-mono text-xs bg-primary/10 text-primary border-primary/20"
+                        className="border-primary/20 bg-primary/10 font-mono text-xs text-primary"
                       >
                         {advantage.badge}
                       </Badge>
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors">
+                    <h3 className="mb-3 text-xl font-bold transition-colors group-hover:text-primary">
                       {advantage.title}
                     </h3>
 
                     {/* Description */}
-                    <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
+                    <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
                       {advantage.description}
                     </p>
 
@@ -200,9 +201,9 @@ const LocalAdvantages = () => {
                       {advantage.details.map((detail, detailIndex) => (
                         <li
                           key={detailIndex}
-                          className="flex items-center text-xs font-mono"
+                          className="flex items-center font-mono text-xs"
                         >
-                          <div className="w-1 h-1 bg-primary rounded-full mr-2 flex-shrink-0" />
+                          <div className="mr-2 h-1 w-1 flex-shrink-0 rounded-full bg-primary" />
                           <span className="text-muted-foreground">
                             {detail}
                           </span>
@@ -218,29 +219,29 @@ const LocalAdvantages = () => {
 
         {/* Trust Indicators */}
         <div className="fade-in-up fade-delay-08">
-          <div className="bg-card/30 backdrop-blur-sm rounded-2xl border border-primary/20 p-8">
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold mb-4 text-gradient">
+          <div className="rounded-2xl border border-primary/20 bg-card/30 p-8 backdrop-blur-sm">
+            <div className="mb-8 text-center">
+              <h3 className="text-gradient mb-4 text-2xl font-bold">
                 Nos certifications et partenaires
               </h3>
-              <p className="text-muted-foreground font-mono">
+              <p className="font-mono text-muted-foreground">
                 La confiance de nos clients repose sur nos engagements
               </p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
+            <div className="grid grid-cols-2 items-center gap-8 md:grid-cols-4">
               {/* Certification Badges */}
               <div className="text-center">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Shield className="w-8 h-8 text-primary" />
+                <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                  <Shield className="h-8 w-8 text-primary" />
                 </div>
                 <p className="font-mono text-sm text-muted-foreground">RGPD</p>
                 <p className="font-mono text-xs text-primary">Certifié</p>
               </div>
 
               <div className="text-center">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Flag className="w-8 h-8 text-primary" />
+                <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                  <Flag className="h-8 w-8 text-primary" />
                 </div>
                 <p className="font-mono text-sm text-muted-foreground">
                   ISO 27001
@@ -249,8 +250,8 @@ const LocalAdvantages = () => {
               </div>
 
               <div className="text-center">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <MapPin className="w-8 h-8 text-primary" />
+                <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                  <MapPin className="h-8 w-8 text-primary" />
                 </div>
                 <p className="font-mono text-sm text-muted-foreground">
                   French Tech
@@ -259,8 +260,8 @@ const LocalAdvantages = () => {
               </div>
 
               <div className="text-center">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Users className="w-8 h-8 text-primary" />
+                <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                  <Users className="h-8 w-8 text-primary" />
                 </div>
                 <p className="font-mono text-sm text-muted-foreground">PME</p>
                 <p className="font-mono text-xs text-primary">Française</p>
@@ -270,9 +271,9 @@ const LocalAdvantages = () => {
         </div>
 
         {/* Local Contact */}
-        <div className="text-center mt-12 fade-in-up fade-delay-10">
-          <div className="inline-flex items-center gap-2 px-6 py-3 bg-primary/10 rounded-full border border-primary/20">
-            <MapPin className="w-4 h-4 text-primary" />
+        <div className="fade-in-up fade-delay-10 mt-12 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-6 py-3">
+            <MapPin className="h-4 w-4 text-primary" />
             <span className="font-mono text-sm text-primary">
               📍 Siège social : 78180 Montigny-le-Bretonneux
             </span>

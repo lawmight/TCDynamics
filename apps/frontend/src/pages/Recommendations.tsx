@@ -1,6 +1,7 @@
-import { fetchMetricsOverview } from '@/api/metrics'
 import { useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
+
+import { fetchMetricsOverview } from '@/api/metrics'
 
 const getStoredProjectId = (): string => {
   try {
@@ -71,15 +72,17 @@ const Recommendations = () => {
   }, [data])
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-4">Recommendations</h1>
+    <div className="mx-auto max-w-5xl p-6">
+      <h1 className="mb-4 text-2xl font-semibold">Recommendations</h1>
       <ul className="space-y-3">
         {recs.map(r => (
-          <li key={r.id} className="border rounded-md p-4">
+          <li key={r.id} className="rounded-md border p-4">
             <div className="text-lg font-medium">{r.title}</div>
-            <div className="text-gray-600 text-sm mt-1">{r.rationale}</div>
+            <div className="mt-1 text-sm text-muted-foreground">
+              {r.rationale}
+            </div>
             <span
-              className={`inline-block mt-2 text-xs px-2 py-1 rounded ${r.impact === 'high' ? 'bg-red-100 text-red-700' : r.impact === 'medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}`}
+              className={`mt-2 inline-block rounded px-2 py-1 text-xs ${r.impact === 'high' ? 'bg-destructive/10 text-destructive' : r.impact === 'medium' ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400' : 'bg-primary/10 text-primary'}`}
             >
               {r.impact.toUpperCase()}
             </span>

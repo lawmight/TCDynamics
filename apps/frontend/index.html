@@ -3,6 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- FOUC Prevention: Apply theme before page renders -->
+    <script>
+      (function() {
+        try {
+          const theme = localStorage.getItem('theme') || 'system';
+          const resolved = theme === 'system'
+            ? window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+            : theme;
+          document.documentElement.classList.add(resolved);
+        } catch (e) {
+          // Fallback to light mode if localStorage is unavailable
+          document.documentElement.classList.add('light');
+        }
+      })();
+    </script>
+
     <title>WorkFlowAI - Automatisez Votre Entreprise avec l'IA</title>
     <meta
       name="description"

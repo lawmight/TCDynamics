@@ -1,10 +1,3 @@
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { useContactForm } from '@/hooks/useContactForm'
-import { useDemoForm } from '@/hooks/useDemoForm'
 import {
   Building,
   Calendar,
@@ -17,6 +10,14 @@ import {
   Train,
   Users,
 } from 'lucide-react'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { useContactForm } from '@/hooks/useContactForm'
+import { useDemoForm } from '@/hooks/useDemoForm'
 
 const Contact = () => {
   const demoForm = useDemoForm()
@@ -73,11 +74,11 @@ const Contact = () => {
   ]
 
   return (
-    <section className="relative py-24 bg-gradient-to-b from-background to-background/50 overflow-hidden">
+    <section className="relative overflow-hidden bg-gradient-to-b from-background to-background/50 py-24">
       {/* Network Background */}
       <div className="absolute inset-0 opacity-5">
         <svg
-          className="absolute inset-0 w-full h-full"
+          className="absolute inset-0 h-full w-full"
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
@@ -106,52 +107,52 @@ const Contact = () => {
         </svg>
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container relative z-10 mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-16 fade-in-up">
+        <div className="fade-in-up mb-16 text-center">
           <Badge
             variant="outline"
-            className="border-primary/40 text-primary font-mono mb-6"
+            className="mb-6 border-primary/40 font-mono text-primary"
           >
             Contactez-nous
           </Badge>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gradient">
+          <h2 className="text-gradient mb-6 text-4xl font-bold md:text-5xl">
             Prêt à automatiser ?
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-mono">
+          <p className="mx-auto max-w-3xl font-mono text-xl text-muted-foreground">
             Découvrez comment WorkFlowAI peut transformer votre entreprise
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
+        <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-2">
           {/* Demo Request Form */}
           <div className="fade-in-up fade-delay-02">
-            <Card className="bg-card/60 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-all duration-300">
+            <Card className="border-primary/20 bg-card/60 backdrop-blur-sm transition-all duration-300 hover:border-primary/40">
               <CardHeader>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-primary/10 rounded-full">
-                    <Calendar className="w-5 h-5 text-primary" />
+                <div className="mb-2 flex items-center gap-3">
+                  <div className="rounded-full bg-primary/10 p-2">
+                    <Calendar className="h-5 w-5 text-primary" />
                   </div>
                   <CardTitle className="text-2xl">Réserver une démo</CardTitle>
                 </div>
-                <p className="text-muted-foreground font-mono text-sm">
+                <p className="font-mono text-sm text-muted-foreground">
                   Démonstration personnalisée avec vos données
                 </p>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Benefits */}
-                <div className="bg-primary/5 rounded-lg p-4 border border-primary/10">
-                  <h4 className="font-semibold mb-3 flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-primary" />
+                <div className="rounded-lg border border-primary/10 bg-primary/5 p-4">
+                  <h4 className="mb-3 flex items-center gap-2 font-semibold">
+                    <CheckCircle className="h-4 w-4 text-primary" />
                     Inclus dans votre démonstration :
                   </h4>
                   <ul className="space-y-2">
                     {benefits.map((benefit, index) => (
                       <li
                         key={index}
-                        className="flex items-center text-sm font-mono"
+                        className="flex items-center font-mono text-sm"
                       >
-                        <div className="w-1.5 h-1.5 bg-primary rounded-full mr-3 flex-shrink-0" />
+                        <div className="mr-3 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" />
                         <span className="text-muted-foreground">{benefit}</span>
                       </li>
                     ))}
@@ -161,7 +162,6 @@ const Contact = () => {
                 {/* Demo Form */}
                 <form
                   className="space-y-4"
-                  role="form"
                   aria-label="Formulaire de demande de démonstration"
                   onSubmit={async e => {
                     e.preventDefault()
@@ -184,11 +184,11 @@ const Contact = () => {
                     }
                   }}
                 >
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <label
                         htmlFor="firstName"
-                        className="text-sm font-medium mb-2 block"
+                        className="mb-2 block text-sm font-medium"
                       >
                         Prénom *
                       </label>
@@ -204,7 +204,7 @@ const Contact = () => {
                     <div>
                       <label
                         htmlFor="lastName"
-                        className="text-sm font-medium mb-2 block"
+                        className="mb-2 block text-sm font-medium"
                       >
                         Nom *
                       </label>
@@ -222,7 +222,7 @@ const Contact = () => {
                   <div>
                     <label
                       htmlFor="email"
-                      className="text-sm font-medium mb-2 block"
+                      className="mb-2 block text-sm font-medium"
                     >
                       Email professionnel *
                     </label>
@@ -237,11 +237,11 @@ const Contact = () => {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <label
                         htmlFor="phone"
-                        className="text-sm font-medium mb-2 block"
+                        className="mb-2 block text-sm font-medium"
                       >
                         Téléphone
                       </label>
@@ -256,7 +256,7 @@ const Contact = () => {
                     <div>
                       <label
                         htmlFor="employees"
-                        className="text-sm font-medium mb-2 block"
+                        className="mb-2 block text-sm font-medium"
                       >
                         Nb employés
                       </label>
@@ -273,7 +273,7 @@ const Contact = () => {
                   <div>
                     <label
                       htmlFor="company"
-                      className="text-sm font-medium mb-2 block"
+                      className="mb-2 block text-sm font-medium"
                     >
                       Entreprise *
                     </label>
@@ -290,7 +290,7 @@ const Contact = () => {
                   <div>
                     <label
                       htmlFor="needs"
-                      className="text-sm font-medium mb-2 block"
+                      className="mb-2 block text-sm font-medium"
                     >
                       Besoins spécifiques
                     </label>
@@ -298,7 +298,7 @@ const Contact = () => {
                       id="needs"
                       name="needs"
                       placeholder="Décrivez brièvement vos processus à automatiser..."
-                      className="bg-background/50 min-h-[100px]"
+                      className="min-h-[100px] bg-background/50"
                     />
                   </div>
 
@@ -317,7 +317,7 @@ const Contact = () => {
                       'Envoi en cours...'
                     ) : (
                       <>
-                        <Calendar className="w-4 h-4 mr-2" />
+                        <Calendar className="mr-2 h-4 w-4" />
                         Réserver ma démo gratuite
                       </>
                     )}
@@ -327,10 +327,10 @@ const Contact = () => {
                 {demoForm.response && (
                   <div
                     role="alert"
-                    className={`p-4 rounded-lg mt-4 ${
+                    className={`mt-4 rounded-lg p-4 ${
                       demoForm.response.success
-                        ? 'bg-green-100 text-green-800 border border-green-200'
-                        : 'bg-red-100 text-red-800 border border-red-200'
+                        ? 'border border-primary/20 bg-primary/10 text-primary'
+                        : 'border border-destructive/20 bg-destructive/10 text-destructive'
                     }`}
                   >
                     {demoForm.response.message}
@@ -344,7 +344,7 @@ const Contact = () => {
                   </div>
                 )}
 
-                <p className="text-xs text-muted-foreground font-mono text-center">
+                <p className="text-center font-mono text-xs text-muted-foreground">
                   Démonstration de 45min • Sans engagement • Réponse sous 2h
                 </p>
               </CardContent>
@@ -354,28 +354,28 @@ const Contact = () => {
           {/* Contact Information & General Form */}
           <div className="space-y-8">
             {/* Contact Info Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 fade-in-up fade-delay-04">
+            <div className="fade-in-up fade-delay-04 grid grid-cols-1 gap-4 sm:grid-cols-2">
               {contactInfo.map((info, index) => {
                 const IconComponent = info.icon
                 return (
                   <Card
                     key={index}
-                    className="bg-card/40 backdrop-blur-sm border-primary/10 hover:border-primary/30 transition-all duration-300"
+                    className="border-primary/10 bg-card/40 backdrop-blur-sm transition-all duration-300 hover:border-primary/30"
                   >
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
-                        <div className="p-2 bg-primary/10 rounded-full flex-shrink-0">
-                          <IconComponent className="w-4 h-4 text-primary" />
+                        <div className="flex-shrink-0 rounded-full bg-primary/10 p-2">
+                          <IconComponent className="h-4 w-4 text-primary" />
                         </div>
                         <div>
-                          <h4 className="font-semibold text-sm mb-2">
+                          <h4 className="mb-2 text-sm font-semibold">
                             {info.title}
                           </h4>
                           <div className="space-y-1">
                             {info.details.map((detail, detailIndex) => (
                               <p
                                 key={detailIndex}
-                                className="text-xs font-mono text-muted-foreground"
+                                className="font-mono text-xs text-muted-foreground"
                               >
                                 {detail}
                               </p>
@@ -390,15 +390,15 @@ const Contact = () => {
             </div>
 
             {/* General Contact Form */}
-            <Card className="bg-card/60 backdrop-blur-sm border-primary/20 fade-in-up fade-delay-06">
+            <Card className="fade-in-up fade-delay-06 border-primary/20 bg-card/60 backdrop-blur-sm">
               <CardHeader>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-primary/10 rounded-full">
-                    <Mail className="w-5 h-5 text-primary" />
+                <div className="mb-2 flex items-center gap-3">
+                  <div className="rounded-full bg-primary/10 p-2">
+                    <Mail className="h-5 w-5 text-primary" />
                   </div>
                   <CardTitle>Nous contacter</CardTitle>
                 </div>
-                <p className="text-muted-foreground font-mono text-sm">
+                <p className="font-mono text-sm text-muted-foreground">
                   Une question ? Notre équipe vous répond rapidement
                 </p>
               </CardHeader>
@@ -423,60 +423,83 @@ const Contact = () => {
                     }
                   }}
                 >
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
-                      <label className="text-sm font-medium mb-2 block">
+                      <label
+                        htmlFor="firstName"
+                        className="mb-2 block text-sm font-medium"
+                      >
                         Prénom *
                       </label>
                       <Input
+                        id="firstName"
                         name="firstName"
                         placeholder="Prénom"
                         className="bg-background/50"
                         required
+                        aria-required="true"
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium mb-2 block">
+                      <label
+                        htmlFor="lastName"
+                        className="mb-2 block text-sm font-medium"
+                      >
                         Nom *
                       </label>
                       <Input
+                        id="lastName"
                         name="lastName"
                         placeholder="Nom"
                         className="bg-background/50"
                         required
+                        aria-required="true"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium mb-2 block">
+                    <label
+                      htmlFor="email"
+                      className="mb-2 block text-sm font-medium"
+                    >
                       Email *
                     </label>
                     <Input
+                      id="email"
                       name="email"
                       type="email"
                       placeholder="votre@email.fr"
                       className="bg-background/50"
                       required
+                      aria-required="true"
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
-                      <label className="text-sm font-medium mb-2 block">
+                      <label
+                        htmlFor="phone"
+                        className="mb-2 block text-sm font-medium"
+                      >
                         Téléphone
                       </label>
                       <Input
+                        id="phone"
                         name="phone"
                         placeholder="01 23 45 67 89"
                         className="bg-background/50"
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium mb-2 block">
+                      <label
+                        htmlFor="company"
+                        className="mb-2 block text-sm font-medium"
+                      >
                         Entreprise
                       </label>
                       <Input
+                        id="company"
                         name="company"
                         placeholder="Nom de votre entreprise"
                         className="bg-background/50"
@@ -485,14 +508,19 @@ const Contact = () => {
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium mb-2 block">
+                    <label
+                      htmlFor="message"
+                      className="mb-2 block text-sm font-medium"
+                    >
                       Message *
                     </label>
                     <Textarea
+                      id="message"
                       name="message"
                       placeholder="Décrivez votre demande..."
-                      className="bg-background/50 min-h-[120px]"
+                      className="min-h-[120px] bg-background/50"
                       required
+                      aria-required="true"
                     />
                   </div>
 
@@ -505,7 +533,7 @@ const Contact = () => {
                       'Envoi en cours...'
                     ) : (
                       <>
-                        <Mail className="w-4 h-4 mr-2" />
+                        <Mail className="mr-2 h-4 w-4" />
                         Envoyer le message
                       </>
                     )}
@@ -514,10 +542,10 @@ const Contact = () => {
 
                 {contactForm.response && (
                   <div
-                    className={`p-4 rounded-lg mt-4 ${
+                    className={`mt-4 rounded-lg p-4 ${
                       contactForm.response.success
-                        ? 'bg-green-100 text-green-800 border border-green-200'
-                        : 'bg-red-100 text-red-800 border border-red-200'
+                        ? 'border border-primary/20 bg-primary/10 text-primary'
+                        : 'border border-destructive/20 bg-destructive/10 text-destructive'
                     }`}
                   >
                     {contactForm.response.message}
@@ -534,36 +562,36 @@ const Contact = () => {
             </Card>
 
             {/* Local Office Highlight */}
-            <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20 fade-in-up fade-delay-08">
+            <Card className="fade-in-up fade-delay-08 border-primary/20 bg-gradient-to-r from-primary/10 to-primary/5">
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
-                  <div className="p-3 bg-primary/20 rounded-full">
-                    <MapPin className="w-6 h-6 text-primary" />
+                  <div className="rounded-full bg-primary/20 p-3">
+                    <MapPin className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg mb-2">
+                    <h3 className="mb-2 text-lg font-bold">
                       Bureau local Île-de-France
                     </h3>
-                    <p className="text-muted-foreground mb-3 font-mono text-sm">
+                    <p className="mb-3 font-mono text-sm text-muted-foreground">
                       Équipe française basée à Montigny-le-Bretonneux, proche de
                       Guyancourt
                     </p>
                     <div className="flex flex-wrap gap-2">
                       <Badge
                         variant="secondary"
-                        className="text-xs font-mono bg-primary/10 text-primary"
+                        className="bg-primary/10 font-mono text-xs text-primary"
                       >
                         Intervention sur site
                       </Badge>
                       <Badge
                         variant="secondary"
-                        className="text-xs font-mono bg-primary/10 text-primary"
+                        className="bg-primary/10 font-mono text-xs text-primary"
                       >
                         Support local
                       </Badge>
                       <Badge
                         variant="secondary"
-                        className="text-xs font-mono bg-primary/10 text-primary"
+                        className="bg-primary/10 font-mono text-xs text-primary"
                       >
                         Formation en français
                       </Badge>
@@ -576,22 +604,22 @@ const Contact = () => {
         </div>
 
         {/* Bottom Trust Indicators */}
-        <div className="text-center mt-16 fade-in-up fade-delay-10">
-          <div className="flex flex-wrap justify-center gap-6 text-sm font-mono text-muted-foreground">
+        <div className="fade-in-up fade-delay-10 mt-16 text-center">
+          <div className="flex flex-wrap justify-center gap-6 font-mono text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-primary" />
+              <Clock className="h-4 w-4 text-primary" />
               <span>Réponse sous 2h</span>
             </div>
             <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-primary" />
+              <Users className="h-4 w-4 text-primary" />
               <span>Équipe française</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-primary" />
+              <CheckCircle className="h-4 w-4 text-primary" />
               <span>RGPD conforme</span>
             </div>
             <div className="flex items-center gap-2">
-              <Train className="w-4 h-4 text-primary" />
+              <Train className="h-4 w-4 text-primary" />
               <span>Accès RER C</span>
             </div>
           </div>

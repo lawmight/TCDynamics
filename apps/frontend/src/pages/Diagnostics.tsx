@@ -38,23 +38,23 @@ const Diagnostics = () => {
   )
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-4">Diagnostics</h1>
-      <p className="text-gray-600 mb-4">
+    <div className="mx-auto max-w-5xl p-6">
+      <h1 className="mb-4 text-2xl font-semibold">Diagnostics</h1>
+      <p className="mb-4 text-muted-foreground">
         Recent main-thread long tasks observed in this session.
       </p>
-      <div className="overflow-x-auto border rounded-md">
+      <div className="overflow-x-auto rounded-md border">
         <table className="min-w-full text-sm">
-          <thead className="bg-gray-50">
+          <thead className="bg-muted">
             <tr>
-              <th className="text-left p-2">Name</th>
-              <th className="text-left p-2">Duration (ms)</th>
+              <th className="p-2 text-left">Name</th>
+              <th className="p-2 text-left">Duration (ms)</th>
             </tr>
           </thead>
           <tbody>
             {topTasks.map((t, idx) => (
               <tr key={idx} className="border-t">
-                <td className="p-2 break-all">{t.name || '(anonymous)'}</td>
+                <td className="break-all p-2">{t.name || '(anonymous)'}</td>
                 <td className="p-2">{Math.round(t.duration)}</td>
               </tr>
             ))}

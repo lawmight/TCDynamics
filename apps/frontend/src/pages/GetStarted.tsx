@@ -1,8 +1,3 @@
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   ArrowRight,
   CheckCircle,
@@ -17,6 +12,12 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 const GetStarted = () => {
   const navigate = useNavigate()
@@ -130,43 +131,43 @@ const GetStarted = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/50">
       {/* Hero Section */}
-      <section className="relative py-20 overflow-hidden">
+      <section className="relative overflow-hidden py-20">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-1/4 left-1/6 w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-          <div className="absolute top-1/2 right-1/4 w-1 h-1 bg-primary-glow rounded-full animate-pulse"></div>
+          <div className="left-1/6 absolute top-1/4 h-2 w-2 animate-pulse rounded-full bg-primary"></div>
+          <div className="absolute right-1/4 top-1/2 h-1 w-1 animate-pulse rounded-full bg-primary-glow"></div>
         </div>
 
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
+        <div className="container relative z-10 mx-auto px-6">
+          <div className="mx-auto max-w-4xl text-center">
             <Badge
               variant="outline"
               className="mb-6 border-primary/40 text-primary"
             >
-              <Sparkles className="w-3 h-3 mr-1" />
+              <Sparkles className="mr-1 h-3 w-3" />
               14 jours d'essai gratuit
             </Badge>
 
-            <h1 className="text-4xl lg:text-6xl font-bold text-foreground mb-6">
+            <h1 className="mb-6 text-4xl font-bold text-foreground lg:text-6xl">
               Démarrez avec <span className="text-gradient">WorkFlowAI</span>
             </h1>
 
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            <p className="mx-auto mb-8 max-w-2xl text-xl text-muted-foreground">
               Essayez gratuitement pendant 14 jours. Aucune carte bancaire
               requise. Annulation possible à tout moment.
             </p>
 
             <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-primary" />
+                <CheckCircle className="h-4 w-4 text-primary" />
                 <span>Sans engagement</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-primary" />
+                <CheckCircle className="h-4 w-4 text-primary" />
                 <span>Configuration en 2 min</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-primary" />
+                <CheckCircle className="h-4 w-4 text-primary" />
                 <span>Support inclus</span>
               </div>
             </div>
@@ -175,19 +176,19 @@ const GetStarted = () => {
       </section>
 
       {/* Trial Benefits */}
-      <section className="py-12 bg-card/20">
+      <section className="bg-card/20 py-12">
         <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-6 max-w-6xl mx-auto">
+          <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-4">
             {trialBenefits.map((benefit, index) => (
               <Card
                 key={index}
-                className="bg-card/60 backdrop-blur-sm border-primary/20 text-center"
+                className="border-primary/20 bg-card/60 text-center backdrop-blur-sm"
               >
                 <CardContent className="p-6">
-                  <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <benefit.icon className="w-6 h-6 text-primary" />
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/20">
+                    <benefit.icon className="h-6 w-6 text-primary" />
                   </div>
-                  <h3 className="font-bold mb-2">{benefit.title}</h3>
+                  <h3 className="mb-2 font-bold">{benefit.title}</h3>
                   <p className="text-sm text-muted-foreground">
                     {benefit.description}
                   </p>
@@ -201,12 +202,12 @@ const GetStarted = () => {
       {/* Sign Up Form */}
       <section className="py-16">
         <div className="container mx-auto px-6">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-12">
+          <div className="mx-auto max-w-6xl">
+            <div className="grid gap-12 lg:grid-cols-2">
               {/* Plan Selection & Form */}
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-3xl font-bold text-foreground mb-4">
+                  <h2 className="mb-4 text-3xl font-bold text-foreground">
                     Choisissez votre plan
                   </h2>
                   <p className="text-muted-foreground">
@@ -237,9 +238,9 @@ const GetStarted = () => {
 
                   {plans.map(plan => (
                     <TabsContent key={plan.id} value={plan.id} className="mt-6">
-                      <Card className="bg-card/60 backdrop-blur-sm border-primary/20">
+                      <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                         <CardContent className="p-6">
-                          <div className="flex items-baseline justify-between mb-4">
+                          <div className="mb-4 flex items-baseline justify-between">
                             <div>
                               <h3 className="text-2xl font-bold">
                                 {plan.name}
@@ -264,7 +265,7 @@ const GetStarted = () => {
                                 key={index}
                                 className="flex items-center gap-2"
                               >
-                                <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                                <CheckCircle className="h-4 w-4 flex-shrink-0 text-primary" />
                                 <span className="text-sm">{feature}</span>
                               </div>
                             ))}
@@ -276,10 +277,10 @@ const GetStarted = () => {
                 </Tabs>
 
                 {/* Sign Up Form */}
-                <Card className="bg-card/60 backdrop-blur-sm border-primary/20">
+                <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                   <CardHeader>
-                    <CardTitle className="text-2xl flex items-center gap-2">
-                      <Rocket className="w-6 h-6 text-primary" />
+                    <CardTitle className="flex items-center gap-2 text-2xl">
+                      <Rocket className="h-6 w-6 text-primary" />
                       Créez votre compte
                     </CardTitle>
                   </CardHeader>
@@ -287,10 +288,14 @@ const GetStarted = () => {
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="text-sm font-medium mb-2 block">
+                          <label
+                            htmlFor="getstarted-firstName"
+                            className="mb-2 block text-sm font-medium"
+                          >
                             Prénom *
                           </label>
                           <Input
+                            id="getstarted-firstName"
                             name="firstName"
                             placeholder="Jean"
                             value={formData.firstName}
@@ -300,10 +305,14 @@ const GetStarted = () => {
                           />
                         </div>
                         <div>
-                          <label className="text-sm font-medium mb-2 block">
+                          <label
+                            htmlFor="getstarted-lastName"
+                            className="mb-2 block text-sm font-medium"
+                          >
                             Nom *
                           </label>
                           <Input
+                            id="getstarted-lastName"
                             name="lastName"
                             placeholder="Dupont"
                             value={formData.lastName}
@@ -315,10 +324,14 @@ const GetStarted = () => {
                       </div>
 
                       <div>
-                        <label className="text-sm font-medium mb-2 block">
+                        <label
+                          htmlFor="getstarted-email"
+                          className="mb-2 block text-sm font-medium"
+                        >
                           Email professionnel *
                         </label>
                         <Input
+                          id="getstarted-email"
                           name="email"
                           type="email"
                           placeholder="jean.dupont@entreprise.fr"
@@ -330,10 +343,14 @@ const GetStarted = () => {
                       </div>
 
                       <div>
-                        <label className="text-sm font-medium mb-2 block">
+                        <label
+                          htmlFor="getstarted-company"
+                          className="mb-2 block text-sm font-medium"
+                        >
                           Entreprise *
                         </label>
                         <Input
+                          id="getstarted-company"
                           name="company"
                           placeholder="Nom de votre entreprise"
                           value={formData.company}
@@ -344,10 +361,14 @@ const GetStarted = () => {
                       </div>
 
                       <div>
-                        <label className="text-sm font-medium mb-2 block">
+                        <label
+                          htmlFor="getstarted-phone"
+                          className="mb-2 block text-sm font-medium"
+                        >
                           Téléphone (optionnel)
                         </label>
                         <Input
+                          id="getstarted-phone"
                           name="phone"
                           type="tel"
                           placeholder="01 23 45 67 89"
@@ -365,18 +386,18 @@ const GetStarted = () => {
                       >
                         {isSubmitting ? (
                           <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
                             Création en cours...
                           </>
                         ) : (
                           <>
-                            <Rocket className="w-4 h-4 mr-2" />
+                            <Rocket className="mr-2 h-4 w-4" />
                             Démarrer l'essai gratuit
                           </>
                         )}
                       </Button>
 
-                      <p className="text-xs text-muted-foreground text-center">
+                      <p className="text-center text-xs text-muted-foreground">
                         En créant un compte, vous acceptez nos{' '}
                         <Link
                           to="/terms"
@@ -400,10 +421,10 @@ const GetStarted = () => {
 
               {/* Onboarding Steps & Support */}
               <div className="space-y-6">
-                <Card className="bg-card/60 backdrop-blur-sm border-primary/20">
+                <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                   <CardHeader>
-                    <CardTitle className="text-2xl flex items-center gap-2">
-                      <Clock className="w-6 h-6 text-primary" />
+                    <CardTitle className="flex items-center gap-2 text-2xl">
+                      <Clock className="h-6 w-6 text-primary" />
                       Processus d'onboarding
                     </CardTitle>
                   </CardHeader>
@@ -411,11 +432,11 @@ const GetStarted = () => {
                     <ol className="space-y-4">
                       {onboardingSteps.map((step, index) => (
                         <li key={index} className="flex items-start gap-3">
-                          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-primary text-sm">
+                          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
                             {step.step}
                           </div>
                           <div>
-                            <h4 className="font-semibold mb-1">{step.title}</h4>
+                            <h4 className="mb-1 font-semibold">{step.title}</h4>
                             <p className="text-sm text-muted-foreground">
                               {step.description}
                             </p>
@@ -426,29 +447,29 @@ const GetStarted = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-950/20 dark:to-green-900/20 border-green-200 dark:border-green-800">
+                <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-3">
-                      <Gift className="w-8 h-8 text-green-600 dark:text-green-400 flex-shrink-0" />
+                      <Gift className="h-8 w-8 flex-shrink-0 text-primary" />
                       <div>
-                        <h3 className="font-bold text-lg mb-2">
+                        <h3 className="mb-2 text-lg font-bold">
                           14 jours pour tout essayer
                         </h3>
                         <ul className="space-y-2 text-sm text-muted-foreground">
                           <li className="flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+                            <CheckCircle className="h-4 w-4 text-primary" />
                             Accès complet à toutes les fonctionnalités
                           </li>
                           <li className="flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+                            <CheckCircle className="h-4 w-4 text-primary" />
                             Support technique inclus
                           </li>
                           <li className="flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+                            <CheckCircle className="h-4 w-4 text-primary" />
                             Annulation en un clic
                           </li>
                           <li className="flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+                            <CheckCircle className="h-4 w-4 text-primary" />
                             Aucun engagement
                           </li>
                         </ul>
@@ -457,15 +478,15 @@ const GetStarted = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-card/60 backdrop-blur-sm border-primary/20">
+                <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-3">
-                      <Mail className="w-6 h-6 text-primary flex-shrink-0" />
+                      <Mail className="h-6 w-6 flex-shrink-0 text-primary" />
                       <div>
-                        <h4 className="font-semibold mb-2">
+                        <h4 className="mb-2 font-semibold">
                           Besoin d'aide pour démarrer ?
                         </h4>
-                        <p className="text-sm text-muted-foreground mb-4">
+                        <p className="mb-4 text-sm text-muted-foreground">
                           Notre équipe est disponible pour vous accompagner dans
                           la configuration de votre compte.
                         </p>
@@ -473,13 +494,13 @@ const GetStarted = () => {
                           <Button asChild variant="outline" size="sm">
                             <Link to="/demo">
                               Demander une démo
-                              <ArrowRight className="w-4 h-4 ml-2" />
+                              <ArrowRight className="ml-2 h-4 w-4" />
                             </Link>
                           </Button>
                           <Button asChild variant="outline" size="sm">
                             <Link to="/contact">
                               Contacter le support
-                              <ArrowRight className="w-4 h-4 ml-2" />
+                              <ArrowRight className="ml-2 h-4 w-4" />
                             </Link>
                           </Button>
                         </div>
@@ -494,17 +515,17 @@ const GetStarted = () => {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-16 bg-card/20">
+      <section className="bg-card/20 py-16">
         <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-12">
+          <div className="mx-auto max-w-4xl">
+            <h2 className="mb-12 text-center text-3xl font-bold">
               Questions fréquentes
             </h2>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              <Card className="bg-card/60 backdrop-blur-sm border-primary/10">
+            <div className="grid gap-6 md:grid-cols-2">
+              <Card className="border-primary/10 bg-card/60 backdrop-blur-sm">
                 <CardContent className="p-6">
-                  <h4 className="font-semibold mb-2">
+                  <h4 className="mb-2 font-semibold">
                     Puis-je changer de plan pendant l'essai ?
                   </h4>
                   <p className="text-sm text-muted-foreground">
@@ -514,9 +535,9 @@ const GetStarted = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-card/60 backdrop-blur-sm border-primary/10">
+              <Card className="border-primary/10 bg-card/60 backdrop-blur-sm">
                 <CardContent className="p-6">
-                  <h4 className="font-semibold mb-2">
+                  <h4 className="mb-2 font-semibold">
                     Que se passe-t-il après les 14 jours ?
                   </h4>
                   <p className="text-sm text-muted-foreground">
@@ -527,9 +548,9 @@ const GetStarted = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-card/60 backdrop-blur-sm border-primary/10">
+              <Card className="border-primary/10 bg-card/60 backdrop-blur-sm">
                 <CardContent className="p-6">
-                  <h4 className="font-semibold mb-2">
+                  <h4 className="mb-2 font-semibold">
                     Puis-je importer mes données existantes ?
                   </h4>
                   <p className="text-sm text-muted-foreground">
@@ -540,9 +561,9 @@ const GetStarted = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-card/60 backdrop-blur-sm border-primary/10">
+              <Card className="border-primary/10 bg-card/60 backdrop-blur-sm">
                 <CardContent className="p-6">
-                  <h4 className="font-semibold mb-2">
+                  <h4 className="mb-2 font-semibold">
                     Le support est-il inclus pendant l'essai ?
                   </h4>
                   <p className="text-sm text-muted-foreground">

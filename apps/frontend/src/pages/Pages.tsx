@@ -1,6 +1,7 @@
-import { fetchMetricsPages } from '@/api/metrics'
 import { useQuery } from '@tanstack/react-query'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
+
+import { fetchMetricsPages } from '@/api/metrics'
 
 const getStoredProjectId = (): string => {
   try {
@@ -19,13 +20,14 @@ const Pages = () => {
     enabled: !!projectId,
   })
 
-  const rows = useMemo(() => data?.pages || [], [data])
+  // React Compiler handles optimization automatically
+  const rows = data?.pages || []
 
   if (!projectId) {
     return (
-      <div className="max-w-6xl mx-auto p-6">
-        <h1 className="text-2xl font-semibold mb-2">Pages</h1>
-        <p className="text-gray-600">
+      <div className="mx-auto max-w-6xl p-6">
+        <h1 className="mb-2 text-2xl font-semibold">Pages</h1>
+        <p className="text-muted-foreground">
           No project configured. Go to Settings to set your Project ID.
         </p>
       </div>
@@ -34,33 +36,33 @@ const Pages = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[40vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-primary"></div>
       </div>
     )
   }
 
   if (isError) {
     return (
-      <div className="max-w-6xl mx-auto p-6">
-        <h1 className="text-2xl font-semibold mb-2">Pages</h1>
-        <p className="text-red-600">Failed to load page metrics.</p>
+      <div className="mx-auto max-w-6xl p-6">
+        <h1 className="mb-2 text-2xl font-semibold">Pages</h1>
+        <p className="text-destructive">Failed to load page metrics.</p>
       </div>
     )
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-4">Pages</h1>
-      <div className="overflow-x-auto border rounded-md">
+    <div className="mx-auto max-w-6xl p-6">
+      <h1 className="mb-4 text-2xl font-semibold">Pages</h1>
+      <div className="overflow-x-auto rounded-md border">
         <table className="min-w-full text-sm">
-          <thead className="bg-gray-50">
+          <thead className="bg-muted">
             <tr>
-              <th className="text-left p-2">Path</th>
-              <th className="text-left p-2">Samples</th>
-              <th className="text-left p-2">p75 LCP (ms)</th>
-              <th className="text-left p-2">p75 INP (ms)</th>
-              <th className="text-left p-2">p75 CLS</th>
+              <th className="p-2 text-left">Path</th>
+              <th className="p-2 text-left">Samples</th>
+              <th className="p-2 text-left">p75 LCP (ms)</th>
+              <th className="p-2 text-left">p75 INP (ms)</th>
+              <th className="p-2 text-left">p75 CLS</th>
             </tr>
           </thead>
           <tbody>
@@ -76,7 +78,7 @@ const Pages = () => {
           </tbody>
         </table>
       </div>
-      <p className="text-gray-500 text-sm mt-4">
+      <p className="mt-4 text-sm text-muted-foreground">
         Window: last {days} days • Project: {projectId}
       </p>
     </div>

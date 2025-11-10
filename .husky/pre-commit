@@ -3,10 +3,16 @@ set -e
 # Quick pre-commit checks (fast feedback)
 echo "🔍 Running pre-commit checks..."
 
+# Change to frontend directory (monorepo structure)
+cd apps/frontend
+
 # Run lint-staged (ESLint + Prettier)
+echo "📝 Running lint-staged..."
 npx lint-staged || exit 1
 
 # Type check TypeScript files
 echo "🔧 Checking TypeScript types..."
 npm run type-check
+
+echo "✅ Pre-commit checks passed!"
 
