@@ -117,7 +117,9 @@ const Pricing = () => {
             <Card
               key={index}
               className={`fade-in-up relative border-primary/20 bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-primary/40 ${
-                plan.popular ? 'scale-105 ring-2 ring-primary/50' : ''
+                plan.popular
+                  ? 'relative z-10 border-2 border-primary shadow-2xl'
+                  : ''
               } ${
                 index === 0
                   ? 'fade-delay-00'

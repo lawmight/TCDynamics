@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 const Settings = () => {
   const [projectId, setProjectId] = useState('')
@@ -17,9 +18,13 @@ const Settings = () => {
     try {
       localStorage.setItem('rum.projectId', projectId)
       localStorage.setItem('rum.writeKey', writeKey)
-      alert('Saved!')
+      toast.success('Configuration enregistrée !', {
+        description: 'Vos paramètres ont été sauvegardés avec succès',
+      })
     } catch {
-      /* noop */
+      toast.error('Erreur lors de la sauvegarde', {
+        description: 'Impossible de sauvegarder les paramètres',
+      })
     }
   }
 

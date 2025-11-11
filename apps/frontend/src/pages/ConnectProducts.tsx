@@ -11,25 +11,6 @@
  * Stripe-Account header for proper account isolation.
  */
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import {
-  createProduct,
-  formatConnectPrice,
-  listProducts,
-  type CreateProductParams,
-  type Product,
-} from '@/utils/stripeConnect'
 import {
   ArrowLeft,
   CheckCircle,
@@ -42,6 +23,27 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { logger } from '@/utils/logger'
+import {
+  createProduct,
+  formatConnectPrice,
+  listProducts,
+  type CreateProductParams,
+  type Product,
+} from '@/utils/stripeConnect'
 
 const ConnectProducts = () => {
   const { accountId } = useParams<{ accountId: string }>()
@@ -115,12 +117,12 @@ const ConnectProducts = () => {
       } else {
         // Use demo products if API fails
         setProducts(demoProducts)
-        console.warn('Using demo products:', result.message)
+        logger.warn('Using demo products', result.message)
       }
     } catch (error) {
       // Fallback to demo products
       setProducts(demoProducts)
-      console.error('Error loading products:', error)
+      logger.error('Failed to load products', error)
     } finally {
       setIsLoading(false)
     }
@@ -198,7 +200,7 @@ const ConnectProducts = () => {
       }
     } catch (error) {
       setError('An unexpected error occurred while creating the product')
-      console.error('Error creating product:', error)
+      logger.error('Failed to create product', error)
     } finally {
       setIsCreating(false)
     }
@@ -214,21 +216,21 @@ const ConnectProducts = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/50 py-8">
       <div className="container mx-auto px-6">
-        <div className="max-w-6xl mx-auto">
+        <div className="mx-auto max-w-6xl">
           {/* Header */}
           <div className="mb-8">
-            <div className="flex items-center gap-4 mb-4">
+            <div className="mb-4 flex items-center gap-4">
               <Button asChild variant="ghost" size="sm">
                 <Link to="/connect/dashboard">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  <ArrowLeft className="mr-2 h-4 w-4" />
                   Back to Dashboard
                 </Link>
               </Button>
             </div>
 
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex items-center justify-between">
               <div>
-                <h1 className="text-4xl font-bold text-foreground mb-2">
+                <h1 className="mb-2 text-4xl font-bold text-foreground">
                   Product Management
                 </h1>
                 <p className="text-xl text-muted-foreground">
@@ -243,7 +245,7 @@ const ConnectProducts = () => {
                   size="sm"
                 >
                   <RefreshCw
-                    className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`}
+                    className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`}
                   />
                   Refresh
                 </Button>
@@ -252,7 +254,7 @@ const ConnectProducts = () => {
                   variant="default"
                   size="sm"
                 >
-                  <Plus className="w-4 h-4 mr-2" />
+                  <Plus className="mr-2 h-4 w-4" />
                   Create Product
                 </Button>
               </div>
@@ -260,17 +262,17 @@ const ConnectProducts = () => {
 
             {/* API Info */}
             <Badge variant="outline">
-              <Package className="w-3 h-3 mr-1" />
+              <Package className="mr-1 h-3 w-3" />
               Connected Account Products
             </Badge>
           </div>
 
           {/* Error/Success Messages */}
           {error && (
-            <Card className="mb-6 bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800">
+            <Card className="mb-6 border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
-                  <XCircle className="w-5 h-5 text-red-600" />
+                  <XCircle className="h-5 w-5 text-red-600" />
                   <p className="text-red-800 dark:text-red-400">{error}</p>
                 </div>
               </CardContent>
@@ -278,10 +280,10 @@ const ConnectProducts = () => {
           )}
 
           {success && (
-            <Card className="mb-6 bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800">
+            <Card className="mb-6 border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/20">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <CheckCircle className="h-5 w-5 text-green-600" />
                   <p className="text-green-800 dark:text-green-400">
                     {success}
                   </p>
@@ -290,14 +292,14 @@ const ConnectProducts = () => {
             </Card>
           )}
 
-          <div className="grid lg:grid-cols-4 gap-8">
+          <div className="grid gap-8 lg:grid-cols-4">
             {/* Create Product Form */}
             {showCreateForm && (
               <div className="lg:col-span-1">
-                <Card className="bg-card/60 backdrop-blur-sm border-primary/20 sticky top-8">
+                <Card className="sticky top-8 border-primary/20 bg-card/60 backdrop-blur-sm">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Plus className="w-5 h-5 text-primary" />
+                      <Plus className="h-5 w-5 text-primary" />
                       Create Product
                     </CardTitle>
                     <CardDescription>
@@ -338,7 +340,7 @@ const ConnectProducts = () => {
                     <div className="space-y-2">
                       <Label htmlFor="price">Price (in cents)</Label>
                       <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-muted-foreground" />
+                        <DollarSign className="h-4 w-4 text-muted-foreground" />
                         <Input
                           id="price"
                           type="number"
@@ -379,7 +381,7 @@ const ConnectProducts = () => {
                         Image URLs (comma-separated)
                       </Label>
                       <div className="flex items-center gap-2">
-                        <Image className="w-4 h-4 text-muted-foreground" />
+                        <Image className="h-4 w-4 text-muted-foreground" />
                         <Input
                           id="images"
                           placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
@@ -407,12 +409,12 @@ const ConnectProducts = () => {
                       >
                         {isCreating ? (
                           <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
                             Creating...
                           </>
                         ) : (
                           <>
-                            <Plus className="w-4 h-4 mr-2" />
+                            <Plus className="mr-2 h-4 w-4" />
                             Create
                           </>
                         )}
@@ -428,8 +430,8 @@ const ConnectProducts = () => {
 
                     {/* Preview */}
                     {newProduct.priceInCents && (
-                      <div className="pt-4 border-t border-border">
-                        <p className="text-sm font-medium mb-2">
+                      <div className="border-t border-border pt-4">
+                        <p className="mb-2 text-sm font-medium">
                           Price Preview:
                         </p>
                         <p className="text-lg font-bold text-primary">
@@ -447,10 +449,10 @@ const ConnectProducts = () => {
 
             {/* Products List */}
             <div className={showCreateForm ? 'lg:col-span-3' : 'lg:col-span-4'}>
-              <Card className="bg-card/60 backdrop-blur-sm border-primary/20">
+              <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Package className="w-5 h-5 text-primary" />
+                    <Package className="h-5 w-5 text-primary" />
                     Products ({products.length})
                   </CardTitle>
                   <CardDescription>
@@ -459,28 +461,28 @@ const ConnectProducts = () => {
                 </CardHeader>
                 <CardContent>
                   {isLoading ? (
-                    <div className="text-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                    <div className="py-8 text-center">
+                      <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
                       <p className="text-muted-foreground">
                         Loading products...
                       </p>
                     </div>
                   ) : products.length === 0 ? (
-                    <div className="text-center py-8">
-                      <Package className="w-16 h-16 text-muted-foreground/50 mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold mb-2">
+                    <div className="py-8 text-center">
+                      <Package className="mx-auto mb-4 h-16 w-16 text-muted-foreground/50" />
+                      <h3 className="mb-2 text-lg font-semibold">
                         No products yet
                       </h3>
-                      <p className="text-muted-foreground mb-4">
+                      <p className="mb-4 text-muted-foreground">
                         Create your first product to start selling
                       </p>
                       <Button onClick={() => setShowCreateForm(true)}>
-                        <Plus className="w-4 h-4 mr-2" />
+                        <Plus className="mr-2 h-4 w-4" />
                         Create Product
                       </Button>
                     </div>
                   ) : (
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                       {products.map(product => {
                         const price = product.default_price
                         const amount =
@@ -491,7 +493,7 @@ const ConnectProducts = () => {
                         return (
                           <Card
                             key={product.id}
-                            className="bg-muted/30 border-border/50"
+                            className="border-border/50 bg-muted/30"
                           >
                             <CardContent className="p-4">
                               {/* Product Image */}
@@ -500,22 +502,22 @@ const ConnectProducts = () => {
                                   <img
                                     src={product.images[0]}
                                     alt={product.name}
-                                    className="w-full h-32 object-cover rounded-lg"
+                                    className="h-32 w-full rounded-lg object-cover"
                                     onError={e => {
                                       e.currentTarget.style.display = 'none'
                                     }}
                                   />
                                 </div>
                               ) : (
-                                <div className="mb-4 bg-muted rounded-lg h-32 flex items-center justify-center">
-                                  <Package className="w-8 h-8 text-muted-foreground/50" />
+                                <div className="mb-4 flex h-32 items-center justify-center rounded-lg bg-muted">
+                                  <Package className="h-8 w-8 text-muted-foreground/50" />
                                 </div>
                               )}
 
                               {/* Product Info */}
                               <div className="space-y-2">
                                 <div className="flex items-start justify-between">
-                                  <h3 className="font-semibold line-clamp-2">
+                                  <h3 className="line-clamp-2 font-semibold">
                                     {product.name}
                                   </h3>
                                   <Badge
@@ -527,7 +529,7 @@ const ConnectProducts = () => {
                                   </Badge>
                                 </div>
 
-                                <p className="text-sm text-muted-foreground line-clamp-3">
+                                <p className="line-clamp-3 text-sm text-muted-foreground">
                                   {product.description}
                                 </p>
 
@@ -557,19 +559,19 @@ const ConnectProducts = () => {
           </div>
 
           {/* API Information */}
-          <Card className="mt-8 bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+          <Card className="mt-8 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/20">
             <CardContent className="p-6">
               <div className="flex items-start gap-3">
-                <Package className="w-5 h-5 text-blue-600 mt-0.5" />
+                <Package className="mt-0.5 h-5 w-5 text-blue-600" />
                 <div>
-                  <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                  <h3 className="mb-2 font-semibold text-blue-900 dark:text-blue-100">
                     Connected Account Products
                   </h3>
-                  <p className="text-blue-800 dark:text-blue-200 text-sm mb-3">
+                  <p className="mb-3 text-sm text-blue-800 dark:text-blue-200">
                     Products are created directly on the connected account using
                     the Stripe-Account header:
                   </p>
-                  <ul className="text-blue-800 dark:text-blue-200 text-sm space-y-1">
+                  <ul className="space-y-1 text-sm text-blue-800 dark:text-blue-200">
                     <li>
                       • Products belong to the connected account, not the
                       platform
@@ -583,7 +585,7 @@ const ConnectProducts = () => {
                     </li>
                     <li>
                       • Account ID in URL:{' '}
-                      <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">
+                      <code className="rounded bg-blue-100 px-1 dark:bg-blue-900">
                         {accountId}
                       </code>
                     </li>

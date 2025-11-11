@@ -1,3 +1,4 @@
+import { logger } from './logger'
 /**
  * Stripe Connect Integration Utilities
  *
@@ -160,7 +161,7 @@ export const createConnectedAccount = async (
 
     return data
   } catch (error) {
-    console.error('Error creating connected account:', error)
+    logger.error('Failed to create connected account', error)
     return {
       success: false,
       message:
@@ -211,7 +212,7 @@ export const getConnectedAccount = async (
 
     return data
   } catch (error) {
-    console.error('Error retrieving connected account:', error)
+    logger.error('Failed to retrieve connected account', error)
     return {
       success: false,
       message:
@@ -254,7 +255,7 @@ export const createAccountLink = async (
 
     return data
   } catch (error) {
-    console.error('Error creating account link:', error)
+    logger.error('Failed to create account link', error)
     return {
       success: false,
       message:
@@ -302,7 +303,7 @@ export const listProducts = async (
 
     return data
   } catch (error) {
-    console.error('Error retrieving products:', error)
+    logger.error('Failed to retrieve products', error)
     return {
       success: false,
       message:
@@ -357,7 +358,7 @@ export const createProduct = async (
 
     return data
   } catch (error) {
-    console.error('Error creating product:', error)
+    logger.error('Failed to create product', error)
     return {
       success: false,
       message:
@@ -410,7 +411,7 @@ export const createCheckoutSession = async (
 
     return data
   } catch (error) {
-    console.error('Error creating checkout session:', error)
+    logger.error('Failed to create checkout session', error)
     return {
       success: false,
       message:
@@ -444,7 +445,7 @@ export const redirectToConnectCheckout = async (
 
     return {}
   } catch (error) {
-    console.error('Error redirecting to checkout:', error)
+    logger.error('Failed to redirect to checkout', error)
     return {
       error: error instanceof Error ? error : new Error('Unknown error'),
     }

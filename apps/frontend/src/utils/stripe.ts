@@ -1,5 +1,6 @@
 import { loadStripe, Stripe } from '@stripe/stripe-js'
 
+import { logger } from './logger'
 // Stripe publishable key from environment
 const STRIPE_PUBLISHABLE_KEY =
   import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ||
@@ -84,7 +85,7 @@ export const createCheckoutSession = async (
   } catch (error) {
     // Log error for debugging (TODO: use proper logging service)
     if (import.meta.env.DEV) {
-      console.error('Error creating checkout session:', error)
+      logger.error('Failed to create checkout session', error)
     }
     return {
       success: false,
@@ -122,7 +123,7 @@ export const redirectToCheckout = async (
   } catch (error) {
     // Log error for debugging (TODO: use proper logging service)
     if (import.meta.env.DEV) {
-      console.error('Error redirecting to checkout:', error)
+      logger.error('Failed to redirect to checkout', error)
     }
     return {
       error: error instanceof Error ? error : new Error('Unknown error'),
@@ -162,7 +163,7 @@ export const getCheckoutSession = async (
   } catch (error) {
     // Log error for debugging (TODO: use proper logging service)
     if (import.meta.env.DEV) {
-      console.error('Error retrieving checkout session:', error)
+      logger.error('Failed to retrieve checkout session', error)
     }
     return null
   }

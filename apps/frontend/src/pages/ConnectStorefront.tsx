@@ -36,6 +36,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { logger } from '@/utils/logger'
 import {
   formatConnectPrice,
   listProducts,
@@ -164,12 +165,12 @@ const ConnectStorefront = () => {
       } else {
         // Use demo products if API fails
         setProducts(demoProducts)
-        console.warn('Using demo products:', result.message)
+        logger.warn('Using demo products', result.message)
       }
     } catch (error) {
       // Fallback to demo products
       setProducts(demoProducts)
-      console.error('Error loading products:', error)
+      logger.error('Failed to load products', error)
     } finally {
       setIsLoading(false)
     }
@@ -302,7 +303,7 @@ const ConnectStorefront = () => {
       // If successful, user will be redirected to Stripe Checkout
     } catch (error) {
       setError('An unexpected error occurred during checkout')
-      console.error('Error during checkout:', error)
+      logger.error('Checkout process failed', error)
       setIsCheckingOut(false)
     }
   }

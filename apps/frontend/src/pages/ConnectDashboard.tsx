@@ -38,6 +38,7 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { logger } from '@/utils/logger'
 import {
   createAccountLink,
   createConnectedAccount,
@@ -134,7 +135,7 @@ const ConnectDashboard = () => {
       }
     } catch (error) {
       setError('An unexpected error occurred while creating the account')
-      console.error('Error creating account:', error)
+      logger.error('Failed to create Stripe Connect account', error)
     } finally {
       setIsCreatingAccount(false)
     }
@@ -170,7 +171,7 @@ const ConnectDashboard = () => {
       }
     } catch (error) {
       setError('An unexpected error occurred while starting onboarding')
-      console.error('Error starting onboarding:', error)
+      logger.error('Failed to start onboarding flow', error)
     }
   }
 
@@ -193,7 +194,7 @@ const ConnectDashboard = () => {
             const result = await getConnectedAccount(account.id)
             return result.account || account
           } catch (error) {
-            console.error(`Error refreshing account ${account.id}:`, error)
+            logger.error(`Failed to refresh account ${account.id}`, error)
             return account // Return original account if refresh fails
           }
         })
@@ -202,7 +203,7 @@ const ConnectDashboard = () => {
       setAccounts(refreshedAccounts)
     } catch (error) {
       setError('Failed to refresh account status')
-      console.error('Error refreshing accounts:', error)
+      logger.error('Failed to refresh accounts list', error)
     } finally {
       setIsRefreshing(false)
     }
