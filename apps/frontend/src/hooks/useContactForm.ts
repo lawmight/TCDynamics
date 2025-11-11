@@ -1,5 +1,6 @@
-import { API_ENDPOINTS } from '@/utils/apiConfig'
 import { useFormSubmit } from './useFormSubmit'
+
+import { API_ENDPOINTS } from '@/utils/apiConfig'
 
 export interface ContactFormData {
   name: string
@@ -11,13 +12,13 @@ export interface ContactFormData {
 
 /**
  * Contact form submission hook
- * Uses unified form submission with Azure Functions primary + Node.js fallback
+ * Uses Vercel serverless functions
  */
 export const useContactForm = () => {
   return useFormSubmit<ContactFormData>({
-    primaryEndpoint: API_ENDPOINTS.azureContact,
-    fallbackEndpoint: API_ENDPOINTS.contact,
-    enableFallback: true,
+    primaryEndpoint: API_ENDPOINTS.contact,
+    fallbackEndpoint: API_ENDPOINTS.contact, // No fallback needed - unified backend
+    enableFallback: false,
     errorMessage: "Erreur lors de l'envoi du formulaire de contact",
   })
 }

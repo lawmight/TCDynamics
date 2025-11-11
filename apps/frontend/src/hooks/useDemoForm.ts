@@ -1,5 +1,6 @@
-import { API_ENDPOINTS } from '@/utils/apiConfig'
 import { useFormSubmit } from './useFormSubmit'
+
+import { API_ENDPOINTS } from '@/utils/apiConfig'
 
 export interface DemoFormData {
   name: string
@@ -13,13 +14,13 @@ export interface DemoFormData {
 
 /**
  * Demo request form submission hook
- * Uses unified form submission with Azure Functions primary + Node.js fallback
+ * Uses Vercel serverless functions
  */
 export const useDemoForm = () => {
   return useFormSubmit<DemoFormData>({
-    primaryEndpoint: API_ENDPOINTS.azureDemo,
-    fallbackEndpoint: API_ENDPOINTS.demo,
-    enableFallback: true,
+    primaryEndpoint: API_ENDPOINTS.demo,
+    fallbackEndpoint: API_ENDPOINTS.demo, // No fallback needed - unified backend
+    enableFallback: false,
     errorMessage: "Erreur lors de l'envoi de la demande de démo",
   })
 }
