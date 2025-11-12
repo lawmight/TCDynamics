@@ -305,6 +305,7 @@ const Contact = () => {
                   </div>
 
                   <Button
+                    type="submit"
                     className="w-full"
                     size="lg"
                     variant="hero"
@@ -529,6 +530,7 @@ const Contact = () => {
                   </div>
 
                   <Button
+                    type="submit"
                     className="w-full"
                     variant="outline"
                     disabled={contactForm.isSubmitting}

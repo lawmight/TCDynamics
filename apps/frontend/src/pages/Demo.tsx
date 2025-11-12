@@ -335,6 +335,7 @@ const Demo = () => {
                       </div>
 
                       <Button
+                        type="submit"
                         className="w-full"
                         size="lg"
                         disabled={demoForm.isSubmitting}
