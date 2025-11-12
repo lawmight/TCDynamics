@@ -173,11 +173,13 @@ const Contact = () => {
                       email: formData.get('email') as string,
                       phone: formData.get('phone') as string,
                       company: formData.get('company') as string,
-                      employeeCount: formData.get('employees') as string,
-                      message: formData.get('needs') as string,
+                      companySize: formData.get('employees') as string,
+                      businessNeeds: formData.get('needs') as string,
                     }
 
+                    console.log('Demo form submission:', data)
                     const result = await demoForm.submitForm(data)
+                    console.log('Demo form result:', result)
                     if (result.success) {
                       e.currentTarget.reset()
                       setTimeout(() => demoForm.clearResponse(), 5000)
@@ -416,7 +418,9 @@ const Contact = () => {
                       message: formData.get('message') as string,
                     }
 
+                    console.log('Contact form submission:', data)
                     const result = await contactForm.submitForm(data)
+                    console.log('Contact form result:', result)
                     if (result.success) {
                       e.currentTarget.reset()
                       setTimeout(() => contactForm.clearResponse(), 5000)

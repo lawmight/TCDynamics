@@ -207,11 +207,13 @@ const Demo = () => {
                           email: formData.get('email') as string,
                           phone: formData.get('phone') as string,
                           company: formData.get('company') as string,
-                          employeeCount: formData.get('employees') as string,
-                          message: formData.get('needs') as string,
+                          companySize: formData.get('employees') as string,
+                          businessNeeds: formData.get('needs') as string,
                         }
 
+                        console.log('Demo page form submission:', data)
                         const result = await demoForm.submitForm(data)
+                        console.log('Demo page form result:', result)
                         if (result.success) {
                           e.currentTarget.reset()
                           setTimeout(() => demoForm.clearResponse(), 5000)
