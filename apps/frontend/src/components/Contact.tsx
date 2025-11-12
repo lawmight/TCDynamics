@@ -164,25 +164,35 @@ const Contact = () => {
                   className="space-y-4"
                   aria-label="Formulaire de demande de démonstration"
                   onSubmit={async e => {
-                    e.preventDefault()
-                    const formData = new FormData(e.currentTarget)
-                    const firstName = formData.get('firstName') as string
-                    const lastName = formData.get('lastName') as string
-                    const data = {
-                      name: `${firstName} ${lastName}`.trim(),
-                      email: formData.get('email') as string,
-                      phone: formData.get('phone') as string,
-                      company: formData.get('company') as string,
-                      companySize: formData.get('employees') as string,
-                      businessNeeds: formData.get('needs') as string,
-                    }
+                    try {
+                      e.preventDefault()
+                      alert('Form submit triggered!')
+                      const formData = new FormData(e.currentTarget)
+                      const firstName = formData.get('firstName') as string
+                      const lastName = formData.get('lastName') as string
+                      const data = {
+                        name: `${firstName} ${lastName}`.trim(),
+                        email: formData.get('email') as string,
+                        phone: formData.get('phone') as string,
+                        company: formData.get('company') as string,
+                        companySize: formData.get('employees') as string,
+                        businessNeeds: formData.get('needs') as string,
+                      }
 
-                    console.log('Demo form submission:', data)
-                    const result = await demoForm.submitForm(data)
-                    console.log('Demo form result:', result)
-                    if (result.success) {
-                      e.currentTarget.reset()
-                      setTimeout(() => demoForm.clearResponse(), 5000)
+                      console.log('Demo form submission:', data)
+                      alert('About to call API...')
+                      const result = await demoForm.submitForm(data)
+                      console.log('Demo form result:', result)
+                      alert(`Result: ${JSON.stringify(result)}`)
+                      if (result.success) {
+                        e.currentTarget.reset()
+                        setTimeout(() => demoForm.clearResponse(), 5000)
+                      }
+                    } catch (error) {
+                      console.error('Demo form error:', error)
+                      alert(
+                        `ERROR: ${error instanceof Error ? error.message : String(error)}`
+                      )
                     }
                   }}
                 >
@@ -409,22 +419,32 @@ const Contact = () => {
                 <form
                   className="space-y-4"
                   onSubmit={async e => {
-                    e.preventDefault()
-                    const formData = new FormData(e.currentTarget)
-                    const data = {
-                      name: `${formData.get('firstName')} ${formData.get('lastName')}`.trim(),
-                      email: formData.get('email') as string,
-                      phone: formData.get('phone') as string,
-                      company: formData.get('company') as string,
-                      message: formData.get('message') as string,
-                    }
+                    try {
+                      e.preventDefault()
+                      alert('Contact form submit triggered!')
+                      const formData = new FormData(e.currentTarget)
+                      const data = {
+                        name: `${formData.get('firstName')} ${formData.get('lastName')}`.trim(),
+                        email: formData.get('email') as string,
+                        phone: formData.get('phone') as string,
+                        company: formData.get('company') as string,
+                        message: formData.get('message') as string,
+                      }
 
-                    console.log('Contact form submission:', data)
-                    const result = await contactForm.submitForm(data)
-                    console.log('Contact form result:', result)
-                    if (result.success) {
-                      e.currentTarget.reset()
-                      setTimeout(() => contactForm.clearResponse(), 5000)
+                      console.log('Contact form submission:', data)
+                      alert('About to call contact API...')
+                      const result = await contactForm.submitForm(data)
+                      console.log('Contact form result:', result)
+                      alert(`Contact Result: ${JSON.stringify(result)}`)
+                      if (result.success) {
+                        e.currentTarget.reset()
+                        setTimeout(() => contactForm.clearResponse(), 5000)
+                      }
+                    } catch (error) {
+                      console.error('Contact form error:', error)
+                      alert(
+                        `CONTACT ERROR: ${error instanceof Error ? error.message : String(error)}`
+                      )
                     }
                   }}
                 >

@@ -198,25 +198,35 @@ const Demo = () => {
                     <form
                       className="space-y-4"
                       onSubmit={async e => {
-                        e.preventDefault()
-                        const formData = new FormData(e.currentTarget)
-                        const firstName = formData.get('firstName') as string
-                        const lastName = formData.get('lastName') as string
-                        const data = {
-                          name: `${firstName} ${lastName}`.trim(),
-                          email: formData.get('email') as string,
-                          phone: formData.get('phone') as string,
-                          company: formData.get('company') as string,
-                          companySize: formData.get('employees') as string,
-                          businessNeeds: formData.get('needs') as string,
-                        }
+                        try {
+                          e.preventDefault()
+                          alert('Demo page form submit triggered!')
+                          const formData = new FormData(e.currentTarget)
+                          const firstName = formData.get('firstName') as string
+                          const lastName = formData.get('lastName') as string
+                          const data = {
+                            name: `${firstName} ${lastName}`.trim(),
+                            email: formData.get('email') as string,
+                            phone: formData.get('phone') as string,
+                            company: formData.get('company') as string,
+                            companySize: formData.get('employees') as string,
+                            businessNeeds: formData.get('needs') as string,
+                          }
 
-                        console.log('Demo page form submission:', data)
-                        const result = await demoForm.submitForm(data)
-                        console.log('Demo page form result:', result)
-                        if (result.success) {
-                          e.currentTarget.reset()
-                          setTimeout(() => demoForm.clearResponse(), 5000)
+                          console.log('Demo page form submission:', data)
+                          alert('About to call demo API from Demo page...')
+                          const result = await demoForm.submitForm(data)
+                          console.log('Demo page form result:', result)
+                          alert(`Demo Page Result: ${JSON.stringify(result)}`)
+                          if (result.success) {
+                            e.currentTarget.reset()
+                            setTimeout(() => demoForm.clearResponse(), 5000)
+                          }
+                        } catch (error) {
+                          console.error('Demo page form error:', error)
+                          alert(
+                            `DEMO PAGE ERROR: ${error instanceof Error ? error.message : String(error)}`
+                          )
                         }
                       }}
                     >
