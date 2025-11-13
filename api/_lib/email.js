@@ -240,8 +240,17 @@ function generateDemoEmailHTML(demoData) {
  */
 export async function sendContactNotification(contactData) {
   try {
-    const resend = getResendClient();
+    console.log('[Email] Starting sendContactNotification...');
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      console.error('[Email] No RESEND_API_KEY found!');
+      return { success: false, error: 'Missing API key' };
+    }
+    console.log('[Email] API key found, length:', apiKey.length);
+
+    const resend = new Resend(apiKey);
     const toEmail = process.env.CONTACT_EMAIL || 'tom.coustols@tcdynamics.fr';
+    console.log('[Email] Sending to:', toEmail);
 
     const result = await resend.emails.send({
       from: 'TCDynamics <contact@tcdynamics.fr>',
@@ -265,9 +274,14 @@ Reçu le ${new Date().toLocaleString('fr-FR')} via le formulaire de contact TCDy
       `.trim()
     });
 
-    return { success: true, emailId: result.data?.id };
+    console.log('[Email] Send result:', JSON.stringify(result));
+    const emailId = result.data?.id || result.id;
+    console.log('[Email] Email ID:', emailId);
+
+    return { success: true, emailId };
   } catch (error) {
-    console.error('Send contact notification error:', error);
+    console.error('[Email] Send contact notification error:', error);
+    console.error('[Email] Error details:', JSON.stringify(error, null, 2));
     return { success: false, error: error.message };
   }
 }

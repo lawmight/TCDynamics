@@ -4,6 +4,8 @@
   "description": "Serverless API functions for TCDynamics",
   "private": true,
   "dependencies": {
-    "stripe": "^17.4.0"
+    "stripe": "^17.4.0",
+    "@supabase/supabase-js": "^2.47.10",
+    "resend": "^6.4.2"
   }
 }
