@@ -13,8 +13,12 @@ build/
 .env.production
 .env.development
 .env.backup
+.env.preview
+.env.temp
+.env.*
 backend/.env
 local.settings.json
+add-env-vars.sh
 
 # MCP Configuration (contains sensitive tokens)
 .mcp.json
@@ -27,6 +31,7 @@ AzureFunctionsTools/
 # IDE
 .vscode/
 .idea/
+.cursor/
 *.swp
 *.swo
 *~
@@ -57,6 +62,8 @@ lerna-debug.log*
 
 # Temporary files
 *.tmp
+*.bak
+*.old/
 .cache/
 .parcel-cache/
 
