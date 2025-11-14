@@ -98,7 +98,15 @@ Use this checklist before deploying to production or after major changes.
 - Check if you've exceeded OpenAI API quota
 - Verify Supabase is saving conversations
 
-**Note**: In Week 5-6 you'll migrate to Azure OpenAI, so this will change.
+### Known Issue (2025-11-13):
+⚠️ **Chatbot Currently Not Working**
+- Missing `OPENAI_API_KEY` environment variable
+- Azure account setup pending
+- Error message shown: "Désolé, une erreur est survenue. Veuillez réessayer."
+- **Status**: Known issue, not critical for MVP launch
+- **Fix planned**: Week 5-6 (Azure OpenAI migration or alternative service)
+
+**Note**: In Week 5-6 you'll migrate to Azure OpenAI or alternative, so this will change.
 
 ---
 
@@ -127,6 +135,26 @@ Use this checklist before deploying to production or after major changes.
 - Verify STRIPE_SECRET_KEY is set (test mode)
 - Verify STRIPE_WEBHOOK_SECRET is configured
 - Check that Stripe webhook endpoint is accessible
+
+### Common Known Issues:
+
+**Ad Blocker Blocking Stripe** 🚫
+- **Symptoms**: Console errors like `net::ERR_BLOCKED_BY_CLIENT`, `FetchError`, or checkout not loading
+- **Cause**: Browser extensions (uBlock Origin, AdBlock Plus, Privacy Badger, etc.) blocking `r.stripe.com` and `errors.stripe.com`
+- **Fix**:
+  1. Temporarily disable ad blocker for your site
+  2. OR whitelist `*.stripe.com` in your ad blocker settings
+  3. Test again
+- **Note**: This is a client-side issue. End users may also experience this. Consider adding a notice on checkout page.
+
+**429 Too Many Requests** ⏱️
+- **Symptoms**: Console error `POST ... 429 (Too Many Requests)` when testing
+- **Cause**: Testing Stripe checkout too quickly (rate limiting on verification endpoint)
+- **Fix**:
+  1. Wait 1-2 minutes before testing again
+  2. Stripe has rate limits to prevent abuse
+  3. Normal users won't hit this (only happens during rapid testing)
+- **Note**: This is expected behavior, not a bug. Production users test once, not repeatedly.
 
 **Important**: Use **test mode** keys for verification!
 

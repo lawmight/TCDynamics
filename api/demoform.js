@@ -59,8 +59,17 @@ export default async function handler(req, res) {
     // Validate required fields
     if (!name || !email || !company || !businessNeeds) {
       return res.status(400).json({
-        error: 'Missing required fields',
+        error: 'Champs requis manquants',
+        message: 'Veuillez remplir tous les champs obligatoires : nom, email, entreprise et besoins spécifiques.',
         required: ['name', 'email', 'company', 'businessNeeds']
+      });
+    }
+
+    // Validate businessNeeds length (10-5000 characters)
+    if (businessNeeds.trim().length < 10 || businessNeeds.length > 5000) {
+      return res.status(400).json({
+        error: 'Validation error',
+        message: 'Le champ "Besoins spécifiques" doit contenir entre 10 et 5000 caractères.'
       });
     }
 

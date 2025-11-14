@@ -46,7 +46,8 @@ export default async function handler(req, res) {
     // Validate required fields
     if (!name || !email || !message) {
       return res.status(400).json({
-        error: 'Missing required fields',
+        error: 'Champs requis manquants',
+        message: 'Veuillez remplir tous les champs obligatoires : nom, email et message.',
         required: ['name', 'email', 'message']
       });
     }
@@ -54,13 +55,17 @@ export default async function handler(req, res) {
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return res.status(400).json({ error: 'Invalid email format' });
+      return res.status(400).json({
+        error: 'Format email invalide',
+        message: 'Veuillez entrer une adresse email valide.'
+      });
     }
 
     // Validate message length (per schema: 10-5000 characters)
     if (message.trim().length < 10 || message.length > 5000) {
       return res.status(400).json({
-        error: 'Message length must be between 10 and 5000 characters'
+        error: 'Longueur du message invalide',
+        message: 'Le message doit contenir entre 10 et 5000 caractères.'
       });
     }
 

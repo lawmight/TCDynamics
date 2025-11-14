@@ -293,13 +293,17 @@ const Contact = () => {
                       htmlFor="needs"
                       className="mb-2 block text-sm font-medium"
                     >
-                      Besoins spécifiques
+                      Besoins spécifiques * <span className="text-xs font-normal text-muted-foreground">(minimum 10 caractères)</span>
                     </label>
                     <Textarea
                       id="needs"
                       name="needs"
-                      placeholder="Décrivez brièvement vos processus à automatiser..."
+                      placeholder="Décrivez brièvement vos processus à automatiser (minimum 10 caractères)..."
                       className="min-h-[100px] bg-background/50"
+                      required
+                      minLength={10}
+                      maxLength={5000}
+                      aria-required="true"
                     />
                   </div>
 
@@ -515,14 +519,16 @@ const Contact = () => {
                       htmlFor="message"
                       className="mb-2 block text-sm font-medium"
                     >
-                      Message *
+                      Message * <span className="text-xs font-normal text-muted-foreground">(minimum 10 caractères)</span>
                     </label>
                     <Textarea
                       id="message"
                       name="message"
-                      placeholder="Décrivez votre demande..."
+                      placeholder="Décrivez votre demande (minimum 10 caractères)..."
                       className="min-h-[120px] bg-background/50"
                       required
+                      minLength={10}
+                      maxLength={5000}
                       aria-required="true"
                     />
                   </div>
