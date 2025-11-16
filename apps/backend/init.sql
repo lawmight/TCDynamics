@@ -70,6 +70,20 @@ CREATE TABLE IF NOT EXISTS demo_requests (
     notes TEXT
 );
 
+-- Create feedback table for customer validation (Week 5-6)
+CREATE TABLE IF NOT EXISTS feedback (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    form_type VARCHAR(20) NOT NULL CHECK (form_type IN ('demo', 'contact')),
+    rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    feedback_text TEXT,
+    user_email VARCHAR(255),
+    user_company VARCHAR(255),
+    allow_followup BOOLEAN DEFAULT FALSE,
+    ip_address INET,
+    user_agent TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_contact_submissions_email ON contact_submissions(email);
 CREATE INDEX IF NOT EXISTS idx_contact_submissions_created_at ON contact_submissions(created_at);
@@ -78,6 +92,11 @@ CREATE INDEX IF NOT EXISTS idx_contact_submissions_status ON contact_submissions
 CREATE INDEX IF NOT EXISTS idx_demo_requests_email ON demo_requests(email);
 CREATE INDEX IF NOT EXISTS idx_demo_requests_created_at ON demo_requests(created_at);
 CREATE INDEX IF NOT EXISTS idx_demo_requests_status ON demo_requests(status);
+
+CREATE INDEX IF NOT EXISTS idx_feedback_form_type ON feedback(form_type);
+CREATE INDEX IF NOT EXISTS idx_feedback_rating ON feedback(rating);
+CREATE INDEX IF NOT EXISTS idx_feedback_created_at ON feedback(created_at);
+CREATE INDEX IF NOT EXISTS idx_feedback_user_email ON feedback(user_email);
 
 -- Grant permissions on tables
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO tcdynamics;

@@ -1,3 +1,4 @@
+import { track } from '@vercel/analytics'
 import { apiRequest, type ApiResponse } from '@/utils/apiConfig'
 import { logger } from '@/utils/logger'
 import { useState } from 'react'
@@ -55,11 +56,14 @@ interface UseFormSubmitReturn<T> {
  */
 const defaultShouldFallback = (error: unknown): boolean => {
   // Network errors (not a Response)
-  if (!(error instanceof Response)) {
+  // eslint-disable-next-line no-undef, @typescript-eslint/no-undef
+  const isResponse = typeof error === 'object' && error !== null && 'status' in error
+  if (!isResponse) {
     return true
   }
   // Service unavailable or server errors
-  return error.status === 503 || error.status >= 500
+  const err = error as { status?: number }
+  return err.status === 503 || (err.status ?? 0) >= 500
 }
 
 /**
@@ -147,6 +151,22 @@ export const useFormSubmit = <T = Record<string, unknown>>(
       setResponse(result)
       setIsSubmitting(false)
 
+      // Track analytics for successful submission
+      if (result.success) {
+        track('form_submitted', {
+          endpoint: primaryEndpoint,
+          timestamp: new Date().toISOString(),
+        })
+      } else {
+        // Track validation errors
+        track('form_error', {
+          endpoint: primaryEndpoint,
+          errorType: 'validation',
+          errorMessage: result.message || 'Validation error',
+          timestamp: new Date().toISOString(),
+        })
+      }
+
       // Execute success callback
       if (onSuccess && result.success) {
         onSuccess(result)
@@ -163,6 +183,14 @@ export const useFormSubmit = <T = Record<string, unknown>>(
 
       setResponse(errorResponse)
       setIsSubmitting(false)
+
+      // Track analytics for submission errors
+      track('form_error', {
+        endpoint: primaryEndpoint,
+        errorType: 'submission',
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString(),
+      })
 
       // Execute error callback
       if (onError) {

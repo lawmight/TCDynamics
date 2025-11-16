@@ -10,18 +10,30 @@ import {
   Train,
   Users,
 } from 'lucide-react'
+import { useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { PostSubmissionFeedback } from '@/components/PostSubmissionFeedback'
 import { useContactForm } from '@/hooks/useContactForm'
 import { useDemoForm } from '@/hooks/useDemoForm'
 
 const Contact = () => {
   const demoForm = useDemoForm()
   const contactForm = useContactForm()
+  const [showDemoFeedback, setShowDemoFeedback] = useState(false)
+  const [showContactFeedback, setShowContactFeedback] = useState(false)
+  const [demoUserData, setDemoUserData] = useState<{
+    email: string
+    company: string
+  } | null>(null)
+  const [contactUserData, setContactUserData] = useState<{
+    email: string
+    company: string
+  } | null>(null)
 
   const contactInfo = [
     {
@@ -169,11 +181,13 @@ const Contact = () => {
                     const formData = new FormData(form)
                     const firstName = formData.get('firstName') as string
                     const lastName = formData.get('lastName') as string
+                    const email = formData.get('email') as string
+                    const company = formData.get('company') as string
                     const data = {
                       name: `${firstName} ${lastName}`.trim(),
-                      email: formData.get('email') as string,
+                      email,
                       phone: formData.get('phone') as string,
-                      company: formData.get('company') as string,
+                      company,
                       companySize: formData.get('employees') as string,
                       businessNeeds: formData.get('needs') as string,
                     }
@@ -181,6 +195,8 @@ const Contact = () => {
                     const result = await demoForm.submitForm(data)
                     if (result.success) {
                       form.reset()
+                      setDemoUserData({ email, company })
+                      setShowDemoFeedback(true)
                       setTimeout(() => demoForm.clearResponse(), 5000)
                     }
                   }}
@@ -415,17 +431,21 @@ const Contact = () => {
                     e.preventDefault()
                     const form = e.currentTarget
                     const formData = new FormData(form)
+                    const email = formData.get('email') as string
+                    const company = formData.get('company') as string
                     const data = {
                       name: `${formData.get('firstName')} ${formData.get('lastName')}`.trim(),
-                      email: formData.get('email') as string,
+                      email,
                       phone: formData.get('phone') as string,
-                      company: formData.get('company') as string,
+                      company,
                       message: formData.get('message') as string,
                     }
 
                     const result = await contactForm.submitForm(data)
                     if (result.success) {
                       form.reset()
+                      setContactUserData({ email, company })
+                      setShowContactFeedback(true)
                       setTimeout(() => contactForm.clearResponse(), 5000)
                     }
                   }}
@@ -635,6 +655,26 @@ const Contact = () => {
           </div>
         </div>
       </div>
+
+      {/* Demo Form Feedback Dialog */}
+      {showDemoFeedback && (
+        <PostSubmissionFeedback
+          formType="demo"
+          userEmail={demoUserData?.email}
+          userCompany={demoUserData?.company}
+          onClose={() => setShowDemoFeedback(false)}
+        />
+      )}
+
+      {/* Contact Form Feedback Dialog */}
+      {showContactFeedback && (
+        <PostSubmissionFeedback
+          formType="contact"
+          userEmail={contactUserData?.email}
+          userCompany={contactUserData?.company}
+          onClose={() => setShowContactFeedback(false)}
+        />
+      )}
     </section>
   )
 }

@@ -1,4 +1,5 @@
 // FIXED: Using simple navigation to prevent black page
+import { Analytics } from '@vercel/analytics/react'
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import { Toaster } from '@/components/ui/toaster'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -9,7 +10,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import SimpleNavigation from './components/SimpleNavigation'
 // import MobileNavigation from './components/MobileNavigation' // DISABLED: Causes black page
 // import StickyHeader from './components/StickyHeader' // DISABLED: Causes black page
-import LazyAIChatbot from './components/LazyAIChatbot'
+// import LazyAIChatbot from './components/LazyAIChatbot' // Temporarily disabled - Week 5-6 customer validation
 import OfflineIndicator from './components/OfflineIndicator'
 import PerformanceMonitor from './components/PerformanceMonitor'
 
@@ -108,7 +109,8 @@ const App = () => (
         <Sonner />
         <OfflineIndicator />
         <PerformanceMonitor />
-        <LazyAIChatbot />
+        <Analytics />
+        {/* <LazyAIChatbot /> */}
         <BrowserRouter>
           <SimpleNavigation />
           {/* DISABLED: MobileNavigation and StickyHeader cause black page */}

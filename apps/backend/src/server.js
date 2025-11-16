@@ -45,7 +45,8 @@ let contactRoutes,
   monitoringRoutes,
   stripeRoutes,
   stripeConnectRoutes,
-  rumRoutes
+  rumRoutes,
+  feedbackRoutes
 
 try {
   contactRoutes = require('./routes/contact')
@@ -98,6 +99,15 @@ try {
   console.log('✅ RUM routes loaded')
 } catch (error) {
   console.error('❌ Failed to load RUM routes:', error.message)
+  console.error(error.stack)
+  process.exit(1)
+}
+
+try {
+  feedbackRoutes = require('./routes/feedback')
+  console.log('✅ Feedback routes loaded')
+} catch (error) {
+  console.error('❌ Failed to load feedback routes:', error.message)
   console.error(error.stack)
   process.exit(1)
 }
@@ -266,6 +276,7 @@ app.use('/api', monitoringRoutes)
 app.use('/api', stripeRoutes)
 app.use('/api', stripeConnectRoutes)
 app.use('/api', rumRoutes)
+app.use('/api', feedbackRoutes)
 
 /**
  * @swagger

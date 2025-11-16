@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run lint)",
+      "Bash(npm run build:*)",
+      "Bash(cat:*)",
+      "mcp__nia__save_context",
+      "mcp__nia__list_contexts",
+      "mcp__nia__retrieve_context",
+      "Bash(stripe:*)",
+      "Bash(printf:*)",
+      "Bash(vercel env add:*)",
+      "Bash(vercel env:*)",
+      "Bash(npm run build:frontend:*)",
+      "Bash(vercel --prod --yes)",
+      "Bash(curl:*)",
+      "Bash(vercel domains add:*)",
+      "Bash(vercel domains:*)",
+      "Bash(ovh:*)",
+      "Bash(nslookup:*)",
+      "Bash(vercel logs:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "tcdynamics"
+  ]
+}
