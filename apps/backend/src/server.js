@@ -205,14 +205,31 @@ app.use(
     },
   })
 )
-app.use(
-  cors({
-    origin: process.env.ALLOWED_ORIGINS
-      ? process.env.ALLOWED_ORIGINS.split(',')
-      : process.env.FRONTEND_URL || 'http://localhost:8080',
-    credentials: true,
-  })
-)
+// CORS Whitelist Configuration
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Define allowed origins
+    const allowedOrigins = process.env.ALLOWED_ORIGINS
+      ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
+      : [
+          'https://tcdynamics.fr',
+          'https://www.tcdynamics.fr',
+          process.env.FRONTEND_URL || 'http://localhost:8080',
+        ].filter(Boolean)
+
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true)
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
+  credentials: true,
+}
+
+app.use(cors(corsOptions))
 app.use(morgan('combined'))
 app.use(
   express.json({

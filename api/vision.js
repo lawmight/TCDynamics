@@ -6,7 +6,8 @@ export default async function handler(req, res) {
   try {
     const { imageUrl } = req.body;
 
-    if (!imageUrl || !imageUrl.trim()) {
+    // Type-check imageUrl before calling string methods
+    if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.trim()) {
       return res.status(400).json({ error: 'URL d\'image requise' });
     }
 

@@ -1,5 +1,3 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -18,6 +16,8 @@ export default async function handler(req, res) {
     if (!process.env.STRIPE_SECRET_KEY) {
       return res.status(503).json({ error: 'Service de paiement non configuré' });
     }
+
+    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
     // Create or retrieve customer
     const customers = await stripe.customers.list({ email });

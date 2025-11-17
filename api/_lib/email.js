@@ -10,6 +10,25 @@ import { Resend } from 'resend';
 let resendClient = null;
 
 /**
+ * Escape HTML special characters to prevent XSS attacks
+ * @param {*} text - Text to escape
+ * @returns {string} Escaped HTML-safe string
+ */
+function escapeHtml(text) {
+  if (text == null) return '';
+  const str = String(text);
+  const escapeMap = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+    '/': '&#x2F;'
+  };
+  return str.replace(/[&<>"'\/]/g, char => escapeMap[char]);
+}
+
+/**
  * Get or create Resend client
  * @returns {Resend}
  */
@@ -59,31 +78,31 @@ function generateContactEmailHTML(contactData) {
     <div class="content">
       <div class="field">
         <div class="field-label">Nom</div>
-        <div class="field-value">${contactData.name}</div>
+        <div class="field-value">${escapeHtml(contactData.name)}</div>
       </div>
 
       <div class="field">
         <div class="field-label">Email</div>
-        <div class="field-value"><a href="mailto:${contactData.email}">${contactData.email}</a></div>
+        <div class="field-value"><a href="mailto:${escapeHtml(contactData.email)}">${escapeHtml(contactData.email)}</a></div>
       </div>
 
       ${contactData.phone ? `
       <div class="field">
         <div class="field-label">Téléphone</div>
-        <div class="field-value">${contactData.phone}</div>
+        <div class="field-value">${escapeHtml(contactData.phone)}</div>
       </div>
       ` : ''}
 
       ${contactData.company ? `
       <div class="field">
         <div class="field-label">Entreprise</div>
-        <div class="field-value">${contactData.company}</div>
+        <div class="field-value">${escapeHtml(contactData.company)}</div>
       </div>
       ` : ''}
 
       <div class="field">
         <div class="field-label">Message</div>
-        <div class="message-box">${contactData.message}</div>
+        <div class="message-box">${escapeHtml(contactData.message)}</div>
       </div>
 
       <div class="footer">
@@ -127,7 +146,7 @@ function generateDemoEmailHTML(demoData) {
   <div class="container">
     <div class="header">
       <h1>🎯 Nouvelle demande de démonstration</h1>
-      ${demoData.timeline ? `<span class="badge">Timeline: ${demoData.timeline}</span>` : ''}
+      ${demoData.timeline ? `<span class="badge">Timeline: ${escapeHtml(demoData.timeline)}</span>` : ''}
     </div>
     <div class="content">
       <div class="section">
@@ -135,25 +154,25 @@ function generateDemoEmailHTML(demoData) {
 
         <div class="field">
           <div class="field-label">Nom</div>
-          <div class="field-value">${demoData.name}</div>
+          <div class="field-value">${escapeHtml(demoData.name)}</div>
         </div>
 
         <div class="field">
           <div class="field-label">Email</div>
-          <div class="field-value"><a href="mailto:${demoData.email}">${demoData.email}</a></div>
+          <div class="field-value"><a href="mailto:${escapeHtml(demoData.email)}">${escapeHtml(demoData.email)}</a></div>
         </div>
 
         ${demoData.phone ? `
         <div class="field">
           <div class="field-label">Téléphone</div>
-          <div class="field-value">${demoData.phone}</div>
+          <div class="field-value">${escapeHtml(demoData.phone)}</div>
         </div>
         ` : ''}
 
         ${demoData.jobTitle ? `
         <div class="field">
           <div class="field-label">Fonction</div>
-          <div class="field-value">${demoData.jobTitle}</div>
+          <div class="field-value">${escapeHtml(demoData.jobTitle)}</div>
         </div>
         ` : ''}
       </div>
@@ -163,20 +182,20 @@ function generateDemoEmailHTML(demoData) {
 
         <div class="field">
           <div class="field-label">Entreprise</div>
-          <div class="field-value">${demoData.company}</div>
+          <div class="field-value">${escapeHtml(demoData.company)}</div>
         </div>
 
         ${demoData.companySize ? `
         <div class="field">
           <div class="field-label">Taille de l'entreprise</div>
-          <div class="field-value">${demoData.companySize}</div>
+          <div class="field-value">${escapeHtml(demoData.companySize)}</div>
         </div>
         ` : ''}
 
         ${demoData.industry ? `
         <div class="field">
           <div class="field-label">Secteur d'activité</div>
-          <div class="field-value">${demoData.industry}</div>
+          <div class="field-value">${escapeHtml(demoData.industry)}</div>
         </div>
         ` : ''}
       </div>
@@ -186,20 +205,20 @@ function generateDemoEmailHTML(demoData) {
 
         <div class="field">
           <div class="field-label">Besoins métier</div>
-          <div class="message-box">${demoData.businessNeeds}</div>
+          <div class="message-box">${escapeHtml(demoData.businessNeeds)}</div>
         </div>
 
         ${demoData.useCase ? `
         <div class="field">
           <div class="field-label">Cas d'usage</div>
-          <div class="field-value">${demoData.useCase}</div>
+          <div class="field-value">${escapeHtml(demoData.useCase)}</div>
         </div>
         ` : ''}
 
         ${demoData.timeline ? `
         <div class="field">
           <div class="field-label">Timeline</div>
-          <div class="field-value">${demoData.timeline}</div>
+          <div class="field-value">${escapeHtml(demoData.timeline)}</div>
         </div>
         ` : ''}
 
@@ -213,7 +232,7 @@ function generateDemoEmailHTML(demoData) {
         ${demoData.message ? `
         <div class="field">
           <div class="field-label">Message additionnel</div>
-          <div class="message-box">${demoData.message}</div>
+          <div class="message-box">${escapeHtml(demoData.message)}</div>
         </div>
         ` : ''}
       </div>
@@ -241,22 +260,20 @@ function generateDemoEmailHTML(demoData) {
 export async function sendContactNotification(contactData) {
   try {
     console.log('[Email] Starting sendContactNotification...');
-    const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey) {
-      console.error('[Email] No RESEND_API_KEY found!');
-      return { success: false, error: 'Missing API key' };
-    }
-    console.log('[Email] API key found, length:', apiKey.length);
 
-    const resend = new Resend(apiKey);
-    const toEmail = process.env.CONTACT_EMAIL || 'tom.coustols@tcdynamics.fr';
+    const resend = getResendClient();
+    const toEmail = process.env.CONTACT_EMAIL;
+    if (!toEmail) {
+      console.error('[Email] No CONTACT_EMAIL environment variable found!');
+      return { success: false, error: 'Missing contact email configuration' };
+    }
     console.log('[Email] Sending to:', toEmail);
 
     const result = await resend.emails.send({
       from: 'TCDynamics <contact@tcdynamics.fr>',
       to: [toEmail],
       replyTo: contactData.email,
-      subject: `Nouveau message de ${contactData.name}${contactData.company ? ` (${contactData.company})` : ''}`,
+      subject: `Nouveau message de ${escapeHtml(contactData.name)}${contactData.company ? ` (${escapeHtml(contactData.company)})` : ''}`,
       html: generateContactEmailHTML(contactData),
       text: `
 Nouveau message de contact
@@ -306,13 +323,17 @@ Reçu le ${new Date().toLocaleString('fr-FR')} via le formulaire de contact TCDy
 export async function sendDemoNotification(demoData) {
   try {
     const resend = getResendClient();
-    const toEmail = process.env.DEMO_EMAIL || 'tom.coustols@tcdynamics.fr';
+    const toEmail = process.env.DEMO_EMAIL || process.env.CONTACT_EMAIL;
+    if (!toEmail) {
+      console.error('[Email] No DEMO_EMAIL or CONTACT_EMAIL environment variable found!');
+      return { success: false, error: 'Missing demo email configuration' };
+    }
 
     const result = await resend.emails.send({
       from: 'TCDynamics <contact@tcdynamics.fr>',
       to: [toEmail],
       replyTo: demoData.email,
-      subject: `Demande de démo: ${demoData.company}${demoData.timeline ? ` (${demoData.timeline})` : ''}`,
+      subject: `Demande de démo: ${escapeHtml(demoData.company)}${demoData.timeline ? ` (${escapeHtml(demoData.timeline)})` : ''}`,
       html: generateDemoEmailHTML(demoData),
       text: `
 Nouvelle demande de démonstration
@@ -343,7 +364,11 @@ Reçu le ${new Date().toLocaleString('fr-FR')} via le formulaire de demande de d
       `.trim()
     });
 
-    return { success: true, emailId: result.data?.id };
+    console.log('[Email] Send result:', JSON.stringify(result));
+    const emailId = result.data?.id || result.id;
+    console.log('[Email] Email ID:', emailId);
+
+    return { success: true, emailId };
   } catch (error) {
     console.error('Send demo notification error:', error);
     return { success: false, error: error.message };

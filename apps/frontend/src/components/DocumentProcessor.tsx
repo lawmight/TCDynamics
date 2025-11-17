@@ -1,7 +1,3 @@
-import { useState, useRef } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import {
   Upload,
   FileText,
@@ -9,8 +5,13 @@ import {
   CheckCircle,
   AlertCircle,
 } from 'lucide-react'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { useState, useRef } from 'react'
+
 import { visionAPI } from '@/api/azureServices'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { logger } from '@/utils/logger'
 
 // Types pour l'API Vision
@@ -74,7 +75,7 @@ const DocumentProcessor = () => {
     setIsProcessing(true)
 
     for (const file of Array.from(files)) {
-      const documentId = `doc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      const documentId = `doc_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
 
       // Ajouter le document en cours de traitement
       setDocuments(prev => [
@@ -92,6 +93,7 @@ const DocumentProcessor = () => {
       try {
         // Convertir le fichier en base64
         const base64 = await new Promise<string>((resolve, reject) => {
+          // eslint-disable-next-line no-undef
           const reader = new FileReader()
           reader.onload = () => {
             const result = reader.result as string
@@ -186,11 +188,11 @@ const DocumentProcessor = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'processing':
-        return <Loader2 className="w-4 h-4 animate-spin text-primary" />
+        return <Loader2 className="h-4 w-4 animate-spin text-primary" />
       case 'completed':
-        return <CheckCircle className="w-4 h-4 text-green-500" />
+        return <CheckCircle className="h-4 w-4 text-green-500" />
       case 'error':
-        return <AlertCircle className="w-4 h-4 text-red-500" />
+        return <AlertCircle className="h-4 w-4 text-red-500" />
       default:
         return null
     }
@@ -220,17 +222,17 @@ const DocumentProcessor = () => {
     <Card className="w-full" data-testid="document-processor">
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <FileText className="w-6 h-6 text-primary" />
+          <div className="rounded-lg bg-primary/10 p-2">
+            <FileText className="h-6 w-6 text-primary" />
           </div>
           <div>
             <CardTitle
-              className="text-xl font-mono"
+              className="font-mono text-xl"
               data-testid="processor-title"
             >
               Traitement de Documents IA
             </CardTitle>
-            <p className="text-muted-foreground font-mono text-sm">
+            <p className="font-mono text-sm text-muted-foreground">
               Analysez automatiquement vos factures, contrats et documents
             </p>
           </div>
@@ -240,7 +242,7 @@ const DocumentProcessor = () => {
       <CardContent className="space-y-6">
         {/* Upload Area */}
         <div
-          className="border-2 border-dashed border-border rounded-lg p-8 text-center"
+          className="rounded-lg border-2 border-dashed border-border p-8 text-center"
           data-testid="upload-area"
         >
           <input
@@ -254,8 +256,8 @@ const DocumentProcessor = () => {
           />
 
           <div className="space-y-4">
-            <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-              <Upload className="w-8 h-8 text-primary" />
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+              <Upload className="h-8 w-8 text-primary" />
             </div>
 
             <div>
@@ -266,19 +268,19 @@ const DocumentProcessor = () => {
               >
                 {isProcessing ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Traitement en cours...
                   </>
                 ) : (
                   <>
-                    <Upload className="w-4 h-4 mr-2" />
+                    <Upload className="mr-2 h-4 w-4" />
                     Sélectionner des documents
                   </>
                 )}
               </Button>
             </div>
 
-            <p className="text-sm text-muted-foreground font-mono">
+            <p className="font-mono text-sm text-muted-foreground">
               Formats supportés: JPG, PNG, PDF, DOC, DOCX
             </p>
           </div>
@@ -287,7 +289,7 @@ const DocumentProcessor = () => {
         {/* Processing Status */}
         {documents.length > 0 && (
           <div className="space-y-4">
-            <h3 className="text-lg font-mono font-semibold">
+            <h3 className="font-mono text-lg font-semibold">
               Documents traités
             </h3>
 
@@ -295,10 +297,10 @@ const DocumentProcessor = () => {
               {documents.map(doc => (
                 <Card key={doc.id} className="p-4">
                   <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3 flex-1">
+                    <div className="flex flex-1 items-start gap-3">
                       {getStatusIcon(doc.status)}
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className="mb-2 flex items-center gap-2">
                           <span className="font-mono text-sm font-medium">
                             {doc.fileName}
                           </span>
@@ -307,8 +309,8 @@ const DocumentProcessor = () => {
 
                         {doc.status === 'completed' && doc.extractedText && (
                           <div className="space-y-2">
-                            <div className="bg-muted/50 rounded-lg p-3">
-                              <p className="text-sm font-mono whitespace-pre-wrap">
+                            <div className="rounded-lg bg-muted/50 p-3">
+                              <p className="whitespace-pre-wrap font-mono text-sm">
                                 {doc.extractedText.length > 300
                                   ? `${doc.extractedText.substring(0, 300)}...`
                                   : doc.extractedText}
@@ -316,7 +318,7 @@ const DocumentProcessor = () => {
                             </div>
                             {doc.confidence > 0 && (
                               <div className="flex items-center gap-2">
-                                <span className="text-xs text-muted-foreground font-mono">
+                                <span className="font-mono text-xs text-muted-foreground">
                                   Confiance: {Math.round(doc.confidence * 100)}%
                                 </span>
                               </div>
@@ -343,19 +345,19 @@ const DocumentProcessor = () => {
         )}
 
         {/* Features Info */}
-        <div className="bg-primary/5 rounded-lg p-4">
-          <h4 className="font-mono font-semibold mb-3">Fonctionnalités IA :</h4>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm font-mono">
+        <div className="rounded-lg bg-primary/5 p-4">
+          <h4 className="mb-3 font-mono font-semibold">Fonctionnalités IA :</h4>
+          <div className="grid grid-cols-1 gap-4 font-mono text-sm md:grid-cols-3">
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-green-500" />
+              <CheckCircle className="h-4 w-4 text-green-500" />
               <span>OCR haute précision</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-green-500" />
+              <CheckCircle className="h-4 w-4 text-green-500" />
               <span>Analyse automatique</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-green-500" />
+              <CheckCircle className="h-4 w-4 text-green-500" />
               <span>Extraction de données</span>
             </div>
           </div>

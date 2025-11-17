@@ -1,5 +1,6 @@
 const rateLimit = require('express-rate-limit')
 const helmet = require('helmet')
+const DOMPurify = require('isomorphic-dompurify')
 const { logger } = require('../utils/logger')
 
 // Rate limiting pour les formulaires
@@ -73,10 +74,10 @@ const validateIP = (req, res, next) => {
 
 // Additional security middleware for input sanitization
 const sanitizeInput = (req, res, next) => {
-  // Remove potentially dangerous characters from string inputs
+  // Sanitize string inputs using DOMPurify to prevent XSS attacks
   const sanitizeString = str => {
     if (typeof str !== 'string') return str
-    return str.replace(/[<>\"'%;()&+]/g, '')
+    return DOMPurify.sanitize(str)
   }
 
   // Sanitize body parameters

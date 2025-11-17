@@ -83,8 +83,8 @@ const handler = async (req, res) => {
 
     // Get the frontend URL from environment or use default
     const frontendUrl = process.env.VITE_FRONTEND_URL ||
-                       process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
-                       'http://localhost:5173';
+                       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
+                       'http://localhost:5173');
 
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({

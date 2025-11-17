@@ -1,4 +1,16 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+// Lazy initialization of Stripe to handle missing environment variables
+let stripe = null;
+
+function getStripeClient() {
+  if (!stripe) {
+    const secretKey = process.env.STRIPE_SECRET_KEY;
+    if (!secretKey) {
+      throw new Error('STRIPE_SECRET_KEY is not configured');
+    }
+    stripe = require('stripe')(secretKey);
+  }
+  return stripe;
+}
 
 export default async function handler(req, res) {
   // Only allow POST requests
@@ -9,6 +21,11 @@ export default async function handler(req, res) {
 
   const sig = req.headers['stripe-signature'];
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!sig) {
+    console.error('Missing stripe-signature header');
+    return res.status(400).json({ error: 'Missing stripe-signature header' });
+  }
 
   if (!webhookSecret) {
     console.error('STRIPE_WEBHOOK_SECRET is not configured');
@@ -22,7 +39,8 @@ export default async function handler(req, res) {
     const body = await getRawBody(req);
 
     // Verify webhook signature
-    event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
+    const stripeClient = getStripeClient();
+    event = stripeClient.webhooks.constructEvent(body, sig, webhookSecret);
   } catch (err) {
     console.error('Webhook signature verification failed:', err.message);
     return res.status(400).json({ error: `Webhook Error: ${err.message}` });

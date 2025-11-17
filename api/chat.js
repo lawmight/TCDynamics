@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
   try {
     const { message, sessionId, userEmail } = req.body;
-    const conversationId = sessionId || `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const conversationId = sessionId || `chat_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 
     if (!message || !message.trim()) {
       return res.status(400).json({ error: 'Message requis' });

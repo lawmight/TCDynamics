@@ -4,7 +4,19 @@ set -e
 echo "🔍 Running pre-commit checks..."
 
 # Change to frontend directory (monorepo structure)
-cd apps/frontend
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
+if [ -z "$REPO_ROOT" ]; then
+  echo "❌ Unable to locate repository root. Make sure git is installed and you're inside the repo."
+  exit 1
+fi
+
+FRONTEND_DIR="$REPO_ROOT/apps/frontend"
+if [ ! -d "$FRONTEND_DIR" ]; then
+  echo "❌ Frontend directory not found at $FRONTEND_DIR"
+  exit 1
+fi
+
+cd "$FRONTEND_DIR"
 
 # Run lint-staged (ESLint + Prettier)
 echo "📝 Running lint-staged..."
@@ -12,7 +24,7 @@ npx lint-staged || exit 1
 
 # Type check TypeScript files
 echo "🔧 Checking TypeScript types..."
-npm run type-check
+npm run type-check || exit 1
 
 echo "✅ Pre-commit checks passed!"
 

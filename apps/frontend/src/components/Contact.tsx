@@ -1,3 +1,4 @@
+import { track } from '@vercel/analytics'
 import {
   Building,
   Calendar,
@@ -10,14 +11,14 @@ import {
   Train,
   Users,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
+import { PostSubmissionFeedback } from '@/components/PostSubmissionFeedback'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { PostSubmissionFeedback } from '@/components/PostSubmissionFeedback'
 import { useContactForm } from '@/hooks/useContactForm'
 import { useDemoForm } from '@/hooks/useDemoForm'
 
@@ -34,6 +35,62 @@ const Contact = () => {
     email: string
     company: string
   } | null>(null)
+
+  // Analytics tracking state
+  const [demoFormStarted, setDemoFormStarted] = useState(false)
+  const [contactFormStarted, setContactFormStarted] = useState(false)
+  const [demoFormSubmitted, setDemoFormSubmitted] = useState(false)
+  const [contactFormSubmitted, setContactFormSubmitted] = useState(false)
+  const demoFormStartTracked = useRef(false)
+  const contactFormStartTracked = useRef(false)
+
+  // Track demo form start
+  const handleDemoFormStart = () => {
+    if (!demoFormStartTracked.current) {
+      setDemoFormStarted(true)
+      demoFormStartTracked.current = true
+      track('demo_form_started', {
+        timestamp: new Date().toISOString(),
+      })
+    }
+  }
+
+  // Track contact form start
+  const handleContactFormStart = () => {
+    if (!contactFormStartTracked.current) {
+      setContactFormStarted(true)
+      contactFormStartTracked.current = true
+      track('contact_form_started', {
+        timestamp: new Date().toISOString(),
+      })
+    }
+  }
+
+  // Track form abandonment when user leaves page
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      // Track demo form abandonment
+      if (demoFormStarted && !demoFormSubmitted) {
+        track('demo_form_abandoned', {
+          timestamp: new Date().toISOString(),
+        })
+      }
+      // Track contact form abandonment
+      if (contactFormStarted && !contactFormSubmitted) {
+        track('contact_form_abandoned', {
+          timestamp: new Date().toISOString(),
+        })
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [
+    demoFormStarted,
+    demoFormSubmitted,
+    contactFormStarted,
+    contactFormSubmitted,
+  ])
 
   const contactInfo = [
     {
@@ -194,6 +251,7 @@ const Contact = () => {
 
                     const result = await demoForm.submitForm(data)
                     if (result.success) {
+                      setDemoFormSubmitted(true)
                       form.reset()
                       setDemoUserData({ email, company })
                       setShowDemoFeedback(true)
@@ -216,6 +274,7 @@ const Contact = () => {
                         className="bg-background/50"
                         required
                         aria-required="true"
+                        onFocus={handleDemoFormStart}
                       />
                     </div>
                     <div>
@@ -309,7 +368,10 @@ const Contact = () => {
                       htmlFor="needs"
                       className="mb-2 block text-sm font-medium"
                     >
-                      Besoins spécifiques * <span className="text-xs font-normal text-muted-foreground">(minimum 10 caractères)</span>
+                      Besoins spécifiques *{' '}
+                      <span className="text-xs font-normal text-muted-foreground">
+                        (minimum 10 caractères)
+                      </span>
                     </label>
                     <Textarea
                       id="needs"
@@ -443,6 +505,7 @@ const Contact = () => {
 
                     const result = await contactForm.submitForm(data)
                     if (result.success) {
+                      setContactFormSubmitted(true)
                       form.reset()
                       setContactUserData({ email, company })
                       setShowContactFeedback(true)
@@ -465,6 +528,7 @@ const Contact = () => {
                         className="bg-background/50"
                         required
                         aria-required="true"
+                        onFocus={handleContactFormStart}
                       />
                     </div>
                     <div>
@@ -539,7 +603,10 @@ const Contact = () => {
                       htmlFor="message"
                       className="mb-2 block text-sm font-medium"
                     >
-                      Message * <span className="text-xs font-normal text-muted-foreground">(minimum 10 caractères)</span>
+                      Message *{' '}
+                      <span className="text-xs font-normal text-muted-foreground">
+                        (minimum 10 caractères)
+                      </span>
                     </label>
                     <Textarea
                       id="message"

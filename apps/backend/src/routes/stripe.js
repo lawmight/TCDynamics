@@ -187,6 +187,16 @@ router.post(
     const sig = req.headers['stripe-signature']
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
+    if (!sig) {
+      logger.error('Missing stripe-signature header')
+      return res.status(400).send('Missing stripe-signature header')
+    }
+
+    if (!webhookSecret) {
+      logger.error('STRIPE_WEBHOOK_SECRET is not configured')
+      return res.status(500).send('Webhook secret not configured')
+    }
+
     let event
 
     try {

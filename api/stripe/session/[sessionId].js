@@ -3,7 +3,9 @@
  * Dynamic route: /api/stripe/session/[sessionId]
  */
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = process.env.STRIPE_SECRET_KEY
+  ? require('stripe')(process.env.STRIPE_SECRET_KEY)
+  : null;
 
 // Enable CORS
 const allowCors = fn => async (req, res) => {
@@ -32,6 +34,16 @@ const handler = async (req, res) => {
   }
 
   try {
+    // Check if Stripe is properly initialized
+    if (!stripe) {
+      console.error('❌ Stripe is not initialized - missing STRIPE_SECRET_KEY');
+      return res.status(500).json({
+        success: false,
+        message: 'Payment service is not configured. Please add STRIPE_SECRET_KEY to environment variables.',
+        error: 'STRIPE_NOT_CONFIGURED',
+      });
+    }
+
     const { sessionId } = req.query;
 
     if (!sessionId) {

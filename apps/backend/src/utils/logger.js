@@ -207,7 +207,7 @@ const logError = (error, context = {}) => {
 const addRequestId = (req, res, next) => {
   req.headers['x-request-id'] =
     req.headers['x-request-id'] ||
-    `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    `req-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
   res.setHeader('X-Request-ID', req.headers['x-request-id'])
   next()
 }
