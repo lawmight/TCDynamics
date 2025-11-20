@@ -54,7 +54,14 @@ export default async function handler(req, res) {
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (typeof email !== 'string') {
+      return res.status(400).json({
+        error: 'Format email invalide',
+        message: "L'email doit être une chaîne de caractères."
+      });
+    }
+    const sanitizedEmail = email.trim();
+    if (!emailRegex.test(sanitizedEmail)) {
       return res.status(400).json({
         error: 'Format email invalide',
         message: 'Veuillez entrer une adresse email valide.'
@@ -62,20 +69,27 @@ export default async function handler(req, res) {
     }
 
     // Validate message length (per schema: 10-5000 characters)
-    if (message.trim().length < 10 || message.trim().length > 5000) {
+    if (typeof message !== 'string') {
+      return res.status(400).json({
+        error: 'Longueur du message invalide',
+        message: 'Le message doit être une chaîne de caractères.'
+      });
+    }
+    const sanitizedMessage = message.trim();
+    if (sanitizedMessage.length < 10 || sanitizedMessage.length > 5000) {
       return res.status(400).json({
         error: 'Longueur du message invalide',
         message: 'Le message doit contenir entre 10 et 5000 caractères.'
       });
     }
 
-    console.log('New contact form submission:', { name, email });
+    console.log('New contact form submission:', { name, email: sanitizedEmail });
 
     // Save to Supabase
     const result = await saveContact({
       name,
-      email,
-      message,
+      email: sanitizedEmail,
+      message: sanitizedMessage,
       phone,
       company,
       source: 'website'
@@ -92,8 +106,8 @@ export default async function handler(req, res) {
     // Send email notification using shared utility function
     const emailResult = await sendContactNotification({
       name,
-      email,
-      message,
+      email: sanitizedEmail,
+      message: sanitizedMessage,
       phone,
       company
     });

@@ -65,8 +65,16 @@ export default async function handler(req, res) {
       });
     }
 
+    if (typeof businessNeeds !== 'string') {
+      return res.status(400).json({
+        error: 'Invalid field type',
+        message: 'Le champ "Besoins spécifiques" doit être une chaîne de caractères.'
+      });
+    }
+
+    const sanitizedBusinessNeeds = businessNeeds.trim();
     // Validate businessNeeds length (10-5000 characters)
-    if (businessNeeds.trim().length < 10 || businessNeeds.trim().length > 5000) {
+    if (sanitizedBusinessNeeds.length < 10 || sanitizedBusinessNeeds.length > 5000) {
       return res.status(400).json({
         error: 'Validation error',
         message: 'Le champ "Besoins spécifiques" doit contenir entre 10 et 5000 caractères.'
@@ -75,18 +83,25 @@ export default async function handler(req, res) {
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (typeof email !== 'string') {
+      return res.status(400).json({
+        error: 'Invalid email format',
+        message: "L'email doit être une chaîne de caractères."
+      });
+    }
+    const sanitizedEmail = email.trim();
+    if (!emailRegex.test(sanitizedEmail)) {
       return res.status(400).json({ error: 'Invalid email format' });
     }
 
-    console.log('New demo request:', { name, email, company });
+    console.log('New demo request:', { name, email: sanitizedEmail, company });
 
     // Save to Supabase
     const result = await saveDemoRequest({
       name,
-      email,
+      email: sanitizedEmail,
       company,
-      businessNeeds,
+      businessNeeds: sanitizedBusinessNeeds,
       phone,
       jobTitle,
       companySize,
@@ -108,13 +123,13 @@ export default async function handler(req, res) {
     // Send email notification using shared utility function
     const emailResult = await sendDemoNotification({
       name,
-      email,
+      email: sanitizedEmail,
       phone,
       jobTitle,
       company,
       companySize,
       industry,
-      businessNeeds,
+      businessNeeds: sanitizedBusinessNeeds,
       useCase,
       timeline,
       preferredDate,
