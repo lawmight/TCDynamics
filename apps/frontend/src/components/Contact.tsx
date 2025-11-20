@@ -4,14 +4,11 @@ import {
   Calendar,
   Car,
   CheckCircle,
-  Clock,
   Mail,
   MapPin,
   Phone,
-  Train,
-  Users,
 } from 'lucide-react'
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { PostSubmissionFeedback } from '@/components/PostSubmissionFeedback'
 import { Badge } from '@/components/ui/badge'
@@ -697,28 +694,6 @@ const Contact = () => {
                 </div>
               </CardContent>
             </Card>
-          </div>
-        </div>
-
-        {/* Bottom Trust Indicators */}
-        <div className="fade-in-up fade-delay-10 mt-16 text-center">
-          <div className="flex flex-wrap justify-center gap-6 font-mono text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-primary" />
-              <span>Réponse sous 2h</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-primary" />
-              <span>Équipe française</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-primary" />
-              <span>RGPD conforme</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Train className="h-4 w-4 text-primary" />
-              <span>Accès RER C</span>
-            </div>
           </div>
         </div>
       </div>

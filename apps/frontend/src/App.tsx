@@ -1,18 +1,21 @@
 // FIXED: Using simple navigation to prevent black page
-import { Analytics } from '@vercel/analytics/react'
-import { Toaster as Sonner } from '@/components/ui/sonner'
-import { Toaster } from '@/components/ui/toaster'
-import { TooltipProvider } from '@/components/ui/tooltip'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { Analytics } from '@vercel/analytics/react'
 import { Suspense, lazy } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+
 import ErrorBoundary from './components/ErrorBoundary'
-import SimpleNavigation from './components/SimpleNavigation'
 // import MobileNavigation from './components/MobileNavigation' // DISABLED: Causes black page
 // import StickyHeader from './components/StickyHeader' // DISABLED: Causes black page
 // import LazyAIChatbot from './components/LazyAIChatbot' // Temporarily disabled - Week 5-6 customer validation
+import Footer from './components/Footer'
 import OfflineIndicator from './components/OfflineIndicator'
 import PerformanceMonitor from './components/PerformanceMonitor'
+import SimpleNavigation from './components/SimpleNavigation'
+
+import { Toaster as Sonner } from '@/components/ui/sonner'
+import { Toaster } from '@/components/ui/toaster'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 // Lazy load pages for better performance
 const Index = lazy(() => import('./pages/Index'))
@@ -58,8 +61,8 @@ const queryClient = new QueryClient({
 
 // Loading component for Suspense fallback
 const PageLoader = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+  <div className="flex min-h-screen items-center justify-center">
+    <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-primary"></div>
   </div>
 )
 
@@ -150,6 +153,7 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
+          <Footer />
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
