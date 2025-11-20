@@ -25,12 +25,14 @@ const CheckoutSuccess = lazy(() => import('./pages/CheckoutSuccess'))
 const Demo = lazy(() => import('./pages/Demo'))
 const GetStarted = lazy(() => import('./pages/GetStarted'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
+const About = lazy(() => import('./pages/About'))
 const Pages = lazy(() => import('./pages/Pages'))
 const Diagnostics = lazy(() => import('./pages/Diagnostics'))
 const Recommendations = lazy(() => import('./pages/Recommendations'))
 const Settings = lazy(() => import('./pages/Settings'))
 const Pricing = lazy(() => import('./pages/Pricing'))
 const Contact = lazy(() => import('./pages/Contact'))
+const FeaturesPage = lazy(() => import('./pages/Features'))
 
 // Stripe Connect pages
 const ConnectDashboard = lazy(() => import('./pages/ConnectDashboard'))
@@ -133,6 +135,8 @@ const App = () => (
               <Route path="/contact" element={<Contact />} />
               <Route path="/get-started" element={<GetStarted />} />
               <Route path="/pricing" element={<Pricing />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/features" element={<FeaturesPage />} />
 
               {/* Stripe Connect Routes */}
               <Route path="/connect/dashboard" element={<ConnectDashboard />} />

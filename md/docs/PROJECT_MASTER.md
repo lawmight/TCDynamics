@@ -1,7 +1,7 @@
 # 🎯 TCDynamics Master Status - Single Source of Truth
 
-**Last Updated**: October 25, 2025  
-**Status**: 🟢 Production Live | 🟡 Tests Need Fixing | 🟡 Stripe Not Production-Ready
+**Last Updated**: November 19, 2025  
+**Status**: 🟢 Production Live | 🟡 Customer Feedback Instrumentation Live (metrics pending) | 🟡 Stripe Not Production-Ready
 
 ---
 
@@ -13,6 +13,7 @@
 This document serves as the definitive reference for TCDynamics project status. Multiple documentation files contained contradictory information that has been resolved here.
 
 ### Key Corrections Made:
+
 - **Azure Functions**: Confirmed deployed and operational (not removed as claimed in WHAT_CHANGED.md)
 - **Stripe Integration**: Fully implemented and working locally (not removed as claimed in WHAT_CHANGED.md)
 - **Architecture**: Hybrid system (React + Node.js + Azure Functions) actively maintained
@@ -23,24 +24,38 @@ This document serves as the definitive reference for TCDynamics project status. 
 
 ### Production Status: 🟢 OPERATIONAL
 
-| Component | Status | Location | Health |
-|-----------|--------|----------|---------|
-| **Frontend** | ✅ Live | OVHcloud (https://tcdynamics.fr) | 🟢 Healthy |
-| **Backend API** | ✅ Live | OVHcloud | 🟢 Healthy |
-| **AI Services** | ✅ Live | Azure Functions | 🟢 Healthy |
-| **Database** | ✅ Live | Cosmos DB | 🟢 Healthy |
-| **Email** | ✅ Live | Zoho Mail | 🟢 Healthy |
+| Component       | Status  | Location                         | Health     |
+| --------------- | ------- | -------------------------------- | ---------- |
+| **Frontend**    | ✅ Live | OVHcloud (https://tcdynamics.fr) | 🟢 Healthy |
+| **Backend API** | ✅ Live | OVHcloud                         | 🟢 Healthy |
+| **AI Services** | ✅ Live | Azure Functions                  | 🟢 Healthy |
+| **Database**    | ✅ Live | Cosmos DB                        | 🟢 Healthy |
+| **Email**       | ✅ Live | Zoho Mail                        | 🟢 Healthy |
 
 ### What's Working:
-- ✅ Complete contact forms (frontend → backend → email)
-- ✅ AI chatbot interface (frontend → Azure Functions)
+
+- ✅ Contact & demo forms with Azure → Node fallback and analytics tracking
+- ✅ Post-submission feedback overlay (demo + contact) saving to Supabase
 - ✅ Document processing (Azure Vision API)
 - ✅ User authentication (Supabase)
 - ✅ Responsive design on all devices
 
+### Temporarily Paused (Intentional):
+
+- 💤 **AI Chatbot UI**: Disabled in `apps/frontend/src/App.tsx` during Week 5-6 to focus on high-signal customer feedback; Azure AI backends remain available for future re-enable.
+
 ### What's Implemented But Not Production-Ready:
+
 - ⚠️ **Stripe Payments**: Complete implementation exists but needs production configuration
 - ⚠️ **3 New Pages**: Checkout, Demo, Get Started (built but Stripe not live)
+
+### Week 5-6 Customer Validation Snapshot
+
+- 🔌 **AI chatbot temporarily disabled** to minimize distractions while interviewing customers (`apps/frontend/src/App.tsx`).
+- 📈 **@vercel/analytics** instrumentation wraps the entire app and `useFormSubmit` hook to capture `form_submitted/form_error` events.
+- 💬 **PostSubmissionFeedback** modal now asks every successful form submitter for a 1–5 rating, optional comment, and follow-up permission (`apps/frontend/src/components/PostSubmissionFeedback.tsx`).
+- 🗃️ **POST /api/feedback** route in the Node backend writes feedback into Supabase (with graceful logging when Supabase creds are absent).
+- 🧾 **Stripe endpoints hardened** to surface clearer errors when env vars are missing (`api/stripe/session`, `api/stripe/webhook`).
 
 ---
 
@@ -80,6 +95,7 @@ This document serves as the definitive reference for TCDynamics project status. 
 ### Technology Stack (Complete & Accurate)
 
 #### Frontend
+
 - **Framework**: React 18.3.1 with TypeScript 5.8.3
 - **Build Tool**: Vite 7.1.6 (fast builds, HMR)
 - **Routing**: React Router v6
@@ -89,6 +105,7 @@ This document serves as the definitive reference for TCDynamics project status. 
 - **Icons**: Lucide React 0.544.0
 
 #### Backend
+
 - **Runtime**: Node.js 18+
 - **Framework**: Express.js 4.21.2
 - **Validation**: Joi 17.13.3
@@ -97,6 +114,7 @@ This document serves as the definitive reference for TCDynamics project status. 
 - **Testing**: Jest + Supertest
 
 #### AI & Azure Services
+
 - **Azure Functions**: Python 3.11 (serverless AI processing)
 - **Azure OpenAI**: GPT models for chatbots
 - **Azure Computer Vision**: Document processing (99.7% accuracy)
@@ -104,6 +122,7 @@ This document serves as the definitive reference for TCDynamics project status. 
 - **Azure Storage**: File storage
 
 #### DevOps & Infrastructure
+
 - **Hosting**: OVHcloud (frontend), Azure Functions (AI services)
 - **CI/CD**: GitHub Actions
 - **Containerization**: Docker support
@@ -116,6 +135,7 @@ This document serves as the definitive reference for TCDynamics project status. 
 ### Implementation Status: ✅ COMPLETE (Local) | ⚠️ NEEDS PRODUCTION SETUP
 
 #### What's Implemented:
+
 - ✅ **Backend Routes**: Complete Stripe API integration
   - `POST /api/stripe/create-checkout-session`
   - `GET /api/stripe/session/:sessionId`
@@ -127,90 +147,73 @@ This document serves as the definitive reference for TCDynamics project status. 
 - ✅ **Security**: Webhook signature verification, CSRF protection
 
 #### What's Missing for Production:
+
 - 🔄 **Environment Variables**: Production Stripe keys not set
 - 🔄 **Webhook Endpoints**: Production webhook URL configuration
 - 🔄 **Testing**: Production checkout flow verification
 - 🔄 **Tax Configuration**: EU tax compliance setup
 
 #### Local Testing Status:
+
 **WORKING**: All Stripe functionality tested and functional in development environment.
 
 ---
 
-## 🧪 Test Status: 87% Pass Rate
+## 🧪 Test Status (Needs Fresh Run)
 
-### Current Metrics:
-- **Total Tests**: 343
-- **Passing**: 260 (76%)
-- **Failing**: 83 (24%)
-- **Test Pass Rate**: 87% (255/287 tests in CI pipeline)
-
-### Test Distribution:
-| Component | Status | Pass Rate | Issues |
-|-----------|--------|-----------|---------|
-| **Frontend** | 🟡 76% | 260/343 | React Router mocking, window.matchMedia |
-| **Backend** | 🟢 88% | 95/108 | Monitoring tests failing |
-| **E2E** | 🔄 TBD | Not running | Playwright configuration |
-
-### Remaining Work:
-- **32 tests to fix** (Component tests: 15, Hook tests: 10, Utility tests: 5, Backend monitoring: 13)
-- **Target**: 95%+ pass rate
-- **Priority**: HIGH (blocking full production readiness)
-
-### Recent Fixes Applied:
-1. ✅ Switched from happy-dom to jsdom (resolved window initialization)
-2. ✅ Regenerated backend package-lock.json (npm ci works)
-3. ✅ Created pytest.ini for async tests (Azure Functions testing works)
+- **Current State**: Automated suites have not been re-run since the Week 5-6 customer-validation merge. Treat previous 87% pass-rate data (Oct 25) as historical only.
+- **Blocking Work**:
+  1. Re-run full frontend + backend + Azure Function suites to capture a new baseline.
+  2. Update coverage dashboards once new numbers are in.
+  3. Resume Playwright E2E configuration after analytics instrumentation verification.
+- **Known Problem Areas** (carried over): component tests relying on `window.matchMedia`, hook tests for `useMobile`, backend monitoring metrics, and new feedback API coverage.
 
 ---
 
 ## 🎯 Immediate Actions (This Week)
 
-### Priority 1: Test Fixes (HIGH)
-1. **Fix Component Tests** (15 failing)
-   - LazyAIChatbot: Suspense boundary mocking
-   - PerformanceMonitor: Development environment mocking
+### Priority 1: Re-baseline Quality (HIGH)
 
-2. **Fix Hook Tests** (10 failing)
-   - useMobile: Window resize and matchMedia mocking
-   - useDemoForm: API mocking and fallback testing
-
-3. **Fix Backend Monitoring Tests** (13 failing)
-   - Metrics collection logic
-   - Coverage target: 50% (currently ~46%)
+1. Re-run all automated suites and record new pass/case counts.
+2. Add tests for `PostSubmissionFeedback` flow and `/api/feedback`.
+3. Patch remaining monitor + hook tests once data highlights failures.
 
 ### Priority 2: Stripe Production Setup (MEDIUM)
-1. **Configure Stripe for production**
-   - Set production environment variables
-   - Configure production webhook endpoints
-   - Test Stripe checkout flow in production environment
 
-### Priority 3: Documentation Cleanup (MEDIUM)
-1. **Archive outdated documentation**
-2. **Update all references to this master document**
-3. **Consolidate deployment and Stripe documentation**
+1. Configure production env vars + webhooks.
+2. Smoke-test checkout + success pages on production URLs.
+3. Document Stripe operational checklist inside `docs/DEPLOYMENT_CHECKLIST.md`.
+
+### Priority 3: Customer Feedback Loop (MEDIUM)
+
+1. Publish `docs/WEEK_5-6_LEARNINGS.md` metrics (fill all TBDs).
+2. Pipe Supabase feedback into analytics dashboards.
+3. Define criteria and timeline to re-enable the AI chatbot with the new insights.
 
 ---
 
 ## 📅 Next 30 Days Roadmap
 
 ### Week 1-2: Quality Gates (Current)
-- [ ] Achieve 95%+ test pass rate
-- [ ] Fix all CI-blocking test failures
+
+- [ ] Re-run automated suites & capture metrics
+- [ ] Backfill `WEEK_5-6_LEARNINGS.md` with actual submission + feedback counts
 - [ ] Complete Stripe production configuration
-- [ ] Update documentation references
+- [ ] Decide when/how to re-enable AI chatbot
 
 ### Week 3-4: Feature Enhancement
+
 - [ ] Implement Stripe webhooks in production
 - [ ] Test complete payment flow end-to-end
-- [ ] Optimize frontend performance (current: 585 KB bundle)
-- [ ] Add production monitoring and alerting
+- [ ] Optimize frontend performance (current bundle ≈585 KB, target <500 KB)
+- [ ] Add production monitoring/alerting for feedback + analytics services
 
 ### Month 2: Scale Preparation
+
 - [ ] Implement user dashboard
 - [ ] Add advanced analytics
 - [ ] Prepare for multi-tenant architecture
-- [ ] Set up staging environment
+- [ ] Set up staging environment and automated load tests
 
 ---
 
@@ -218,14 +221,15 @@ This document serves as the definitive reference for TCDynamics project status. 
 
 ### WHAT_CHANGED.md Claims vs Reality
 
-| Document | Claimed | Reality | Status |
-|----------|---------|---------|--------|
-| **Azure Functions** | Removed, simplified to Node.js only | Deployed and operational | ❌ **INCORRECT** |
-| **Stripe Integration** | Removed, not needed for MVP | Fully implemented, working locally | ❌ **INCORRECT** |
-| **Architecture** | Node.js + React only | Hybrid: React + Node.js + Azure Functions | ❌ **INCORRECT** |
-| **Deployment** | FileZilla + PM2 only | OVHcloud + Azure Functions | ❌ **INCORRECT** |
+| Document               | Claimed                             | Reality                                   | Status           |
+| ---------------------- | ----------------------------------- | ----------------------------------------- | ---------------- |
+| **Azure Functions**    | Removed, simplified to Node.js only | Deployed and operational                  | ❌ **INCORRECT** |
+| **Stripe Integration** | Removed, not needed for MVP         | Fully implemented, working locally        | ❌ **INCORRECT** |
+| **Architecture**       | Node.js + React only                | Hybrid: React + Node.js + Azure Functions | ❌ **INCORRECT** |
+| **Deployment**         | FileZilla + PM2 only                | OVHcloud + Azure Functions                | ❌ **INCORRECT** |
 
 ### Why This Matters:
+
 - WHAT_CHANGED.md was written as if a major simplification occurred
 - In reality, the hybrid architecture was maintained and is working
 - This caused confusion about current capabilities
@@ -233,28 +237,31 @@ This document serves as the definitive reference for TCDynamics project status. 
 
 ---
 
-## 📊 Key Metrics Dashboard
+## 📊 Key Metrics Dashboard (Pending Fresh Data)
 
 ### Code Quality
-| Metric | Current | Target | Status |
-|--------|---------|--------|---------|
-| Test Pass Rate | 87% | 95% | 🟡 In Progress |
-| Frontend Coverage | 53.41% | 60% | 🟢 On Track |
-| Backend Coverage | 46.21% | 50% | 🟡 In Progress |
-| Code Duplication | 0% | 0% | ✅ Excellent |
-| Linter Errors | 0 | 0 | ✅ Clean |
+
+| Metric            | Current                                     | Target | Status          |
+| ----------------- | ------------------------------------------- | ------ | --------------- |
+| Test Pass Rate    | Pending rerun (last recorded 87% on Oct 25) | 95%    | 🟡 Needs update |
+| Frontend Coverage | Pending rerun                               | 60%    | 🟡 Needs update |
+| Backend Coverage  | Pending rerun                               | 50%    | 🟡 Needs update |
+| Code Duplication  | 0%                                          | 0%     | ✅ Excellent    |
+| Linter Errors     | 0                                           | 0      | ✅ Clean        |
 
 ### Performance
-| Metric | Current | Target | Status |
-|--------|---------|--------|---------|
-| Build Time | ~5s | <10s | ✅ Excellent |
-| API Response | <500ms | <1s | ✅ Excellent |
-| Bundle Size | 585 KB | <1 MB | ✅ Good |
-| Uptime | 99.9% | 99.5%+ | ✅ Excellent |
+
+| Metric       | Current                                      | Target | Status       |
+| ------------ | -------------------------------------------- | ------ | ------------ |
+| Build Time   | ~5s                                          | <10s   | ✅ Excellent |
+| API Response | <500ms                                       | <1s    | ✅ Excellent |
+| Bundle Size  | 585 KB (needs re-measure after latest build) | <1 MB  | ✅ Good      |
+| Uptime       | 99.9%                                        | 99.5%+ | ✅ Excellent |
 
 ### Business Impact
+
 - **25% codebase reduction** achieved (Tinker Phase 1)
-- **110 new tests** added (all passing)
+- **110 new tests** added (pending re-run)
 - **Service layers** implemented across frontend/backend
 - **Production deployment** successful and operational
 
@@ -263,19 +270,23 @@ This document serves as the definitive reference for TCDynamics project status. 
 ## 🔗 Related Documentation
 
 ### Active References:
-- **[PROJECT_STATUS.md](active/PROJECT_STATUS.md)** - Detailed status metrics
-- **[PROJECT_ASSESSMENT.md](active/PROJECT_ASSESSMENT.md)** - Technical health check
-- **[WHAT_TO_DO_NEXT.md](active/WHAT_TO_DO_NEXT.md)** - Action items and priorities
-- **[STRIPE_DOCUMENTATION.md](active/STRIPE_DOCUMENTATION.md)** - Payment integration guide
-- **[DEPLOYMENT_GUIDE.md](deployment/DEPLOYMENT_GUIDE.md)** - Deployment instructions
+
+- `docs/WEEK_5-6_LEARNINGS.md` – source of truth for current validation work.
+- `docs/QUICK_START_GUIDE.md` – environment setup + run instructions.
+- `docs/DEPLOYMENT_CHECKLIST.md` – prod readiness checklist (includes Stripe tasks).
+- `docs/PRE-LAUNCH-CHECKLIST.md` – go-live validation list.
+- `docs/business/ROAST_MVP_PLAN.md` – product vision & MVP scope.
+- `docs/learning/LEARN_TODAY.md` – daily learning log for context.
 
 ### Archived (Outdated/Incorrect):
-- **[WHAT_CHANGED.md](archive/outdated/WHAT_CHANGED.md)** - Contains incorrect claims
-- **Old deployment status files** in `archive/deployment-history/`
+
+- `archive/outdated/WHAT_CHANGED.md` – contains incorrect claims (keep for history).
+- Legacy deployment history under `archive/deployment-history/`.
 
 ### Business Strategy:
-- **[SOLO_FOUNDER_ROADMAP.md](business/SOLO_FOUNDER_ROADMAP.md)** - Long-term planning
-- **[MINIMAL_STACK.md](business/MINIMAL_STACK.md)** - Technology choices
+
+- `docs/business/SOLO_FOUNDER_ROADMAP.md` – long-term planning.
+- `docs/business/MINIMAL_STACK.md` – technology choices.
 
 ---
 

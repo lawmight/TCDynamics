@@ -4,10 +4,11 @@
  * Sends notification emails for contact forms and demo requests
  */
 
-import { Resend } from 'resend';
+import { Resend } from 'resend'
 
 // Module-scope singleton (reused across invocations for performance)
-let resendClient = null;
+let resendClient = null
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 /**
  * Escape HTML special characters to prevent XSS attacks
@@ -15,17 +16,26 @@ let resendClient = null;
  * @returns {string} Escaped HTML-safe string
  */
 function escapeHtml(text) {
-  if (text == null) return '';
-  const str = String(text);
+  if (text == null) return ''
+  const str = String(text)
   const escapeMap = {
     '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
     '"': '&quot;',
     "'": '&#39;',
-    '/': '&#x2F;'
-  };
-  return str.replace(/[&<>"'\/]/g, char => escapeMap[char]);
+    '/': '&#x2F;',
+  }
+  return str.replace(/[&<>"'\/]/g, char => escapeMap[char])
+}
+
+/**
+ * Validate email format
+ * @param {string} email
+ * @returns {boolean}
+ */
+function isValidEmail(email) {
+  return EMAIL_REGEX.test(email)
 }
 
 /**
@@ -34,16 +44,18 @@ function escapeHtml(text) {
  */
 export function getResendClient() {
   if (!resendClient) {
-    const apiKey = process.env.RESEND_API_KEY;
+    const apiKey = process.env.RESEND_API_KEY
 
     if (!apiKey) {
-      throw new Error('Resend configuration missing. Check RESEND_API_KEY environment variable.');
+      throw new Error(
+        'Resend configuration missing. Check RESEND_API_KEY environment variable.'
+      )
     }
 
-    resendClient = new Resend(apiKey);
+    resendClient = new Resend(apiKey)
   }
 
-  return resendClient;
+  return resendClient
 }
 
 /**
@@ -86,19 +98,27 @@ function generateContactEmailHTML(contactData) {
         <div class="field-value"><a href="mailto:${escapeHtml(contactData.email)}">${escapeHtml(contactData.email)}</a></div>
       </div>
 
-      ${contactData.phone ? `
+      ${
+        contactData.phone
+          ? `
       <div class="field">
         <div class="field-label">Téléphone</div>
         <div class="field-value">${escapeHtml(contactData.phone)}</div>
       </div>
-      ` : ''}
+      `
+          : ''
+      }
 
-      ${contactData.company ? `
+      ${
+        contactData.company
+          ? `
       <div class="field">
         <div class="field-label">Entreprise</div>
         <div class="field-value">${escapeHtml(contactData.company)}</div>
       </div>
-      ` : ''}
+      `
+          : ''
+      }
 
       <div class="field">
         <div class="field-label">Message</div>
@@ -112,7 +132,7 @@ function generateContactEmailHTML(contactData) {
   </div>
 </body>
 </html>
-  `;
+  `
 }
 
 /**
@@ -162,19 +182,27 @@ function generateDemoEmailHTML(demoData) {
           <div class="field-value"><a href="mailto:${escapeHtml(demoData.email)}">${escapeHtml(demoData.email)}</a></div>
         </div>
 
-        ${demoData.phone ? `
+        ${
+          demoData.phone
+            ? `
         <div class="field">
           <div class="field-label">Téléphone</div>
           <div class="field-value">${escapeHtml(demoData.phone)}</div>
         </div>
-        ` : ''}
+        `
+            : ''
+        }
 
-        ${demoData.jobTitle ? `
+        ${
+          demoData.jobTitle
+            ? `
         <div class="field">
           <div class="field-label">Fonction</div>
           <div class="field-value">${escapeHtml(demoData.jobTitle)}</div>
         </div>
-        ` : ''}
+        `
+            : ''
+        }
       </div>
 
       <div class="section">
@@ -185,19 +213,27 @@ function generateDemoEmailHTML(demoData) {
           <div class="field-value">${escapeHtml(demoData.company)}</div>
         </div>
 
-        ${demoData.companySize ? `
+        ${
+          demoData.companySize
+            ? `
         <div class="field">
           <div class="field-label">Taille de l'entreprise</div>
           <div class="field-value">${escapeHtml(demoData.companySize)}</div>
         </div>
-        ` : ''}
+        `
+            : ''
+        }
 
-        ${demoData.industry ? `
+        ${
+          demoData.industry
+            ? `
         <div class="field">
           <div class="field-label">Secteur d'activité</div>
           <div class="field-value">${escapeHtml(demoData.industry)}</div>
         </div>
-        ` : ''}
+        `
+            : ''
+        }
       </div>
 
       <div class="section">
@@ -208,33 +244,49 @@ function generateDemoEmailHTML(demoData) {
           <div class="message-box">${escapeHtml(demoData.businessNeeds)}</div>
         </div>
 
-        ${demoData.useCase ? `
+        ${
+          demoData.useCase
+            ? `
         <div class="field">
           <div class="field-label">Cas d'usage</div>
           <div class="field-value">${escapeHtml(demoData.useCase)}</div>
         </div>
-        ` : ''}
+        `
+            : ''
+        }
 
-        ${demoData.timeline ? `
+        ${
+          demoData.timeline
+            ? `
         <div class="field">
           <div class="field-label">Timeline</div>
           <div class="field-value">${escapeHtml(demoData.timeline)}</div>
         </div>
-        ` : ''}
+        `
+            : ''
+        }
 
-        ${demoData.preferredDate ? `
+        ${
+          demoData.preferredDate
+            ? `
         <div class="field">
           <div class="field-label">Date préférée</div>
           <div class="field-value">${new Date(demoData.preferredDate).toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
         </div>
-        ` : ''}
+        `
+            : ''
+        }
 
-        ${demoData.message ? `
+        ${
+          demoData.message
+            ? `
         <div class="field">
           <div class="field-label">Message additionnel</div>
           <div class="message-box">${escapeHtml(demoData.message)}</div>
         </div>
-        ` : ''}
+        `
+            : ''
+        }
       </div>
 
       <div class="footer">
@@ -244,7 +296,7 @@ function generateDemoEmailHTML(demoData) {
   </div>
 </body>
 </html>
-  `;
+  `
 }
 
 /**
@@ -259,15 +311,19 @@ function generateDemoEmailHTML(demoData) {
  */
 export async function sendContactNotification(contactData) {
   try {
-    console.log('[Email] Starting sendContactNotification...');
+    console.log('[Email] Starting sendContactNotification...')
 
-    const resend = getResendClient();
-    const toEmail = process.env.CONTACT_EMAIL;
+    const resend = getResendClient()
+    const toEmail = process.env.CONTACT_EMAIL?.trim()
     if (!toEmail) {
-      console.error('[Email] No CONTACT_EMAIL environment variable found!');
-      return { success: false, error: 'Missing contact email configuration' };
+      console.error('[Email] No CONTACT_EMAIL environment variable found!')
+      return { success: false, error: 'Missing contact email configuration' }
     }
-    console.log('[Email] Sending to:', toEmail);
+    if (!isValidEmail(toEmail)) {
+      console.error('[Email] CONTACT_EMAIL has invalid format:', toEmail)
+      return { success: false, error: 'Invalid contact email configuration' }
+    }
+    console.log('[Email] Sending to:', toEmail)
 
     const result = await resend.emails.send({
       from: 'TCDynamics <contact@tcdynamics.fr>',
@@ -288,18 +344,18 @@ ${contactData.message}
 
 ---
 Reçu le ${new Date().toLocaleString('fr-FR')} via le formulaire de contact TCDynamics
-      `.trim()
-    });
+      `.trim(),
+    })
 
-    console.log('[Email] Send result:', JSON.stringify(result));
-    const emailId = result.data?.id || result.id;
-    console.log('[Email] Email ID:', emailId);
+    console.log('[Email] Send result:', JSON.stringify(result))
+    const emailId = result.data?.id || result.id
+    console.log('[Email] Email ID:', emailId)
 
-    return { success: true, emailId };
+    return { success: true, emailId }
   } catch (error) {
-    console.error('[Email] Send contact notification error:', error);
-    console.error('[Email] Error details:', JSON.stringify(error, null, 2));
-    return { success: false, error: error.message };
+    console.error('[Email] Send contact notification error:', error)
+    console.error('[Email] Error details:', JSON.stringify(error, null, 2))
+    return { success: false, error: error.message }
   }
 }
 
@@ -322,11 +378,22 @@ Reçu le ${new Date().toLocaleString('fr-FR')} via le formulaire de contact TCDy
  */
 export async function sendDemoNotification(demoData) {
   try {
-    const resend = getResendClient();
-    const toEmail = process.env.DEMO_EMAIL || process.env.CONTACT_EMAIL;
+    const resend = getResendClient()
+    const toEmail = (
+      process.env.DEMO_EMAIL || process.env.CONTACT_EMAIL
+    )?.trim()
     if (!toEmail) {
-      console.error('[Email] No DEMO_EMAIL or CONTACT_EMAIL environment variable found!');
-      return { success: false, error: 'Missing demo email configuration' };
+      console.error(
+        '[Email] No DEMO_EMAIL or CONTACT_EMAIL environment variable found!'
+      )
+      return { success: false, error: 'Missing demo email configuration' }
+    }
+    if (!isValidEmail(toEmail)) {
+      console.error(
+        '[Email] DEMO_EMAIL/CONTACT_EMAIL has invalid format:',
+        toEmail
+      )
+      return { success: false, error: 'Invalid demo email configuration' }
     }
 
     const result = await resend.emails.send({
@@ -361,18 +428,22 @@ ${demoData.message ? `Message additionnel:\n${demoData.message}` : ''}
 
 ---
 Reçu le ${new Date().toLocaleString('fr-FR')} via le formulaire de demande de démonstration TCDynamics
-      `.trim()
-    });
+      `.trim(),
+    })
 
-    console.log('[Email] Send result:', JSON.stringify(result));
-    const emailId = result.data?.id || result.id;
-    console.log('[Email] Email ID:', emailId);
+    console.log('[Email] Send result:', JSON.stringify(result))
+    const emailId = result.data?.id || result.id
+    console.log('[Email] Email ID:', emailId)
 
-    return { success: true, emailId };
+    return { success: true, emailId }
   } catch (error) {
-    console.error('Send demo notification error:', error);
-    return { success: false, error: error.message };
+    console.error('Send demo notification error:', error)
+    return { success: false, error: error.message }
   }
 }
 
-export default { getResendClient, sendContactNotification, sendDemoNotification };
+export default {
+  getResendClient,
+  sendContactNotification,
+  sendDemoNotification,
+}

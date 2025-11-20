@@ -173,4 +173,23 @@ test.describe('Navigation and Core Features', () => {
       await expect(page.locator('text=online|Online')).toBeVisible()
     }
   })
+
+  test('should open About and Features pages from the footer', async ({
+    page,
+  }) => {
+    await page.locator('footer').scrollIntoViewIfNeeded()
+
+    await page.getByRole('link', { name: 'About' }).click()
+    await expect(
+      page.getByRole('heading', {
+        name: /IA opérationnelle pensée pour les PME françaises/i,
+      })
+    ).toBeVisible()
+
+    await page.locator('footer').scrollIntoViewIfNeeded()
+    await page.getByRole('link', { name: 'Features' }).click()
+    await expect(
+      page.getByRole('heading', { name: /Toute la profondeur produit/i })
+    ).toBeVisible()
+  })
 })

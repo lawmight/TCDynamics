@@ -1,16 +1,8 @@
-import {
-  ArrowRight,
-  BarChart3,
-  Brain,
-  FileText,
-  Lock,
-  MessageSquare,
-  Shield,
-  Zap,
-} from 'lucide-react'
+import { ArrowRight, Brain, Lock, Zap } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
+import { featureModules } from '@/data/productHighlights'
 
 const Features = () => {
   const navigate = useNavigate()
@@ -47,57 +39,6 @@ const Features = () => {
     '0.2s': 'fade-delay-02',
     '0.3s': 'fade-delay-03',
   } as const
-
-  const features = [
-    {
-      icon: FileText,
-      title: 'IA Documentaire',
-      subtitle: 'TRAITEMENT INTELLIGENT',
-      description:
-        'Analysez automatiquement vos factures, contrats et documents légaux. Notre IA extrait les données clés en quelques secondes.',
-      benefits: [
-        '99.7% de précision',
-        'Traitement en temps réel',
-        'Export vers vos outils',
-      ],
-      color: 'primary',
-      delay: '0s',
-    },
-    {
-      icon: MessageSquare,
-      title: 'Service Client IA',
-      subtitle: 'SUPPORT AUTOMATISÉ',
-      description:
-        'Chatbots intelligents qui comprennent vos clients et résolvent 80% des demandes sans intervention humaine.',
-      benefits: [
-        '24h/7j disponible',
-        'Multilingue FR/EN',
-        'Escalade automatique',
-      ],
-      color: 'primary-glow',
-      delay: '0.1s',
-    },
-    {
-      icon: BarChart3,
-      title: 'Analytics Métier',
-      subtitle: 'BUSINESS INTELLIGENCE',
-      description:
-        'Tableaux de bord en temps réel pour piloter votre entreprise. KPIs automatiques et alertes intelligentes.',
-      benefits: ['Prédictions IA', 'Alertes proactives', 'ROI mesurable'],
-      color: 'primary',
-      delay: '0.2s',
-    },
-    {
-      icon: Shield,
-      title: 'Conformité RGPD',
-      subtitle: 'SÉCURITÉ GARANTIE',
-      description:
-        'Protection maximale de vos données. Audit automatique de conformité et chiffrement bancaire.',
-      benefits: ['Hébergement France', 'Audit continu', 'Certification ISO'],
-      color: 'primary-glow',
-      delay: '0.3s',
-    },
-  ]
 
   return (
     <section className="relative overflow-hidden bg-background py-20 lg:py-32">
@@ -168,7 +109,7 @@ const Features = () => {
 
         {/* Features Grid */}
         <div className="mb-16 grid gap-8 md:grid-cols-2">
-          {features.map((feature, index) => {
+          {featureModules.map((feature, index) => {
             const colors =
               colorVariants[feature.color as keyof typeof colorVariants]
             const delayClass =
