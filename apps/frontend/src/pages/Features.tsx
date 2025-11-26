@@ -53,7 +53,7 @@ const reliabilityHighlights = [
   {
     title: 'RGPD et sécurité',
     detail:
-      'Hébergement OVHcloud, politiques TermsFeed, chiffrement TLS et isolement des traitements IA côté Azure.',
+      'Hébergement Vercel (conformité RGPD), politiques TermsFeed, chiffrement TLS et isolement des traitements IA côté Azure.',
   },
   {
     title: 'Équipe locale engagée',

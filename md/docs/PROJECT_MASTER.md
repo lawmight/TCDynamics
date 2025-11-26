@@ -1,12 +1,12 @@
 # 🎯 TCDynamics Master Status - Single Source of Truth
 
-**Last Updated**: November 19, 2025  
+**Last Updated**: November 23, 2025  
 **Status**: 🟢 Production Live | 🟡 Customer Feedback Instrumentation Live (metrics pending) | 🟡 Stripe Not Production-Ready
 
 ---
 
 > **AUTHORITATIVE SOURCE**: This is the single source of truth for TCDynamics project status.
-> All other documentation should reference this document. Last verified: October 25, 2025
+> All other documentation should reference this document. Last verified: November 23, 2025
 
 ## 🚨 CRITICAL: Documentation Inconsistencies Resolved
 
@@ -17,6 +17,7 @@ This document serves as the definitive reference for TCDynamics project status. 
 - **Azure Functions**: Confirmed deployed and operational (not removed as claimed in WHAT_CHANGED.md)
 - **Stripe Integration**: Fully implemented and working locally (not removed as claimed in WHAT_CHANGED.md)
 - **Architecture**: Hybrid system (React + Node.js + Azure Functions) actively maintained
+- **Hosting Migration**: Migrated from OVHcloud to Vercel during Week 5-6 (November 2025) for improved developer experience and serverless architecture
 
 ---
 
@@ -24,19 +25,20 @@ This document serves as the definitive reference for TCDynamics project status. 
 
 ### Production Status: 🟢 OPERATIONAL
 
-| Component       | Status  | Location                         | Health     |
-| --------------- | ------- | -------------------------------- | ---------- |
-| **Frontend**    | ✅ Live | OVHcloud (https://tcdynamics.fr) | 🟢 Healthy |
-| **Backend API** | ✅ Live | OVHcloud                         | 🟢 Healthy |
-| **AI Services** | ✅ Live | Azure Functions                  | 🟢 Healthy |
-| **Database**    | ✅ Live | Cosmos DB                        | 🟢 Healthy |
-| **Email**       | ✅ Live | Zoho Mail                        | 🟢 Healthy |
+| Component       | Status  | Location                                     | Health     |
+| --------------- | ------- | -------------------------------------------- | ---------- |
+| **Frontend**    | ✅ Live | Vercel (https://tcdynamics.fr)               | 🟢 Healthy |
+| **API Routes**  | ✅ Live | Vercel Serverless Functions (`/api/**/*.js`) | 🟢 Healthy |
+| **AI Services** | ✅ Live | Azure Functions                              | 🟢 Healthy |
+| **Database**    | ✅ Live | Supabase (feedback) + Cosmos DB (documents)  | 🟢 Healthy |
+| **Email**       | ✅ Live | Zoho Mail                                    | 🟢 Healthy |
 
 ### What's Working:
 
-- ✅ Contact & demo forms with Azure → Node fallback and analytics tracking
-- ✅ Post-submission feedback overlay (demo + contact) saving to Supabase
-- ✅ Document processing (Azure Vision API)
+- ✅ Contact & demo forms via Vercel serverless functions (`/api/contactform`, `/api/demoform`) with analytics tracking
+- ✅ Post-submission feedback overlay (demo + contact) - feedback handling via frontend integration
+- ✅ Document processing (Azure Vision API via `/api/vision`)
+- ✅ AI Chat via Vercel serverless function (`/api/chat`)
 - ✅ User authentication (Supabase)
 - ✅ Responsive design on all devices
 
@@ -51,10 +53,11 @@ This document serves as the definitive reference for TCDynamics project status. 
 
 ### Week 5-6 Customer Validation Snapshot
 
+- 🚀 **Hosting Migration**: Migrated from OVHcloud to Vercel for improved developer experience, automatic deployments, and serverless architecture. Domain `tcdynamics.fr` now points to Vercel deployment.
 - 🔌 **AI chatbot temporarily disabled** to minimize distractions while interviewing customers (`apps/frontend/src/App.tsx`).
 - 📈 **@vercel/analytics** instrumentation wraps the entire app and `useFormSubmit` hook to capture `form_submitted/form_error` events.
 - 💬 **PostSubmissionFeedback** modal now asks every successful form submitter for a 1–5 rating, optional comment, and follow-up permission (`apps/frontend/src/components/PostSubmissionFeedback.tsx`).
-- 🗃️ **POST /api/feedback** route in the Node backend writes feedback into Supabase (with graceful logging when Supabase creds are absent).
+- 🗃️ **Feedback handling**: Currently implemented in `apps/backend/src/routes/feedback.js` (Express server, dev only). Production uses Vercel serverless functions for contact/demo forms with Supabase integration.
 - 🧾 **Stripe endpoints hardened** to surface clearer errors when env vars are missing (`api/stripe/session`, `api/stripe/webhook`).
 
 ---
@@ -68,26 +71,26 @@ This document serves as the definitive reference for TCDynamics project status. 
 │                      TCDynamics System                       │
 ├─────────────────────────────────────────────────────────────┤
 │                                                               │
-│  ┌─────────────────┐         ┌──────────────────┐          │
-│  │  React Frontend │────────▶│  Node.js Backend │          │
-│  │   (Vite 7.1)    │         │     (Express)    │          │
-│  │   Port: Dev     │         │   API Routes     │          │
-│  └─────────────────┘         └──────────────────┘          │
+│  ┌─────────────────┐         ┌──────────────────────────┐  │
+│  │  React Frontend │────────▶│  Vercel Serverless API   │  │
+│  │   (Vite 7.1)    │         │  (`/api/**/*.js` routes) │  │
+│  │   on Vercel     │         │  • Contact, Demo, Chat   │  │
+│  └─────────────────┘         │  • Vision, Health, Stripe│  │
+│         │                     └──────────────────────────┘  │
 │         │                             │                      │
 │         │                             │                      │
 │         ▼                             ▼                      │
 │  ┌──────────────────────────────────────────────┐          │
 │  │         Azure Functions (Python 3.11)         │          │
-│  │  • Contact Form Handler                       │          │
-│  │  • Demo Request Handler                       │          │
 │  │  • AI Chat (Azure OpenAI)                    │          │
 │  │  • Vision API (Document Processing)          │          │
 │  └──────────────────────────────────────────────┘          │
 │                                                               │
 │  Deployment:                                                  │
-│  • Frontend → OVHcloud (https://tcdynamics.fr)              │
-│  • Backend → OVHcloud                                        │
-│  • Functions → Azure (func-tcdynamics-contact)              │
+│  • Frontend → Vercel (https://tcdynamics.fr)                │
+│  • API Routes → Vercel Serverless Functions (`/api/**/*.js`)│
+│  • AI Functions → Azure (func-tcdynamics-contact)          │
+│  • Express Backend (`apps/backend`) → Local dev only        │
 │                                                               │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -104,10 +107,20 @@ This document serves as the definitive reference for TCDynamics project status. 
 - **Testing**: Vitest 3.2.4 + React Testing Library + Playwright
 - **Icons**: Lucide React 0.544.0
 
-#### Backend
+#### Backend API (Production)
+
+- **Platform**: Vercel Serverless Functions
+- **Runtime**: Node.js 18+
+- **Routes**: `/api/**/*.js` serverless functions (contactform, demoform, chat, vision, health, stripe)
+- **Dependencies**: Stripe, Supabase, Resend, Sentry
+- **Testing**: Manual testing + Vercel function logs
+
+#### Express Backend (Development Only)
 
 - **Runtime**: Node.js 18+
 - **Framework**: Express.js 4.21.2
+- **Location**: `apps/backend` (not deployed to production)
+- **Purpose**: Local development, testing, and API route development
 - **Validation**: Joi 17.13.3
 - **Security**: Helmet 8.1.0, CORS, rate limiting
 - **Email**: Nodemailer 6.10.1 (Zoho Mail)
@@ -123,10 +136,11 @@ This document serves as the definitive reference for TCDynamics project status. 
 
 #### DevOps & Infrastructure
 
-- **Hosting**: OVHcloud (frontend), Azure Functions (AI services)
-- **CI/CD**: GitHub Actions
-- **Containerization**: Docker support
-- **Process Manager**: PM2 for production
+- **Hosting**: Vercel (frontend + API serverless functions), Azure Functions (AI services)
+- **API Architecture**: Vercel serverless functions (`/api/**/*.js`) handle contact, demo, chat, vision, health, and Stripe endpoints
+- **Express Backend**: `apps/backend` is a traditional Express server used for local development only, not deployed to production
+- **CI/CD**: Vercel auto-deploy (GitHub integration) + GitHub Actions for Azure Functions
+- **Containerization**: Docker support (local development)
 
 ---
 
@@ -226,7 +240,7 @@ This document serves as the definitive reference for TCDynamics project status. 
 | **Azure Functions**    | Removed, simplified to Node.js only | Deployed and operational                  | ❌ **INCORRECT** |
 | **Stripe Integration** | Removed, not needed for MVP         | Fully implemented, working locally        | ❌ **INCORRECT** |
 | **Architecture**       | Node.js + React only                | Hybrid: React + Node.js + Azure Functions | ❌ **INCORRECT** |
-| **Deployment**         | FileZilla + PM2 only                | OVHcloud + Azure Functions                | ❌ **INCORRECT** |
+| **Deployment**         | FileZilla + PM2 only                | Vercel + Azure Functions                  | ❌ **INCORRECT** |
 
 ### Why This Matters:
 

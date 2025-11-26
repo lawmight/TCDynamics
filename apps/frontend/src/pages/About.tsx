@@ -25,7 +25,7 @@ const missionPillars = [
   {
     title: 'Transparence & conformité',
     description:
-      'Chaque flux de données est documenté, de la collecte OVHcloud aux traitements Azure Functions.',
+      'Chaque flux de données est documenté, de la collecte Vercel aux traitements Azure Functions.',
     proof: 'Politique RGPD maintenue à jour via TermsFeed et audits réguliers.',
     icon: ShieldCheck,
   },
@@ -41,12 +41,12 @@ const missionPillars = [
 const deploymentFootprint = [
   {
     label: 'Frontend React 18',
-    detail: 'Hébergé sur OVHcloud (https://tcdynamics.fr) avec Vite 7.1',
+    detail: 'Hébergé sur Vercel (https://tcdynamics.fr) avec Vite 7.1',
   },
   {
-    label: 'API Node.js',
+    label: 'API Routes',
     detail:
-      'Routes Express sécurisées (Helmet, rate limiting) déployées sur la même infrastructure OVHcloud.',
+      'Routes serverless sécurisées déployées sur Vercel (`/api/**/*.js`) pour contact, demo, chat, vision et Stripe.',
   },
   {
     label: 'Azure Functions',
@@ -64,7 +64,7 @@ const complianceCommitments = [
   {
     title: 'Hébergement souverain',
     detail:
-      'Les données clients restent en France via OVHcloud, avec redondance Azure limitée aux traitements IA.',
+      'Les données clients restent en Europe via Vercel (conformité RGPD), avec redondance Azure limitée aux traitements IA.',
   },
   {
     title: 'Sécurité opérationnelle',
@@ -101,7 +101,7 @@ const milestones = [
     date: 'Aujourd’hui',
     title: 'Architecture hybride live',
     detail:
-      'Frontend OVHcloud, backend Node, Azure Functions IA et emails Zoho tous opérationnels.',
+      'Frontend Vercel, API routes serverless (Vercel), Azure Functions IA et emails Zoho tous opérationnels.',
   },
 ]
 
@@ -138,7 +138,7 @@ const About = () => {
         <div className="container mx-auto px-4">
           <div className="mb-6 flex flex-wrap items-center gap-3">
             <Badge variant="outline" className="font-mono">
-              Made in France · OVHcloud + Azure
+              Made in France · Vercel + Azure
             </Badge>
             <Badge className="bg-primary/15 font-mono text-primary">
               Réponse sous 2h garantie
@@ -159,7 +159,7 @@ const About = () => {
             <div className="flex items-center gap-3">
               <CheckCircle2 className="text-primary" aria-hidden="true" />
               <span className="font-mono text-sm text-muted-foreground">
-                Frontend + backend live sur OVHcloud
+                Frontend + backend live sur Vercel
               </span>
             </div>
             <div className="flex items-center gap-3">

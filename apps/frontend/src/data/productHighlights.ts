@@ -117,9 +117,9 @@ export const featureModules: FeatureModule[] = [
     delay: '0.3s',
     detail: {
       mission:
-        'Garantir que chaque flux – OVHcloud, Azure Functions, emails Zoho – respecte les exigences européennes.',
+        'Garantir que chaque flux – Vercel, Azure Functions, emails Zoho – respecte les exigences européennes.',
       proofPoints: [
-        'Données clients hébergées sur OVHcloud (France)',
+        'Données clients hébergées sur Vercel (conformité RGPD)',
         'Azure Functions isolées pour les traitements IA',
         'Politique RGPD actualisée avec TermsFeed',
       ],
@@ -127,7 +127,7 @@ export const featureModules: FeatureModule[] = [
         { label: 'Incidents sécurité', value: '0 signalé' },
         { label: 'SLA support', value: '- 2 h' },
       ],
-      integrations: ['OVHcloud', 'Azure Functions', 'TermsFeed Policies'],
+      integrations: ['Vercel', 'Azure Functions', 'TermsFeed Policies'],
     },
   },
 ]

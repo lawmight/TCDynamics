@@ -33,14 +33,14 @@ TCDynamics/
 
 ## 🛠️ Technology Stack
 
-| Component     | Technology                     | Status         |
-| ------------- | ------------------------------ | -------------- |
-| **Frontend**  | React 18.3 + TypeScript + Vite | ✅ Production  |
-| **Backend**   | Node.js + Express              | ✅ Production  |
-| **Functions** | Azure Functions (Python 3.11)  | ✅ Deployed    |
-| **Database**  | Cosmos DB                      | ✅ Configured  |
-| **CI/CD**     | GitHub Actions                 | ✅ Operational |
-| **Hosting**   | OVHcloud + Azure               | ✅ Live        |
+| Component     | Technology                                | Status         |
+| ------------- | ----------------------------------------- | -------------- |
+| **Frontend**  | React 18.3 + TypeScript + Vite            | ✅ Production  |
+| **Backend**   | Node.js + Express                         | ✅ Production  |
+| **Functions** | Azure Functions (Python 3.11)             | ✅ Deployed    |
+| **Database**  | Cosmos DB                                 | ✅ Configured  |
+| **CI/CD**     | GitHub Actions                            | ✅ Operational |
+| **Hosting**   | Vercel (frontend + API) + Azure Functions | ✅ Live        |
 
 ## 🚀 Quick Start
 
@@ -137,21 +137,19 @@ npm run format
 
 ### Automated Deployment
 
-- **Frontend**: GitHub Actions → OVHcloud
+- **Frontend + Backend API**: Vercel auto-deploy (via GitHub integration)
 - **Azure Functions**: GitHub Actions → Azure
 - **CI/CD**: Full pipeline with testing and health checks
 
 ### Manual Deployment
 
 ```bash
+# Deploy to Vercel (frontend + API)
+vercel --prod
+
 # Deploy Azure Functions
 cd apps/functions
 func azure functionapp publish func-tcdynamics-contact
-
-# Build and deploy frontend
-cd apps/frontend
-npm run build
-# Upload dist/ to OVHcloud
 ```
 
 ## 🧪 Testing

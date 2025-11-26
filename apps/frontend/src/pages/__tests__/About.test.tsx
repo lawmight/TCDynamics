@@ -29,7 +29,7 @@ describe('About Page', () => {
       })
     ).toBeInTheDocument()
     expect(
-      screen.getByText(/Frontend \+ backend live sur OVHcloud/i)
+      screen.getByText(/Frontend \+ backend live sur Vercel/i)
     ).toBeInTheDocument()
     expect(
       screen.getByText(/Azure Functions Python 3\.11 actives/i)
