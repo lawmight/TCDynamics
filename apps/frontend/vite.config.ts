@@ -29,7 +29,9 @@ export default defineConfig(({ mode }) => ({
         brotliSize: true,
       }),
     // Image optimization for production builds
-    mode === 'production' &&
+    // Temporarily disabled due to dependency issues on Vercel
+    // mode === 'production' &&
+    false &&
       viteImagemin({
         gifsicle: {
           optimizationLevel: 7,
