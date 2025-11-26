@@ -44,7 +44,9 @@
     "stripe": "^17.4.0"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "@typescript-eslint/scope-manager": "^8.48.0",
+    "concurrently": "^8.2.2",
+    "yaml": "^2.8.1"
   },
   "engines": {
     "node": ">=18.0.0",
