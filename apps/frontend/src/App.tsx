@@ -12,6 +12,7 @@ import Footer from './components/Footer'
 import OfflineIndicator from './components/OfflineIndicator'
 import PerformanceMonitor from './components/PerformanceMonitor'
 import SimpleNavigation from './components/SimpleNavigation'
+import { ThemeProvider } from './components/ThemeProvider'
 
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import { Toaster } from '@/components/ui/toaster'
@@ -107,7 +108,8 @@ const handleAppError = (
 }
 
 const App = () => (
-  <ErrorBoundary onError={handleAppError}>
+  <ThemeProvider>
+    <ErrorBoundary onError={handleAppError}>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
@@ -162,6 +164,7 @@ const App = () => (
       </TooltipProvider>
     </QueryClientProvider>
   </ErrorBoundary>
+  </ThemeProvider>
 )
 
 export default App

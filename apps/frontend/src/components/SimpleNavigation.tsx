@@ -1,6 +1,7 @@
-import { ArrowUp, Menu, X } from 'lucide-react'
+import { ArrowUp, Menu, X, Sun, Moon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useTheme } from '@/components/ThemeProvider'
 
 const SimpleNavigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -8,7 +9,7 @@ const SimpleNavigation = () => {
   const [showBackToTop, setShowBackToTop] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
-
+  const { resolvedTheme, setTheme } = useTheme()
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY
@@ -89,6 +90,18 @@ const SimpleNavigation = () => {
                   >
                     Connect
                   </Link>
+                  {/* Theme Toggle - Desktop */}
+                  <button
+                    className="theme-toggle p-2 md:p-0"
+                    onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+                    title="Toggle theme"
+                    aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+                  >
+                    <div className="sun-moon">
+                      <div className="sun" />
+                      <div className="moon" />
+                    </div>
+                  </button>
                 </>
               ) : (
                 <>
@@ -158,6 +171,21 @@ const SimpleNavigation = () => {
                 >
                   Connect
                 </Link>
+                {/* Theme Toggle - Mobile */}
+                <button
+                  className="theme-toggle mx-auto my-2 p-2 w-12 h-12"
+                  onClick={() => {
+                    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
+                    setIsMobileMenuOpen(false)
+                  }}
+                  title="Toggle theme"
+                  aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+                >
+                  <div className="sun-moon">
+                    <div className="sun" />
+                    <div className="moon" />
+                  </div>
+                </button>
               </nav>
             </div>
           </div>

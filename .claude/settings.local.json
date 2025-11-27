@@ -18,7 +18,10 @@
       "Bash(vercel domains:*)",
       "Bash(ovh:*)",
       "Bash(nslookup:*)",
-      "Bash(vercel logs:*)"
+      "Bash(vercel logs:*)",
+      "Bash(rm:*)",
+      "Bash(del:*)",
+      "Bash(git add:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
