@@ -2,7 +2,6 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import path from 'path'
 import { visualizer } from 'rollup-plugin-visualizer'
-import viteImagemin from 'vite-plugin-imagemin'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -28,38 +27,8 @@ export default defineConfig(({ mode }) => ({
         gzipSize: true,
         brotliSize: true,
       }),
-    // Image optimization for production builds
-    // Temporarily disabled due to dependency issues on Vercel
-    // mode === 'production' &&
-    false &&
-      viteImagemin({
-        gifsicle: {
-          optimizationLevel: 7,
-          interlaced: false,
-        },
-        optipng: {
-          optimizationLevel: 7,
-        },
-        mozjpeg: {
-          quality: 80,
-        },
-        pngquant: {
-          quality: [0.8, 0.9],
-          speed: 4,
-        },
-        svgo: {
-          plugins: [
-            {
-              name: 'removeViewBox',
-              active: false,
-            },
-            {
-              name: 'removeEmptyAttrs',
-              active: true,
-            },
-          ],
-        },
-      }),
+    // Image optimization removed (vite-plugin-imagemin vulns/Vercel issues)
+    // Vite handles basic opt natively
   ].filter(Boolean),
   resolve: {
     alias: {
