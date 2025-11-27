@@ -145,5 +145,6 @@
     "XXX",
     "[ ]",
     "[x]"
-  ]
+  ],
+  "jest.enable": false
 }

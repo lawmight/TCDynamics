@@ -41,7 +41,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/contact"
+                  to="/#contact"
                   className="text-slate-400 transition-colors hover:text-primary"
                 >
                   Contact
@@ -56,7 +56,7 @@ const Footer = () => {
             <ul className="space-y-2">
               <li>
                 <Link
-                  to="/features"
+                  to="/#features"
                   className="text-slate-400 transition-colors hover:text-primary"
                 >
                   Features
@@ -64,7 +64,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/pricing"
+                  to="/#pricing"
                   className="text-slate-400 transition-colors hover:text-primary"
                 >
                   Pricing

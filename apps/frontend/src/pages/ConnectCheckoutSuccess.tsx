@@ -230,7 +230,7 @@ const ConnectCheckoutSuccess = () => {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Button variant="outline" size="sm" asChild>
-                    <Link to="/contact">
+                    <Link to="/#contact">
                       <ExternalLink className="w-4 h-4 mr-2" />
                       Contact Support
                     </Link>

@@ -110,7 +110,7 @@ const Checkout = () => {
         <div className="mx-auto max-w-5xl">
           {/* Back Button */}
           <Button asChild variant="ghost" className="mb-8" size="sm">
-            <Link to="/pricing">
+            <Link to="/#pricing">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Retour aux tarifs
             </Link>
@@ -311,7 +311,7 @@ const Checkout = () => {
                       className="flex-1"
                       size="sm"
                     >
-                      <Link to="/contact">Contactez-nous</Link>
+                      <Link to="/#contact">Contactez-nous</Link>
                     </Button>
                     <Button
                       asChild

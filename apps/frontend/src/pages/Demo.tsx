@@ -469,7 +469,7 @@ const Demo = () => {
                           production.
                         </p>
                         <Button asChild variant="outline" size="sm">
-                          <Link to="/contact">
+                          <Link to="/#contact">
                             En savoir plus
                             <ArrowRight className="ml-2 h-4 w-4" />
                           </Link>
@@ -505,7 +505,7 @@ const Demo = () => {
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild>
-                  <Link to="/pricing">
+                  <Link to="/#pricing">
                     Voir les tarifs
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>

@@ -33,6 +33,7 @@ AzureFunctionsTools/
 .idea/
 .cursor/*
 !.cursor/rules/
+.claude/
 *.swp
 *.swo
 *~

@@ -21,10 +21,17 @@ const SimpleNavigation = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId)
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' })
+  const handleNavClick = (item: any) => {
+    if (item.scrollId && location.pathname === '/') {
+      const element = document.getElementById(item.scrollId)
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' })
+        setIsMobileMenuOpen(false)
+        return
+      }
+    }
+    if (item.path) {
+      navigate(item.path)
       setIsMobileMenuOpen(false)
     }
   }
@@ -36,7 +43,7 @@ const SimpleNavigation = () => {
   const handleLogoClick = () => {
     if (location.pathname === '/') {
       // If on home page, scroll to hero section
-      scrollToSection('hero')
+      handleNavClick({scrollId: 'hero'})
     } else {
       // If on any other page, navigate to home
       navigate('/')
@@ -44,11 +51,12 @@ const SimpleNavigation = () => {
   }
 
   const navigationItems = [
-    { label: 'Accueil', id: 'hero' },
-    { label: 'Fonctionnalités', id: 'features' },
-    { label: 'Comment ça marche', id: 'how-it-works' },
-    { label: 'Tarifs', id: 'pricing' },
-    { label: 'Contact', id: 'contact' },
+    { label: 'Accueil', scrollId: 'hero' },
+    { label: 'Fonctionnalités', scrollId: 'features' },
+    { label: 'Tarifs', scrollId: 'pricing' },
+    { label: 'À propos', path: '/about' },
+    { label: 'Démo', path: '/demo' },
+    { label: 'Démarrer', path: '/get-started' },
   ]
 
   return (
@@ -77,8 +85,8 @@ const SimpleNavigation = () => {
                 <>
                   {navigationItems.map(item => (
                     <button
-                      key={item.id}
-                      onClick={() => scrollToSection(item.id)}
+                      key={item.label}
+                      onClick={() => handleNavClick(item)}
                       className="px-0 py-2.5 text-foreground/80 transition-colors hover:text-primary"
                     >
                       {item.label}
@@ -140,8 +148,8 @@ const SimpleNavigation = () => {
                 {location.pathname === '/' ? (
                   navigationItems.map(item => (
                     <button
-                      key={item.id}
-                      onClick={() => scrollToSection(item.id)}
+                      key={item.label}
+                      onClick={() => handleNavClick(item)}
                       className="py-2 text-left text-foreground/80 transition-colors hover:text-primary"
                     >
                       {item.label}

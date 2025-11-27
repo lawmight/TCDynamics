@@ -1,7 +1,13 @@
 # NIA Sources Tracking
 
 ## Indexed Resources
-(To be updated as resources are indexed)
+
+### Repositories
+- **anthropics/skills** - https://github.com/anthropics/skills.git
+  - **Indexed**: 2025-01-XX
+  - **Status**: Indexing in progress (cloning stage)
+  - **Description**: Public repository containing example skills for Claude, including creative, development, enterprise, and document skills
+  - **Branch**: main
 
 ## Research Sessions
 

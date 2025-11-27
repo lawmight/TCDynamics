@@ -131,19 +131,29 @@ export default async function handler(req, res) {
 }
 
 // Helper function to get raw body (needed for signature verification)
+// Stripe requires the raw binary Buffer for HMAC signature verification
 async function getRawBody(req) {
+  // If body is already a string, convert it to Buffer
   if (req.body && typeof req.body === 'string') {
+    return Buffer.from(req.body, 'utf8');
+  }
+
+  // If body is already a Buffer, return it directly
+  if (Buffer.isBuffer(req.body)) {
     return req.body;
   }
 
+  // Collect chunks as Buffers (not strings) to preserve binary data
   return new Promise((resolve, reject) => {
-    let data = '';
-    req.setEncoding('utf8');
+    const chunks = [];
+    // Do NOT set encoding - we need raw binary data
     req.on('data', chunk => {
-      data += chunk;
+      // Ensure chunk is a Buffer
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
     });
     req.on('end', () => {
-      resolve(data);
+      // Concatenate all Buffer chunks into a single Buffer
+      resolve(Buffer.concat(chunks));
     });
     req.on('error', reject);
   });

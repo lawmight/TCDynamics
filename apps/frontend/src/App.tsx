@@ -2,7 +2,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Analytics } from '@vercel/analytics/react'
 import { Suspense, lazy } from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
 
 import ErrorBoundary from './components/ErrorBoundary'
 // import MobileNavigation from './components/MobileNavigation' // DISABLED: Causes black page
@@ -31,9 +31,6 @@ const Pages = lazy(() => import('./pages/Pages'))
 const Diagnostics = lazy(() => import('./pages/Diagnostics'))
 const Recommendations = lazy(() => import('./pages/Recommendations'))
 const Settings = lazy(() => import('./pages/Settings'))
-const Pricing = lazy(() => import('./pages/Pricing'))
-const Contact = lazy(() => import('./pages/Contact'))
-const FeaturesPage = lazy(() => import('./pages/Features'))
 
 // Stripe Connect pages
 const ConnectDashboard = lazy(() => import('./pages/ConnectDashboard'))
@@ -134,11 +131,12 @@ const App = () => (
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/checkout-success" element={<CheckoutSuccess />} />
               <Route path="/demo" element={<Demo />} />
-              <Route path="/contact" element={<Contact />} />
               <Route path="/get-started" element={<GetStarted />} />
-              <Route path="/pricing" element={<Pricing />} />
               <Route path="/about" element={<About />} />
-              <Route path="/features" element={<FeaturesPage />} />
+
+              <Route path="/features" element={<Navigate to="/#features" replace />} />
+              <Route path="/pricing" element={<Navigate to="/#pricing" replace />} />
+              <Route path="/contact" element={<Navigate to="/#contact" replace />} />
 
               {/* Stripe Connect Routes */}
               <Route path="/connect/dashboard" element={<ConnectDashboard />} />

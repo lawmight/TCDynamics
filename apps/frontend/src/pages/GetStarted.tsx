@@ -498,7 +498,7 @@ const GetStarted = () => {
                             </Link>
                           </Button>
                           <Button asChild variant="outline" size="sm">
-                            <Link to="/contact">
+                            <Link to="/#contact">
                               Contacter le support
                               <ArrowRight className="ml-2 h-4 w-4" />
                             </Link>
