@@ -11,9 +11,9 @@
     --card-foreground: 0 0% 10%;
     --popover: 50 20% 95%;
     --popover-foreground: 0 0% 10%;
-    --primary: 45 90% 55%; /* Pale gold */
+    --primary: 200deg 95% 48%; /* sky-500 (old blue) */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 45 90% 65%;
+    --primary-glow: 200deg 95% 60%; /* sky-400 (old blue glow) */
     --secondary: 50 30% 92%;
     --secondary-foreground: 0 0% 20%;
     --muted: 50 30% 92%;
@@ -24,8 +24,8 @@
     --destructive-foreground: 0 0% 98%;
     --border: 50 20% 85%;
     --input: 50 20% 95%;
-    --ring: 45 90% 55%;
-    --chart-1: 45 90% 55%;
+    --ring: 200deg 95% 48%;
+    --chart-1: 200deg 95% 48%;
     --chart-2: 142deg 76% 45%;
     --chart-3: 25deg 95% 61%;
     --chart-4: 262deg 83% 58%;
@@ -75,9 +75,9 @@
     --card-foreground: 0 0% 98%;
     --popover: 0 0% 6%;
     --popover-foreground: 0 0% 98%;
-    --primary: 45 90% 55%; /* Gold glow in dark */
+    --primary: 200deg 95% 48%; /* sky-500 (old blue) */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 45 90% 65%;
+    --primary-glow: 200deg 95% 60%; /* sky-400 (old blue glow) */
     --secondary: 0 0% 16%;
     --secondary-foreground: 0 0% 98%;
     --muted: 0 0% 16%;
@@ -88,8 +88,8 @@
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 16%;
     --input: 0 0% 16%;
-    --ring: 45 90% 55%;
-    --chart-1: 45 90% 55%;
+    --ring: 200deg 95% 48%;
+    --chart-1: 200deg 95% 48%;
     --chart-2: 142 76% 45%;
     --chart-3: 25 95% 61%;
     --chart-4: 262 83% 58%;
@@ -395,7 +395,9 @@ html {
   border: none;
   background: hsla(var(--primary), 0.2);
   backdrop-filter: blur(20px);
-  box-shadow: var(--shadow-elegant), inset 0 2px 4px hsla(0 0% 0% / 0.1);
+  box-shadow:
+    var(--shadow-elegant),
+    inset 0 2px 4px hsla(0 0% 0% / 0.1);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -405,7 +407,9 @@ html {
 
 .theme-toggle:hover {
   transform: scale(1.1) rotate(10deg);
-  box-shadow: var(--shadow-button), 0 0 2rem hsla(var(--primary-glow), 0.4);
+  box-shadow:
+    var(--shadow-button),
+    0 0 2rem hsla(var(--primary-glow), 0.4);
   background: hsla(var(--primary), 0.3);
 }
 
@@ -425,7 +429,9 @@ html {
   height: 100%;
   border-radius: 50%;
   background: hsl(var(--primary));
-  box-shadow: 0 0 1.25rem hsla(var(--primary-glow), 0.6), 0 0 2.5rem hsla(var(--primary-glow), 0.3);
+  box-shadow:
+    0 0 1.25rem hsla(var(--primary-glow), 0.6),
+    0 0 2.5rem hsla(var(--primary-glow), 0.3);
   opacity: 1;
   transform: scale(1) rotate(0deg);
   transition: var(--transition-smooth);
@@ -462,7 +468,12 @@ html {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(90deg, transparent 0%, hsla(0 0% 100% / 0.1) 50%, transparent 100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    hsla(0 0% 100% / 0.1) 50%,
+    transparent 100%
+  );
   opacity: 0;
   transition: opacity 0.3s;
   border-radius: inherit;
@@ -474,11 +485,11 @@ html {
 }
 
 @keyframes scanline {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(-100%);
   }
   100% {
     transform: translateX(100%);
   }
 }
-
