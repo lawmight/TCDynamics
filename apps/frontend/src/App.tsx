@@ -11,6 +11,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import Footer from './components/Footer'
 import OfflineIndicator from './components/OfflineIndicator'
 import PerformanceMonitor from './components/PerformanceMonitor'
+import ScrollToTop from './components/ScrollToTop'
 import SimpleNavigation from './components/SimpleNavigation'
 import { ThemeProvider } from './components/ThemeProvider'
 
@@ -107,61 +108,74 @@ const handleAppError = (
 const App = () => (
   <ThemeProvider>
     <ErrorBoundary onError={handleAppError}>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <OfflineIndicator />
-        <PerformanceMonitor />
-        <Analytics />
-        {/* <LazyAIChatbot /> */}
-        <BrowserRouter>
-          <SimpleNavigation />
-          {/* DISABLED: MobileNavigation and StickyHeader cause black page */}
-          {/* <MobileNavigation /> */}
-          {/* <StickyHeader /> */}
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/pages" element={<Pages />} />
-              <Route path="/diagnostics" element={<Diagnostics />} />
-              <Route path="/recommendations" element={<Recommendations />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/checkout-success" element={<CheckoutSuccess />} />
-              <Route path="/demo" element={<Demo />} />
-              <Route path="/get-started" element={<GetStarted />} />
-              <Route path="/about" element={<About />} />
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <OfflineIndicator />
+          <PerformanceMonitor />
+          <Analytics />
+          {/* <LazyAIChatbot /> */}
+          <BrowserRouter>
+            <SimpleNavigation />
+            {/* DISABLED: MobileNavigation and StickyHeader cause black page */}
+            {/* <MobileNavigation /> */}
+            {/* <StickyHeader /> */}
+            <ScrollToTop />
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/pages" element={<Pages />} />
+                <Route path="/diagnostics" element={<Diagnostics />} />
+                <Route path="/recommendations" element={<Recommendations />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/checkout-success" element={<CheckoutSuccess />} />
+                <Route path="/demo" element={<Demo />} />
+                <Route path="/get-started" element={<GetStarted />} />
+                <Route path="/about" element={<About />} />
 
-              <Route path="/features" element={<Navigate to="/#features" replace />} />
-              <Route path="/pricing" element={<Navigate to="/#pricing" replace />} />
-              <Route path="/contact" element={<Navigate to="/#contact" replace />} />
+                <Route
+                  path="/features"
+                  element={<Navigate to="/#features" replace />}
+                />
+                <Route
+                  path="/pricing"
+                  element={<Navigate to="/#pricing" replace />}
+                />
+                <Route
+                  path="/contact"
+                  element={<Navigate to="/#contact" replace />}
+                />
 
-              {/* Stripe Connect Routes */}
-              <Route path="/connect/dashboard" element={<ConnectDashboard />} />
-              <Route
-                path="/connect/products/:accountId"
-                element={<ConnectProducts />}
-              />
-              <Route
-                path="/connect/store/:accountId"
-                element={<ConnectStorefront />}
-              />
-              <Route
-                path="/connect/store/:accountId/success"
-                element={<ConnectCheckoutSuccess />}
-              />
+                {/* Stripe Connect Routes */}
+                <Route
+                  path="/connect/dashboard"
+                  element={<ConnectDashboard />}
+                />
+                <Route
+                  path="/connect/products/:accountId"
+                  element={<ConnectProducts />}
+                />
+                <Route
+                  path="/connect/store/:accountId"
+                  element={<ConnectStorefront />}
+                />
+                <Route
+                  path="/connect/store/:accountId/success"
+                  element={<ConnectCheckoutSuccess />}
+                />
 
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-          <Footer />
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
-  </ErrorBoundary>
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+            <Footer />
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   </ThemeProvider>
 )
 
