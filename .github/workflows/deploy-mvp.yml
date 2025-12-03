@@ -32,6 +32,18 @@ jobs:
         run: npm run lint
         continue-on-error: true
 
+      # Copy API directory to frontend for Vercel serverless functions
+      - name: Copy API directory
+        run: |
+          cp -r api apps/frontend/api
+          echo "✅ API directory copied to apps/frontend/api"
+
+      # Install API dependencies (Vercel will also install these automatically, but this ensures they're available)
+      - name: Install API dependencies
+        working-directory: ./apps/frontend/api
+        run: npm install --production
+        continue-on-error: true
+
       - name: Build frontend
         working-directory: ./apps/frontend
         run: npm run build
