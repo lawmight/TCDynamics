@@ -23,7 +23,7 @@ console.log('✅ Environment variables loaded')
 
 import { createApp } from './app'
 import { loadEnvironment } from './config/environment'
-import { logger } from './utils/logger'
+import type { logger } from './utils/logger'\nimport { logger } from './utils/logger'
 
 /**
  * Start the server

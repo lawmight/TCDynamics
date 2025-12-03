@@ -24,7 +24,7 @@ export function initializeDatabase(config: EnvironmentConfig['database']): Pool 
     ssl: config.ssl,
   })
 
-  pool.on('error', err => {
+  pool.on('error', (err: unknown) => {
     // Prevent the app from crashing due to an idle client error
     // Log and continue; callers should handle query errors
     console.error('Unexpected PG client error', err)
@@ -39,7 +39,7 @@ export function initializeDatabase(config: EnvironmentConfig['database']): Pool 
 export async function query(
   text: string,
   params?: unknown[]
-): Promise<{ rows: unknown[]; rowCount: number }> {
+): Promise<{ rows: unknown[]; rowCount: number | null }> {
   if (!pool) {
     throw new Error('Database pool not initialized. Call initializeDatabase first.')
   }

@@ -32,7 +32,7 @@ export function initializeStripeService(
   // Initialize Stripe with latest API version
   try {
     stripeInstance = new Stripe(config.secretKey, {
-      apiVersion: '2025-09-30.clover',
+      apiVersion: '2024-11-20',
     })
     console.log('✅ Stripe SDK initialized successfully')
     return stripeInstance
