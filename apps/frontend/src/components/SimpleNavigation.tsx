@@ -1,6 +1,7 @@
 import { ArrowUp, Menu, X, Sun, Moon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+
 import { useTheme } from '@/components/ThemeProvider'
 
 const SimpleNavigation = () => {
@@ -43,7 +44,7 @@ const SimpleNavigation = () => {
   const handleLogoClick = () => {
     if (location.pathname === '/') {
       // If on home page, scroll to hero section
-      handleNavClick({scrollId: 'hero'})
+      handleNavClick({ scrollId: 'hero' })
     } else {
       // If on any other page, navigate to home
       navigate('/')
@@ -92,16 +93,12 @@ const SimpleNavigation = () => {
                       {item.label}
                     </button>
                   ))}
-                  <Link
-                    to="/connect/dashboard"
-                    className="px-0 py-3 text-foreground/80 transition-colors hover:text-primary"
-                  >
-                    Connect
-                  </Link>
                   {/* Theme Toggle - Desktop */}
                   <button
                     className="theme-toggle p-2 md:p-0"
-                    onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+                    onClick={() =>
+                      setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
+                    }
                     title="Toggle theme"
                     aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
                   >
@@ -118,12 +115,6 @@ const SimpleNavigation = () => {
                     className="px-0 py-1.5 text-foreground/80 transition-colors hover:text-primary"
                   >
                     Home
-                  </Link>
-                  <Link
-                    to="/connect/dashboard"
-                    className="px-0 py-1.5 text-foreground/80 transition-colors hover:text-primary"
-                  >
-                    Connect
                   </Link>
                 </>
               )}
@@ -168,20 +159,10 @@ const SimpleNavigation = () => {
                     Home
                   </Link>
                 )}
-                {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-                <Link
-                  to="/connect/dashboard"
-                  className="py-2 text-left text-foreground/80 transition-colors hover:text-primary"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  onKeyDown={e =>
-                    e.key === 'Enter' && setIsMobileMenuOpen(false)
-                  }
-                >
-                  Connect
-                </Link>
+                {}
                 {/* Theme Toggle - Mobile */}
                 <button
-                  className="theme-toggle mx-auto my-2 p-2 w-12 h-12"
+                  className="theme-toggle mx-auto my-2 h-12 w-12 p-2"
                   onClick={() => {
                     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
                     setIsMobileMenuOpen(false)

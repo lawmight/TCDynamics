@@ -33,14 +33,6 @@ const Diagnostics = lazy(() => import('./pages/Diagnostics'))
 const Recommendations = lazy(() => import('./pages/Recommendations'))
 const Settings = lazy(() => import('./pages/Settings'))
 
-// Stripe Connect pages
-const ConnectDashboard = lazy(() => import('./pages/ConnectDashboard'))
-const ConnectProducts = lazy(() => import('./pages/ConnectProducts'))
-const ConnectStorefront = lazy(() => import('./pages/ConnectStorefront'))
-const ConnectCheckoutSuccess = lazy(
-  () => import('./pages/ConnectCheckoutSuccess')
-)
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -147,24 +139,6 @@ const App = () => (
                 <Route
                   path="/contact"
                   element={<Navigate to="/#contact" replace />}
-                />
-
-                {/* Stripe Connect Routes */}
-                <Route
-                  path="/connect/dashboard"
-                  element={<ConnectDashboard />}
-                />
-                <Route
-                  path="/connect/products/:accountId"
-                  element={<ConnectProducts />}
-                />
-                <Route
-                  path="/connect/store/:accountId"
-                  element={<ConnectStorefront />}
-                />
-                <Route
-                  path="/connect/store/:accountId/success"
-                  element={<ConnectCheckoutSuccess />}
                 />
 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

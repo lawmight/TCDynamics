@@ -84,14 +84,6 @@ try {
   process.exit(1)
 }
 
-try {
-  stripeConnectRoutes = require('./routes/stripe-connect')
-  console.log('✅ Stripe Connect routes loaded')
-} catch (error) {
-  console.error('❌ Failed to load stripe connect routes:', error.message)
-  console.error(error.stack)
-  process.exit(1)
-}
 
 try {
   rumRoutes = require('./routes/rum')
