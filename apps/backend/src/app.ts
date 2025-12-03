@@ -15,7 +15,6 @@ const contactRoutes = require('./routes/contact')
 const demoRoutes = require('./routes/demo')
 const monitoringModule = require('./routes/monitoring')
 const stripeRoutes = require('./routes/stripe')
-const stripeConnectRoutes = require('./routes/stripe-connect')
 const rumRoutes = require('./routes/rum')
 const feedbackRoutes = require('./routes/feedback')
 
@@ -86,8 +85,7 @@ export function createApp(): Express {
   app.use('/api', demoRoutes)
   app.use('/api', monitoringModule.router)
   app.use('/api', stripeRoutes)
-  app.use('/api', stripeConnectRoutes)
-  app.use('/api', rumRoutes)
+    app.use('/api', rumRoutes)
   app.use('/api', feedbackRoutes)
   console.log('✅ Routes loaded')
 

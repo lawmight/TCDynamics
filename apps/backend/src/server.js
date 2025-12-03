@@ -44,7 +44,6 @@ let contactRoutes,
   demoRoutes,
   monitoringRoutes,
   stripeRoutes,
-  stripeConnectRoutes,
   rumRoutes,
   feedbackRoutes
 
@@ -291,7 +290,6 @@ app.use('/api', contactRoutes)
 app.use('/api', demoRoutes)
 app.use('/api', monitoringRoutes)
 app.use('/api', stripeRoutes)
-app.use('/api', stripeConnectRoutes)
 app.use('/api', rumRoutes)
 app.use('/api', feedbackRoutes)
 
@@ -365,7 +363,7 @@ const server = app.listen(PORT, () => {
   console.log(`  Health Check: http://localhost:${PORT}/health`)
   console.log(`  API Test: http://localhost:${PORT}/api/test`)
   console.log(`  API Docs: http://localhost:${PORT}/api-docs`)
-  console.log(`  Stripe Connect: http://localhost:${PORT}/api/stripe-connect/*`)
+  console.log(``)
   console.log('')
   console.log('✅ Server is ready to accept requests')
   console.log('='.repeat(60))

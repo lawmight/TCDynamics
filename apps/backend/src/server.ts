@@ -50,7 +50,7 @@ function startServer(): void {
       console.log(`  Health Check: http://localhost:${PORT}/health`)
       console.log(`  API Test: http://localhost:${PORT}/api/test`)
       console.log(`  API Docs: http://localhost:${PORT}/api-docs`)
-      console.log(`  Stripe Connect: http://localhost:${PORT}/api/stripe-connect/*`)
+      console.log()
       console.log('')
       console.log('✅ Server is ready to accept requests')
       console.log('='.repeat(60))
