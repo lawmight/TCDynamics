@@ -3,88 +3,108 @@
  * This replaces the backend route for MVP deployment
  */
 
+import Stripe from 'stripe'
+
 // Enhanced logging for debugging
 console.log('Environment check at startup:', {
   hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
-  keyPrefix: process.env.STRIPE_SECRET_KEY ? process.env.STRIPE_SECRET_KEY.substring(0, 10) : 'NOT_SET',
+  keyPrefix: process.env.STRIPE_SECRET_KEY
+    ? process.env.STRIPE_SECRET_KEY.substring(0, 10)
+    : 'NOT_SET',
   vercelEnv: process.env.VERCEL_ENV,
-  nodeEnv: process.env.NODE_ENV
-});
+  nodeEnv: process.env.NODE_ENV,
+})
 
 // Check if Stripe key is configured
 if (!process.env.STRIPE_SECRET_KEY) {
-  console.error('❌ STRIPE_SECRET_KEY is not configured in environment variables');
-  console.error('Available env keys:', Object.keys(process.env).filter(k => k.includes('STRIPE')));
+  console.error(
+    '❌ STRIPE_SECRET_KEY is not configured in environment variables'
+  )
+  console.error(
+    'Available env keys:',
+    Object.keys(process.env).filter(k => k.includes('STRIPE'))
+  )
 }
 
 const stripe = process.env.STRIPE_SECRET_KEY
-  ? require('stripe')(process.env.STRIPE_SECRET_KEY)
-  : null;
+  ? new Stripe(process.env.STRIPE_SECRET_KEY)
+  : null
 
 if (stripe) {
-  console.log('✅ Stripe initialized successfully');
+  console.log('✅ Stripe initialized successfully')
 } else {
-  console.error('❌ Stripe initialization failed');
+  console.error('❌ Stripe initialization failed')
 }
 
 // Enable CORS
 const allowCors = fn => async (req, res) => {
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Credentials', true)
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'GET,OPTIONS,PATCH,DELETE,POST,PUT'
+  )
   res.setHeader(
     'Access-Control-Allow-Headers',
     'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-  );
+  )
 
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+    res.status(200).end()
+    return
   }
 
-  return await fn(req, res);
-};
+  return await fn(req, res)
+}
 
 const handler = async (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).json({
       success: false,
-      message: 'Method not allowed'
-    });
+      message: 'Method not allowed',
+    })
   }
 
   try {
     // Check if Stripe is properly initialized
     if (!stripe) {
-      console.error('❌ Stripe is not initialized - missing STRIPE_SECRET_KEY');
-      console.error('Environment variables available:', Object.keys(process.env).filter(k => k.includes('STRIPE')));
+      console.error('❌ Stripe is not initialized - missing STRIPE_SECRET_KEY')
+      console.error(
+        'Environment variables available:',
+        Object.keys(process.env).filter(k => k.includes('STRIPE'))
+      )
       return res.status(500).json({
         success: false,
-        message: 'Payment service is not configured. Please add STRIPE_SECRET_KEY to Vercel environment variables for Preview deployments.',
+        message:
+          'Payment service is not configured. Please add STRIPE_SECRET_KEY to Vercel environment variables for Preview deployments.',
         error: 'STRIPE_NOT_CONFIGURED',
         debugInfo: {
           vercelEnv: process.env.VERCEL_ENV,
           hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
-          availableStripeVars: Object.keys(process.env).filter(k => k.includes('STRIPE'))
-        }
-      });
+          availableStripeVars: Object.keys(process.env).filter(k =>
+            k.includes('STRIPE')
+          ),
+        },
+      })
     }
 
-    const { priceId, planName } = req.body;
+    const { priceId, planName } = req.body
 
-    console.log('Received request:', { priceId, planName });
+    console.log('Received request:', { priceId, planName })
 
     if (!priceId || !planName) {
       return res.status(400).json({
         success: false,
         message: 'Price ID and plan name are required',
-      });
+      })
     }
 
     // Get the frontend URL from environment or use default
-    const frontendUrl = process.env.VITE_FRONTEND_URL ||
-                       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
-                       'http://localhost:5173');
+    const frontendUrl =
+      process.env.VITE_FRONTEND_URL ||
+      (process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : 'http://localhost:5173')
 
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
@@ -103,35 +123,37 @@ const handler = async (req, res) => {
       },
       billing_address_collection: 'required',
       allow_promotion_codes: true,
-    });
+    })
 
     console.log('✅ Stripe checkout session created:', {
       sessionId: session.id,
       planName,
       priceId,
-    });
+    })
 
     return res.status(200).json({
       success: true,
       sessionId: session.id,
       url: session.url,
-    });
+    })
   } catch (error) {
-    console.error('❌ Error creating Stripe checkout session:', error);
-    console.error('Error stack:', error.stack);
+    console.error('❌ Error creating Stripe checkout session:', error)
+    console.error('Error stack:', error.stack)
     console.error('Environment check:', {
       hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
-      keyStart: process.env.STRIPE_SECRET_KEY ? process.env.STRIPE_SECRET_KEY.substring(0, 7) : 'NOT_SET',
-      vercelEnv: process.env.VERCEL_ENV
-    });
+      keyStart: process.env.STRIPE_SECRET_KEY
+        ? process.env.STRIPE_SECRET_KEY.substring(0, 7)
+        : 'NOT_SET',
+      vercelEnv: process.env.VERCEL_ENV,
+    })
 
     return res.status(500).json({
       success: false,
       message: 'Failed to create checkout session',
       error: error.message || 'Unknown error occurred',
       details: process.env.NODE_ENV === 'development' ? error.stack : undefined,
-    });
+    })
   }
-};
+}
 
-module.exports = allowCors(handler);
+export default allowCors(handler)

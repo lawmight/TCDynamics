@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Serverless API functions for TCDynamics",
   "private": true,
+  "type": "module",
   "dependencies": {
     "stripe": "^17.4.0",
     "@supabase/supabase-js": "^2.47.10",

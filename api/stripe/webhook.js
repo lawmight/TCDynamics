@@ -1,61 +1,63 @@
+import Stripe from 'stripe'
+
 // Lazy initialization of Stripe to handle missing environment variables
-let stripe = null;
+let stripe = null
 
 function getStripeClient() {
   if (!stripe) {
-    const secretKey = process.env.STRIPE_SECRET_KEY;
+    const secretKey = process.env.STRIPE_SECRET_KEY
     if (!secretKey) {
-      throw new Error('STRIPE_SECRET_KEY is not configured');
+      throw new Error('STRIPE_SECRET_KEY is not configured')
     }
-    stripe = require('stripe')(secretKey);
+    stripe = new Stripe(secretKey)
   }
-  return stripe;
+  return stripe
 }
 
 export default async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
-    return res.status(405).json({ error: 'Method not allowed' });
+    res.setHeader('Allow', 'POST')
+    return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const sig = req.headers['stripe-signature'];
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const sig = req.headers['stripe-signature']
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
   if (!sig) {
-    console.error('Missing stripe-signature header');
-    return res.status(400).json({ error: 'Missing stripe-signature header' });
+    console.error('Missing stripe-signature header')
+    return res.status(400).json({ error: 'Missing stripe-signature header' })
   }
 
   if (!webhookSecret) {
-    console.error('STRIPE_WEBHOOK_SECRET is not configured');
-    return res.status(500).json({ error: 'Webhook secret not configured' });
+    console.error('STRIPE_WEBHOOK_SECRET is not configured')
+    return res.status(500).json({ error: 'Webhook secret not configured' })
   }
 
-  let event;
+  let event
 
   try {
     // Get the raw body for signature verification
-    const body = await getRawBody(req);
+    const body = await getRawBody(req)
 
     // Verify webhook signature
-    const stripeClient = getStripeClient();
-    event = stripeClient.webhooks.constructEvent(body, sig, webhookSecret);
+    const stripeClient = getStripeClient()
+    event = stripeClient.webhooks.constructEvent(body, sig, webhookSecret)
   } catch (err) {
-    console.error('Webhook signature verification failed:', err.message);
-    return res.status(400).json({ error: `Webhook Error: ${err.message}` });
+    console.error('Webhook signature verification failed:', err.message)
+    return res.status(400).json({ error: `Webhook Error: ${err.message}` })
   }
 
   // Handle the event
-  console.log(`Received webhook event: ${event.type}`);
+  console.log(`Received webhook event: ${event.type}`)
 
   try {
     switch (event.type) {
       case 'checkout.session.completed': {
-        const session = event.data.object;
-        console.log('Checkout session completed:', session.id);
-        console.log('Customer email:', session.customer_email);
-        console.log('Payment status:', session.payment_status);
+        const session = event.data.object
+        console.log('Checkout session completed:', session.id)
+        console.log('Customer email:', session.customer_email)
+        console.log('Payment status:', session.payment_status)
 
         // TODO: Fulfill the order, send confirmation email, etc.
         // You can:
@@ -64,69 +66,68 @@ export default async function handler(req, res) {
         // - Update customer record
         // - Provision access to services
 
-        break;
+        break
       }
 
       case 'checkout.session.async_payment_succeeded': {
-        const session = event.data.object;
-        console.log('Async payment succeeded:', session.id);
+        const session = event.data.object
+        console.log('Async payment succeeded:', session.id)
 
         // Fulfill the order for async payments
-        break;
+        break
       }
 
       case 'checkout.session.async_payment_failed': {
-        const session = event.data.object;
-        console.log('Async payment failed:', session.id);
+        const session = event.data.object
+        console.log('Async payment failed:', session.id)
 
         // Handle failed payment
-        break;
+        break
       }
 
       case 'customer.subscription.created':
       case 'customer.subscription.updated': {
-        const subscription = event.data.object;
-        console.log('Subscription event:', event.type, subscription.id);
-        console.log('Status:', subscription.status);
+        const subscription = event.data.object
+        console.log('Subscription event:', event.type, subscription.id)
+        console.log('Status:', subscription.status)
 
         // Handle subscription changes
-        break;
+        break
       }
 
       case 'customer.subscription.deleted': {
-        const subscription = event.data.object;
-        console.log('Subscription cancelled:', subscription.id);
+        const subscription = event.data.object
+        console.log('Subscription cancelled:', subscription.id)
 
         // Handle cancellation
-        break;
+        break
       }
 
       case 'invoice.payment_succeeded': {
-        const invoice = event.data.object;
-        console.log('Invoice payment succeeded:', invoice.id);
+        const invoice = event.data.object
+        console.log('Invoice payment succeeded:', invoice.id)
 
         // Handle successful recurring payment
-        break;
+        break
       }
 
       case 'invoice.payment_failed': {
-        const invoice = event.data.object;
-        console.log('Invoice payment failed:', invoice.id);
+        const invoice = event.data.object
+        console.log('Invoice payment failed:', invoice.id)
 
         // Handle failed payment - send email notification
-        break;
+        break
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        console.log(`Unhandled event type: ${event.type}`)
     }
 
     // Return a response to acknowledge receipt of the event
-    res.json({ received: true, type: event.type });
-
+    res.json({ received: true, type: event.type })
   } catch (error) {
-    console.error('Error processing webhook:', error);
-    res.status(500).json({ error: 'Webhook processing failed' });
+    console.error('Error processing webhook:', error)
+    res.status(500).json({ error: 'Webhook processing failed' })
   }
 }
 
@@ -135,28 +136,28 @@ export default async function handler(req, res) {
 async function getRawBody(req) {
   // If body is already a string, convert it to Buffer
   if (req.body && typeof req.body === 'string') {
-    return Buffer.from(req.body, 'utf8');
+    return Buffer.from(req.body, 'utf8')
   }
 
   // If body is already a Buffer, return it directly
   if (Buffer.isBuffer(req.body)) {
-    return req.body;
+    return req.body
   }
 
   // Collect chunks as Buffers (not strings) to preserve binary data
   return new Promise((resolve, reject) => {
-    const chunks = [];
+    const chunks = []
     // Do NOT set encoding - we need raw binary data
     req.on('data', chunk => {
       // Ensure chunk is a Buffer
-      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-    });
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
+    })
     req.on('end', () => {
       // Concatenate all Buffer chunks into a single Buffer
-      resolve(Buffer.concat(chunks));
-    });
-    req.on('error', reject);
-  });
+      resolve(Buffer.concat(chunks))
+    })
+    req.on('error', reject)
+  })
 }
 
 // Configure to receive raw body for signature verification
@@ -164,4 +165,4 @@ export const config = {
   api: {
     bodyParser: false,
   },
-};
+}

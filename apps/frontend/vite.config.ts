@@ -100,7 +100,11 @@ export default defineConfig(({ mode }) => ({
             : [],
       },
     },
-    sourcemap: mode === 'development',
+    // Generate sourcemaps in development and production (when Sentry is configured)
+    // Sentry requires sourcemaps to map production errors back to source code
+    sourcemap:
+      mode === 'development' ||
+      (mode === 'production' && !!process.env.SENTRY_AUTH_TOKEN),
     reportCompressedSize: false, // Disable gzip size reporting for faster builds
   },
   optimizeDeps: {

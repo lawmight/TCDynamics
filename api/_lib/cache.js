@@ -24,7 +24,10 @@ const cache = new LRUCache({
  * @returns {any|null} Cached value or null if not found
  */
 export function getCached(key) {
-  return cache.get(key) || null
+  const value = cache.get(key)
+  // LRUCache.get() returns undefined when key is not found
+  // Use explicit undefined check to preserve falsy values (0, false, '', etc.)
+  return value === undefined ? null : value
 }
 
 /**
@@ -74,4 +77,3 @@ export default {
   clearAllCache,
   getCacheStats,
 }
-

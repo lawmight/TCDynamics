@@ -70,3 +70,59 @@ jobs:
           flags: frontend
           name: frontend-coverage
           fail_ci_if_error: false
+
+      # API Serverless Functions Validation
+      - name: Install API dependencies
+        working-directory: ./api
+        run: npm install
+
+      - name: Validate API ESM syntax
+        working-directory: ./api
+        run: |
+          # Check that all .js files use ESM syntax (no CommonJS)
+          # Exclude node_modules
+          failed=0
+          while IFS= read -r file; do
+            if grep -q "require(" "$file" 2>/dev/null || grep -q "module.exports" "$file" 2>/dev/null; then
+              echo "❌ $file contains CommonJS syntax (require or module.exports)"
+              echo "   All API files must use ESM (import/export) syntax"
+              failed=1
+            fi
+          done < <(find . -name "*.js" -not -path "./node_modules/*")
+
+          if [ $failed -eq 1 ]; then
+            exit 1
+          fi
+          echo "✅ All API files use ESM syntax"
+
+      - name: Check API file structure
+        working-directory: ./api
+        run: |
+          # Verify critical API files exist
+          required_files=(
+            "health.js"
+            "chat.js"
+            "contactform.js"
+            "create-payment-intent.js"
+            "create-subscription.js"
+            "stripe/webhook.js"
+            "stripe/create-checkout-session.js"
+            "_lib/cache.js"
+            "_lib/supabase.js"
+            "_lib/email.js"
+          )
+
+          missing_files=()
+          for file in "${required_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              missing_files+=("$file")
+            fi
+          done
+
+          if [ ${#missing_files[@]} -gt 0 ]; then
+            echo "❌ Missing required API files:"
+            printf '  - %s\n' "${missing_files[@]}"
+            exit 1
+          fi
+
+          echo "✅ All required API files present"
