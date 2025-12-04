@@ -1,3 +1,6 @@
+import { Bot, Loader2, Send, User, X } from 'lucide-react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
+
 import { chatAPI } from '@/api/azureServices'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -6,8 +9,6 @@ import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useToggle } from '@/hooks/useToggle'
 import { logger } from '@/utils/logger'
-import { Bot, Loader2, Send, User, X } from 'lucide-react'
-import { useCallback, useEffect, useId, useRef, useState } from 'react'
 
 interface Message {
   id: string
@@ -238,12 +239,12 @@ const AIChatbot = () => {
         <Button
           onClick={toggle}
           size="lg"
-          className="rounded-full w-16 h-16 shadow-lg hover:shadow-xl transition-all duration-300 bg-primary hover:bg-primary/90"
+          className="h-16 w-16 rounded-full bg-primary shadow-lg transition-all duration-300 hover:bg-primary/90 hover:shadow-xl"
           aria-expanded={isOpen}
           aria-controls={chatbotId}
           aria-label={isOpen ? 'Fermer le chatbot IA' : 'Ouvrir le chatbot IA'}
         >
-          {isOpen ? <X className="w-6 h-6" /> : <Bot className="w-6 h-6" />}
+          {isOpen ? <X className="h-6 w-6" /> : <Bot className="h-6 w-6" />}
         </Button>
       </div>
 
@@ -259,24 +260,24 @@ const AIChatbot = () => {
       {isOpen && (
         <div
           id={chatbotId}
-          className="fixed bottom-24 right-6 z-40 w-96 h-[500px] shadow-2xl"
+          className="fixed bottom-24 right-6 z-40 h-[500px] w-96 shadow-2xl"
           role="dialog"
           aria-labelledby="chatbot-title"
           aria-describedby="chatbot-description"
           onKeyDown={handleFocusTrap}
         >
-          <Card className="h-full flex flex-col bg-card/95 backdrop-blur-sm border-primary/20">
-            <CardHeader className="pb-4 bg-primary/5">
+          <Card className="flex h-full flex-col border-primary/20 bg-card/95 backdrop-blur-sm">
+            <CardHeader className="bg-primary/5 pb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
-                    <Bot className="w-4 h-4 text-primary" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20">
+                    <Bot className="h-4 w-4 text-primary" />
                   </div>
                   <div>
-                    <CardTitle id="chatbot-title" className="text-lg font-mono">
+                    <CardTitle id="chatbot-title" className="font-mono text-lg">
                       WorkFlowAI Assistant
                     </CardTitle>
-                    <Badge variant="secondary" className="text-xs font-mono">
+                    <Badge variant="secondary" className="font-mono text-xs">
                       IA Active
                     </Badge>
                   </div>
@@ -298,16 +299,16 @@ const AIChatbot = () => {
               recevez des réponses intelligentes.
             </div>
 
-            <CardContent className="flex-1 flex flex-col p-0">
+            <CardContent className="flex flex-1 flex-col p-0">
               {/* Messages Area */}
               <ScrollArea className="flex-1 p-4">
                 {messages.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
-                    <Bot className="w-12 h-12 mb-4 text-primary/50" />
-                    <p className="font-mono text-sm mb-2">
+                  <div className="flex h-full flex-col items-center justify-center text-center text-muted-foreground">
+                    <Bot className="mb-4 h-12 w-12 text-primary/50" />
+                    <p className="mb-2 font-mono text-sm">
                       Bonjour! Je suis votre assistant IA
                     </p>
-                    <p className="text-xs font-mono">
+                    <p className="font-mono text-xs">
                       Comment puis-je vous aider avec WorkFlowAI ?
                     </p>
                   </div>
@@ -319,35 +320,35 @@ const AIChatbot = () => {
                         className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
                         {message.role === 'assistant' && (
-                          <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
-                            <Bot className="w-4 h-4 text-primary" />
+                          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary/20">
+                            <Bot className="h-4 w-4 text-primary" />
                           </div>
                         )}
                         <div
                           className={`max-w-[80%] rounded-lg px-4 py-2 font-mono text-sm ${
                             message.role === 'user'
                               ? 'bg-primary text-primary-foreground'
-                              : 'bg-card border border-border'
+                              : 'border border-border bg-card'
                           }`}
                         >
                           {message.content}
                         </div>
                         {message.role === 'user' && (
-                          <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center flex-shrink-0">
-                            <User className="w-4 h-4" />
+                          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-muted">
+                            <User className="h-4 w-4" />
                           </div>
                         )}
                       </div>
                     ))}
                     {isConnecting && (
-                      <div className="flex gap-3 justify-start">
-                        <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
-                          <Bot className="w-4 h-4 text-primary" />
+                      <div className="flex justify-start gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20">
+                          <Bot className="h-4 w-4 text-primary" />
                         </div>
-                        <div className="bg-card border border-border rounded-lg px-4 py-2">
+                        <div className="rounded-lg border border-border bg-card px-4 py-2">
                           <div className="flex items-center gap-2">
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            <span className="text-xs text-muted-foreground font-mono">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <span className="font-mono text-xs text-muted-foreground">
                               Connexion...
                             </span>
                           </div>
@@ -355,14 +356,14 @@ const AIChatbot = () => {
                       </div>
                     )}
                     {isLoading && (
-                      <div className="flex gap-3 justify-start">
-                        <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
-                          <Bot className="w-4 h-4 text-primary" />
+                      <div className="flex justify-start gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20">
+                          <Bot className="h-4 w-4 text-primary" />
                         </div>
-                        <div className="bg-card border border-border rounded-lg px-4 py-2">
+                        <div className="rounded-lg border border-border bg-card px-4 py-2">
                           <div className="flex items-center gap-2">
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            <span className="text-xs text-muted-foreground font-mono">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <span className="font-mono text-xs text-muted-foreground">
                               Réflexion...
                             </span>
                           </div>
@@ -375,7 +376,7 @@ const AIChatbot = () => {
               </ScrollArea>
 
               {/* Input Area */}
-              <div className="p-4 border-t border-border">
+              <div className="border-t border-border p-4">
                 <div className="flex gap-2">
                   <Input
                     value={input}
@@ -392,10 +393,10 @@ const AIChatbot = () => {
                     size="sm"
                     className="px-3"
                   >
-                    <Send className="w-4 h-4" />
+                    <Send className="h-4 w-4" />
                   </Button>
                 </div>
-                <p className="text-xs text-muted-foreground font-mono mt-2 text-center">
+                <p className="mt-2 text-center font-mono text-xs text-muted-foreground">
                   Propulsé par Azure OpenAI GPT-3.5-turbo
                 </p>
               </div>

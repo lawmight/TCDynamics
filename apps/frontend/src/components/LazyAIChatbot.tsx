@@ -1,5 +1,5 @@
-import { Suspense, lazy } from 'react'
 import { Loader2 } from 'lucide-react'
+import { Suspense, lazy } from 'react'
 
 // Lazy load the AIChatbot component
 const AIChatbot = lazy(() => import('./AIChatbot'))
@@ -7,8 +7,8 @@ const AIChatbot = lazy(() => import('./AIChatbot'))
 // Loading fallback component
 const ChatbotLoadingFallback = () => (
   <div className="fixed bottom-6 right-6 z-50">
-    <div className="rounded-full w-16 h-16 shadow-lg bg-primary/50 flex items-center justify-center">
-      <Loader2 className="w-6 h-6 animate-spin text-primary-foreground" />
+    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/50 shadow-lg">
+      <Loader2 className="h-6 w-6 animate-spin text-primary-foreground" />
     </div>
   </div>
 )

@@ -1,5 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+
 import { config, ConfigManager } from '../config'
+import {
+  isBrowser,
+  isDevelopment,
+  cryptoUtils,
+  storageUtils,
+} from '../isomorphic'
 import {
   performanceMonitor,
   smartCache,
@@ -7,12 +14,6 @@ import {
   SmartCache,
 } from '../performance'
 import { securityHeaders } from '../security'
-import {
-  isBrowser,
-  isDevelopment,
-  cryptoUtils,
-  storageUtils,
-} from '../isomorphic'
 
 // Mock import.meta.env for testing
 const mockEnv = {

@@ -74,8 +74,8 @@ const PerformanceMonitor = () => {
   if (!metrics || !isVisible) return null
 
   return (
-    <div className="fixed bottom-4 right-4 bg-black/80 text-white p-3 rounded-lg text-xs font-mono z-50">
-      <div className="flex items-center justify-between mb-2">
+    <div className="fixed bottom-4 right-4 z-50 rounded-lg bg-black/80 p-3 font-mono text-xs text-white">
+      <div className="mb-2 flex items-center justify-between">
         <span className="font-bold">Performance Monitor</span>
         <button
           onClick={() => setIsVisible(false)}
@@ -89,7 +89,7 @@ const PerformanceMonitor = () => {
         <div>Render: {metrics.renderTime}ms</div>
         {metrics.memoryUsage && <div>Memory: {metrics.memoryUsage}MB</div>}
       </div>
-      <div className="text-gray-400 mt-2 text-xs">
+      <div className="mt-2 text-xs text-gray-400">
         Press Ctrl+Shift+P to toggle
       </div>
     </div>

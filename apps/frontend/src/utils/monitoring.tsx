@@ -4,6 +4,7 @@
  */
 
 import React from 'react'
+
 import { logger } from '@/utils/logger'
 
 // Sentry Types
@@ -52,10 +53,18 @@ class Monitoring {
     }
 
     try {
-      const Sentry = await import('@sentry/react')
+      const Sentry = await import('@sentry/browser')
       Sentry.init({
         dsn: this.dsn,
         environment: import.meta.env.MODE,
+        tracesSampleRate: 0.1, // Match API configuration
+        beforeSend(event, hint) {
+          // Only send errors in production
+          if (import.meta.env.MODE !== 'production') {
+            return null
+          }
+          return event
+        },
       })
     } catch (error) {
       logger.error("Erreur lors de l'initialisation du monitoring", error)
@@ -143,17 +152,17 @@ export class ErrorBoundary extends React.Component<
       }
 
       return (
-        <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="flex min-h-screen items-center justify-center p-4">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-red-600 mb-4">
+            <h2 className="mb-4 text-2xl font-bold text-red-600">
               Une erreur s'est produite
             </h2>
-            <p className="text-gray-600 mb-4">
+            <p className="mb-4 text-gray-600">
               Nous nous excusons pour ce désagrément.
             </p>
             <button
               onClick={this.resetError}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
+              className="rounded-lg bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90"
             >
               Réessayer
             </button>

@@ -1,7 +1,8 @@
 import { track } from '@vercel/analytics'
+import { useState } from 'react'
+
 import { apiRequest, type ApiResponse } from '@/utils/apiConfig'
 import { logger } from '@/utils/logger'
-import { useState } from 'react'
 
 /**
  * Configuration for form submission endpoints
@@ -56,8 +57,8 @@ interface UseFormSubmitReturn<T> {
  */
 const defaultShouldFallback = (error: unknown): boolean => {
   // Network errors (not a Response)
-  // eslint-disable-next-line no-undef, @typescript-eslint/no-undef
-  const isResponse = typeof error === 'object' && error !== null && 'status' in error
+  const isResponse =
+    typeof error === 'object' && error !== null && 'status' in error
   if (!isResponse) {
     return true
   }

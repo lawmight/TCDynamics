@@ -4,6 +4,10 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import { useTheme } from '@/components/ThemeProvider'
 
+type NavigationItem =
+  | { label: string; scrollId: string; path?: never }
+  | { label: string; path: string; scrollId?: never }
+
 const SimpleNavigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
@@ -22,7 +26,7 @@ const SimpleNavigation = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const handleNavClick = (item: any) => {
+  const handleNavClick = (item: NavigationItem) => {
     if (item.scrollId && location.pathname === '/') {
       const element = document.getElementById(item.scrollId)
       if (element) {

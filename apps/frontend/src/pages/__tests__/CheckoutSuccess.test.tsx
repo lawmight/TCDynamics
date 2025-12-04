@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { BrowserRouter, useSearchParams } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import CheckoutSuccess from '../CheckoutSuccess'
 
 // Mock react-router-dom

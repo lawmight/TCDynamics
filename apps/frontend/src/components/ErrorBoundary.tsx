@@ -1,6 +1,7 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react'
-import { Button } from '@/components/ui/button'
 import { AlertTriangle, RefreshCw } from 'lucide-react'
+import React, { Component, ErrorInfo, ReactNode } from 'react'
+
+import { Button } from '@/components/ui/button'
 
 interface Props {
   children: ReactNode
@@ -140,24 +141,24 @@ class ErrorBoundary extends Component<Props, State> {
 
       // Default error UI
       return (
-        <div className="min-h-screen flex items-center justify-center bg-background p-4">
-          <div className="max-w-md w-full bg-card border border-destructive/20 rounded-lg p-6 text-center shadow-lg">
-            <div className="flex justify-center mb-4">
-              <div className="p-3 bg-destructive/10 rounded-full">
-                <AlertTriangle className="w-8 h-8 text-destructive" />
+        <div className="flex min-h-screen items-center justify-center bg-background p-4">
+          <div className="w-full max-w-md rounded-lg border border-destructive/20 bg-card p-6 text-center shadow-lg">
+            <div className="mb-4 flex justify-center">
+              <div className="rounded-full bg-destructive/10 p-3">
+                <AlertTriangle className="h-8 w-8 text-destructive" />
               </div>
             </div>
 
-            <h1 className="text-xl font-semibold text-foreground mb-2">
+            <h1 className="mb-2 text-xl font-semibold text-foreground">
               Quelque chose s'est mal passé
             </h1>
 
-            <p className="text-muted-foreground mb-2">
+            <p className="mb-2 text-muted-foreground">
               Une erreur inattendue s'est produite. Nos équipes ont été
               notifiées.
             </p>
 
-            <p className="text-sm text-muted-foreground mb-6">
+            <p className="mb-6 text-sm text-muted-foreground">
               Tentative de récupération automatique dans 5 secondes...
             </p>
 
@@ -167,7 +168,7 @@ class ErrorBoundary extends Component<Props, State> {
                 className="w-full"
                 variant="default"
               >
-                <RefreshCw className="w-4 h-4 mr-2" />
+                <RefreshCw className="mr-2 h-4 w-4" />
                 Réessayer maintenant
               </Button>
 
@@ -185,7 +186,7 @@ class ErrorBoundary extends Component<Props, State> {
                 <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground">
                   Détails de l'erreur (développement)
                 </summary>
-                <pre className="mt-2 p-3 bg-muted rounded text-xs overflow-auto max-h-32 whitespace-pre-wrap">
+                <pre className="mt-2 max-h-32 overflow-auto whitespace-pre-wrap rounded bg-muted p-3 text-xs">
                   {this.state.error.toString()}
                   {this.state.errorInfo?.componentStack}
                 </pre>

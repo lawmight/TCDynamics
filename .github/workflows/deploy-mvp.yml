@@ -5,7 +5,12 @@ on:
     branches: [main]
 
 jobs:
+  # Run quality gate first
+  quality-gate:
+    uses: ./.github/workflows/quality-gate.yml
+
   deploy:
+    needs: quality-gate
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

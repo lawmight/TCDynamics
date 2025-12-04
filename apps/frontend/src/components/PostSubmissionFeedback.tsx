@@ -1,6 +1,7 @@
 import { track } from '@vercel/analytics'
-import { useState } from 'react'
 import { X } from 'lucide-react'
+import { useState } from 'react'
+
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 
@@ -101,10 +102,12 @@ export const PostSubmissionFeedback = ({
               <span className="sr-only">Close</span>
             </button>
             <div>
-              <h2 className="text-xl font-semibold">Votre avis nous intéresse</h2>
+              <h2 className="text-xl font-semibold">
+                Votre avis nous intéresse
+              </h2>
               <p className="pt-2 text-sm text-muted-foreground">
-                Avez-vous trouvé ce que vous cherchiez ? Votre retour nous aide à
-                améliorer
+                Avez-vous trouvé ce que vous cherchiez ? Votre retour nous aide
+                à améliorer
               </p>
             </div>
           </div>
@@ -117,7 +120,7 @@ export const PostSubmissionFeedback = ({
                 Étiez-vous satisfait de votre expérience ? *
               </label>
               <div className="grid grid-cols-5 gap-2">
-                {[1, 2, 3, 4, 5].map((value) => (
+                {[1, 2, 3, 4, 5].map(value => (
                   <button
                     key={value}
                     type="button"
@@ -150,7 +153,7 @@ export const PostSubmissionFeedback = ({
                 id="feedback"
                 placeholder="Décrivez votre besoin ou ce que vous trouviez manquant..."
                 value={feedback}
-                onChange={(e) => setFeedback(e.target.value)}
+                onChange={e => setFeedback(e.target.value)}
                 maxLength={500}
                 className="min-h-[100px] resize-none bg-background/50"
               />
@@ -165,11 +168,12 @@ export const PostSubmissionFeedback = ({
                 type="checkbox"
                 id="followup"
                 checked={followup}
-                onChange={(e) => setFollowup(e.target.checked)}
+                onChange={e => setFollowup(e.target.checked)}
                 className="mt-1 h-4 w-4 rounded border-border"
               />
               <label htmlFor="followup" className="text-sm">
-                Puis-je vous contacter pour discuter de vos besoins spécifiques ?
+                Puis-je vous contacter pour discuter de vos besoins spécifiques
+                ?
               </label>
             </div>
 

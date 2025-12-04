@@ -1,7 +1,8 @@
-import { defineConfig } from 'vite'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 import react from '@vitejs/plugin-react-swc'
 import path from 'path'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { defineConfig } from 'vite'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -19,13 +20,28 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
-    // Bundle analysis plugin - generates stats.html in dist/
+    // Sentry source maps plugin (production only)
     mode === 'production' &&
+      process.env.SENTRY_AUTH_TOKEN &&
+      sentryVitePlugin({
+        org: process.env.SENTRY_ORG,
+        project: process.env.SENTRY_PROJECT,
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+        sourcemaps: {
+          assets: './dist/**',
+          ignore: ['node_modules'],
+          rewriteSources: source => source.replace(/^\/@fs/, ''),
+        },
+      }),
+    // Bundle analysis plugin - generates stats.html in dist/
+    // Runs in both analyze mode and production builds
+    (mode === 'analyze' || mode === 'production') &&
       visualizer({
-        open: false, // Don't auto-open browser
+        open: mode === 'analyze', // Auto-open browser in analyze mode
         filename: 'dist/stats.html',
         gzipSize: true,
         brotliSize: true,
+        template: 'treemap', // Use treemap visualization
       }),
     // Image optimization removed (vite-plugin-imagemin vulns/Vercel issues)
     // Vite handles basic opt natively

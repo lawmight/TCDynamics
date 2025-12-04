@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import StickyHeader from '../StickyHeader'
 
 // Mock the hooks and icons
@@ -33,7 +34,7 @@ vi.mock('react-router-dom', async () => {
 })
 
 describe('StickyHeader Component', () => {
-  let scrollSpy: any
+  let scrollSpy: ReturnType<typeof vi.spyOn> | null = null
 
   beforeEach(() => {
     // Mock window.scrollY and scroll event
@@ -97,8 +98,8 @@ describe('StickyHeader Component', () => {
     const mockScrollIntoView = vi.fn()
 
     // Mock getElementById and scrollIntoView
-    const mockElement = { scrollIntoView: mockScrollIntoView }
-    vi.spyOn(document, 'getElementById').mockReturnValue(mockElement as any)
+    const mockElement = { scrollIntoView: mockScrollIntoView } as HTMLElement
+    vi.spyOn(document, 'getElementById').mockReturnValue(mockElement)
 
     fireEvent.click(logoButton)
 
@@ -115,8 +116,8 @@ describe('StickyHeader Component', () => {
     const featuresButton = screen.getByText('Fonctionnalités')
     const mockScrollIntoView = vi.fn()
 
-    const mockElement = { scrollIntoView: mockScrollIntoView }
-    vi.spyOn(document, 'getElementById').mockReturnValue(mockElement as any)
+    const mockElement = { scrollIntoView: mockScrollIntoView } as HTMLElement
+    vi.spyOn(document, 'getElementById').mockReturnValue(mockElement)
 
     fireEvent.click(featuresButton)
 

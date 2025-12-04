@@ -1,4 +1,6 @@
+import { Menu, Phone, Calendar, Mail, MapPin } from 'lucide-react'
 import { useId } from 'react'
+
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -7,9 +9,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { Menu, Phone, Calendar, Mail, MapPin } from 'lucide-react'
-import { useToggle } from '@/hooks/useToggle'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useToggle } from '@/hooks/useToggle'
 
 const MobileNavigation = () => {
   const { isOpen, toggle, close } = useToggle()
@@ -38,7 +39,7 @@ const MobileNavigation = () => {
   ]
 
   return (
-    <div className="fixed top-4 right-4 z-50 md:hidden">
+    <div className="fixed right-4 top-4 z-50 md:hidden">
       <Sheet open={isOpen} onOpenChange={toggle}>
         <SheetTrigger asChild>
           <Button
@@ -59,13 +60,13 @@ const MobileNavigation = () => {
         <SheetContent
           id={panelId}
           side="right"
-          className="w-full sm:max-w-md bg-background/95 backdrop-blur-xl border-l border-primary/20"
+          className="w-full border-l border-primary/20 bg-background/95 backdrop-blur-xl sm:max-w-md"
         >
           <SheetHeader className="text-left">
-            <SheetTitle className="text-2xl font-bold text-gradient">
+            <SheetTitle className="text-gradient text-2xl font-bold">
               WorkFlowAI
             </SheetTitle>
-            <p className="text-sm text-muted-foreground font-mono">
+            <p className="font-mono text-sm text-muted-foreground">
               Automatisation IA française
             </p>
           </SheetHeader>
@@ -77,9 +78,9 @@ const MobileNavigation = () => {
                 <button
                   key={item.id}
                   onClick={() => scrollToSection(item.id)}
-                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-primary/10 transition-colors group"
+                  className="group w-full rounded-lg px-4 py-3 text-left transition-colors hover:bg-primary/10"
                 >
-                  <span className="font-medium group-hover:text-primary transition-colors">
+                  <span className="font-medium transition-colors group-hover:text-primary">
                     {item.label}
                   </span>
                 </button>
@@ -87,8 +88,8 @@ const MobileNavigation = () => {
             </nav>
 
             {/* Quick Actions */}
-            <div className="space-y-3 pt-6 border-t border-primary/20">
-              <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+            <div className="space-y-3 border-t border-primary/20 pt-6">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                 Actions rapides
               </h3>
 
@@ -97,7 +98,7 @@ const MobileNavigation = () => {
                 className="w-full justify-start"
                 onClick={() => scrollToSection('contact')}
               >
-                <Calendar className="w-4 h-4 mr-3" />
+                <Calendar className="mr-3 h-4 w-4" />
                 Réserver une démo
               </Button>
 
@@ -106,38 +107,38 @@ const MobileNavigation = () => {
                 className="w-full justify-start"
                 onClick={() => scrollToSection('pricing')}
               >
-                <Phone className="w-4 h-4 mr-3" />
+                <Phone className="mr-3 h-4 w-4" />
                 Voir les tarifs
               </Button>
             </div>
 
             {/* Contact Info */}
-            <div className="space-y-3 pt-6 border-t border-primary/20">
-              <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+            <div className="space-y-3 border-t border-primary/20 pt-6">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                 Contact direct
               </h3>
 
               <div className="space-y-2">
                 <a
                   href="tel:0139447500"
-                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-primary/10 transition-colors"
+                  className="flex items-center gap-3 rounded-lg p-3 transition-colors hover:bg-primary/10"
                 >
-                  <Phone className="w-4 h-4 text-primary" />
+                  <Phone className="h-4 w-4 text-primary" />
                   <span className="font-mono text-sm">01 39 44 75 00</span>
                 </a>
 
                 <a
                   href="mailto:contact@workflowai.fr"
-                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-primary/10 transition-colors"
+                  className="flex items-center gap-3 rounded-lg p-3 transition-colors hover:bg-primary/10"
                 >
-                  <Mail className="w-4 h-4 text-primary" />
+                  <Mail className="h-4 w-4 text-primary" />
                   <span className="font-mono text-sm">
                     contact@workflowai.fr
                   </span>
                 </a>
 
-                <div className="flex items-center gap-3 p-3 rounded-lg">
-                  <MapPin className="w-4 h-4 text-primary" />
+                <div className="flex items-center gap-3 rounded-lg p-3">
+                  <MapPin className="h-4 w-4 text-primary" />
                   <span className="font-mono text-sm">
                     Montigny-le-Bretonneux
                   </span>

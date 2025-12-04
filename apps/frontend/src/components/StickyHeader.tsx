@@ -1,9 +1,10 @@
+import { ShoppingCart, Menu, X } from 'lucide-react'
 import React, { useState, useEffect, useId, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+
 import { Button } from '@/components/ui/button'
-import { ShoppingCart, Menu, X } from 'lucide-react'
-import { useToggle } from '@/hooks/useToggle'
 import { useThrottle } from '@/hooks/useThrottle'
+import { useToggle } from '@/hooks/useToggle'
 
 const StickyHeader = () => {
   const navigate = useNavigate()
@@ -55,45 +56,45 @@ const StickyHeader = () => {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
+        className={`fixed left-0 right-0 top-0 z-50 transition-all duration-500 ease-out ${
           isScrolled
-            ? 'bg-background/80 backdrop-blur-xl border-b border-primary/10 shadow-lg shadow-primary/5'
+            ? 'border-b border-primary/10 bg-background/80 shadow-lg shadow-primary/5 backdrop-blur-xl'
             : 'bg-transparent'
         }`}
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-20">
+          <div className="flex h-16 items-center justify-between lg:h-20">
             {/* Logo */}
             <div className="flex-shrink-0">
               <button
                 onClick={() => scrollToSection('hero')}
-                className="text-2xl font-bold font-mono text-gradient hover:scale-105 transition-transform duration-300"
+                className="text-gradient font-mono text-2xl font-bold transition-transform duration-300 hover:scale-105"
               >
                 TCDynamics
               </button>
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-2">
+            <nav className="hidden items-center space-x-2 lg:flex">
               {navigationItems.slice(0, -1).map(item => (
                 <Button
                   key={item.id}
                   variant="ghost"
                   size="sm"
                   onClick={() => scrollToSection(item.id)}
-                  className="relative px-4 py-2 text-sm font-mono text-foreground/80 hover:text-foreground hover:bg-primary/5 rounded-full transition-all duration-300 group"
+                  className="group relative rounded-full px-4 py-2 font-mono text-sm text-foreground/80 transition-all duration-300 hover:bg-primary/5 hover:text-foreground"
                 >
                   {item.label}
-                  <span className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full"></span>
+                  <span className="absolute inset-x-0 bottom-0 h-0.5 scale-x-0 rounded-full bg-gradient-primary transition-transform duration-300 group-hover:scale-x-100"></span>
                 </Button>
               ))}
 
               {/* Checkout Button */}
               <Button
                 onClick={handleCheckoutClick}
-                className="ml-4 px-6 py-2 bg-gradient-primary text-primary-foreground rounded-full hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 button-hover-scale font-medium"
+                className="button-hover-scale ml-4 rounded-full bg-gradient-primary px-6 py-2 font-medium text-primary-foreground transition-all duration-300 hover:shadow-lg hover:shadow-primary/25"
               >
-                <ShoppingCart className="w-4 h-4 mr-2" />
+                <ShoppingCart className="mr-2 h-4 w-4" />
                 Voir les tarifs
               </Button>
             </nav>
@@ -102,7 +103,7 @@ const StickyHeader = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden rounded-full hover:bg-primary/5"
+              className="rounded-full hover:bg-primary/5 lg:hidden"
               onClick={toggleMobileMenu}
               aria-expanded={isMobileMenuOpen}
               aria-controls={mobileMenuId}
@@ -113,9 +114,9 @@ const StickyHeader = () => {
               }
             >
               {isMobileMenuOpen ? (
-                <X className="w-5 h-5" />
+                <X className="h-5 w-5" />
               ) : (
-                <Menu className="w-5 h-5" />
+                <Menu className="h-5 w-5" />
               )}
             </Button>
           </div>
@@ -125,7 +126,7 @@ const StickyHeader = () => {
         {isMobileMenuOpen && (
           <div
             id={mobileMenuId}
-            className="lg:hidden absolute top-full left-0 right-0 bg-background/95 backdrop-blur-xl border-b border-primary/10 shadow-xl"
+            className="absolute left-0 right-0 top-full border-b border-primary/10 bg-background/95 shadow-xl backdrop-blur-xl lg:hidden"
             role="menu"
             aria-label="Menu de navigation mobile"
           >
@@ -136,7 +137,7 @@ const StickyHeader = () => {
                     key={item.id}
                     variant="ghost"
                     onClick={() => scrollToSection(item.id)}
-                    className="justify-start px-4 py-3 text-left font-mono text-foreground/80 hover:text-foreground hover:bg-primary/5 rounded-xl transition-all duration-300"
+                    className="justify-start rounded-xl px-4 py-3 text-left font-mono text-foreground/80 transition-all duration-300 hover:bg-primary/5 hover:text-foreground"
                     role="menuitem"
                   >
                     {item.label}
@@ -146,10 +147,10 @@ const StickyHeader = () => {
                 {/* Mobile Checkout Button */}
                 <Button
                   onClick={handleCheckoutClick}
-                  className="mt-4 w-full px-6 py-3 bg-gradient-primary text-primary-foreground rounded-xl hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 button-hover-scale font-medium"
+                  className="button-hover-scale mt-4 w-full rounded-xl bg-gradient-primary px-6 py-3 font-medium text-primary-foreground transition-all duration-300 hover:shadow-lg hover:shadow-primary/25"
                   role="menuitem"
                 >
-                  <ShoppingCart className="w-4 h-4 mr-2" />
+                  <ShoppingCart className="mr-2 h-4 w-4" />
                   Voir les tarifs
                 </Button>
               </nav>

@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+
 import SocialProof from '../SocialProof'
 
 describe('SocialProof Component', () => {

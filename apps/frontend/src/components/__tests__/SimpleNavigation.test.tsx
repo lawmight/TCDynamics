@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import SimpleNavigation from '../SimpleNavigation'
 
 // Mock the icons
@@ -10,7 +11,7 @@ vi.mock('lucide-react', () => ({
 }))
 
 describe('SimpleNavigation Component', () => {
-  let scrollSpy: any
+  let scrollSpy: ReturnType<typeof vi.spyOn> | null = null
 
   beforeEach(() => {
     // Mock window.scrollY and scroll event
@@ -56,8 +57,8 @@ describe('SimpleNavigation Component', () => {
     const mockScrollIntoView = vi.fn()
 
     // Mock getElementById and scrollIntoView
-    const mockElement = { scrollIntoView: mockScrollIntoView }
-    vi.spyOn(document, 'getElementById').mockReturnValue(mockElement as any)
+    const mockElement = { scrollIntoView: mockScrollIntoView } as HTMLElement
+    vi.spyOn(document, 'getElementById').mockReturnValue(mockElement)
 
     fireEvent.click(logoButton)
 
@@ -71,8 +72,8 @@ describe('SimpleNavigation Component', () => {
     const featuresButton = screen.getByText('Fonctionnalités')
     const mockScrollIntoView = vi.fn()
 
-    const mockElement = { scrollIntoView: mockScrollIntoView }
-    vi.spyOn(document, 'getElementById').mockReturnValue(mockElement as any)
+    const mockElement = { scrollIntoView: mockScrollIntoView } as HTMLElement
+    vi.spyOn(document, 'getElementById').mockReturnValue(mockElement)
 
     fireEvent.click(featuresButton)
 

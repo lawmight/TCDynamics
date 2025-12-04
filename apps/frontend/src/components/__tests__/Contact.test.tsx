@@ -1,6 +1,7 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import Contact from '../Contact'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+
+import Contact from '../Contact'
 
 const queryClient = new QueryClient({
   defaultOptions: {

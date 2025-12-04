@@ -1,7 +1,9 @@
-import * as apiConfig from '@/utils/apiConfig'
 import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { useContactForm, type ContactFormData } from '../useContactForm'
+
+import * as apiConfig from '@/utils/apiConfig'
 
 // Mock modules
 vi.mock('@/utils/apiConfig', async () => {

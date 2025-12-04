@@ -2,6 +2,7 @@
 // Security utilities for input sanitization, validation, and protection
 
 import DOMPurify from 'isomorphic-dompurify'
+
 import { logger } from './logger'
 
 // ========== INPUT SANITIZATION ==========

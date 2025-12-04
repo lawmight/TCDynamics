@@ -1,7 +1,3 @@
-import { AnimatedCounter } from '@/components/ui/animated-counter'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
-import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 import {
   ArrowRight,
   CheckCircle,
@@ -12,6 +8,11 @@ import {
   TrendingUp,
   Users,
 } from 'lucide-react'
+
+import { AnimatedCounter } from '@/components/ui/animated-counter'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 
 const SocialProof = () => {
   const { ref: sectionRef, isIntersecting } = useIntersectionObserver({
@@ -100,8 +101,7 @@ const SocialProof = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative py-24 bg-gradient-to-b from-background/50 to-background overflow-hidden"
-      role="region"
+      className="relative overflow-hidden bg-gradient-to-b from-background/50 to-background py-24"
       aria-labelledby="social-proof-title"
     >
       {/* Network Background */}
@@ -115,7 +115,7 @@ const SocialProof = () => {
           }}
         >
           <svg
-            className="absolute inset-0 w-full h-full"
+            className="absolute inset-0 h-full w-full"
             xmlns="http://www.w3.org/2000/svg"
           >
             <defs>
@@ -145,24 +145,24 @@ const SocialProof = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container relative z-10 mx-auto px-4">
         {/* Header */}
         <div
-          className={`text-center mb-16 ${isIntersecting ? 'fade-in-up' : 'opacity-0'}`}
+          className={`mb-16 text-center ${isIntersecting ? 'fade-in-up' : 'opacity-0'}`}
         >
           <Badge
             variant="outline"
-            className="border-primary/40 text-primary font-mono mb-6"
+            className="mb-6 border-primary/40 font-mono text-primary"
           >
             Témoignages clients
           </Badge>
           <h2
             id="social-proof-title"
-            className="text-4xl md:text-5xl font-bold mb-6 text-gradient"
+            className="text-gradient mb-6 text-4xl font-bold md:text-5xl"
           >
             Ils nous font confiance
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-mono">
+          <p className="mx-auto max-w-3xl font-mono text-xl text-muted-foreground">
             Découvrez comment les entreprises françaises transforment leurs
             processus avec WorkFlowAI
           </p>
@@ -170,30 +170,30 @@ const SocialProof = () => {
 
         {/* Metrics */}
         <div
-          className={`grid md:grid-cols-3 gap-8 mb-16 stagger-fade ${isIntersecting ? '' : 'opacity-0'}`}
+          className={`stagger-fade mb-16 grid gap-8 md:grid-cols-3 ${isIntersecting ? '' : 'opacity-0'}`}
         >
           {metrics.map((metric, index) => {
             const IconComponent = metric.icon
             return (
               <Card
                 key={index}
-                className="bg-card/60 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-all duration-500 card-hover group"
+                className="card-hover group border-primary/20 bg-card/60 backdrop-blur-sm transition-all duration-500 hover:border-primary/40"
               >
                 <CardContent className="p-8 text-center">
-                  <div className="p-4 bg-primary/10 rounded-full w-fit mx-auto mb-6 group-hover:bg-primary/20 transition-colors">
-                    <IconComponent className="w-8 h-8 text-primary" />
+                  <div className="mx-auto mb-6 w-fit rounded-full bg-primary/10 p-4 transition-colors group-hover:bg-primary/20">
+                    <IconComponent className="h-8 w-8 text-primary" />
                   </div>
-                  <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
+                  <div className="mb-2 text-4xl font-bold text-primary md:text-5xl">
                     <AnimatedCounter
                       end={metric.value}
                       suffix={metric.suffix}
                       duration={2500}
                     />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
+                  <h3 className="mb-2 text-xl font-semibold transition-colors group-hover:text-primary">
                     {metric.label}
                   </h3>
-                  <p className="text-muted-foreground font-mono text-sm">
+                  <p className="font-mono text-sm text-muted-foreground">
                     {metric.description}
                   </p>
                 </CardContent>
@@ -204,47 +204,47 @@ const SocialProof = () => {
 
         {/* Testimonials */}
         <div
-          className={`grid md:grid-cols-3 gap-8 mb-16 stagger-fade ${isIntersecting ? '' : 'opacity-0'}`}
+          className={`stagger-fade mb-16 grid gap-8 md:grid-cols-3 ${isIntersecting ? '' : 'opacity-0'}`}
         >
           {testimonials.map((testimonial, index) => (
             <Card
               key={index}
-              className="bg-card/60 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-all duration-500 card-hover group"
+              className="card-hover group border-primary/20 bg-card/60 backdrop-blur-sm transition-all duration-500 hover:border-primary/40"
               role="article"
               aria-labelledby={`testimonial-${index}-author`}
             >
               <CardContent className="p-6">
                 <div
-                  className="flex items-center gap-1 mb-4"
+                  className="mb-4 flex items-center gap-1"
                   aria-label={`${testimonial.rating} étoiles sur 5`}
                 >
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star
                       key={i}
-                      className="w-4 h-4 fill-yellow-400 text-yellow-400"
+                      className="h-4 w-4 fill-yellow-400 text-yellow-400"
                     />
                   ))}
                 </div>
-                <blockquote className="text-muted-foreground mb-6 leading-relaxed italic">
+                <blockquote className="mb-6 italic leading-relaxed text-muted-foreground">
                   "{testimonial.quote}"
                 </blockquote>
                 <div className="flex items-center gap-3">
                   <img
                     src={testimonial.image}
-                    alt={`Photo de ${testimonial.author}, ${testimonial.position} chez ${testimonial.company}`}
-                    className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/20"
+                    alt={`${testimonial.author}, ${testimonial.position} chez ${testimonial.company}`}
+                    className="h-12 w-12 rounded-full object-cover ring-2 ring-primary/20"
                   />
                   <div>
                     <cite
                       id={`testimonial-${index}-author`}
-                      className="font-semibold text-foreground not-italic group-hover:text-primary transition-colors"
+                      className="font-semibold not-italic text-foreground transition-colors group-hover:text-primary"
                     >
                       {testimonial.author}
                     </cite>
-                    <p className="text-sm text-muted-foreground font-mono">
+                    <p className="font-mono text-sm text-muted-foreground">
                       {testimonial.position}
                     </p>
-                    <p className="text-sm text-primary font-mono">
+                    <p className="font-mono text-sm text-primary">
                       {testimonial.company}
                     </p>
                   </div>
@@ -256,18 +256,18 @@ const SocialProof = () => {
 
         {/* Company Logos */}
         <div
-          className={`mb-16 fade-in-up ${isIntersecting ? '' : 'opacity-0'}`}
+          className={`fade-in-up mb-16 ${isIntersecting ? '' : 'opacity-0'}`}
         >
-          <h3 className="text-center text-lg font-semibold mb-8 text-muted-foreground">
+          <h3 className="mb-8 text-center text-lg font-semibold text-muted-foreground">
             Ils nous font déjà confiance
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+          <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-6">
             {companies.map((company, index) => (
               <div
                 key={index}
-                className="bg-card/40 backdrop-blur-sm border border-primary/10 rounded-lg p-4 text-center hover:border-primary/30 transition-all duration-300 group"
+                className="group rounded-lg border border-primary/10 bg-card/40 p-4 text-center backdrop-blur-sm transition-all duration-300 hover:border-primary/30"
               >
-                <div className="text-sm font-mono text-muted-foreground group-hover:text-foreground transition-colors">
+                <div className="font-mono text-sm text-muted-foreground transition-colors group-hover:text-foreground">
                   {company}
                 </div>
               </div>
@@ -277,25 +277,25 @@ const SocialProof = () => {
 
         {/* Trust Indicators */}
         <div
-          className={`grid md:grid-cols-2 gap-8 stagger-fade ${isIntersecting ? '' : 'opacity-0'}`}
+          className={`stagger-fade grid gap-8 md:grid-cols-2 ${isIntersecting ? '' : 'opacity-0'}`}
         >
           {trustIndicators.map((indicator, index) => {
             const IconComponent = indicator.icon
             return (
               <Card
                 key={index}
-                className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20 hover:from-primary/15 hover:to-primary/10 transition-all duration-300 group"
+                className="group border-primary/20 bg-gradient-to-r from-primary/10 to-primary/5 transition-all duration-300 hover:from-primary/15 hover:to-primary/10"
               >
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">
-                    <div className="p-3 bg-primary/20 rounded-full group-hover:bg-primary/30 transition-colors">
-                      <IconComponent className="w-6 h-6 text-primary" />
+                    <div className="rounded-full bg-primary/20 p-3 transition-colors group-hover:bg-primary/30">
+                      <IconComponent className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors">
+                      <h4 className="mb-1 text-lg font-bold transition-colors group-hover:text-primary">
                         {indicator.title}
                       </h4>
-                      <p className="text-muted-foreground font-mono text-sm">
+                      <p className="font-mono text-sm text-muted-foreground">
                         {indicator.description}
                       </p>
                     </div>
@@ -308,14 +308,14 @@ const SocialProof = () => {
 
         {/* CTA */}
         <div
-          className={`text-center mt-16 fade-in-up ${isIntersecting ? '' : 'opacity-0'}`}
+          className={`fade-in-up mt-16 text-center ${isIntersecting ? '' : 'opacity-0'}`}
         >
-          <div className="inline-flex items-center gap-2 px-6 py-3 bg-primary/10 rounded-full border border-primary/20 group hover:bg-primary/15 transition-colors cursor-pointer">
-            <CheckCircle className="w-4 h-4 text-primary" />
-            <span className="text-primary font-mono font-medium">
+          <div className="group inline-flex cursor-pointer items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-6 py-3 transition-colors hover:bg-primary/15">
+            <CheckCircle className="h-4 w-4 text-primary" />
+            <span className="font-mono font-medium text-primary">
               Rejoignez plus de 500 entreprises françaises
             </span>
-            <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-1" />
           </div>
         </div>
       </div>

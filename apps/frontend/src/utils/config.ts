@@ -2,6 +2,7 @@
 // Configuration management with validation and environment variable handling
 
 import { z } from 'zod'
+
 import { logger } from './logger'
 
 const DEFAULT_API_BASE_URL = '/api' // Use relative URLs for Vercel API routes

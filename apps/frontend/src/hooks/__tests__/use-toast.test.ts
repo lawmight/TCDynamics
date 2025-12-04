@@ -1,4 +1,5 @@
 import { renderHook, act } from '@testing-library/react'
+
 import { useToast } from '../use-toast'
 
 describe('useToast Hook', () => {

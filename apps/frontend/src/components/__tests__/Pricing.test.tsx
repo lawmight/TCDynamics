@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+
 import Pricing from '../Pricing'
 
 describe('Pricing Component', () => {

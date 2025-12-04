@@ -1,11 +1,11 @@
-import Hero from '@/components/Hero'
+import Contact from '@/components/Contact'
+import FAQ from '@/components/FAQ'
 import Features from '@/components/Features'
+import Hero from '@/components/Hero'
 import HowItWorks from '@/components/HowItWorks'
 import LocalAdvantages from '@/components/LocalAdvantages'
-import SocialProof from '@/components/SocialProof'
 import Pricing from '@/components/Pricing'
-import FAQ from '@/components/FAQ'
-import Contact from '@/components/Contact'
+import SocialProof from '@/components/SocialProof'
 
 const Index = () => {
   return (

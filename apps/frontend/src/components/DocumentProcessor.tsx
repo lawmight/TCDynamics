@@ -93,7 +93,6 @@ const DocumentProcessor = () => {
       try {
         // Convertir le fichier en base64
         const base64 = await new Promise<string>((resolve, reject) => {
-          // eslint-disable-next-line no-undef
           const reader = new FileReader()
           reader.onload = () => {
             const result = reader.result as string

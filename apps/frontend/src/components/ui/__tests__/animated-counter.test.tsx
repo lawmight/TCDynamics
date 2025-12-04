@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react'
+
 import { AnimatedCounter } from '../animated-counter'
 
 // Mock the intersection observer

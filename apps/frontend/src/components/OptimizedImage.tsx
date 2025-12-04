@@ -52,7 +52,7 @@ export const OptimizedImage = ({
     <div ref={imgRef} className={`relative ${className}`}>
       {!loaded && (
         <div
-          className="animate-pulse bg-gray-300 dark:bg-gray-700 rounded"
+          className="animate-pulse rounded bg-gray-300 dark:bg-gray-700"
           style={{
             width: width || '100%',
             height: height || 200,

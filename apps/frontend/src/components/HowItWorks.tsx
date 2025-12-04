@@ -1,5 +1,6 @@
-import { Card, CardContent } from '@/components/ui/card'
 import { ArrowRight, Link, Settings, TrendingUp } from 'lucide-react'
+
+import { Card, CardContent } from '@/components/ui/card'
 
 const HowItWorks = () => {
   const steps = [
@@ -45,7 +46,7 @@ const HowItWorks = () => {
   ]
 
   return (
-    <section className="relative py-24 bg-background overflow-hidden">
+    <section className="relative overflow-hidden bg-background py-24">
       {/* Network Background */}
       <div className="absolute inset-0 opacity-5">
         <div
@@ -57,7 +58,7 @@ const HowItWorks = () => {
           }}
         >
           <svg
-            className="absolute inset-0 w-full h-full"
+            className="absolute inset-0 h-full w-full"
             xmlns="http://www.w3.org/2000/svg"
           >
             <defs>
@@ -87,23 +88,23 @@ const HowItWorks = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-16 fade-in-up">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gradient">
+      <div className="container relative z-10 mx-auto px-4">
+        <div className="fade-in-up mb-16 text-center">
+          <h2 className="text-gradient mb-6 text-4xl font-bold md:text-5xl">
             Comment ça marche
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-mono">
+          <p className="mx-auto max-w-3xl font-mono text-xl text-muted-foreground">
             Trois étapes simples pour transformer votre entreprise avec l'IA
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-3">
           {steps.map((step, index) => {
             const IconComponent = step.icon
             return (
               <div
                 key={index}
-                className={`relative fade-in-up ${
+                className={`fade-in-up relative ${
                   index === 0
                     ? 'fade-delay-00'
                     : index === 1
@@ -113,25 +114,25 @@ const HowItWorks = () => {
                         : ''
                 }`}
               >
-                <Card className="h-full bg-card/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-all duration-300 group hover:scale-105">
+                <Card className="group h-full border-primary/20 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-primary/40">
                   <CardContent className="p-8">
                     {/* Step Number */}
-                    <div className="flex items-center justify-between mb-6">
-                      <span className="text-6xl font-mono font-bold text-primary/20 group-hover:text-primary/40 transition-colors">
+                    <div className="mb-6 flex items-center justify-between">
+                      <span className="font-mono text-6xl font-bold text-primary/20 transition-colors group-hover:text-primary/40">
                         {step.number}
                       </span>
-                      <div className="p-4 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors">
-                        <IconComponent className="w-8 h-8 text-primary" />
+                      <div className="rounded-full bg-primary/10 p-4 transition-colors group-hover:bg-primary/20">
+                        <IconComponent className="h-8 w-8 text-primary" />
                       </div>
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-2xl font-bold mb-4 group-hover:text-primary transition-colors">
+                    <h3 className="mb-4 text-2xl font-bold transition-colors group-hover:text-primary">
                       {step.title}
                     </h3>
 
                     {/* Description */}
-                    <p className="text-muted-foreground mb-6 leading-relaxed">
+                    <p className="mb-6 leading-relaxed text-muted-foreground">
                       {step.description}
                     </p>
 
@@ -140,9 +141,9 @@ const HowItWorks = () => {
                       {step.details.map((detail, detailIndex) => (
                         <li
                           key={detailIndex}
-                          className="flex items-center text-sm font-mono"
+                          className="flex items-center font-mono text-sm"
                         >
-                          <div className="w-1.5 h-1.5 bg-primary rounded-full mr-3 flex-shrink-0" />
+                          <div className="mr-3 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" />
                           <span className="text-muted-foreground">
                             {detail}
                           </span>
@@ -154,9 +155,9 @@ const HowItWorks = () => {
 
                 {/* Arrow between steps */}
                 {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute -right-4 top-1/2 transform -translate-y-1/2 z-10">
-                    <div className="bg-background border border-primary/20 rounded-full p-2">
-                      <ArrowRight className="w-4 h-4 text-primary" />
+                  <div className="absolute -right-4 top-1/2 z-10 hidden -translate-y-1/2 transform lg:block">
+                    <div className="rounded-full border border-primary/20 bg-background p-2">
+                      <ArrowRight className="h-4 w-4 text-primary" />
                     </div>
                   </div>
                 )}
@@ -166,12 +167,12 @@ const HowItWorks = () => {
         </div>
 
         {/* Bottom CTA */}
-        <div className="text-center mt-16 fade-in-up fade-delay-06">
-          <p className="text-lg text-muted-foreground font-mono mb-6">
+        <div className="fade-in-up fade-delay-06 mt-16 text-center">
+          <p className="mb-6 font-mono text-lg text-muted-foreground">
             Prêt à automatiser votre entreprise ?
           </p>
-          <div className="inline-flex items-center px-6 py-3 bg-primary/10 rounded-full border border-primary/20">
-            <span className="text-primary font-mono font-medium">
+          <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-6 py-3">
+            <span className="font-mono font-medium text-primary">
               Démarrez en moins de 5 minutes
             </span>
           </div>

@@ -1,10 +1,11 @@
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import confetti from 'canvas-confetti'
 import { ArrowRight, CheckCircle, Download, Mail } from 'lucide-react'
 import { useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 const CheckoutSuccess = () => {
   const [searchParams] = useSearchParams()
@@ -27,27 +28,27 @@ const CheckoutSuccess = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/50 py-16">
       <div className="container mx-auto px-6">
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div className="mx-auto max-w-4xl space-y-8">
           {/* Success Header */}
-          <Card className="text-center bg-card/95 backdrop-blur-sm border-primary/20">
-            <CardContent className="pt-8 pb-6">
-              <div className="flex justify-center mb-6">
-                <div className="w-20 h-20 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-12 h-12 text-green-600 dark:text-green-400" />
+          <Card className="border-primary/20 bg-card/95 text-center backdrop-blur-sm">
+            <CardContent className="pb-6 pt-8">
+              <div className="mb-6 flex justify-center">
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
+                  <CheckCircle className="h-12 w-12 text-green-600 dark:text-green-400" />
                 </div>
               </div>
 
-              <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-4">
+              <h1 className="mb-4 text-4xl font-bold text-foreground lg:text-5xl">
                 Paiement réussi ! 🎉
               </h1>
 
-              <p className="text-xl text-muted-foreground mb-6">
+              <p className="mb-6 text-xl text-muted-foreground">
                 Merci pour votre confiance. Votre paiement a été traité avec
                 succès.
               </p>
 
               {sessionId && (
-                <div className="inline-flex items-center gap-2 bg-muted/50 rounded-lg px-4 py-2">
+                <div className="inline-flex items-center gap-2 rounded-lg bg-muted/50 px-4 py-2">
                   <span className="text-sm text-muted-foreground">
                     Session ID:
                   </span>
@@ -60,10 +61,10 @@ const CheckoutSuccess = () => {
           </Card>
 
           {/* Order Confirmation */}
-          <Card className="bg-card/95 backdrop-blur-sm border-primary/20">
+          <Card className="border-primary/20 bg-card/95 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="text-2xl flex items-center gap-3">
-                <Mail className="w-6 h-6 text-primary" />
+              <CardTitle className="flex items-center gap-3 text-2xl">
+                <Mail className="h-6 w-6 text-primary" />
                 Confirmation de commande
               </CardTitle>
             </CardHeader>
@@ -77,15 +78,15 @@ const CheckoutSuccess = () => {
           </Card>
 
           {/* Next Steps */}
-          <Card className="bg-card/95 backdrop-blur-sm border-primary/20">
+          <Card className="border-primary/20 bg-card/95 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="text-2xl">Prochaines étapes</CardTitle>
             </CardHeader>
             <CardContent>
               <ol className="space-y-4">
                 <li className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Mail className="w-4 h-4 text-primary" />
+                  <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary/10">
+                    <Mail className="h-4 w-4 text-primary" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground">
@@ -99,8 +100,8 @@ const CheckoutSuccess = () => {
                 </li>
 
                 <li className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Download className="w-4 h-4 text-primary" />
+                  <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary/10">
+                    <Download className="h-4 w-4 text-primary" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground">
@@ -114,8 +115,8 @@ const CheckoutSuccess = () => {
                 </li>
 
                 <li className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <ArrowRight className="w-4 h-4 text-primary" />
+                  <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary/10">
+                    <ArrowRight className="h-4 w-4 text-primary" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground">
@@ -129,8 +130,8 @@ const CheckoutSuccess = () => {
                 </li>
 
                 <li className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <CheckCircle className="w-4 h-4 text-primary" />
+                  <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary/10">
+                    <CheckCircle className="h-4 w-4 text-primary" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground">
@@ -147,7 +148,7 @@ const CheckoutSuccess = () => {
           </Card>
 
           {/* Support Section */}
-          <Card className="bg-card/95 backdrop-blur-sm border-primary/20">
+          <Card className="border-primary/20 bg-card/95 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="text-2xl">Besoin d'aide ?</CardTitle>
             </CardHeader>
@@ -158,19 +159,19 @@ const CheckoutSuccess = () => {
                 un problème.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col gap-4 sm:flex-row">
                 <Button
                   onClick={handleSupportClick}
                   className="flex-1"
                   size="lg"
                 >
-                  <Mail className="w-4 h-4 mr-2" />
+                  <Mail className="mr-2 h-4 w-4" />
                   Contacter le support
                 </Button>
 
                 <Button asChild variant="outline" className="flex-1" size="lg">
                   <Link to="/">
-                    <ArrowRight className="w-4 h-4 mr-2" />
+                    <ArrowRight className="mr-2 h-4 w-4" />
                     Retour à l'accueil
                   </Link>
                 </Button>
@@ -179,9 +180,9 @@ const CheckoutSuccess = () => {
           </Card>
 
           {/* Thank You Message */}
-          <Card className="text-center bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
+          <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10 text-center">
             <CardContent className="py-8">
-              <p className="text-lg font-medium text-foreground mb-2">
+              <p className="mb-2 text-lg font-medium text-foreground">
                 Merci pour votre confiance !
               </p>
               <p className="text-muted-foreground">

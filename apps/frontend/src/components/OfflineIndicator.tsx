@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
-import { Badge } from '@/components/ui/badge'
 import { WifiOff, Wifi } from 'lucide-react'
+import { useState, useEffect } from 'react'
+
+import { Badge } from '@/components/ui/badge'
 
 const OfflineIndicator = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine)
@@ -37,12 +38,12 @@ const OfflineIndicator = () => {
       >
         {isOnline ? (
           <>
-            <Wifi className="w-4 h-4" />
+            <Wifi className="h-4 w-4" />
             <span className="font-mono text-sm">Connexion rétablie</span>
           </>
         ) : (
           <>
-            <WifiOff className="w-4 h-4" />
+            <WifiOff className="h-4 w-4" />
             <span className="font-mono text-sm">Mode hors ligne</span>
           </>
         )}

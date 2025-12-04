@@ -1,5 +1,3 @@
-import { Badge } from '@/components/ui/badge'
-import { Card } from '@/components/ui/card'
 import {
   CheckCircle,
   Clock,
@@ -11,6 +9,9 @@ import {
   Wrench,
 } from 'lucide-react'
 import React, { createContext, useContext, useId, useState } from 'react'
+
+import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
 
 // Accordion Context for state management
 interface AccordionContextType {
@@ -122,17 +123,16 @@ const AccordionTrigger = ({
   return (
     <button
       id={triggerId}
-      className={`${className} w-full flex items-center justify-between text-left focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg`}
+      className={`${className} flex w-full items-center justify-between rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2`}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       aria-expanded={isOpen}
       aria-controls={contentId}
-      role="button"
-      tabIndex={0}
+      type="button"
     >
       {children}
       <svg
-        className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+        className={`h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -279,11 +279,11 @@ const FAQ = () => {
   const allFaqs = [...faqs, ...additionalFaqs]
 
   return (
-    <section className="relative py-24 bg-gradient-to-b from-background/50 to-background overflow-hidden">
+    <section className="relative overflow-hidden bg-gradient-to-b from-background/50 to-background py-24">
       {/* Network Background */}
       <div className="absolute inset-0 opacity-5">
         <svg
-          className="absolute inset-0 w-full h-full"
+          className="absolute inset-0 h-full w-full"
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
@@ -312,26 +312,26 @@ const FAQ = () => {
         </svg>
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container relative z-10 mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-16 fade-in-up">
+        <div className="fade-in-up mb-16 text-center">
           <Badge
             variant="outline"
-            className="border-primary/40 text-primary font-mono mb-6"
+            className="mb-6 border-primary/40 font-mono text-primary"
           >
             Questions fréquentes
           </Badge>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gradient">
+          <h2 className="text-gradient mb-6 text-4xl font-bold md:text-5xl">
             Vos questions, nos réponses
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-mono">
+          <p className="mx-auto max-w-3xl font-mono text-xl text-muted-foreground">
             Tout ce que vous devez savoir sur WorkFlowAI avant de commencer
           </p>
         </div>
 
         {/* FAQ Accordion */}
-        <div className="max-w-4xl mx-auto">
-          <Card className="bg-card/60 backdrop-blur-sm border-primary/20 p-8 fade-in-up fade-delay-02">
+        <div className="mx-auto max-w-4xl">
+          <Card className="fade-in-up fade-delay-02 border-primary/20 bg-card/60 p-8 backdrop-blur-sm">
             <Accordion type="single" collapsible className="space-y-4">
               {allFaqs.map(faq => {
                 const IconComponent = faq.icon
@@ -339,24 +339,24 @@ const FAQ = () => {
                   <AccordionItem
                     key={faq.id}
                     value={faq.id}
-                    className="border border-primary/10 rounded-lg px-6 py-2 hover:border-primary/30 transition-colors"
+                    className="rounded-lg border border-primary/10 px-6 py-2 transition-colors hover:border-primary/30"
                   >
                     <AccordionTrigger
                       value={faq.id}
-                      className="text-left hover:no-underline group py-6"
+                      className="group py-6 text-left hover:no-underline"
                     >
-                      <div className="flex items-center gap-4 flex-1">
-                        <div className="p-2 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors flex-shrink-0">
-                          <IconComponent className="w-5 h-5 text-primary" />
+                      <div className="flex flex-1 items-center gap-4">
+                        <div className="flex-shrink-0 rounded-full bg-primary/10 p-2 transition-colors group-hover:bg-primary/20">
+                          <IconComponent className="h-5 w-5 text-primary" />
                         </div>
                         <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-1">
-                            <h3 className="text-lg font-semibold group-hover:text-primary transition-colors">
+                          <div className="mb-1 flex items-center gap-3">
+                            <h3 className="text-lg font-semibold transition-colors group-hover:text-primary">
                               {faq.question}
                             </h3>
                             <Badge
                               variant="secondary"
-                              className="text-xs font-mono bg-primary/10 text-primary border-primary/20"
+                              className="border-primary/20 bg-primary/10 font-mono text-xs text-primary"
                             >
                               {faq.badge}
                             </Badge>
@@ -373,13 +373,13 @@ const FAQ = () => {
                             return (
                               <p
                                 key={lineIndex}
-                                className="text-muted-foreground leading-relaxed"
+                                className="leading-relaxed text-muted-foreground"
                               >
                                 {parts.map((part, partIndex) =>
                                   partIndex % 2 === 1 ? (
                                     <strong
                                       key={partIndex}
-                                      className="text-foreground font-semibold"
+                                      className="font-semibold text-foreground"
                                     >
                                       {part}
                                     </strong>
@@ -393,7 +393,7 @@ const FAQ = () => {
                           return (
                             <p
                               key={lineIndex}
-                              className="text-muted-foreground leading-relaxed"
+                              className="leading-relaxed text-muted-foreground"
                             >
                               {line}
                             </p>
@@ -409,24 +409,24 @@ const FAQ = () => {
         </div>
 
         {/* Contact CTA */}
-        <div className="text-center mt-12 fade-in-up fade-delay-04">
-          <div className="bg-card/30 backdrop-blur-sm rounded-2xl border border-primary/20 p-8 max-w-2xl mx-auto">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <Phone className="w-6 h-6 text-primary" />
+        <div className="fade-in-up fade-delay-04 mt-12 text-center">
+          <div className="mx-auto max-w-2xl rounded-2xl border border-primary/20 bg-card/30 p-8 backdrop-blur-sm">
+            <div className="mb-4 flex items-center justify-center gap-3">
+              <Phone className="h-6 w-6 text-primary" />
               <h3 className="text-xl font-bold">Une autre question ?</h3>
             </div>
-            <p className="text-muted-foreground mb-6 font-mono">
+            <p className="mb-6 font-mono text-muted-foreground">
               Notre équipe française est là pour vous répondre
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full border border-primary/20">
-                <CheckCircle className="w-4 h-4 text-primary" />
+            <div className="flex flex-col justify-center gap-4 sm:flex-row">
+              <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2">
+                <CheckCircle className="h-4 w-4 text-primary" />
                 <span className="font-mono text-sm text-primary">
                   📞 01 39 44 75 00
                 </span>
               </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full border border-primary/20">
-                <CheckCircle className="w-4 h-4 text-primary" />
+              <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2">
+                <CheckCircle className="h-4 w-4 text-primary" />
                 <span className="font-mono text-sm text-primary">
                   ✉️ contact@workflowai.fr
                 </span>
