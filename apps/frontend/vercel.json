@@ -17,9 +17,6 @@
       "memory": 1024
     }
   },
-  "experimental": {
-    "fluidCompute": true
-  },
   "env": {
     "USE_BYTECODE_CACHING": "1"
   }
