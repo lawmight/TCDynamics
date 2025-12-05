@@ -36,6 +36,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const init = async () => {
       try {
         const supabase = getSupabaseClient()
+
+        // If returning from OAuth redirect, exchange the code for a session before we gate routes.
+        if (typeof window !== 'undefined') {
+          const url = new URL(window.location.href)
+          const code = url.searchParams.get('code')
+          if (code) {
+            const { error } = await supabase.auth.exchangeCodeForSession(code)
+            if (error) {
+              console.error('Auth code exchange failed', error)
+            } else {
+              url.searchParams.delete('code')
+              url.searchParams.delete('state')
+              const cleanUrl = `${url.pathname}${url.search}${url.hash}`
+              window.history.replaceState({}, document.title, cleanUrl)
+            }
+          }
+        }
+
         const {
           data: { session: currentSession },
         } = await supabase.auth.getSession()
@@ -141,7 +159,11 @@ export const useRequireAuth = () => {
   const auth = useAuth()
 
   useEffect(() => {
-    if (!auth.loading && !auth.user) {
+    const hasAuthCode =
+      typeof window !== 'undefined' &&
+      new URLSearchParams(window.location.search).has('code')
+
+    if (!auth.loading && !auth.user && !hasAuthCode) {
       navigate('/login')
     }
   }, [auth.loading, auth.user, navigate])
