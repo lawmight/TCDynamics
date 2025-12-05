@@ -1,10 +1,18 @@
 import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 
 import Features from '../Features'
 
+const renderWithRouter = () =>
+  render(
+    <MemoryRouter>
+      <Features />
+    </MemoryRouter>
+  )
+
 describe('Features Component', () => {
   it('should render all feature cards', () => {
-    render(<Features />)
+    renderWithRouter()
 
     // Vérifier le titre principal
     expect(screen.getByText(/Modules IA pour/i)).toBeInTheDocument()
@@ -18,7 +26,7 @@ describe('Features Component', () => {
   })
 
   it('should display feature benefits', () => {
-    render(<Features />)
+    renderWithRouter()
 
     // Vérifier quelques bénéfices clés
     expect(screen.getByText('99.7% de précision')).toBeInTheDocument()
@@ -27,7 +35,7 @@ describe('Features Component', () => {
   })
 
   it('should render CTA section', () => {
-    render(<Features />)
+    renderWithRouter()
 
     expect(
       screen.getByText(/Prêt à transformer votre entreprise/i)
@@ -37,7 +45,7 @@ describe('Features Component', () => {
   })
 
   it('should have security badge', () => {
-    render(<Features />)
+    renderWithRouter()
 
     expect(
       screen.getByText(/DONNÉES SÉCURISÉES EN FRANCE/i)

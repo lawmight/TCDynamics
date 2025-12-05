@@ -30,6 +30,15 @@ client_manager = ClientManager()
 app = func.FunctionApp()
 
 
+@app.schedule(schedule="0 */5 * * * *", arg_name="timer", run_on_startup=True)
+def warm_instances(timer: func.TimerRequest) -> None:
+    """
+    Periodic ping to keep Azure Functions warm.
+    Triggered every 5 minutes and on startup.
+    """
+    logging.info("Warmup timer triggered at %s", datetime.utcnow().isoformat())
+
+
 @app.route(route="health", auth_level=func.AuthLevel.ANONYMOUS)
 def health_check(_req: func.HttpRequest) -> func.HttpResponse:
     """Health check endpoint"""

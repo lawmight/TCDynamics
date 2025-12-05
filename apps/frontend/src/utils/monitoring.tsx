@@ -54,11 +54,17 @@ class Monitoring {
 
     try {
       const Sentry = await import('@sentry/browser')
+      const parsedSampleRate = Number(
+        import.meta.env.VITE_SENTRY_TRACES_SAMPLE_RATE ?? '0.1'
+      )
+      const tracesSampleRate = Number.isFinite(parsedSampleRate)
+        ? Math.max(0, Math.min(1, parsedSampleRate))
+        : 0.1
       Sentry.init({
         dsn: this.dsn,
         environment: import.meta.env.MODE,
-        tracesSampleRate: 0.1, // Match API configuration
-        beforeSend(event, hint) {
+        tracesSampleRate,
+        beforeSend(event, _hint) {
           // Only send errors in production
           if (import.meta.env.MODE !== 'production') {
             return null
@@ -131,7 +137,9 @@ export class ErrorBoundary extends React.Component<
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     monitoring.captureError(error, {
       component: 'ErrorBoundary',
-      extra: errorInfo,
+      extra: {
+        componentStack: errorInfo.componentStack,
+      },
     })
   }
 

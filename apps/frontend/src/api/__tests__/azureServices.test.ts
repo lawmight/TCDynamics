@@ -32,7 +32,14 @@ vi.mock('@/utils/performance', () => ({
     get: vi.fn(),
     set: vi.fn(),
     clear: vi.fn(),
-    getStats: vi.fn(() => ({ size: 10, hitRate: 85 })),
+    getStats: vi.fn(() => ({
+      size: 10,
+      hitRate: 85,
+      enabled: true,
+      maxSize: 100,
+      totalSize: 50,
+      utilizationPercent: 20,
+    })),
     cache: { size: 10 },
   },
 }))
@@ -61,6 +68,7 @@ vi.mock('@/utils/security', () => ({
 // Mock configuration
 vi.mock('@/utils/config', () => ({
   config: {
+    apiBaseUrl: 'https://test-api.com',
     functionsBaseUrl: 'https://test-api.com',
     client: {
       VITE_ENABLE_CACHE: true,
@@ -464,10 +472,16 @@ describe('Azure Services API Client', () => {
     it('should get cache stats', async () => {
       const stats = apiUtils.getCacheStats()
 
-      expect(stats).toEqual({
-        size: 0, // From the actual implementation
-        enabled: true,
-      })
+      expect(stats).toEqual(
+        expect.objectContaining({
+          size: 10,
+          hitRate: 85,
+          enabled: true,
+          maxSize: expect.any(Number),
+          totalSize: expect.any(Number),
+          utilizationPercent: expect.any(Number),
+        })
+      )
     })
   })
 

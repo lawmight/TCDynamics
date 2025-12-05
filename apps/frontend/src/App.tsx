@@ -2,7 +2,13 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Analytics } from '@vercel/analytics/react'
 import { Suspense, lazy } from 'react'
-import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  Navigate,
+  useLocation,
+} from 'react-router-dom'
 
 import ErrorBoundary from './components/ErrorBoundary'
 // import MobileNavigation from './components/MobileNavigation' // DISABLED: Causes black page
@@ -14,6 +20,8 @@ import PerformanceMonitor from './components/PerformanceMonitor'
 import ScrollToTop from './components/ScrollToTop'
 import SimpleNavigation from './components/SimpleNavigation'
 import { ThemeProvider } from './components/ThemeProvider'
+import { AppLayout } from './components/app/AppLayout'
+import { AuthProvider, useAuth } from './hooks/useAuth'
 
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import { Toaster } from '@/components/ui/toaster'
@@ -32,6 +40,10 @@ const Pages = lazy(() => import('./pages/Pages'))
 const Diagnostics = lazy(() => import('./pages/Diagnostics'))
 const Recommendations = lazy(() => import('./pages/Recommendations'))
 const Settings = lazy(() => import('./pages/Settings'))
+const Login = lazy(() => import('./pages/auth/Login'))
+const ChatApp = lazy(() => import('./pages/app/Chat'))
+const FilesApp = lazy(() => import('./pages/app/Files'))
+const AnalyticsApp = lazy(() => import('./pages/app/Analytics'))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -97,6 +109,81 @@ const handleAppError = (
   }
 }
 
+const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+  const { user, loading } = useAuth()
+
+  if (loading) {
+    return <PageLoader />
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />
+  }
+
+  return children
+}
+
+const AppRouter = () => {
+  const location = useLocation()
+  const hideMarketingChrome =
+    location.pathname.startsWith('/app') ||
+    location.pathname.startsWith('/login')
+
+  return (
+    <>
+      {!hideMarketingChrome && <SimpleNavigation />}
+      <ScrollToTop />
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/pages" element={<Pages />} />
+          <Route path="/diagnostics" element={<Diagnostics />} />
+          <Route path="/recommendations" element={<Recommendations />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/checkout-success" element={<CheckoutSuccess />} />
+          <Route path="/demo" element={<Demo />} />
+          <Route path="/get-started" element={<GetStarted />} />
+          <Route path="/about" element={<About />} />
+
+          <Route
+            path="/features"
+            element={<Navigate to="/#features" replace />}
+          />
+          <Route
+            path="/pricing"
+            element={<Navigate to="/#pricing" replace />}
+          />
+          <Route
+            path="/contact"
+            element={<Navigate to="/#contact" replace />}
+          />
+
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/app"
+            element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to="chat" replace />} />
+            <Route path="chat" element={<ChatApp />} />
+            <Route path="files" element={<FilesApp />} />
+            <Route path="analytics" element={<AnalyticsApp />} />
+          </Route>
+
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+      {!hideMarketingChrome && <Footer />}
+    </>
+  )
+}
+
 const App = () => (
   <ThemeProvider>
     <ErrorBoundary onError={handleAppError}>
@@ -107,45 +194,10 @@ const App = () => (
           <OfflineIndicator />
           <PerformanceMonitor />
           <Analytics />
-          {/* <LazyAIChatbot /> */}
           <BrowserRouter>
-            <SimpleNavigation />
-            {/* DISABLED: MobileNavigation and StickyHeader cause black page */}
-            {/* <MobileNavigation /> */}
-            {/* <StickyHeader /> */}
-            <ScrollToTop />
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/pages" element={<Pages />} />
-                <Route path="/diagnostics" element={<Diagnostics />} />
-                <Route path="/recommendations" element={<Recommendations />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/checkout-success" element={<CheckoutSuccess />} />
-                <Route path="/demo" element={<Demo />} />
-                <Route path="/get-started" element={<GetStarted />} />
-                <Route path="/about" element={<About />} />
-
-                <Route
-                  path="/features"
-                  element={<Navigate to="/#features" replace />}
-                />
-                <Route
-                  path="/pricing"
-                  element={<Navigate to="/#pricing" replace />}
-                />
-                <Route
-                  path="/contact"
-                  element={<Navigate to="/#contact" replace />}
-                />
-
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-            <Footer />
+            <AuthProvider>
+              <AppRouter />
+            </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>

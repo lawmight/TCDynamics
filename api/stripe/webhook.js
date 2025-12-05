@@ -1,7 +1,56 @@
 import Stripe from 'stripe'
+import { getResendClient } from '../_lib/email.js'
+import { saveStripeEvent } from '../_lib/supabase.js'
 
 // Lazy initialization of Stripe to handle missing environment variables
 let stripe = null
+
+// Bounded in-memory dedupe cache (Map preserves insertion order for easy eviction)
+const processedEvents = new Map()
+const EVENT_CACHE_MAX = parsePositiveInt(
+  process.env.STRIPE_EVENT_CACHE_MAX,
+  1000
+)
+const EVENT_CACHE_TTL_MS = parsePositiveInt(
+  process.env.STRIPE_EVENT_CACHE_TTL_MS,
+  15 * 60 * 1000
+) // 15 minutes default
+
+function parsePositiveInt(value, fallback) {
+  const parsed = Number.parseInt(value, 10)
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
+}
+
+function pruneProcessedEvents() {
+  const now = Date.now()
+
+  // Drop expired entries
+  for (const [id, ts] of processedEvents) {
+    if (now - ts > EVENT_CACHE_TTL_MS) {
+      processedEvents.delete(id)
+    }
+  }
+
+  // Enforce max size by evicting oldest first
+  const keysToDelete = []
+  for (const key of processedEvents.keys()) {
+    if (processedEvents.size - keysToDelete.length <= EVENT_CACHE_MAX) break
+    keysToDelete.push(key)
+  }
+  for (const key of keysToDelete) {
+    processedEvents.delete(key)
+  }
+}
+
+function hasSeenEvent(eventId) {
+  pruneProcessedEvents()
+  return processedEvents.has(eventId)
+}
+
+function markEventProcessed(eventId) {
+  pruneProcessedEvents()
+  processedEvents.set(eventId, Date.now())
+}
 
 function getStripeClient() {
   if (!stripe) {
@@ -48,6 +97,31 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: `Webhook Error: ${err.message}` })
   }
 
+  // Durable idempotency guard (database first)
+  try {
+    const persisted = await saveStripeEvent(event)
+    if (persisted?.duplicate) {
+      markEventProcessed(event.id)
+      return res
+        .status(200)
+        .json({ received: true, type: event.type, replay: true })
+    }
+    if (!persisted?.success) {
+      console.warn('Could not persist stripe event', persisted?.error)
+    }
+  } catch (persistErr) {
+    console.warn('Stripe event persistence failed', persistErr)
+  }
+
+  // In-memory fast-path for this runtime
+  if (hasSeenEvent(event.id)) {
+    return res
+      .status(200)
+      .json({ received: true, type: event.type, replay: true })
+  }
+
+  markEventProcessed(event.id)
+
   // Handle the event
   console.log(`Received webhook event: ${event.type}`)
 
@@ -59,12 +133,10 @@ export default async function handler(req, res) {
         console.log('Customer email:', session.customer_email)
         console.log('Payment status:', session.payment_status)
 
-        // TODO: Fulfill the order, send confirmation email, etc.
-        // You can:
-        // - Save to database
-        // - Send confirmation email
-        // - Update customer record
-        // - Provision access to services
+        await sendStripeEmail(
+          'Checkout session completed',
+          `Session ${session.id} for ${session.customer_email || 'unknown'}`
+        )
 
         break
       }
@@ -73,7 +145,10 @@ export default async function handler(req, res) {
         const session = event.data.object
         console.log('Async payment succeeded:', session.id)
 
-        // Fulfill the order for async payments
+        await sendStripeEmail(
+          'Async payment succeeded',
+          `Session ${session.id} async payment succeeded`
+        )
         break
       }
 
@@ -81,7 +156,10 @@ export default async function handler(req, res) {
         const session = event.data.object
         console.log('Async payment failed:', session.id)
 
-        // Handle failed payment
+        await sendStripeEmail(
+          'Async payment failed',
+          `Session ${session.id} async payment failed`
+        )
         break
       }
 
@@ -91,15 +169,23 @@ export default async function handler(req, res) {
         console.log('Subscription event:', event.type, subscription.id)
         console.log('Status:', subscription.status)
 
-        // Handle subscription changes
-        break
+        await sendStripeEmail(
+  } catch (error) {
+    console.error('Error processing webhook:', error)
+    // Remove from in-memory cache so retries can reprocess
+    processedEvents.delete(event.id)
+    res.status(500).json({ error: 'Webhook processing failed' })
+  }
       }
 
       case 'customer.subscription.deleted': {
         const subscription = event.data.object
         console.log('Subscription cancelled:', subscription.id)
 
-        // Handle cancellation
+        await sendStripeEmail(
+          'Subscription cancelled',
+          `Subscription ${subscription.id} cancelled`
+        )
         break
       }
 
@@ -107,7 +193,10 @@ export default async function handler(req, res) {
         const invoice = event.data.object
         console.log('Invoice payment succeeded:', invoice.id)
 
-        // Handle successful recurring payment
+        await sendStripeEmail(
+          'Invoice payment succeeded',
+          `Invoice ${invoice.id} succeeded`
+        )
         break
       }
 
@@ -115,7 +204,10 @@ export default async function handler(req, res) {
         const invoice = event.data.object
         console.log('Invoice payment failed:', invoice.id)
 
-        // Handle failed payment - send email notification
+        await sendStripeEmail(
+          'Invoice payment failed',
+          `Invoice ${invoice.id} failed`
+        )
         break
       }
 
@@ -158,6 +250,27 @@ async function getRawBody(req) {
     })
     req.on('error', reject)
   })
+}
+
+async function sendStripeEmail(subject, body) {
+  try {
+    const toEmail = process.env.STRIPE_ALERT_EMAIL || process.env.CONTACT_EMAIL
+    if (!toEmail) {
+      console.warn(
+        'No STRIPE_ALERT_EMAIL/CONTACT_EMAIL configured; skipping email'
+      )
+      return
+    }
+    const resend = getResendClient()
+    await resend.emails.send({
+      from: 'TCDynamics <contact@tcdynamics.fr>',
+      to: [toEmail],
+      subject,
+      text: body,
+    })
+  } catch (err) {
+    console.warn('Stripe email notification failed', err)
+  }
 }
 
 // Configure to receive raw body for signature verification

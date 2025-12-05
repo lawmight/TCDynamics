@@ -6,7 +6,10 @@
 import express, { Express } from 'express'
 import { loadEnvironment, validateEnvironment } from './config/environment'
 import { initializeDatabase } from './config/database'
-import { configureMiddleware, configureErrorHandling } from './config/middleware'
+import {
+  configureMiddleware,
+  configureErrorHandling,
+} from './config/middleware'
 import { initializeEmailService } from './services/email.service'
 import { initializeStripeService } from './services/stripe.service'
 
@@ -37,7 +40,10 @@ export function createApp(): Express {
     try {
       initializeStripeService(config.stripe)
     } catch (error) {
-      console.warn('⚠️  Stripe service initialization failed:', (error as Error).message)
+      console.warn(
+        '⚠️  Stripe service initialization failed:',
+        (error as Error).message
+      )
     }
   }
   console.log('✅ Services initialized')
@@ -64,6 +70,9 @@ export function createApp(): Express {
    *         description: Serveur opérationnel
    */
   app.get('/health', (_req, res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate')
+    res.setHeader('Pragma', 'no-cache')
+    res.setHeader('Expires', '0')
     res.json({
       status: 'OK',
       timestamp: new Date().toISOString(),
@@ -85,7 +94,7 @@ export function createApp(): Express {
   app.use('/api', demoRoutes)
   app.use('/api', monitoringModule.router)
   app.use('/api', stripeRoutes)
-    app.use('/api', rumRoutes)
+  app.use('/api', rumRoutes)
   app.use('/api', feedbackRoutes)
   console.log('✅ Routes loaded')
 
@@ -127,4 +136,3 @@ export function createApp(): Express {
 
   return app
 }
-

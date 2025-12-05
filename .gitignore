@@ -21,7 +21,7 @@ local.settings.json
 add-env-vars.sh
 
 # MCP Configuration (contains sensitive tokens)
-.mcp.json
+
 
 # Azure Functions (keeping in case we need to reference)
 bin/

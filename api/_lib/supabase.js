@@ -4,10 +4,10 @@
  * Uses service role key for server-side operations (bypasses RLS)
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js'
 
 // Module-scope singleton (reused across invocations for performance)
-let supabaseClient = null;
+let supabaseClient = null
 
 /**
  * Get or create Supabase client
@@ -15,23 +15,25 @@ let supabaseClient = null;
  */
 export function getSupabaseClient() {
   if (!supabaseClient) {
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
+    const supabaseUrl = process.env.SUPABASE_URL
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY
 
     if (!supabaseUrl || !supabaseServiceKey) {
-      throw new Error('Supabase configuration missing. Check SUPABASE_URL and SUPABASE_SERVICE_KEY environment variables.');
+      throw new Error(
+        'Supabase configuration missing. Check SUPABASE_URL and SUPABASE_SERVICE_KEY environment variables.'
+      )
     }
 
     // Create client with service role key (bypasses RLS for server-side operations)
     supabaseClient = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
-        persistSession: false
-      }
-    });
+        persistSession: false,
+      },
+    })
   }
 
-  return supabaseClient;
+  return supabaseClient
 }
 
 /**
@@ -47,7 +49,7 @@ export function getSupabaseClient() {
  */
 export async function saveContact(contactData) {
   try {
-    const supabase = getSupabaseClient();
+    const supabase = getSupabaseClient()
 
     const { data, error } = await supabase
       .from('contacts')
@@ -60,21 +62,21 @@ export async function saveContact(contactData) {
           message: contactData.message,
           source: contactData.source || 'website',
           status: 'new',
-          type: 'contact'
-        }
+          type: 'contact',
+        },
       ])
       .select('id')
-      .single();
+      .single()
 
     if (error) {
-      console.error('Supabase contact insert error:', error);
-      return { success: false, error: error.message };
+      console.error('Supabase contact insert error:', error)
+      return { success: false, error: error.message }
     }
 
-    return { success: true, id: data.id };
+    return { success: true, id: data.id }
   } catch (error) {
-    console.error('Save contact error:', error);
-    return { success: false, error: error.message };
+    console.error('Save contact error:', error)
+    return { success: false, error: error.message }
   }
 }
 
@@ -97,7 +99,7 @@ export async function saveContact(contactData) {
  */
 export async function saveDemoRequest(demoData) {
   try {
-    const supabase = getSupabaseClient();
+    const supabase = getSupabaseClient()
 
     const { data, error } = await supabase
       .from('demo_requests')
@@ -116,21 +118,21 @@ export async function saveDemoRequest(demoData) {
           message: demoData.message || null,
           preferred_date: demoData.preferredDate || null,
           status: 'pending',
-          type: 'demo_request'
-        }
+          type: 'demo_request',
+        },
       ])
       .select('id')
-      .single();
+      .single()
 
     if (error) {
-      console.error('Supabase demo request insert error:', error);
-      return { success: false, error: error.message };
+      console.error('Supabase demo request insert error:', error)
+      return { success: false, error: error.message }
     }
 
-    return { success: true, id: data.id };
+    return { success: true, id: data.id }
   } catch (error) {
-    console.error('Save demo request error:', error);
-    return { success: false, error: error.message };
+    console.error('Save demo request error:', error)
+    return { success: false, error: error.message }
   }
 }
 
@@ -146,58 +148,56 @@ export async function saveDemoRequest(demoData) {
  */
 export async function saveConversation(conversationData) {
   try {
-    const supabase = getSupabaseClient();
+    const supabase = getSupabaseClient()
 
     // Build messages array
     const messages = [
       {
         role: 'user',
         content: conversationData.userMessage,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
       {
         role: 'assistant',
         content: conversationData.aiResponse,
-        timestamp: new Date().toISOString()
-      }
-    ];
+        timestamp: new Date().toISOString(),
+      },
+    ]
 
     // Try to find existing conversation by session_id
     const { data: existing, error: fetchError } = await supabase
       .from('chat_conversations')
       .select('id, messages')
       .eq('session_id', conversationData.sessionId)
-      .maybeSingle();
+      .maybeSingle()
 
-    if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 = not found, which is fine
-      console.error('Supabase fetch conversation error:', fetchError);
-      return { success: false, error: fetchError.message };
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      // PGRST116 = not found, which is fine
+      console.error('Supabase fetch conversation error:', fetchError)
+      return { success: false, error: fetchError.message }
     }
 
     if (existing) {
       // Update existing conversation - append messages
-      const updatedMessages = [
-        ...(existing.messages || []),
-        ...messages
-      ];
+      const updatedMessages = [...(existing.messages || []), ...messages]
 
       const { data, error } = await supabase
         .from('chat_conversations')
         .update({
           messages: updatedMessages,
           message_count: updatedMessages.length,
-          last_message_at: new Date().toISOString()
+          last_message_at: new Date().toISOString(),
         })
         .eq('id', existing.id)
         .select('id')
-        .single();
+        .single()
 
       if (error) {
-        console.error('Supabase conversation update error:', error);
-        return { success: false, error: error.message };
+        console.error('Supabase conversation update error:', error)
+        return { success: false, error: error.message }
       }
 
-      return { success: true, id: data.id };
+      return { success: true, id: data.id }
     } else {
       // Create new conversation
       const { data, error } = await supabase
@@ -211,23 +211,75 @@ export async function saveConversation(conversationData) {
             message_count: messages.length,
             metadata: conversationData.metadata || {},
             conversation_status: 'active',
-            type: 'chat'
-          }
+            type: 'chat',
+          },
         ])
         .select('id')
-        .single();
+        .single()
 
       if (error) {
-        console.error('Supabase conversation insert error:', error);
-        return { success: false, error: error.message };
+        console.error('Supabase conversation insert error:', error)
+        return { success: false, error: error.message }
       }
 
-      return { success: true, id: data.id };
+      return { success: true, id: data.id }
     }
   } catch (error) {
-    console.error('Save conversation error:', error);
-    return { success: false, error: error.message };
+    console.error('Save conversation error:', error)
+    return { success: false, error: error.message }
   }
 }
 
-export default { getSupabaseClient, saveContact, saveDemoRequest, saveConversation };
+/**
+ * Save a Stripe event for idempotency and auditing
+ * @param {Object} stripeEvent - Stripe event payload
+ * @returns {Promise<{success: boolean, id?: string, error?: string, duplicate?: boolean}>}
+ */
+export async function saveStripeEvent(stripeEvent) {
+  try {
+    const supabase = getSupabaseClient()
+
+    const { data, error } = await supabase
+      .from('stripe_events')
+      .insert([
+        {
+          event_id: stripeEvent.id,
+          type: stripeEvent.type,
+          payload: stripeEvent,
+          created_at: stripeEvent?.created
+            ? new Date(stripeEvent.created * 1000).toISOString()
+            : new Date().toISOString(),
+        },
+      ])
+      .select('id')
+      .single()
+
+    if (error) {
+      // Unique constraint violation (duplicate event) - treat as idempotent replay
+      const isDuplicate =
+        error.code === '23505' ||
+        (typeof error.message === 'string' &&
+          error.message.toLowerCase().includes('duplicate'))
+
+      if (isDuplicate) {
+        return { success: true, duplicate: true }
+      }
+
+      console.error('Supabase stripe event insert error:', error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, id: data.id, duplicate: false }
+  } catch (error) {
+    console.error('Save stripe event error:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+export default {
+  getSupabaseClient,
+  saveContact,
+  saveDemoRequest,
+  saveConversation,
+  saveStripeEvent,
+}

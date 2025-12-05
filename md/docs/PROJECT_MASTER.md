@@ -42,6 +42,12 @@ This document serves as the definitive reference for TCDynamics project status. 
 - ✅ User authentication (Supabase)
 - ✅ Responsive design on all devices
 
+### Data Privacy & Retention (Chat)
+
+- Chat conversation metadata lives in Supabase `chat_conversations` with a 90-day TTL enforced via `expires_at` (see `supabase-schema-enhanced.sql`). IP-derived values follow the same retention.
+- Lawful basis for any IP-derived value: legitimate interest (service security, abuse prevention, rate-limiting). Data is minimized to a salted, one-way hash only when explicitly enabled.
+- IP logging is **off by default** (`ENABLE_CLIENT_IP_LOGGING=false`). When enabled, `IP_HASH_SALT` is required and only `clientIpHash` (SHA-256 of salt + IP) is stored; raw IPs are never persisted. Rate limiting still uses transient IPs in-memory only.
+
 ### Temporarily Paused (Intentional):
 
 - 💤 **AI Chatbot UI**: Disabled in `apps/frontend/src/App.tsx` during Week 5-6 to focus on high-signal customer feedback; Azure AI backends remain available for future re-enable.

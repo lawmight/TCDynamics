@@ -1,10 +1,26 @@
 require('dotenv').config()
 const express = require('express')
+const { v4: uuidv4 } = require('uuid')
 const router = express.Router()
 const { logger } = require('../utils/logger')
 
 // Initialize Stripe with secret key
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
+
+// Simple in-memory cache for Stripe price metadata
+const PRICE_CACHE_TTL_MS = 15 * 60 * 1000 // 15 minutes
+const priceCache = new Map()
+
+const getCachedPrice = async priceId => {
+  const cached = priceCache.get(priceId)
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.price
+  }
+
+  const price = await stripe.prices.retrieve(priceId)
+  priceCache.set(priceId, { price, expiresAt: Date.now() + PRICE_CACHE_TTL_MS })
+  return price
+}
 
 /**
  * @swagger
@@ -53,28 +69,47 @@ router.post('/stripe/create-checkout-session', async (req, res) => {
       })
     }
 
+    // Warm price metadata (cached) and validate price exists
+    try {
+      await getCachedPrice(priceId)
+    } catch (error) {
+      logger.error('Invalid Stripe price ID', { priceId, error: error.message })
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid priceId',
+      })
+    }
+
     // Get the frontend URL from environment or use default
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080'
 
+    const idempotencyKey =
+      req.headers['idempotency-key'] ||
+      req.body?.idempotencyKey ||
+      `checkout_${uuidv4()}`
+
     // Create Stripe checkout session
-    const session = await stripe.checkout.sessions.create({
-      mode: 'subscription',
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
+    const session = await stripe.checkout.sessions.create(
+      {
+        mode: 'subscription',
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        success_url: `${frontendUrl}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${frontendUrl}/pricing`,
+        metadata: {
+          planName,
         },
-      ],
-      success_url: `${frontendUrl}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${frontendUrl}/pricing`,
-      metadata: {
-        planName,
+        // Enable customer portal for subscription management
+        billing_address_collection: 'required',
+        allow_promotion_codes: true,
       },
-      // Enable customer portal for subscription management
-      billing_address_collection: 'required',
-      allow_promotion_codes: true,
-    })
+      { idempotencyKey }
+    )
 
     logger.info('Stripe checkout session created', {
       sessionId: session.id,

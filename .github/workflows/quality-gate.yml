@@ -19,7 +19,10 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: apps/frontend/package-lock.json
+          cache-dependency-path: |
+            package-lock.json
+            apps/frontend/package-lock.json
+            api/package-lock.json
 
       - name: Install root dependencies
         run: npm install
@@ -39,6 +42,22 @@ jobs:
       - name: Unit Tests
         working-directory: ./apps/frontend
         run: npm run test:coverage
+
+      - name: Assert health endpoint non-cacheable
+        run: |
+          if grep -q "Cache-Control" apps/backend/src/app.ts; then
+            if ! grep -q "no-store" apps/backend/src/app.ts; then
+              echo "❌ /health must include no-store Cache-Control"
+              exit 1
+            fi
+            if grep -q "stale-while-revalidate" apps/backend/src/app.ts; then
+              echo "❌ /health must not include stale-while-revalidate"
+              exit 1
+            fi
+            echo "✅ /health Cache-Control is non-cacheable"
+          else
+            echo "ℹ️ No Cache-Control header found for /health"
+          fi
 
       - name: Check Coverage Threshold
         working-directory: ./apps/frontend

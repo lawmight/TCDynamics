@@ -297,33 +297,72 @@ describe('Configuration Management', () => {
       expect(mockConfig.isProduction).toBe(true)
     })
   })
+})
 
-  describe('Functions Base URL', () => {
-    it('should return configured functions URL', async () => {
-      vi.doMock('../config', () => ({
-        config: {
-          functionsBaseUrl: 'https://custom-functions.com/api',
+describe('Functions Base URL', () => {
+  beforeEach(() => {
+    vi.resetModules()
+  })
+
+  it('uses configured Azure Functions URL when feature flag is enabled', async () => {
+    vi.doMock(
+      'import.meta',
+      () => ({
+        env: {
+          VITE_FEATURE_ENABLE_AZURE_FUNCTIONS: 'true',
+          VITE_AZURE_FUNCTIONS_URL: 'https://custom-functions.com/api',
+          VITE_NODE_ENV: 'test',
         },
-      }))
+      }),
+      { virtual: true }
+    )
 
-      const { config: mockConfig } = await import('../config')
-      expect(mockConfig.functionsBaseUrl).toBe(
-        'https://custom-functions.com/api'
-      )
-    })
+    const { ConfigManager } = await import('../config')
+    const configInstance = new ConfigManager()
+    await configInstance.initialize()
 
-    it('should return default URL when not configured', async () => {
-      vi.doMock('../config', () => ({
-        config: {
-          functionsBaseUrl:
-            'https://func-tcdynamics-contact.azurewebsites.net/api',
+    expect(configInstance.functionsBaseUrl).toBe(
+      'https://custom-functions.com/api'
+    )
+  })
+
+  it('falls back to API base URL when Azure Functions are disabled', async () => {
+    vi.doMock(
+      'import.meta',
+      () => ({
+        env: {
+          VITE_FEATURE_ENABLE_AZURE_FUNCTIONS: 'false',
+          VITE_API_URL: 'https://api.example.com',
+          VITE_NODE_ENV: 'test',
         },
-      }))
+      }),
+      { virtual: true }
+    )
 
-      const { config: mockConfig } = await import('../config')
-      expect(mockConfig.functionsBaseUrl).toBe(
-        'https://func-tcdynamics-contact.azurewebsites.net/api'
-      )
-    })
+    const { ConfigManager } = await import('../config')
+    const configInstance = new ConfigManager()
+    await configInstance.initialize()
+
+    expect(configInstance.functionsBaseUrl).toBe('https://api.example.com')
+  })
+
+  it('throws when feature flag is enabled but URL is missing', async () => {
+    vi.doMock(
+      'import.meta',
+      () => ({
+        env: {
+          VITE_FEATURE_ENABLE_AZURE_FUNCTIONS: 'true',
+          VITE_NODE_ENV: 'test',
+        },
+      }),
+      { virtual: true }
+    )
+
+    const { ConfigManager } = await import('../config')
+    const configInstance = new ConfigManager()
+
+    await expect(configInstance.initialize()).rejects.toThrow(
+      'VITE_AZURE_FUNCTIONS_URL is required when VITE_FEATURE_ENABLE_AZURE_FUNCTIONS is enabled'
+    )
   })
 })

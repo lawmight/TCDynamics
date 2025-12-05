@@ -9,6 +9,7 @@
     "@supabase/supabase-js": "^2.47.10",
     "resend": "^6.4.2",
     "@sentry/node": "^7.0.0",
-    "lru-cache": "^11.0.1"
+    "lru-cache": "^11.0.1",
+    "google-auth-library": "^9.14.1"
   }
 }

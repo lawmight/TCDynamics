@@ -71,7 +71,7 @@ describe('useContactForm', () => {
     expect(result.current.hasErrors).toBe(false)
   })
 
-  it('should use Azure Functions as primary endpoint', async () => {
+  it('should call contact endpoint with payload', async () => {
     mockApiRequest.mockResolvedValueOnce(mockSuccessResponse)
 
     const { result } = renderHook(() => useContactForm())
@@ -81,7 +81,7 @@ describe('useContactForm', () => {
     })
 
     expect(mockApiRequest).toHaveBeenCalledWith(
-      apiConfig.API_ENDPOINTS.azureContact,
+      apiConfig.API_ENDPOINTS.contact,
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify(mockContactData),
@@ -89,11 +89,9 @@ describe('useContactForm', () => {
     )
   })
 
-  it('should fallback to Node.js backend on Azure failure', async () => {
+  it('should surface server errors without fallback', async () => {
     const serverError = new Response(null, { status: 503 })
-    mockApiRequest
-      .mockRejectedValueOnce(serverError)
-      .mockResolvedValueOnce(mockSuccessResponse)
+    mockApiRequest.mockRejectedValueOnce(serverError)
 
     const { result } = renderHook(() => useContactForm())
 
@@ -101,15 +99,9 @@ describe('useContactForm', () => {
       await result.current.submitForm(mockContactData)
     })
 
-    expect(mockApiRequest).toHaveBeenCalledTimes(2)
-    expect(mockApiRequest).toHaveBeenNthCalledWith(
-      2,
-      apiConfig.API_ENDPOINTS.contact,
-      expect.objectContaining({
-        method: 'POST',
-      })
-    )
-    expect(result.current.isSuccess).toBe(true)
+    expect(mockApiRequest).toHaveBeenCalledTimes(1)
+    expect(result.current.hasErrors).toBe(true)
+    expect(result.current.isSuccess).toBe(false)
   })
 
   it('should handle validation errors', async () => {

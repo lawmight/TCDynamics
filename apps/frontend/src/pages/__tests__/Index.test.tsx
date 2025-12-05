@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 
 import Index from '../Index'
@@ -40,7 +41,11 @@ vi.mock('@/components/Contact', () => ({
 
 describe('Index Page', () => {
   it('should render all main sections', () => {
-    render(<Index />)
+    render(
+      <MemoryRouter>
+        <Index />
+      </MemoryRouter>
+    )
 
     expect(screen.getByTestId('hero')).toBeInTheDocument()
     expect(screen.getByTestId('features')).toBeInTheDocument()
@@ -53,7 +58,11 @@ describe('Index Page', () => {
   })
 
   it('should render with correct semantic structure', () => {
-    render(<Index />)
+    render(
+      <MemoryRouter>
+        <Index />
+      </MemoryRouter>
+    )
 
     const main = screen.getByRole('main')
     expect(main).toBeInTheDocument()
@@ -95,7 +104,11 @@ describe('Index Page', () => {
   })
 
   it('should have proper accessibility labels', () => {
-    render(<Index />)
+    render(
+      <MemoryRouter>
+        <Index />
+      </MemoryRouter>
+    )
 
     const heroSection = screen.getByTestId('hero').closest('section')
     expect(heroSection).toHaveAttribute('aria-label', 'Présentation WorkFlowAI')

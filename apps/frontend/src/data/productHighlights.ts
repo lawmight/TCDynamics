@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
-import { BarChart3, Brain, FileText, MessageSquare, Shield } from 'lucide-react'
+import { BarChart3, FileText, MessageSquare, Shield } from 'lucide-react'
 
 type FeatureColor = 'primary' | 'primary-glow'
 type FeatureDelay = '0s' | '0.1s' | '0.2s' | '0.3s'

@@ -1,5 +1,5 @@
-import { renderHook, waitFor } from '@testing-library/react'
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+import { act, renderHook, waitFor } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useThrottle } from '../useThrottle'
 
@@ -35,11 +35,15 @@ describe('useThrottle', () => {
     expect(callback).toHaveBeenCalledTimes(1)
 
     // Fast-forward time
-    vi.advanceTimersByTime(50)
+    act(() => {
+      vi.advanceTimersByTime(50)
+    })
     expect(callback).toHaveBeenCalledTimes(1)
 
     // After delay, should be called again
-    vi.advanceTimersByTime(50)
+    act(() => {
+      vi.advanceTimersByTime(50)
+    })
     await waitFor(() => {
       expect(callback).toHaveBeenCalledTimes(2)
     })
@@ -64,7 +68,9 @@ describe('useThrottle', () => {
     unmount()
 
     // Fast-forward time - callback should not be called after unmount
-    vi.advanceTimersByTime(100)
+    act(() => {
+      vi.advanceTimersByTime(100)
+    })
     expect(callback).toHaveBeenCalledTimes(1)
   })
 
@@ -76,7 +82,9 @@ describe('useThrottle', () => {
     expect(callback).toHaveBeenCalledTimes(1)
 
     // Wait for throttle delay
-    vi.advanceTimersByTime(100)
+    act(() => {
+      vi.advanceTimersByTime(100)
+    })
 
     // Now should allow another immediate call
     result.current()

@@ -5,6 +5,13 @@ import { z } from 'zod'
 
 import { logger } from './logger'
 
+class ConfigValidationError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'ConfigValidationError'
+  }
+}
+
 const DEFAULT_API_BASE_URL = '/api' // Use relative URLs for Vercel API routes
 
 // ========== ENVIRONMENT VARIABLE SCHEMAS ==========
@@ -12,6 +19,7 @@ const DEFAULT_API_BASE_URL = '/api' // Use relative URLs for Vercel API routes
 const clientConfigSchema = z.object({
   // API URLs
   VITE_API_URL: z.union([z.string(), z.undefined()]).optional(),
+  VITE_AZURE_FUNCTIONS_URL: z.union([z.string(), z.undefined()]).optional(),
 
   // Environment
   VITE_NODE_ENV: z
@@ -34,6 +42,7 @@ const clientConfigSchema = z.object({
   VITE_FEATURE_ENABLE_CONTACT_FORM: z.boolean().default(true),
   VITE_FEATURE_ENABLE_DEMO_FORM: z.boolean().default(true),
   VITE_FEATURE_ENABLE_AZURE_FUNCTIONS: z.boolean().default(false),
+  VITE_FEATURE_ENABLE_VERCEL_CHAT: z.boolean().default(false),
 
   // Cache configuration (numbers)
   VITE_CACHE_MAX_SIZE: z.number().int().positive().default(1000),
@@ -85,6 +94,7 @@ class ConfigManager {
   private clientConfig: z.infer<typeof clientConfigSchema>
   private serverConfig: z.infer<typeof serverConfigSchema>
   private isInitialized = false
+  private initializationError?: Error
 
   constructor() {
     this.clientConfig = {} as z.infer<typeof clientConfigSchema>
@@ -104,6 +114,7 @@ class ConfigManager {
         (env.VITE_NODE_ENV as 'development' | 'production' | 'test') ||
         'development',
       VITE_APP_VERSION: env.VITE_APP_VERSION || '1.0.0',
+      VITE_AZURE_FUNCTIONS_URL: env.VITE_AZURE_FUNCTIONS_URL,
       VITE_ANALYTICS_GA_TRACKING_ID: env.VITE_ANALYTICS_GA_TRACKING_ID,
       VITE_ANALYTICS_HOTJAR_ID: env.VITE_ANALYTICS_HOTJAR_ID,
       VITE_FEATURE_ENABLE_ANALYTICS:
@@ -120,6 +131,8 @@ class ConfigManager {
         env.VITE_FEATURE_ENABLE_DEMO_FORM !== 'false', // Default true
       VITE_FEATURE_ENABLE_AZURE_FUNCTIONS:
         env.VITE_FEATURE_ENABLE_AZURE_FUNCTIONS === 'true',
+      VITE_FEATURE_ENABLE_VERCEL_CHAT:
+        env.VITE_FEATURE_ENABLE_VERCEL_CHAT === 'true',
       VITE_CACHE_MAX_SIZE: Math.max(
         100,
         parseInt(env.VITE_CACHE_MAX_SIZE || '1000', 10)
@@ -184,6 +197,7 @@ class ConfigManager {
     if (this.isInitialized) return
 
     try {
+      this.initializationError = undefined
       // Load and validate client-side configuration with safe defaults
       const safeClientConfig = this.getSafeClientConfig()
       const clientValidation = clientConfigSchema.safeParse(safeClientConfig)
@@ -216,7 +230,19 @@ class ConfigManager {
         this.serverConfig = serverValidation.data
       }
 
+      const validation = this.validateConfigs(
+        this.clientConfig,
+        this.serverConfig
+      )
+
+      if (!validation.valid) {
+        throw new ConfigValidationError(
+          `Missing required configuration: ${validation.missing.join(', ')}`
+        )
+      }
+
       this.isInitialized = true
+      this.initializationError = undefined
       this.logConfigStatus()
 
       // Emit config loaded event for other modules
@@ -225,6 +251,11 @@ class ConfigManager {
       }
     } catch (error) {
       logger.error('Configuration initialization failed', error)
+
+      if (error instanceof ConfigValidationError) {
+        this.initializationError = error
+        throw error
+      }
 
       // Fallback to safe defaults even if validation completely fails
       try {
@@ -252,6 +283,7 @@ class ConfigManager {
     // Client-side variables (prefixed with VITE_)
     const clientVars = [
       'VITE_API_URL',
+      'VITE_AZURE_FUNCTIONS_URL',
       'VITE_NODE_ENV',
       'VITE_APP_VERSION',
       'VITE_ANALYTICS_GA_TRACKING_ID',
@@ -264,6 +296,7 @@ class ConfigManager {
       'VITE_FEATURE_ENABLE_CONTACT_FORM',
       'VITE_FEATURE_ENABLE_DEMO_FORM',
       'VITE_FEATURE_ENABLE_AZURE_FUNCTIONS',
+      'VITE_FEATURE_ENABLE_VERCEL_CHAT',
       'VITE_CACHE_MAX_SIZE',
       'VITE_CACHE_DEFAULT_TTL',
       'VITE_CACHE_CLEANUP_INTERVAL',
@@ -373,10 +406,29 @@ class ConfigManager {
     return this.client.VITE_API_URL || DEFAULT_API_BASE_URL
   }
 
+  get functionsBaseUrl(): string {
+    this.ensureInitialized()
+
+    if (this.client.VITE_FEATURE_ENABLE_AZURE_FUNCTIONS) {
+      if (!this.client.VITE_AZURE_FUNCTIONS_URL) {
+        throw new ConfigValidationError(
+          'VITE_AZURE_FUNCTIONS_URL is required when VITE_FEATURE_ENABLE_AZURE_FUNCTIONS is enabled'
+        )
+      }
+      return this.client.VITE_AZURE_FUNCTIONS_URL
+    }
+
+    return this.apiBaseUrl
+  }
+
   // ========== UTILITY METHODS ==========
 
   private ensureInitialized(): void {
     if (!this.isInitialized) {
+      if (this.initializationError) {
+        throw this.initializationError
+      }
+
       throw new Error('Configuration not initialized. Call initialize() first.')
     }
   }
@@ -385,11 +437,24 @@ class ConfigManager {
    * Validate all required configurations are present
    */
   validateRequiredConfigs(): { valid: boolean; missing: string[] } {
+    this.ensureInitialized()
+
+    return this.validateConfigs(this.clientConfig, this.serverConfig)
+  }
+
+  private validateConfigs(
+    clientConfig: z.infer<typeof clientConfigSchema>,
+    serverConfig: z.infer<typeof serverConfigSchema>
+  ): { valid: boolean; missing: string[] } {
     const missing: string[] = []
 
     // Check client-side required configs
-    if (!this.client.VITE_API_URL) {
-      missing.push('VITE_API_URL')
+
+    if (
+      clientConfig.VITE_FEATURE_ENABLE_AZURE_FUNCTIONS &&
+      !clientConfig.VITE_AZURE_FUNCTIONS_URL
+    ) {
+      missing.push('VITE_AZURE_FUNCTIONS_URL')
     }
 
     // Check server-side required configs (only if we're on server)
@@ -405,7 +470,7 @@ class ConfigManager {
       ]
 
       requiredServer.forEach(key => {
-        if (!this.serverConfig[key as keyof typeof this.serverConfig]) {
+        if (!serverConfig[key as keyof typeof serverConfig]) {
           missing.push(key)
         }
       })
@@ -423,6 +488,7 @@ class ConfigManager {
   getSafeConfigSummary(): {
     environment: string
     version: string
+    apiUrl: string
     functionsUrl: string
     features: {
       analytics: boolean
@@ -442,6 +508,7 @@ class ConfigManager {
       environment: this.client.VITE_NODE_ENV,
       version: this.client.VITE_APP_VERSION,
       apiUrl: this.apiBaseUrl,
+      functionsUrl: this.functionsBaseUrl,
       features: {
         analytics: this.client.VITE_FEATURE_ENABLE_ANALYTICS,
         debugLogging: this.client.VITE_FEATURE_ENABLE_DEBUG_LOGGING,

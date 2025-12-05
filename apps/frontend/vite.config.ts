@@ -54,6 +54,9 @@ export default defineConfig(({ mode }) => ({
   build: {
     target: 'es2020', // Good balance of modern features + browser support
     minify: 'terser',
+    modulePreload: {
+      polyfill: false, // Modern targets; avoid extra preload polyfill cost
+    },
     rollupOptions: {
       output: {
         manualChunks: {

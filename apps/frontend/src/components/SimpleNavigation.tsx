@@ -1,4 +1,4 @@
-import { ArrowUp, Menu, X, Sun, Moon } from 'lucide-react'
+import { ArrowUp, Menu, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 
@@ -7,6 +7,23 @@ import { useTheme } from '@/components/ThemeProvider'
 type NavigationItem =
   | { label: string; scrollId: string; path?: never }
   | { label: string; path: string; scrollId?: never }
+
+// Prefetch route chunks on hover to reduce TTFB on navigation
+const routePrefetchers: Record<string, () => Promise<unknown>> = {
+  '/about': () => import('../pages/About'),
+  '/demo': () => import('../pages/Demo'),
+  '/get-started': () => import('../pages/GetStarted'),
+}
+
+const prefetchRoute = (path?: string) => {
+  if (!path) return
+  const loader = routePrefetchers[path]
+  if (loader) {
+    loader().catch(() => {
+      // Swallow prefetch failures; navigation will still work via normal load
+    })
+  }
+}
 
 const SimpleNavigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -48,7 +65,7 @@ const SimpleNavigation = () => {
   const handleLogoClick = () => {
     if (location.pathname === '/') {
       // If on home page, scroll to hero section
-      handleNavClick({ scrollId: 'hero' })
+      handleNavClick({ label: 'Accueil', scrollId: 'hero' })
     } else {
       // If on any other page, navigate to home
       navigate('/')
@@ -93,6 +110,7 @@ const SimpleNavigation = () => {
                       key={item.label}
                       onClick={() => handleNavClick(item)}
                       className="px-0 py-2.5 text-foreground/80 transition-colors hover:text-primary"
+                      onMouseEnter={() => prefetchRoute(item.path)}
                     >
                       {item.label}
                     </button>
@@ -146,6 +164,7 @@ const SimpleNavigation = () => {
                       key={item.label}
                       onClick={() => handleNavClick(item)}
                       className="py-2 text-left text-foreground/80 transition-colors hover:text-primary"
+                      onMouseEnter={() => prefetchRoute(item.path)}
                     >
                       {item.label}
                     </button>

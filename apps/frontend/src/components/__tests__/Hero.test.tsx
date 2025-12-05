@@ -1,10 +1,18 @@
 import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 
 import Hero from '../Hero'
 
+const renderWithRouter = () =>
+  render(
+    <MemoryRouter>
+      <Hero />
+    </MemoryRouter>
+  )
+
 describe('Hero Component', () => {
   it('should render hero section', () => {
-    render(<Hero />)
+    renderWithRouter()
 
     // Vérifier que le titre principal existe et contient le texte clé
     const heading = screen.getByRole('heading', { level: 1 })
@@ -23,7 +31,7 @@ describe('Hero Component', () => {
   })
 
   it('should render trust indicators', () => {
-    render(<Hero />)
+    renderWithRouter()
 
     expect(screen.getByText(/Hébergement France/i)).toBeInTheDocument()
     expect(screen.getByText(/Sécurité Bancaire/i)).toBeInTheDocument()
@@ -31,7 +39,7 @@ describe('Hero Component', () => {
   })
 
   it('should render hero image with alt text', () => {
-    render(<Hero />)
+    renderWithRouter()
 
     const heroImage = screen.getByAltText(/Réseau d'intelligence artificielle/i)
     expect(heroImage).toBeInTheDocument()
@@ -39,7 +47,7 @@ describe('Hero Component', () => {
   })
 
   it('should have proper semantic structure', () => {
-    render(<Hero />)
+    renderWithRouter()
 
     // Vérifier la structure sémantique
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
@@ -50,7 +58,7 @@ describe('Hero Component', () => {
   })
 
   it('should render network background elements', () => {
-    render(<Hero />)
+    renderWithRouter()
 
     // Vérifier que le SVG de fond est présent
     const svgElement = document.querySelector('svg')

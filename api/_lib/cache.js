@@ -37,7 +37,7 @@ export function getCached(key) {
  * @param {number} [ttl] - Optional custom TTL in milliseconds
  */
 export function setCached(key, value, ttl = null) {
-  if (ttl) {
+  if (ttl !== null && ttl !== undefined) {
     cache.set(key, value, { ttl })
   } else {
     cache.set(key, value)

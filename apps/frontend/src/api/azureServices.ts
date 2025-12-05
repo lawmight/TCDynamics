@@ -6,20 +6,36 @@ import { z } from 'zod'
 
 import { config } from '@/utils/config'
 import { performanceMonitor, smartCache } from '@/utils/performance'
-import { sanitizeInput, rateLimiters, contentSecurity } from '@/utils/security'
+import { contentSecurity, rateLimiters, sanitizeInput } from '@/utils/security'
 
 // ========== CONFIGURATION ==========
 
-const API_CONFIG = {
+type ApiConfig = {
+  timeout: number
+  retries: number
+  retryDelay: number
+  cacheEnabled: boolean
+  cacheTTL: number
+}
+
+const API_CONFIG: ApiConfig = {
   timeout: 30000, // 30 seconds
   retries: 3,
   retryDelay: 1000, // 1 second
   cacheEnabled: config.client.VITE_FEATURE_ENABLE_CACHE,
   cacheTTL: config.client.VITE_CACHE_DEFAULT_TTL || 300000, // 5 minutes
-} as const
+}
 
 // Get API base URL from config
 const getApiBaseUrl = (): string => config.apiBaseUrl
+
+// Prefer Azure Functions for chat unless explicitly opting into Vercel
+const getChatBaseUrl = (preferVercel?: boolean): string => {
+  if (preferVercel || config.client.VITE_FEATURE_ENABLE_VERCEL_CHAT) {
+    return getApiBaseUrl()
+  }
+  return config.functionsBaseUrl || getApiBaseUrl()
+}
 
 // ========== TYPE DEFINITIONS ==========
 
@@ -63,6 +79,7 @@ export interface ChatRequest {
   sessionId: string
   temperature?: number
   maxTokens?: number
+  useVercelChat?: boolean
 }
 
 export interface ChatResponse {
@@ -242,27 +259,23 @@ const isRetryableError = (error: unknown): boolean => {
 // ========== CACHE INTEGRATION ==========
 
 // Use the smart cache from performance utils
-const apiCache = {
-  get: (key: string) => smartCache.get(key),
-  set: (key: string, data: unknown) =>
-    smartCache.set(key, data, API_CONFIG.cacheTTL),
-  clear: () => smartCache.clear(),
-}
+const apiCache = smartCache
 
 // ========== HTTP CLIENT ==========
 
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit,
-  retriesLeft: number = API_CONFIG.retries
+  retriesLeft: number = API_CONFIG.retries,
+  baseUrlOverride?: string
 ): Promise<T> {
-  const baseUrl = getApiBaseUrl()
+  const baseUrl = baseUrlOverride || getApiBaseUrl()
   const url = `${baseUrl}${endpoint}`
   const method = options.method || 'GET'
   const cacheKey = `${method}:${url}:${JSON.stringify(options.body || {})}`
 
   // Check cache for GET requests
-  if (method === 'GET') {
+  if (method === 'GET' && API_CONFIG.cacheEnabled) {
     const cachedData = apiCache.get(cacheKey)
     if (cachedData !== null) {
       performanceMonitor.recordApiCall({
@@ -321,8 +334,8 @@ async function apiRequest<T>(
     const data = await response.json()
 
     // Cache successful GET responses
-    if (method === 'GET' && response.ok) {
-      apiCache.set(cacheKey, data)
+    if (method === 'GET' && response.ok && API_CONFIG.cacheEnabled) {
+      apiCache.set(cacheKey, data, API_CONFIG.cacheTTL)
     }
 
     // Add metadata to response
@@ -365,7 +378,7 @@ async function apiRequest<T>(
         errorType: 'retry',
       })
 
-      return apiRequest<T>(endpoint, options, retriesLeft - 1)
+      return apiRequest<T>(endpoint, options, retriesLeft - 1, baseUrlOverride)
     }
 
     performanceMonitor.recordApiCall({
@@ -383,7 +396,7 @@ async function apiRequest<T>(
       throw error
     }
 
-    if (error.name === 'AbortError') {
+    if (error instanceof Error && error.name === 'AbortError') {
       throw new ApiError('Request timeout', 408)
     }
 
@@ -547,16 +560,23 @@ export const chatAPI = {
 
     const validatedRequest = validateAndSanitize(chatRequestSchema, request)
 
-    try {
-      const response = await apiRequest<ApiResponse<ChatResponse>>('/chat', {
-        method: 'POST',
-        body: JSON.stringify({
-          ...validatedRequest,
-          temperature: validatedRequest.temperature || 0.7,
-          maxTokens: validatedRequest.maxTokens || 1000,
-        }),
-      })
+    const preferVercel = request.useVercelChat === true
+    const chatBaseUrl = getChatBaseUrl(preferVercel)
 
+    try {
+      const response = await apiRequest<ApiResponse<ChatResponse>>(
+        '/chat',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            ...validatedRequest,
+            temperature: validatedRequest.temperature || 0.7,
+            maxTokens: validatedRequest.maxTokens || 1000,
+          }),
+        },
+        undefined,
+        chatBaseUrl
+      )
       return response
     } catch (error) {
       return {
@@ -694,10 +714,17 @@ export const apiUtils = {
     API_CONFIG.cacheEnabled = enabled
     if (!enabled) apiCache.clear()
   },
-  getCacheStats: () => ({
-    size: apiCache.cache?.size || 0,
-    enabled: API_CONFIG.cacheEnabled,
-  }),
+  getCacheStats: () => {
+    const stats = apiCache.getStats()
+    return {
+      size: stats.size,
+      hitRate: stats.hitRate,
+      totalSize: stats.totalSize,
+      maxSize: stats.maxSize,
+      utilizationPercent: stats.utilizationPercent,
+      enabled: API_CONFIG.cacheEnabled,
+    }
+  },
 }
 
 // Export types for external use

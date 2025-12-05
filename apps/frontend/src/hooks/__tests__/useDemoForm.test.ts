@@ -73,7 +73,7 @@ describe('useDemoForm', () => {
     expect(result.current.hasErrors).toBe(false)
   })
 
-  it('should use Azure Functions as primary endpoint', async () => {
+  it('should call demo endpoint with payload', async () => {
     mockApiRequest.mockResolvedValueOnce(mockSuccessResponse)
 
     const { result } = renderHook(() => useDemoForm())
@@ -83,7 +83,7 @@ describe('useDemoForm', () => {
     })
 
     expect(mockApiRequest).toHaveBeenCalledWith(
-      apiConfig.API_ENDPOINTS.azureDemo,
+      apiConfig.API_ENDPOINTS.demo,
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify(mockDemoData),
@@ -91,11 +91,9 @@ describe('useDemoForm', () => {
     )
   })
 
-  it('should fallback to Node.js backend on Azure failure', async () => {
+  it('should surface server errors without fallback', async () => {
     const serverError = new Response(null, { status: 500 })
-    mockApiRequest
-      .mockRejectedValueOnce(serverError)
-      .mockResolvedValueOnce(mockSuccessResponse)
+    mockApiRequest.mockRejectedValueOnce(serverError)
 
     const { result } = renderHook(() => useDemoForm())
 
@@ -103,15 +101,9 @@ describe('useDemoForm', () => {
       await result.current.submitForm(mockDemoData)
     })
 
-    expect(mockApiRequest).toHaveBeenCalledTimes(2)
-    expect(mockApiRequest).toHaveBeenNthCalledWith(
-      2,
-      apiConfig.API_ENDPOINTS.demo,
-      expect.objectContaining({
-        method: 'POST',
-      })
-    )
-    expect(result.current.isSuccess).toBe(true)
+    expect(mockApiRequest).toHaveBeenCalledTimes(1)
+    expect(result.current.hasErrors).toBe(true)
+    expect(result.current.isSuccess).toBe(false)
   })
 
   it('should handle validation errors', async () => {
