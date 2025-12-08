@@ -6,18 +6,21 @@
 
     <!-- FOUC Prevention: Apply theme before page renders -->
     <script>
-      (function() {
+      ;(function () {
         try {
-          const theme = localStorage.getItem('theme') || 'system';
-          const resolved = theme === 'system'
-            ? window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-            : theme;
-          document.documentElement.classList.add(resolved);
+          const theme = localStorage.getItem('theme') || 'system'
+          const resolved =
+            theme === 'system'
+              ? window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light'
+              : theme
+          document.documentElement.classList.add(resolved)
         } catch (e) {
           // Fallback to light mode if localStorage is unavailable
-          document.documentElement.classList.add('light');
+          document.documentElement.classList.add('light')
         }
-      })();
+      })()
     </script>
 
     <title>WorkFlowAI - Automatisez Votre Entreprise avec l'IA</title>
@@ -48,5 +51,28 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      window.fbAsyncInit = function () {
+        FB.init({
+          appId: '1508926600336855',
+          cookie: true,
+          xfbml: true,
+          version: 'v24.0',
+        })
+
+        FB.AppEvents.logPageView()
+      }
+      ;(function (d, s, id) {
+        var js,
+          fjs = d.getElementsByTagName(s)[0]
+        if (d.getElementById(id)) {
+          return
+        }
+        js = d.createElement(s)
+        js.id = id
+        js.src = 'https://connect.facebook.net/en_US/sdk.js'
+        fjs.parentNode.insertBefore(js, fjs)
+      })(document, 'script', 'facebook-jssdk')
+    </script>
   </body>
 </html>
