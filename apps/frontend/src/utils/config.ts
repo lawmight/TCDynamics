@@ -118,21 +118,32 @@ class ConfigManager {
       VITE_ANALYTICS_GA_TRACKING_ID: env.VITE_ANALYTICS_GA_TRACKING_ID,
       VITE_ANALYTICS_HOTJAR_ID: env.VITE_ANALYTICS_HOTJAR_ID,
       VITE_FEATURE_ENABLE_ANALYTICS:
-        env.VITE_FEATURE_ENABLE_ANALYTICS === 'true',
+        env.VITE_FEATURE_ENABLE_ANALYTICS === 'true' ||
+        env.VITE_FEATURE_ENABLE_ANALYTICS === true,
       VITE_FEATURE_ENABLE_DEBUG_LOGGING:
-        env.VITE_FEATURE_ENABLE_DEBUG_LOGGING === 'true',
-      VITE_FEATURE_ENABLE_CACHE: env.VITE_FEATURE_ENABLE_CACHE !== 'false', // Default true
-      VITE_FEATURE_ENABLE_AI_CHAT: env.VITE_FEATURE_ENABLE_AI_CHAT === 'true',
+        env.VITE_FEATURE_ENABLE_DEBUG_LOGGING === 'true' ||
+        env.VITE_FEATURE_ENABLE_DEBUG_LOGGING === true,
+      VITE_FEATURE_ENABLE_CACHE:
+        env.VITE_FEATURE_ENABLE_CACHE !== 'false' &&
+        env.VITE_FEATURE_ENABLE_CACHE !== false, // Default true
+      VITE_FEATURE_ENABLE_AI_CHAT:
+        env.VITE_FEATURE_ENABLE_AI_CHAT === 'true' ||
+        env.VITE_FEATURE_ENABLE_AI_CHAT === true,
       VITE_FEATURE_ENABLE_AI_VISION:
-        env.VITE_FEATURE_ENABLE_AI_VISION === 'true',
+        env.VITE_FEATURE_ENABLE_AI_VISION === 'true' ||
+        env.VITE_FEATURE_ENABLE_AI_VISION === true,
       VITE_FEATURE_ENABLE_CONTACT_FORM:
-        env.VITE_FEATURE_ENABLE_CONTACT_FORM !== 'false', // Default true
+        env.VITE_FEATURE_ENABLE_CONTACT_FORM !== 'false' &&
+        env.VITE_FEATURE_ENABLE_CONTACT_FORM !== false, // Default true
       VITE_FEATURE_ENABLE_DEMO_FORM:
-        env.VITE_FEATURE_ENABLE_DEMO_FORM !== 'false', // Default true
+        env.VITE_FEATURE_ENABLE_DEMO_FORM !== 'false' &&
+        env.VITE_FEATURE_ENABLE_DEMO_FORM !== false, // Default true
       VITE_FEATURE_ENABLE_AZURE_FUNCTIONS:
-        env.VITE_FEATURE_ENABLE_AZURE_FUNCTIONS === 'true',
+        env.VITE_FEATURE_ENABLE_AZURE_FUNCTIONS === 'true' ||
+        env.VITE_FEATURE_ENABLE_AZURE_FUNCTIONS === true,
       VITE_FEATURE_ENABLE_VERCEL_CHAT:
-        env.VITE_FEATURE_ENABLE_VERCEL_CHAT === 'true',
+        env.VITE_FEATURE_ENABLE_VERCEL_CHAT === 'true' ||
+        env.VITE_FEATURE_ENABLE_VERCEL_CHAT === true,
       VITE_CACHE_MAX_SIZE: Math.max(
         100,
         parseInt(env.VITE_CACHE_MAX_SIZE || '1000', 10)
@@ -280,6 +291,20 @@ class ConfigManager {
   private loadClientEnvironmentVariables(): Record<string, string | undefined> {
     const env: Record<string, string | undefined> = {}
 
+    // Helper to read from process.env first (useful for Vitest) then import.meta.env
+    const readEnv = (key: string) => {
+      if (typeof process !== 'undefined' && process.env?.[key] !== undefined) {
+        return process.env[key]
+      }
+      return typeof import.meta !== 'undefined'
+        ? (
+            import.meta as unknown as {
+              env?: Record<string, string | undefined>
+            }
+          ).env?.[key]
+        : undefined
+    }
+
     // Client-side variables (prefixed with VITE_)
     const clientVars = [
       'VITE_API_URL',
@@ -309,7 +334,7 @@ class ConfigManager {
     ]
 
     clientVars.forEach(key => {
-      env[key] = import.meta.env[key]
+      env[key] = readEnv(key)
     })
 
     return env
@@ -457,8 +482,13 @@ class ConfigManager {
       missing.push('VITE_AZURE_FUNCTIONS_URL')
     }
 
-    // Check server-side required configs (only if we're on server)
-    if (typeof window === 'undefined') {
+    const isTestEnv =
+      process.env.VITEST === 'true' ||
+      process.env.NODE_ENV === 'test' ||
+      clientConfig.VITE_NODE_ENV === 'test'
+
+    // Check server-side required configs (only if we're on server and not in test)
+    if (typeof window === 'undefined' && !isTestEnv) {
       const requiredServer = [
         'AZURE_OPENAI_ENDPOINT',
         'AZURE_OPENAI_KEY',
@@ -538,7 +568,10 @@ export const envHelpers = {
    * Get environment variable with fallback
    */
   getEnvVar: (key: string, fallback?: string): string => {
-    const value = import.meta.env[key] || fallback
+    const value =
+      (typeof process !== 'undefined' ? process.env[key] : undefined) ||
+      (typeof import.meta !== 'undefined' ? import.meta.env[key] : undefined) ||
+      fallback
     if (!value) {
       throw new Error(`Environment variable ${key} is required but not set`)
     }
@@ -549,7 +582,9 @@ export const envHelpers = {
    * Get boolean environment variable
    */
   getBooleanEnvVar: (key: string, fallback = false): boolean => {
-    const value = import.meta.env[key]
+    const value =
+      (typeof process !== 'undefined' ? process.env[key] : undefined) ??
+      (typeof import.meta !== 'undefined' ? import.meta.env[key] : undefined)
     if (value === undefined) return fallback
     return value === 'true' || value === '1'
   },
@@ -558,7 +593,9 @@ export const envHelpers = {
    * Get number environment variable
    */
   getNumberEnvVar: (key: string, fallback?: number): number => {
-    const value = import.meta.env[key]
+    const value =
+      (typeof process !== 'undefined' ? process.env[key] : undefined) ??
+      (typeof import.meta !== 'undefined' ? import.meta.env[key] : undefined)
     if (value === undefined) {
       if (fallback !== undefined) return fallback
       throw new Error(`Environment variable ${key} is required but not set`)

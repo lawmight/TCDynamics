@@ -10,6 +10,7 @@ export interface DemoFormData {
   employeeCount?: string
   industry?: string
   message?: string
+  captchaToken?: string
 }
 
 /**

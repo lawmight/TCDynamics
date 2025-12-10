@@ -1,7 +1,7 @@
 import { track } from '@vercel/analytics'
 import { useState } from 'react'
 
-import { apiRequest, type ApiResponse } from '@/utils/apiConfig'
+import type { ApiResponse } from '@/utils/apiConfig'
 import { logger } from '@/utils/logger'
 
 /**
@@ -113,93 +113,96 @@ export const useFormSubmit = <T = Record<string, unknown>>(
     setIsSubmitting(true)
     setResponse(null)
 
-    try {
-      let result: ApiResponse
+    // Resolve the (possibly mocked) apiRequest at call time to avoid stale references in tests
+    const { apiRequest } = await import('@/utils/apiConfig')
 
+    const performRequest = async () => {
       try {
-        // Attempt primary endpoint first
-        result = await apiRequest<ApiResponse>(primaryEndpoint, {
+        return await apiRequest<ApiResponse>(primaryEndpoint, {
           method: 'POST',
           body: JSON.stringify(data),
         })
       } catch (primaryError) {
-        // Check if we should fallback
         const canFallback = enableFallback && shouldFallback(primaryError)
+        logger.warn?.(`Primary endpoint failed, evaluating fallback`, {
+          primary: primaryEndpoint,
+          fallback: fallbackEndpoint,
+          error: primaryError,
+        })
+        if (!canFallback) throw primaryError
 
-        if (!canFallback) {
-          // Surface validation/client errors directly without fallback
-          throw primaryError
-        }
-
-        // Log fallback attempt
-        logger.warn(
-          `Primary endpoint failed, falling back to secondary endpoint`,
-          {
-            primary: primaryEndpoint,
-            fallback: fallbackEndpoint,
-            error: primaryError,
-          }
-        )
-
-        // Attempt fallback endpoint
-        result = await apiRequest<ApiResponse>(fallbackEndpoint, {
+        return await apiRequest<ApiResponse>(fallbackEndpoint, {
           method: 'POST',
           body: JSON.stringify(data),
         })
       }
+    }
 
-      // Success path
-      setResponse(result)
+    try {
+      const result = await performRequest()
+      const safeResult: ApiResponse =
+        result ??
+        ({
+          success: false,
+          message: errorMessage,
+          errors: [errorMessage],
+        } as ApiResponse)
+
+      setResponse(safeResult)
       setIsSubmitting(false)
 
-      // Track analytics for successful submission
-      if (result.success) {
-        track('form_submitted', {
-          endpoint: primaryEndpoint,
-          timestamp: new Date().toISOString(),
-        })
+      if (safeResult.success) {
+        try {
+          track?.('form_submitted', {
+            endpoint: primaryEndpoint,
+            timestamp: new Date().toISOString(),
+          })
+        } catch {
+          // Ignore analytics failures in tests/runtime
+        }
+        onSuccess?.(safeResult)
       } else {
-        // Track validation errors
-        track('form_error', {
-          endpoint: primaryEndpoint,
-          errorType: 'validation',
-          errorMessage: result.message || 'Validation error',
-          timestamp: new Date().toISOString(),
-        })
+        try {
+          track?.('form_error', {
+            endpoint: primaryEndpoint,
+            errorType: 'validation',
+            errorMessage: safeResult.message || 'Validation error',
+            timestamp: new Date().toISOString(),
+          })
+        } catch {
+          // Ignore analytics failures
+        }
       }
 
-      // Execute success callback
-      if (onSuccess && result.success) {
-        onSuccess(result)
-      }
-
-      return result
+      return safeResult
     } catch (error) {
-      // Error path
+      const normalizedMessage =
+        error instanceof Error ? error.message : errorMessage
+
       const errorResponse: ApiResponse = {
         success: false,
-        message: error instanceof Error ? error.message : errorMessage,
-        errors: [error instanceof Error ? error.message : 'Erreur inconnue'],
+        message: normalizedMessage,
+        errors: [normalizedMessage],
       }
 
       setResponse(errorResponse)
       setIsSubmitting(false)
 
-      // Track analytics for submission errors
-      track('form_error', {
-        endpoint: primaryEndpoint,
-        errorType: 'submission',
-        errorMessage: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString(),
-      })
-
-      // Execute error callback
-      if (onError) {
-        onError(
-          error instanceof Error ? error : new Error(errorMessage),
-          errorResponse
-        )
+      try {
+        track?.('form_error', {
+          endpoint: primaryEndpoint,
+          errorType: 'submission',
+          errorMessage: normalizedMessage,
+          timestamp: new Date().toISOString(),
+        })
+      } catch {
+        // Ignore analytics failures
       }
+
+      onError?.(
+        error instanceof Error ? error : new Error(errorMessage),
+        errorResponse
+      )
 
       return errorResponse
     }

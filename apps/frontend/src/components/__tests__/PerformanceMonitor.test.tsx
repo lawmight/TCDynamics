@@ -38,17 +38,40 @@ describe('PerformanceMonitor Component', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
-    // Reset performance mock
-    mockPerformance.getEntriesByType.mockReturnValue([
-      {
-        loadEventEnd: 1000,
-        fetchStart: 100,
-        name: 'first-contentful-paint',
-        startTime: 200,
-      },
-    ])
+    vi.stubEnv('NODE_ENV', 'test')
+    vi.stubEnv('VITEST', 'true')
+
+    // Reset performance mock with navigation + paint entries
+    mockPerformance.memory = {
+      usedJSHeapSize: 50 * 1024 * 1024,
+    }
+    mockPerformance.getEntriesByType.mockImplementation(type => {
+      if (type === 'navigation') {
+        return [
+          {
+            loadEventEnd: 1000,
+            fetchStart: 100,
+          },
+        ]
+      }
+      if (type === 'paint') {
+        return [
+          {
+            name: 'first-contentful-paint',
+            startTime: 200,
+          },
+        ]
+      }
+      return []
+    })
 
     mockLocalStorage.getItem.mockReturnValue(null)
+
+    // Default document state
+    Object.defineProperty(document, 'readyState', {
+      value: 'complete',
+      writable: true,
+    })
   })
 
   afterEach(() => {
@@ -178,7 +201,7 @@ describe('PerformanceMonitor Component', () => {
   it('should handle close button click', () => {
     render(<PerformanceMonitor />)
 
-    const closeButton = screen.getByRole('button', { name: '' }) // × button
+    const closeButton = screen.getByRole('button', { name: /close/i })
 
     fireEvent.click(closeButton)
 

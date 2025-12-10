@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
+import Captcha, { type CaptchaHandle } from '@/components/Captcha'
 import { PostSubmissionFeedback } from '@/components/PostSubmissionFeedback'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -32,6 +33,12 @@ const Contact = () => {
     email: string
     company: string
   } | null>(null)
+  const [demoCaptchaToken, setDemoCaptchaToken] = useState<string | undefined>()
+  const [contactCaptchaToken, setContactCaptchaToken] = useState<
+    string | undefined
+  >()
+  const demoCaptchaRef = useRef<CaptchaHandle | null>(null)
+  const contactCaptchaRef = useRef<CaptchaHandle | null>(null)
 
   // Analytics tracking state
   const [demoFormStarted, setDemoFormStarted] = useState(false)
@@ -231,6 +238,7 @@ const Contact = () => {
                   aria-label="Formulaire de demande de démonstration"
                   onSubmit={async e => {
                     e.preventDefault()
+                    if (demoForm.isSubmitting) return
                     const form = e.currentTarget
                     const formData = new FormData(form)
                     const firstName = formData.get('firstName') as string
@@ -244,6 +252,7 @@ const Contact = () => {
                       company,
                       companySize: formData.get('employees') as string,
                       businessNeeds: formData.get('needs') as string,
+                      captchaToken: demoCaptchaToken,
                     }
 
                     const result = await demoForm.submitForm(data)
@@ -252,6 +261,8 @@ const Contact = () => {
                       form.reset()
                       setDemoUserData({ email, company })
                       setShowDemoFeedback(true)
+                      setDemoCaptchaToken(undefined)
+                      demoCaptchaRef.current?.reset()
                       setTimeout(() => demoForm.clearResponse(), 5000)
                     }
                   }}
@@ -382,6 +393,12 @@ const Contact = () => {
                     />
                   </div>
 
+                  <Captcha
+                    ref={demoCaptchaRef}
+                    onToken={token => setDemoCaptchaToken(token)}
+                    action="demo-form"
+                  />
+
                   <Button
                     type="submit"
                     className="w-full"
@@ -488,6 +505,7 @@ const Contact = () => {
                   className="space-y-4"
                   onSubmit={async e => {
                     e.preventDefault()
+                    if (contactForm.isSubmitting) return
                     const form = e.currentTarget
                     const formData = new FormData(form)
                     const email = formData.get('email') as string
@@ -498,6 +516,7 @@ const Contact = () => {
                       phone: formData.get('phone') as string,
                       company,
                       message: formData.get('message') as string,
+                      captchaToken: contactCaptchaToken,
                     }
 
                     const result = await contactForm.submitForm(data)
@@ -506,6 +525,8 @@ const Contact = () => {
                       form.reset()
                       setContactUserData({ email, company })
                       setShowContactFeedback(true)
+                      setContactCaptchaToken(undefined)
+                      contactCaptchaRef.current?.reset()
                       setTimeout(() => contactForm.clearResponse(), 5000)
                     }
                   }}
@@ -616,6 +637,12 @@ const Contact = () => {
                       aria-required="true"
                     />
                   </div>
+
+                  <Captcha
+                    ref={contactCaptchaRef}
+                    onToken={token => setContactCaptchaToken(token)}
+                    action="contact-form"
+                  />
 
                   <Button
                     type="submit"

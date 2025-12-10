@@ -1,11 +1,19 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 
 import AIDemo from '../AIDemo'
 
+const renderWithRouter = () =>
+  render(
+    <MemoryRouter>
+      <AIDemo />
+    </MemoryRouter>
+  )
+
 describe('AIDemo Component', () => {
   it('should render demo interface', () => {
-    render(<AIDemo />)
+    renderWithRouter()
 
     expect(
       screen.getByText(/Essayez gratuitement dès maintenant/i)
@@ -18,7 +26,7 @@ describe('AIDemo Component', () => {
 
   it('should show demo features', async () => {
     const user = userEvent.setup()
-    render(<AIDemo />)
+    renderWithRouter()
 
     // Switch to documents tab
     const documentsTab = screen.getByRole('tab', {
@@ -37,7 +45,7 @@ describe('AIDemo Component', () => {
   })
 
   it('should have interactive demo buttons', () => {
-    render(<AIDemo />)
+    renderWithRouter()
 
     const buttons = screen.getAllByRole('button')
     expect(buttons.length).toBeGreaterThan(0)
@@ -51,7 +59,7 @@ describe('AIDemo Component', () => {
 
   it('should show demo features correctly', async () => {
     const user = userEvent.setup()
-    render(<AIDemo />)
+    renderWithRouter()
 
     // Check for the main heading with span content
     expect(screen.getByText(/Découvrez l'IA en/i)).toBeInTheDocument()
@@ -82,7 +90,7 @@ describe('AIDemo Component', () => {
   })
 
   it('should display call-to-action buttons', () => {
-    render(<AIDemo />)
+    renderWithRouter()
 
     expect(
       screen.getByRole('button', { name: /Démarrer l'Essai Gratuit/i })
@@ -94,7 +102,7 @@ describe('AIDemo Component', () => {
 
   it('should display precision information', async () => {
     const user = userEvent.setup()
-    render(<AIDemo />)
+    renderWithRouter()
 
     // Switch to documents tab where precision information is displayed
     const documentsTab = screen.getByRole('tab', {
@@ -109,7 +117,7 @@ describe('AIDemo Component', () => {
   })
 
   it('should display sample conversations', () => {
-    render(<AIDemo />)
+    renderWithRouter()
 
     expect(screen.getByText(/Exemples de Conversations/i)).toBeInTheDocument()
     expect(
@@ -118,7 +126,7 @@ describe('AIDemo Component', () => {
   })
 
   it('should be accessible', () => {
-    render(<AIDemo />)
+    renderWithRouter()
 
     // Check that the section has proper heading structure
     expect(
@@ -130,7 +138,7 @@ describe('AIDemo Component', () => {
   })
 
   it('should have working tabs', () => {
-    render(<AIDemo />)
+    renderWithRouter()
 
     // Should have tabs for different demo features
     const chatbotTab = screen.getByRole('tab', {
@@ -145,7 +153,7 @@ describe('AIDemo Component', () => {
   })
 
   it('should display sample data', () => {
-    render(<AIDemo />)
+    renderWithRouter()
 
     expect(screen.getByText(/Exemples de Conversations/i)).toBeInTheDocument()
     // The component shows conversation examples, not invoice data

@@ -13,6 +13,7 @@ const routePrefetchers: Record<string, () => Promise<unknown>> = {
   '/about': () => import('../pages/About'),
   '/demo': () => import('../pages/Demo'),
   '/get-started': () => import('../pages/GetStarted'),
+  '/app': () => import('../pages/app/Chat'),
 }
 
 const prefetchRoute = (path?: string) => {
@@ -32,6 +33,15 @@ const SimpleNavigation = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const { resolvedTheme, setTheme } = useTheme()
+  const appUrl = import.meta.env.VITE_APP_URL || '/app'
+  const isExternalApp = appUrl.startsWith('http')
+  const goToApp = () => {
+    if (isExternalApp) {
+      window.location.href = appUrl
+      return
+    }
+    navigate(appUrl)
+  }
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY
@@ -81,6 +91,9 @@ const SimpleNavigation = () => {
     { label: 'Démarrer', path: '/get-started' },
   ]
 
+  // Avoid rendering duplicate nav items in tests/mobile by hiding desktop set when the mobile menu is open.
+  const shouldShowDesktopNav = location.pathname === '/' && !isMobileMenuOpen
+
   return (
     <>
       {/* Simple Header */}
@@ -102,8 +115,8 @@ const SimpleNavigation = () => {
             </button>
 
             {/* Desktop Navigation */}
-            <nav className="hidden items-center space-x-6 md:flex">
-              {location.pathname === '/' ? (
+            <nav className="hidden items-center space-x-4 lg:flex">
+              {shouldShowDesktopNav ? (
                 <>
                   {navigationItems.map(item => (
                     <button
@@ -115,6 +128,13 @@ const SimpleNavigation = () => {
                       {item.label}
                     </button>
                   ))}
+                  <button
+                    onClick={goToApp}
+                    onMouseEnter={() => !isExternalApp && prefetchRoute('/app')}
+                    className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  >
+                    Accéder à l'app
+                  </button>
                   {/* Theme Toggle - Desktop */}
                   <button
                     className="theme-toggle p-2 md:p-0"
@@ -138,6 +158,13 @@ const SimpleNavigation = () => {
                   >
                     Home
                   </Link>
+                  <button
+                    onClick={goToApp}
+                    onMouseEnter={() => !isExternalApp && prefetchRoute('/app')}
+                    className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  >
+                    Accéder à l'app
+                  </button>
                 </>
               )}
             </nav>
@@ -145,7 +172,7 @@ const SimpleNavigation = () => {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 text-foreground transition-colors hover:text-primary md:hidden"
+              className="p-2 text-foreground transition-colors hover:text-primary lg:hidden"
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -182,7 +209,13 @@ const SimpleNavigation = () => {
                     Home
                   </Link>
                 )}
-                {}
+                <button
+                  onClick={goToApp}
+                  className="mt-2 rounded-full bg-primary px-4 py-2 text-left text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  onMouseEnter={() => !isExternalApp && prefetchRoute('/app')}
+                >
+                  Accéder à l'app
+                </button>
                 {/* Theme Toggle - Mobile */}
                 <button
                   className="theme-toggle mx-auto my-2 h-12 w-12 p-2"

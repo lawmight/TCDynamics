@@ -5,12 +5,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import StickyHeader from '../StickyHeader'
 
 // Mock the hooks and icons
+const mockToggle = vi.fn()
+const mockClose = vi.fn()
+const mockUseToggle = vi.fn(() => ({
+  isOpen: false,
+  toggle: mockToggle,
+  close: mockClose,
+}))
 vi.mock('@/hooks/useToggle', () => ({
-  useToggle: () => ({
-    isOpen: false,
-    toggle: vi.fn(),
-    close: vi.fn(),
-  }),
+  useToggle: () => mockUseToggle(),
 }))
 
 vi.mock('@/hooks/useThrottle', () => ({
@@ -45,6 +48,14 @@ describe('StickyHeader Component', () => {
 
     scrollSpy = vi.spyOn(window, 'addEventListener')
     mockNavigate.mockClear()
+
+    mockToggle.mockClear()
+    mockClose.mockClear()
+    mockUseToggle.mockReturnValue({
+      isOpen: false,
+      toggle: mockToggle,
+      close: mockClose,
+    })
   })
 
   afterEach(() => {
@@ -68,7 +79,6 @@ describe('StickyHeader Component', () => {
     expect(screen.getByText('Comment ça marche')).toBeInTheDocument()
     expect(screen.getByText('Avantages locaux')).toBeInTheDocument()
     expect(screen.getByText('Tarifs')).toBeInTheDocument()
-    expect(screen.getByText('Contact')).toBeInTheDocument()
   })
 
   it('should render checkout button', () => {
@@ -161,14 +171,6 @@ describe('StickyHeader Component', () => {
   })
 
   it('should handle mobile menu toggle', () => {
-    // Mock useToggle to return controlled state
-    const mockToggle = vi.fn()
-    vi.mocked(vi.importMock('@/hooks/useToggle')).mockReturnValue({
-      isOpen: false,
-      toggle: mockToggle,
-      close: vi.fn(),
-    })
-
     renderStickyHeader()
 
     const mobileMenuButton = screen.getByLabelText(
@@ -190,11 +192,10 @@ describe('StickyHeader Component', () => {
   })
 
   it('should render mobile menu when open', () => {
-    // Mock useToggle to return open state
-    vi.mocked(vi.importMock('@/hooks/useToggle')).mockReturnValue({
+    mockUseToggle.mockReturnValue({
       isOpen: true,
-      toggle: vi.fn(),
-      close: vi.fn(),
+      toggle: mockToggle,
+      close: mockClose,
     })
 
     renderStickyHeader()
@@ -203,6 +204,7 @@ describe('StickyHeader Component', () => {
     expect(
       screen.getByLabelText('Menu de navigation mobile')
     ).toBeInTheDocument()
+    expect(screen.getByText('Contact')).toBeInTheDocument()
   })
 
   it('should add scroll event listener on mount', () => {

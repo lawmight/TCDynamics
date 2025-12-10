@@ -44,6 +44,7 @@ const Login = lazy(() => import('./pages/auth/Login'))
 const ChatApp = lazy(() => import('./pages/app/Chat'))
 const FilesApp = lazy(() => import('./pages/app/Files'))
 const AnalyticsApp = lazy(() => import('./pages/app/Analytics'))
+const Security = lazy(() => import('./pages/Security'))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -146,6 +147,7 @@ const AppRouter = () => {
           <Route path="/demo" element={<Demo />} />
           <Route path="/get-started" element={<GetStarted />} />
           <Route path="/about" element={<About />} />
+          <Route path="/security" element={<Security />} />
 
           <Route
             path="/features"

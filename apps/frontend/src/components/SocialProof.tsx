@@ -1,16 +1,7 @@
-import {
-  ArrowRight,
-  CheckCircle,
-  Clock,
-  MapPin,
-  Shield,
-  Star,
-  TrendingUp,
-  Users,
-} from 'lucide-react'
+import { ArrowRight, MapPin, Shield, Star } from 'lucide-react'
 
-import { AnimatedCounter } from '@/components/ui/animated-counter'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 
@@ -18,70 +9,57 @@ const SocialProof = () => {
   const { ref: sectionRef, isIntersecting } = useIntersectionObserver({
     threshold: 0.2,
   })
+  const demoLink = import.meta.env.VITE_DEMO_URL || '/demo'
+
+  const logos = [
+    {
+      name: 'Client pilote A',
+      tagline: 'Automatisation factures',
+    },
+    {
+      name: 'Client pilote B',
+      tagline: 'Support client IA',
+    },
+    {
+      name: 'Client pilote C',
+      tagline: 'Traitement documents',
+    },
+    {
+      name: 'Client pilote D',
+      tagline: 'Pilotage analytics',
+    },
+  ]
 
   const testimonials = [
     {
       quote:
-        'WorkFlowAI a révolutionné notre gestion documentaire. Nous économisons 15h par semaine sur le traitement des factures.',
-      author: 'Marie Dubois',
-      position: 'Directrice Administrative',
-      company: 'TechSolutions Montigny',
+        'WorkFlowAI structure nos dossiers et répond aux questions clés en quelques secondes. On déploie le pilote sur d’autres équipes.',
+      author: 'Pilote Finance',
+      position: 'Responsable Ops',
+      company: 'PME Île-de-France',
       rating: 5,
       image:
-        'https://images.unsplash.com/photo-1494790108755-2616b2e4b4b4?w=64&h=64&fit=crop&crop=face',
+        'https://images.unsplash.com/photo-1494790108755-2616b2e4b4b4?w=64&h=64&fit=crop&crop=face&auto=format&fm=webp',
     },
     {
       quote:
-        "L'équipe française de WorkFlowAI nous accompagne parfaitement. Le support local fait toute la différence.",
-      author: 'Pierre Martin',
-      position: 'CEO',
-      company: 'InnovConseil Guyancourt',
+        "L'équipe nous accompagne sur la rédaction des prompts métiers et la gouvernance des données. Support local réactif.",
+      author: 'Pilote Support',
+      position: 'Head of CX',
+      company: 'Scale-up SaaS',
       rating: 5,
       image:
-        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face',
+        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face&auto=format&fm=webp',
     },
     {
       quote:
-        'La conformité RGPD était notre priorité. WorkFlowAI respecte parfaitement nos exigences de sécurité.',
-      author: 'Sophie Leroy',
-      position: 'DPO',
-      company: 'SecureData Versailles',
+        'Nous préparons la mise en production après validation sécurité et RGPD. Les workflows sont prêts.',
+      author: 'Pilote IT',
+      position: 'IT & Sécurité',
+      company: 'Industrie FR',
       rating: 5,
       image:
-        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face',
-    },
-  ]
-
-  const companies = [
-    'TechSolutions Montigny',
-    'InnovConseil Guyancourt',
-    'SecureData Versailles',
-    'BusinessFlow SQY',
-    'AutomatePro Vélizy',
-    'DataFrance Élancourt',
-  ]
-
-  const metrics = [
-    {
-      value: 75,
-      suffix: '%',
-      label: 'Temps économisé',
-      icon: Clock,
-      description: 'en moyenne par processus',
-    },
-    {
-      value: 300,
-      suffix: '%',
-      label: 'ROI moyen',
-      icon: TrendingUp,
-      description: 'sur 12 mois',
-    },
-    {
-      value: 500,
-      suffix: '+',
-      label: 'Entreprises françaises',
-      icon: Users,
-      description: 'nous font confiance',
+        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face&auto=format&fm=webp',
     },
   ]
 
@@ -163,43 +141,33 @@ const SocialProof = () => {
             Ils nous font confiance
           </h2>
           <p className="mx-auto max-w-3xl font-mono text-xl text-muted-foreground">
-            Découvrez comment les entreprises françaises transforment leurs
-            processus avec WorkFlowAI
+            Déploiements pilotes en cours (processus finance, support et
+            documentation). Logos et cas clients vérifiés arrivent.
           </p>
         </div>
 
-        {/* Metrics */}
+        {/* Logo Strip */}
         <div
-          className={`stagger-fade mb-16 grid gap-8 md:grid-cols-3 ${isIntersecting ? '' : 'opacity-0'}`}
+          className={`fade-in-up mb-16 ${isIntersecting ? '' : 'opacity-0'}`}
         >
-          {metrics.map((metric, index) => {
-            const IconComponent = metric.icon
-            return (
-              <Card
-                key={index}
-                className="card-hover group border-primary/20 bg-card/60 backdrop-blur-sm transition-all duration-500 hover:border-primary/40"
+          <div className="mb-4 text-center font-mono text-sm text-muted-foreground">
+            Remplacez par vos logos clients validés
+          </div>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-5">
+            {logos.map(logo => (
+              <div
+                key={logo.name}
+                className="rounded-lg border border-primary/10 bg-card/40 p-4 text-center backdrop-blur-sm transition-all duration-300 hover:border-primary/30"
               >
-                <CardContent className="p-8 text-center">
-                  <div className="mx-auto mb-6 w-fit rounded-full bg-primary/10 p-4 transition-colors group-hover:bg-primary/20">
-                    <IconComponent className="h-8 w-8 text-primary" />
-                  </div>
-                  <div className="mb-2 text-4xl font-bold text-primary md:text-5xl">
-                    <AnimatedCounter
-                      end={metric.value}
-                      suffix={metric.suffix}
-                      duration={2500}
-                    />
-                  </div>
-                  <h3 className="mb-2 text-xl font-semibold transition-colors group-hover:text-primary">
-                    {metric.label}
-                  </h3>
-                  <p className="font-mono text-sm text-muted-foreground">
-                    {metric.description}
-                  </p>
-                </CardContent>
-              </Card>
-            )
-          })}
+                <div className="text-sm font-semibold text-foreground">
+                  {logo.name}
+                </div>
+                <p className="mt-1 font-mono text-xs text-muted-foreground">
+                  {logo.tagline}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Testimonials */}
@@ -233,6 +201,77 @@ const SocialProof = () => {
                     src={testimonial.image}
                     alt={`${testimonial.author}, ${testimonial.position} chez ${testimonial.company}`}
                     className="h-12 w-12 rounded-full object-cover ring-2 ring-primary/20"
+                    loading="lazy"
+                    onError={e => {
+                      // #region agent log
+                      fetch(
+                        'http://127.0.0.1:7242/ingest/58095262-9eae-40ce-bf51-b3d6c86e36b2',
+                        {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            sessionId: 'debug-session',
+                            runId: 'pre-fix',
+                            hypothesisId: 'H1',
+                            location: 'SocialProof.tsx:onError',
+                            message: 'img onError triggered',
+                            data: {
+                              currentSrc: e.currentTarget.src,
+                              fallbackApplied:
+                                e.currentTarget.dataset.fallbackApplied ===
+                                'true',
+                            },
+                            timestamp: Date.now(),
+                          }),
+                        }
+                      ).catch(() => {})
+                      // #endregion
+
+                      if (e.currentTarget.dataset.fallbackApplied === 'true') {
+                        // #region agent log
+                        fetch(
+                          'http://127.0.0.1:7242/ingest/58095262-9eae-40ce-bf51-b3d6c86e36b2',
+                          {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              sessionId: 'debug-session',
+                              runId: 'pre-fix',
+                              hypothesisId: 'H2',
+                              location: 'SocialProof.tsx:onError',
+                              message: 'fallback already applied, skipping',
+                              data: { currentSrc: e.currentTarget.src },
+                              timestamp: Date.now(),
+                            }),
+                          }
+                        ).catch(() => {})
+                        // #endregion
+                        return
+                      }
+
+                      e.currentTarget.dataset.fallbackApplied = 'true'
+
+                      // #region agent log
+                      fetch(
+                        'http://127.0.0.1:7242/ingest/58095262-9eae-40ce-bf51-b3d6c86e36b2',
+                        {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            sessionId: 'debug-session',
+                            runId: 'pre-fix',
+                            hypothesisId: 'H3',
+                            location: 'SocialProof.tsx:onError',
+                            message: 'applying fallback src',
+                            data: { newSrc: '/placeholder.svg' },
+                            timestamp: Date.now(),
+                          }),
+                        }
+                      ).catch(() => {})
+                      // #endregion
+
+                      e.currentTarget.src = '/placeholder.svg'
+                    }}
                   />
                   <div>
                     <cite
@@ -252,27 +291,6 @@ const SocialProof = () => {
               </CardContent>
             </Card>
           ))}
-        </div>
-
-        {/* Company Logos */}
-        <div
-          className={`fade-in-up mb-16 ${isIntersecting ? '' : 'opacity-0'}`}
-        >
-          <h3 className="mb-8 text-center text-lg font-semibold text-muted-foreground">
-            Ils nous font déjà confiance
-          </h3>
-          <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-6">
-            {companies.map((company, index) => (
-              <div
-                key={index}
-                className="group rounded-lg border border-primary/10 bg-card/40 p-4 text-center backdrop-blur-sm transition-all duration-300 hover:border-primary/30"
-              >
-                <div className="font-mono text-sm text-muted-foreground transition-colors group-hover:text-foreground">
-                  {company}
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Trust Indicators */}
@@ -310,13 +328,25 @@ const SocialProof = () => {
         <div
           className={`fade-in-up mt-16 text-center ${isIntersecting ? '' : 'opacity-0'}`}
         >
-          <div className="group inline-flex cursor-pointer items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-6 py-3 transition-colors hover:bg-primary/15">
-            <CheckCircle className="h-4 w-4 text-primary" />
-            <span className="font-mono font-medium text-primary">
-              Rejoignez plus de 500 entreprises françaises
-            </span>
-            <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-1" />
-          </div>
+          <Button
+            variant="hero"
+            size="lg"
+            className="inline-flex items-center gap-2"
+            onClick={() => {
+              if (demoLink.startsWith('http')) {
+                window.location.href = demoLink
+              } else {
+                window.location.assign(demoLink)
+              }
+            }}
+          >
+            Voir la démo personnalisée
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+          <p className="mt-3 font-mono text-sm text-muted-foreground">
+            Programmes pilotes ouverts — sécurité et conformité revues pendant
+            le parcours démo.
+          </p>
         </div>
       </div>
     </section>

@@ -95,6 +95,7 @@ describe('ErrorBoundary', () => {
     Object.defineProperty(window, 'location', {
       value: { reload: reloadSpy },
       writable: true,
+      configurable: true,
     })
 
     render(

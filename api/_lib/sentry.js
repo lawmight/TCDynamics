@@ -18,6 +18,7 @@ export function initSentry() {
   }
 
   const dsn = process.env.SENTRY_DSN;
+  const release = process.env.SENTRY_RELEASE || process.env.VERCEL_GIT_COMMIT_SHA;
 
   if (!dsn) {
     console.log('[Sentry] Not initialized - SENTRY_DSN not set');
@@ -27,8 +28,9 @@ export function initSentry() {
   try {
     Sentry.init({
       dsn,
-      environment: process.env.VERCEL_ENV || 'development',
+      environment: process.env.VERCEL_ENV || process.env.NODE_ENV || 'development',
       tracesSampleRate: 0.1, // 10% of transactions for performance monitoring (keep costs low)
+      release,
 
       // Only send errors in production
       beforeSend(event) {
@@ -113,6 +115,7 @@ export function withSentry(handler) {
         method: req.method,
         headers: req.headers,
         query: req.query,
+        requestId: req.requestId,
       });
 
       // Re-throw so the handler can decide how to respond

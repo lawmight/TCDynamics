@@ -20,6 +20,15 @@ const Footer = () => {
             <span>RGPD conforme</span>
           </div>
           <div className="flex items-center gap-2">
+            <CheckCircle className="h-4 w-4 text-primary" />
+            <Link
+              to="/security"
+              className="underline-offset-4 transition-colors hover:text-primary hover:underline"
+            >
+              Security & Availability
+            </Link>
+          </div>
+          <div className="flex items-center gap-2">
             <Train className="h-4 w-4 text-primary" />
             <span>Accès RER C</span>
           </div>
@@ -41,7 +50,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/#contact"
+                  to="/contact"
                   className="text-slate-400 transition-colors hover:text-primary"
                 >
                   Contact
@@ -124,6 +133,14 @@ const Footer = () => {
                 >
                   EULA
                 </a>
+              </li>
+              <li>
+                <Link
+                  to="/security"
+                  className="text-slate-400 transition-colors hover:text-primary"
+                >
+                  Security & Availability
+                </Link>
               </li>
             </ul>
           </div>

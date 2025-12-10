@@ -60,10 +60,14 @@ class Monitoring {
       const tracesSampleRate = Number.isFinite(parsedSampleRate)
         ? Math.max(0, Math.min(1, parsedSampleRate))
         : 0.1
+      const release =
+        import.meta.env.VITE_SENTRY_RELEASE ||
+        import.meta.env.VERCEL_GIT_COMMIT_SHA
       Sentry.init({
         dsn: this.dsn,
         environment: import.meta.env.MODE,
         tracesSampleRate,
+        release,
         beforeSend(event, _hint) {
           // Only send errors in production
           if (import.meta.env.MODE !== 'production') {

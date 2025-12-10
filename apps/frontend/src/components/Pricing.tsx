@@ -1,4 +1,4 @@
-import { Check, MapPin, Phone, Play, X, Users, TrendingUp } from 'lucide-react'
+import { Check, MapPin, Phone, Play, Shield, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
@@ -8,12 +8,12 @@ const pricingPlans = [
   {
     name: 'Starter',
     price: '29€',
-    period: '/mois',
+    period: '',
     description:
       'Parfait pour les petites entreprises qui commencent leur digitalisation',
     testimonial: {
       quote:
-        'WorkFlowAI a révolutionné notre gestion documentaire. Nous économisons 15h par semaine.',
+        'Pilote en cours : automatisation factures et réponses client. Cas complet présenté en démo.',
       author: 'Marie Dubois',
       position: 'Directrice Administrative, TechSolutions Montigny',
     },
@@ -28,18 +28,18 @@ const pricingPlans = [
       { name: 'Suivez une formation personnalisée', included: false },
       { name: 'Déployez sur votre site interne', included: false },
     ],
-    cta: 'Économisez 10h/semaine - Essai gratuit 14j',
+    cta: 'Planifier une démo',
     popular: false,
   },
   {
     name: 'Professional',
     price: '79€',
-    period: '/mois',
+    period: '',
     description:
       'Idéal pour les PME qui veulent automatiser leurs processus métier',
     testimonial: {
       quote:
-        "L'équipe française nous accompagne parfaitement. Le support local fait toute la différence.",
+        'Support local + workshops prompts métier pendant la phase pilote. Démo guidée disponible.',
       author: 'Pierre Martin',
       position: 'CEO, InnovConseil Guyancourt',
     },
@@ -54,7 +54,7 @@ const pricingPlans = [
       { name: 'Suivez une formation personnalisée', included: false },
       { name: 'Déployez sur votre site interne', included: false },
     ],
-    cta: 'Automatisez tout - ROI 300% garanti',
+    cta: 'Planifier une démo',
     popular: true,
   },
   {
@@ -65,7 +65,7 @@ const pricingPlans = [
       'Solution complète pour les grandes entreprises avec besoins spécifiques',
     testimonial: {
       quote:
-        'La conformité RGPD était notre priorité. WorkFlowAI respecte parfaitement nos exigences.',
+        'Conformité et parcours de validation sécurité présentés pendant la démo.',
       author: 'Sophie Leroy',
       position: 'DPO, SecureData Versailles',
     },
@@ -80,7 +80,7 @@ const pricingPlans = [
       { name: 'Suivez formations personnalisées', included: true },
       { name: 'Déployez entièrement sur site', included: true },
     ],
-    cta: 'Démo personnalisée - ROI calculé en 15min',
+    cta: 'Parler à un expert',
     popular: false,
   },
 ]
@@ -100,10 +100,18 @@ const supportInfo = [
 
 const Pricing = () => {
   const navigate = useNavigate()
+  const demoLink = import.meta.env.VITE_DEMO_URL || '/demo'
 
-  const handlePlanSelect = (planName: string) => {
-    // Navigate to checkout page with plan parameter
-    navigate(`/checkout?plan=${planName}`)
+  const goToDemo = (planName?: string) => {
+    if (demoLink.startsWith('http')) {
+      window.location.href = demoLink
+      return
+    }
+    if (planName) {
+      navigate(`${demoLink}?plan=${planName}`)
+      return
+    }
+    navigate(demoLink)
   }
 
   return (
@@ -124,29 +132,30 @@ const Pricing = () => {
             {/* Above-fold social proof */}
             <div className="mb-12 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
-                <span aria-hidden="true">⭐</span>
-                <span className="font-mono">4.9/5 (200+ avis)</span>
+                <Shield size={14} aria-hidden="true" />
+                <span className="font-mono">
+                  RGPD & revues sécurité en démo
+                </span>
               </div>
               <div className="flex items-center gap-2">
-                <Users size={14} aria-hidden="true" />
-                <span className="font-mono">500+ entreprises françaises</span>
+                <MapPin size={14} aria-hidden="true" />
+                <span className="font-mono">Support local Île-de-France</span>
               </div>
               <div className="flex items-center gap-2">
-                <TrendingUp size={14} aria-hidden="true" />
-                <span className="font-mono">ROI 300% moyen</span>
+                <Play size={14} aria-hidden="true" />
+                <span className="font-mono">Parcours démo guidé</span>
               </div>
             </div>
             <div className="mx-auto mb-4 inline-flex items-center justify-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-6 py-2 font-mono text-sm font-semibold text-primary">
-              Automatisation IA Française • Conformité RGPD
+              Automatisation IA Française • Validation en démo
             </div>
           </div>
           <h2 className="mb-4 font-mono text-4xl font-bold text-foreground">
-            Plans IA qui Économisent 10h/Semaine Dès le Jour 1{' '}
-            <span className="text-primary">à Partir de 29€</span>
+            Plans IA, activation après démo guidée
           </h2>
           <p className="mx-auto max-w-2xl font-mono text-lg text-muted-foreground">
-            Automatisez documents et support client en 3 clics. Essai gratuit 14
-            jours, sans carte – annulez n'importe quand.
+            Les paiements/Stripe arrivent. Aujourd'hui, réservez une démo pour
+            valider le fit produit, la sécurité et la mise en place.
           </p>
         </div>
 
@@ -232,7 +241,7 @@ const Pricing = () => {
           {pricingPlans.map((plan, index) => (
             <Card
               key={index}
-              className={`fade-in-up relative border-primary/20 bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-primary/40 ${
+              className={`fade-in-up relative flex h-full flex-col border-primary/20 bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-primary/40 ${
                 plan.popular
                   ? 'relative z-10 border-2 border-primary shadow-2xl'
                   : ''
@@ -259,18 +268,9 @@ const Pricing = () => {
                   {plan.name}
                 </CardTitle>
                 <div className="mb-4">
-                  {plan.price.includes('€') ? (
-                    <data
-                      value={plan.price.replace(/[€/]/g, '')}
-                      className="font-mono text-4xl font-bold text-foreground drop-shadow-sm transition-colors duration-200 group-hover:text-primary"
-                    >
-                      {plan.price}
-                    </data>
-                  ) : (
-                    <span className="font-mono text-4xl font-bold text-foreground drop-shadow-sm transition-colors duration-200 group-hover:text-primary">
-                      {plan.price}
-                    </span>
-                  )}
+                  <span className="font-mono text-4xl font-bold text-foreground drop-shadow-sm transition-colors duration-200 group-hover:text-primary">
+                    {plan.price}
+                  </span>
                   <span className="font-mono text-muted-foreground">
                     {plan.period}
                   </span>
@@ -290,9 +290,9 @@ const Pricing = () => {
                 )}
               </CardHeader>
 
-              <CardContent className="space-y-6">
+              <CardContent className="flex flex-1 flex-col space-y-6">
                 {/* Features List */}
-                <div className="space-y-3">
+                <div className="flex-1 space-y-3">
                   {plan.features.map((feature, featureIndex) => (
                     <div
                       key={featureIndex}
@@ -320,11 +320,8 @@ const Pricing = () => {
                 <Button
                   variant={plan.popular ? 'hero' : 'hero-outline'}
                   size="lg"
-                  className="w-full"
-                  onClick={() =>
-                    plan.name !== 'Enterprise' &&
-                    handlePlanSelect(plan.name.toLowerCase())
-                  }
+                  className="mt-auto w-full"
+                  onClick={() => goToDemo(plan.name.toLowerCase())}
                 >
                   {plan.cta}
                 </Button>
@@ -372,10 +369,11 @@ const Pricing = () => {
                 Des questions sur nos tarifs ?
               </h4>
               <p className="mb-6 font-mono text-sm text-muted-foreground">
-                Contactez notre équipe commerciale pour une démonstration
-                personnalisée et un devis adapté à vos besoins spécifiques.
+                Contactez notre équipe pour une démo personnalisée et un devis
+                adapté à vos besoins spécifiques. Stripe et essais auto arrivent
+                après validation.
               </p>
-              <Button variant="hero-outline" onClick={() => navigate('/demo')}>
+              <Button variant="hero-outline" onClick={() => goToDemo()}>
                 Découvrez votre ROI en 15 minutes
               </Button>
             </CardContent>

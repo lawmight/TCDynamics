@@ -26,22 +26,24 @@ describe('Hero Component', () => {
     expect(descriptionElement).toHaveTextContent('10h par semaine')
 
     // Vérifier les boutons CTA
-    expect(screen.getByText('GET COMPUTE')).toBeInTheDocument()
     expect(screen.getByText('VOIR LA DÉMO')).toBeInTheDocument()
+    expect(screen.getByText('PARLER À UN EXPERT')).toBeInTheDocument()
   })
 
   it('should render trust indicators', () => {
     renderWithRouter()
 
-    expect(screen.getByText(/Hébergement France/i)).toBeInTheDocument()
-    expect(screen.getByText(/Sécurité Bancaire/i)).toBeInTheDocument()
-    expect(screen.getByText(/4\.9\/5 sur 200\+ avis/i)).toBeInTheDocument()
+    expect(screen.getByText(/Données hébergées en France/i)).toBeInTheDocument()
+    expect(screen.getByText(/RGPD prêt \+ chiffrement/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/Disponibilité 99\.9% \(SLA\)/i)
+    ).toBeInTheDocument()
   })
 
   it('should render hero image with alt text', () => {
     renderWithRouter()
 
-    const heroImage = screen.getByAltText(/Réseau d'intelligence artificielle/i)
+    const heroImage = screen.getByAltText(/Aperçu produit WorkFlowAI/i)
     expect(heroImage).toBeInTheDocument()
     expect(heroImage.tagName).toBe('IMG')
   })

@@ -140,12 +140,9 @@ describe('CheckoutSuccess', () => {
     const searchParams = new URLSearchParams()
     mockUseSearchParams.mockReturnValue([searchParams])
 
-    // Mock window.location.href
-    delete (window as unknown as { location: unknown }).location
-    Object.defineProperty(window, 'location', {
-      value: { href: '' },
-      writable: true,
-    })
+    const assignSpy = vi
+      .spyOn(window.location, 'assign')
+      .mockImplementation(() => undefined)
 
     renderWithRouter(<CheckoutSuccess />)
 
@@ -154,7 +151,7 @@ describe('CheckoutSuccess', () => {
     })
     fireEvent.click(supportButton)
 
-    expect(window.location.href).toBe('mailto:support@tcdynamics.fr')
+    expect(assignSpy).toHaveBeenCalledWith('mailto:support@tcdynamics.fr')
   })
 
   it('renders return home button', () => {

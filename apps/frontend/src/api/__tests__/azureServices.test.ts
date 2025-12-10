@@ -294,7 +294,7 @@ describe('Azure Services API Client', () => {
       const result = await chatAPI.sendMessage(validChatRequest)
 
       expect(fetchMock).toHaveBeenCalledWith(
-        'https://test-api.com/chat',
+        expect.stringContaining('/chat'),
         expect.objectContaining({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

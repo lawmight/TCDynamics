@@ -5,6 +5,10 @@ import { useContactForm, type ContactFormData } from '../useContactForm'
 
 import * as apiConfig from '@/utils/apiConfig'
 
+vi.mock('@vercel/analytics', () => ({
+  track: vi.fn(),
+}))
+
 // Mock modules
 vi.mock('@/utils/apiConfig', async () => {
   const actual = await vi.importActual('@/utils/apiConfig')

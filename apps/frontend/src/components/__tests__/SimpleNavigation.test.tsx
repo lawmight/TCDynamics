@@ -1,7 +1,10 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import SimpleNavigation from '../SimpleNavigation'
+
+import { ThemeProvider } from '@/components/ThemeProvider'
 
 // Mock the icons
 vi.mock('lucide-react', () => ({
@@ -27,9 +30,14 @@ describe('SimpleNavigation Component', () => {
     vi.restoreAllMocks()
   })
 
-  const renderSimpleNavigation = () => {
-    return render(<SimpleNavigation />)
-  }
+  const renderSimpleNavigation = () =>
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <ThemeProvider defaultTheme="light" storageKey="theme">
+          <SimpleNavigation />
+        </ThemeProvider>
+      </MemoryRouter>
+    )
 
   it('should render logo and navigation items', () => {
     renderSimpleNavigation()
@@ -37,9 +45,10 @@ describe('SimpleNavigation Component', () => {
     expect(screen.getByText('WorkFlowAI')).toBeInTheDocument()
     expect(screen.getByText('Accueil')).toBeInTheDocument()
     expect(screen.getByText('Fonctionnalités')).toBeInTheDocument()
-    expect(screen.getByText('Comment ça marche')).toBeInTheDocument()
     expect(screen.getByText('Tarifs')).toBeInTheDocument()
-    expect(screen.getByText('Contact')).toBeInTheDocument()
+    expect(screen.getByText('À propos')).toBeInTheDocument()
+    expect(screen.getByText('Démo')).toBeInTheDocument()
+    expect(screen.getByText('Démarrer')).toBeInTheDocument()
   })
 
   it('should render mobile menu button', () => {
@@ -117,7 +126,7 @@ describe('SimpleNavigation Component', () => {
     fireEvent.click(mobileMenuButton)
 
     // Click on a navigation item
-    const featuresButton = screen.getAllByText('Fonctionnalités')[1] // Mobile version
+    const featuresButton = screen.getByText('Fonctionnalités')
     fireEvent.click(featuresButton)
 
     // Menu should close

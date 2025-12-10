@@ -8,6 +8,11 @@ import { useEffect } from 'react'
  */
 export function useBodyScrollLock(isLocked: boolean) {
   useEffect(() => {
+    // Skip on server or non-DOM environments (prevents ReferenceError in tests)
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      return
+    }
+
     if (!isLocked) return
 
     // Store current scroll position

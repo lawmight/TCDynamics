@@ -1,10 +1,18 @@
 import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 
 import Pricing from '../Pricing'
 
 describe('Pricing Component', () => {
+  const renderPricing = () =>
+    render(
+      <MemoryRouter>
+        <Pricing />
+      </MemoryRouter>
+    )
+
   it('should render all pricing plans', () => {
-    render(<Pricing />)
+    renderPricing()
 
     // Vérifier les 3 plans
     expect(screen.getByText('Starter')).toBeInTheDocument()
@@ -13,34 +21,33 @@ describe('Pricing Component', () => {
   })
 
   it('should display correct prices', () => {
-    render(<Pricing />)
+    renderPricing()
 
-    expect(screen.getByText('29€')).toBeInTheDocument()
-    expect(screen.getByText('79€')).toBeInTheDocument()
+    expect(screen.getAllByText('Sur devis')).toHaveLength(2)
     expect(screen.getByText('Sur mesure')).toBeInTheDocument()
   })
 
   it('should mark Professional as popular', () => {
-    render(<Pricing />)
+    renderPricing()
 
     expect(screen.getByText('Plus populaire')).toBeInTheDocument()
   })
 
   it('should show feature comparison', () => {
-    render(<Pricing />)
+    renderPricing()
 
     // Vérifier quelques features
     expect(
-      screen.getByText(/Traitement de 50 documents\/mois/i)
+      screen.getByText(/Traitez 50 documents\/mois automatiquement/i)
     ).toBeInTheDocument()
+    expect(screen.getByText(/Traitez 500 documents\/mois/i)).toBeInTheDocument()
     expect(
-      screen.getByText(/Traitement de 500 documents\/mois/i)
+      screen.getByText(/Traitez un volume illimité de documents/i)
     ).toBeInTheDocument()
-    expect(screen.getByText(/Traitement illimité/i)).toBeInTheDocument()
   })
 
   it('should display support information', () => {
-    render(<Pricing />)
+    renderPricing()
 
     expect(screen.getByText('Support Local')).toBeInTheDocument()
     expect(
@@ -49,10 +56,11 @@ describe('Pricing Component', () => {
   })
 
   it('should have CTA buttons', () => {
-    render(<Pricing />)
+    renderPricing()
 
-    expect(screen.getByText("S'abonner - 29€")).toBeInTheDocument()
-    expect(screen.getByText("S'abonner - 79€")).toBeInTheDocument()
-    expect(screen.getByText('Contactez-nous')).toBeInTheDocument()
+    expect(
+      screen.getAllByText('Planifier une démo', { exact: false })
+    ).not.toHaveLength(0)
+    expect(screen.getByText('Parler à un expert')).toBeInTheDocument()
   })
 })

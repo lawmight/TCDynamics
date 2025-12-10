@@ -40,13 +40,10 @@ describe('useThrottle', () => {
     })
     expect(callback).toHaveBeenCalledTimes(1)
 
-    // After delay, should be called again
     act(() => {
       vi.advanceTimersByTime(50)
     })
-    await waitFor(() => {
-      expect(callback).toHaveBeenCalledTimes(2)
-    })
+    expect(callback).toHaveBeenCalledTimes(2)
   })
 
   it('should pass arguments to the callback', () => {

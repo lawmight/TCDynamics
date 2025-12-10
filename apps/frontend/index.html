@@ -42,11 +42,43 @@
     <meta name="apple-mobile-web-app-title" content="WorkFlowAI" />
     <meta name="msapplication-TileColor" content="#667eea" />
 
+    <!-- Preconnects & critical fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+    />
+    <link rel="preconnect" href="https://api.tcdynamics.fr" crossorigin />
+    <link rel="preconnect" href="https://connect.facebook.net" crossorigin />
+    <link rel="canonical" href="https://tcdynamics.fr/" />
+
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="manifest" href="/manifest.json" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "WorkFlowAI",
+        "url": "https://tcdynamics.fr/",
+        "logo": "https://tcdynamics.fr/apple-touch-icon.png",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+33-1-39-44-75-00",
+          "contactType": "customer support",
+          "areaServed": "FR"
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

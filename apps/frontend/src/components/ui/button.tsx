@@ -20,7 +20,7 @@ const buttonVariants = cva(
         link: 'text-primary underline-offset-4 hover:underline',
         hero: 'button-hover-scale bg-gradient-primary font-medium text-primary-foreground shadow-button',
         'hero-outline':
-          'button-hover-scale border-2 border-white/20 bg-white/10 font-medium text-white backdrop-blur-sm hover:border-white/30 hover:bg-white/20',
+          'button-hover-scale border-2 border-primary/40 bg-primary/5 font-medium text-primary backdrop-blur-sm hover:border-primary/60 hover:bg-primary/10 dark:border-white/30 dark:bg-white/10 dark:text-white dark:hover:border-white/40 dark:hover:bg-white/20',
       },
       size: {
         default: 'h-10 px-4 py-2',

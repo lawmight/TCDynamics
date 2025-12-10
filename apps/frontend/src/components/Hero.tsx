@@ -1,11 +1,30 @@
-import { ArrowRight, Cpu, Database, Network, Play, Shield } from 'lucide-react'
+import {
+  ArrowRight,
+  CheckCircle,
+  Cpu,
+  Database,
+  Network,
+  Play,
+  Shield,
+} from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
-import heroImage from '@/assets/hero-network.jpg'
+import heroAutomation from '@/assets/hero-automation.jpg'
 import { Button } from '@/components/ui/button'
 
 const Hero = () => {
   const navigate = useNavigate()
+  const demoLink = import.meta.env.VITE_DEMO_URL || '/demo'
+  const contactLink = '/#contact'
+  const securityLink = '/security'
+
+  const goTo = (target: string) => {
+    if (target.startsWith('http')) {
+      window.location.href = target
+      return
+    }
+    navigate(target)
+  }
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
@@ -107,9 +126,9 @@ const Hero = () => {
                 variant="default"
                 size="xl"
                 className="group font-mono"
-                onClick={() => navigate('/get-started')}
+                onClick={() => goTo(demoLink)}
               >
-                GET COMPUTE
+                VOIR LA DÉMO
                 <ArrowRight
                   size={18}
                   aria-hidden="true"
@@ -120,14 +139,14 @@ const Hero = () => {
                 variant="outline"
                 size="xl"
                 className="group font-mono"
-                onClick={() => navigate('/demo')}
+                onClick={() => goTo(contactLink)}
               >
                 <Play
                   size={16}
                   aria-hidden="true"
                   className="transition-transform group-hover:scale-110"
                 />
-                VOIR LA DÉMO
+                PARLER À UN EXPERT
               </Button>
             </div>
 
@@ -135,48 +154,68 @@ const Hero = () => {
             <div className="fade-in-up-delay-2 flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Database size={14} aria-hidden="true" />
-                <span className="font-mono">Hébergement France</span>
+                <span className="font-mono">Données hébergées en France</span>
               </div>
               <div className="flex items-center gap-2">
                 <Shield size={14} aria-hidden="true" />
-                <span className="font-mono">Sécurité Bancaire</span>
+                <span className="font-mono">RGPD prêt + chiffrement</span>
               </div>
               <div className="flex items-center gap-2">
-                <span aria-hidden="true">⭐</span>
-                <span className="font-mono">4.9/5 sur 200+ avis</span>
+                <CheckCircle
+                  size={14}
+                  aria-hidden="true"
+                  className="text-primary"
+                />
+                <span className="font-mono">Disponibilité 99.9% (SLA)</span>
               </div>
+              <button
+                onClick={() => goTo(securityLink)}
+                className="font-mono text-xs uppercase tracking-wide text-primary underline-offset-4 hover:underline"
+              >
+                Security & Availability
+              </button>
             </div>
           </div>
 
           {/* Right Column - Hero Visualization */}
           <div className="fade-in-up-delay-2 relative">
-            <div className="relative z-10">
-              <img
-                src={heroImage}
-                alt="Réseau d'intelligence artificielle pour l'automatisation d'entreprise - WorkFlowAI"
-                className="h-auto w-full rounded-lg shadow-glow"
-              />
-
-              {/* Floating Status Indicators - Prime Intellect Style */}
-              <div className="absolute -left-4 -top-4 hidden rounded-lg border border-border bg-card/90 px-3 py-2 backdrop-blur-sm md:block">
-                <div className="flex items-center gap-2 text-foreground">
-                  <div className="h-2 w-2 animate-pulse rounded-full bg-primary-glow"></div>
-                  <span className="font-mono text-xs">IA ACTIVE</span>
+            <div className="relative z-10 overflow-hidden rounded-xl border border-border bg-card/60 shadow-xl shadow-primary/10 backdrop-blur">
+              <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 animate-pulse rounded-full bg-primary"></span>
+                  <p className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
+                    Aperçu produit (remplacez par capture/vidéo)
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-xs"
+                  onClick={() => goTo(demoLink)}
+                >
+                  Voir la démo
+                </Button>
+              </div>
+              <div className="relative">
+                <img
+                  src={heroAutomation}
+                  alt="Aperçu produit WorkFlowAI"
+                  className="h-auto w-full object-cover"
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority="high"
+                />
+                <div className="absolute inset-0 bg-gradient-to-tr from-background/40 via-transparent to-background/10"></div>
+                <div className="absolute bottom-4 left-4 rounded-lg border border-border/60 bg-background/70 px-4 py-3 shadow-lg backdrop-blur">
+                  <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
+                    <Network size={14} />
+                    Workflow en direct
+                  </div>
+                  <p className="text-sm font-semibold text-foreground">
+                    Extraction + réponses IA orchestrées
+                  </p>
                 </div>
               </div>
-
-              <div className="absolute -bottom-4 -right-4 hidden rounded-lg border border-border bg-card/90 px-4 py-3 backdrop-blur-sm md:block">
-                <div className="font-mono text-xs text-muted-foreground">
-                  TEMPS ÉCONOMISÉ
-                </div>
-                <div className="font-mono text-xl font-bold text-primary">
-                  <data value="10.5">+10.5h</data>
-                </div>
-              </div>
-
-              {/* Additional network nodes */}
-              <div className="fade-delay-05 absolute -right-2 top-1/4 hidden h-3 w-3 animate-pulse rounded-full bg-primary opacity-80 md:block"></div>
-              <div className="fade-delay-20 absolute -left-2 bottom-1/3 hidden h-2 w-2 animate-pulse rounded-full bg-primary-glow opacity-60 md:block"></div>
             </div>
 
             {/* Background Glow Effect */}

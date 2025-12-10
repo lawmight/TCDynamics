@@ -26,17 +26,23 @@ vi.mock(
 describe('Configuration Management', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    // Reset config for each test
-    vi.doMock('../config', () => ({
-      config: {
-        initialize: vi.fn().mockResolvedValue(undefined),
-        client: {},
-        server: {},
-        isDevelopment: false,
-        isProduction: false,
-        functionsBaseUrl: mockEnv.VITE_AZURE_FUNCTIONS_URL,
-      },
-    }))
+    // Reset config for each test (preserve ConfigManager export)
+    vi.doMock('../config', async () => {
+      const actual =
+        await vi.importActual<typeof import('../config')>('../config')
+      return {
+        ...actual,
+        config: {
+          ...actual.config,
+          initialize: vi.fn().mockResolvedValue(undefined),
+          client: {},
+          server: {},
+          isDevelopment: false,
+          isProduction: false,
+          functionsBaseUrl: mockEnv.VITE_AZURE_FUNCTIONS_URL,
+        },
+      }
+    })
   })
 
   describe('Environment Helpers', () => {
@@ -302,20 +308,18 @@ describe('Configuration Management', () => {
 describe('Functions Base URL', () => {
   beforeEach(() => {
     vi.resetModules()
+    vi.doUnmock('../config')
+    vi.unmock('../config')
+    // Clear env between tests
+    delete process.env.VITE_FEATURE_ENABLE_AZURE_FUNCTIONS
+    delete process.env.VITE_AZURE_FUNCTIONS_URL
+    delete process.env.VITE_API_URL
+    process.env.VITE_NODE_ENV = 'test'
   })
 
   it('uses configured Azure Functions URL when feature flag is enabled', async () => {
-    vi.doMock(
-      'import.meta',
-      () => ({
-        env: {
-          VITE_FEATURE_ENABLE_AZURE_FUNCTIONS: 'true',
-          VITE_AZURE_FUNCTIONS_URL: 'https://custom-functions.com/api',
-          VITE_NODE_ENV: 'test',
-        },
-      }),
-      { virtual: true }
-    )
+    process.env.VITE_FEATURE_ENABLE_AZURE_FUNCTIONS = 'true'
+    process.env.VITE_AZURE_FUNCTIONS_URL = 'https://custom-functions.com/api'
 
     const { ConfigManager } = await import('../config')
     const configInstance = new ConfigManager()
@@ -327,17 +331,8 @@ describe('Functions Base URL', () => {
   })
 
   it('falls back to API base URL when Azure Functions are disabled', async () => {
-    vi.doMock(
-      'import.meta',
-      () => ({
-        env: {
-          VITE_FEATURE_ENABLE_AZURE_FUNCTIONS: 'false',
-          VITE_API_URL: 'https://api.example.com',
-          VITE_NODE_ENV: 'test',
-        },
-      }),
-      { virtual: true }
-    )
+    process.env.VITE_FEATURE_ENABLE_AZURE_FUNCTIONS = 'false'
+    process.env.VITE_API_URL = 'https://api.example.com'
 
     const { ConfigManager } = await import('../config')
     const configInstance = new ConfigManager()
@@ -347,22 +342,13 @@ describe('Functions Base URL', () => {
   })
 
   it('throws when feature flag is enabled but URL is missing', async () => {
-    vi.doMock(
-      'import.meta',
-      () => ({
-        env: {
-          VITE_FEATURE_ENABLE_AZURE_FUNCTIONS: 'true',
-          VITE_NODE_ENV: 'test',
-        },
-      }),
-      { virtual: true }
-    )
+    process.env.VITE_FEATURE_ENABLE_AZURE_FUNCTIONS = 'true'
 
     const { ConfigManager } = await import('../config')
     const configInstance = new ConfigManager()
 
     await expect(configInstance.initialize()).rejects.toThrow(
-      'VITE_AZURE_FUNCTIONS_URL is required when VITE_FEATURE_ENABLE_AZURE_FUNCTIONS is enabled'
+      'Missing required configuration: VITE_AZURE_FUNCTIONS_URL'
     )
   })
 })

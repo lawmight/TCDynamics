@@ -21,6 +21,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 const GetStarted = () => {
   const navigate = useNavigate()
+  const demoLink = import.meta.env.VITE_DEMO_URL || '/demo'
   const [selectedPlan, setSelectedPlan] = useState<'starter' | 'professional'>(
     'starter'
   )
@@ -66,23 +67,23 @@ const GetStarted = () => {
   const trialBenefits = [
     {
       icon: Gift,
-      title: '14 jours gratuits',
-      description: 'Essayez toutes les fonctionnalités sans engagement',
+      title: 'Démo guidée',
+      description: 'Parcours personnalisé avec un expert produit',
     },
     {
       icon: Lock,
       title: 'Sans carte bancaire',
-      description: 'Aucune information de paiement requise pour démarrer',
+      description: 'Activation après démo uniquement',
     },
     {
       icon: Zap,
-      title: 'Activation instantanée',
-      description: 'Accédez à votre compte en moins de 2 minutes',
+      title: 'Mise en place rapide',
+      description: 'Nous configurons un premier workflow pendant la démo',
     },
     {
       icon: Shield,
       title: 'Données sécurisées',
-      description: 'Conformité RGPD et hébergement en France',
+      description: 'RGPD + hébergement France, revues sécurité en démo',
     },
   ]
 
@@ -112,13 +113,11 @@ const GetStarted = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-
-    // TODO: Implement actual trial signup logic
-    // For now, simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500))
-
-    // Redirect to checkout for subscription setup
-    navigate(`/checkout?plan=${selectedPlan}`)
+    if (demoLink.startsWith('http')) {
+      window.location.href = demoLink
+      return
+    }
+    navigate(`${demoLink}?plan=${selectedPlan}`)
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -145,26 +144,28 @@ const GetStarted = () => {
               className="mb-6 border-primary/40 text-primary"
             >
               <Sparkles className="mr-1 h-3 w-3" />
-              14 jours d'essai gratuit
+              Démarrage via une démo guidée
             </Badge>
 
             <h1 className="mb-6 text-4xl font-bold text-foreground lg:text-6xl">
-              Démarrez avec <span className="text-gradient">WorkFlowAI</span>
+              Activez WorkFlowAI via{' '}
+              <span className="text-gradient">une démo personnalisée</span>
             </h1>
 
             <p className="mx-auto mb-8 max-w-2xl text-xl text-muted-foreground">
-              Essayez gratuitement pendant 14 jours. Aucune carte bancaire
-              requise. Annulation possible à tout moment.
+              Nous présentons la configuration, la sécurité et le déploiement
+              pendant une session démo. L’activation se fait après validation,
+              sans carte bancaire à ce stade.
             </p>
 
             <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-primary" />
-                <span>Sans engagement</span>
+                <span>Sans paiement à ce stade</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-primary" />
-                <span>Configuration en 2 min</span>
+                <span>Configuration guidée</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-primary" />
@@ -208,10 +209,11 @@ const GetStarted = () => {
               <div className="space-y-6">
                 <div>
                   <h2 className="mb-4 text-3xl font-bold text-foreground">
-                    Choisissez votre plan
+                    Choisissez votre plan pour la démo
                   </h2>
                   <p className="text-muted-foreground">
-                    Tous les plans incluent 14 jours d'essai gratuit
+                    Nous préparons un parcours adapté à votre plan avant la
+                    session.
                   </p>
                 </div>
 
@@ -387,12 +389,12 @@ const GetStarted = () => {
                         {isSubmitting ? (
                           <>
                             <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
-                            Création en cours...
+                            Redirection vers la démo...
                           </>
                         ) : (
                           <>
                             <Rocket className="mr-2 h-4 w-4" />
-                            Démarrer l'essai gratuit
+                            Réserver la démo
                           </>
                         )}
                       </Button>

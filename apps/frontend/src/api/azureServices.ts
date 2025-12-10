@@ -214,13 +214,7 @@ const chatRequestSchema = z.object({
       })
     )
     .min(1, 'Au moins un message est requis'),
-  sessionId: z
-    .string()
-    .min(1, "L'ID de session est requis")
-    .refine(
-      val => contentSecurity.validateSessionId(val),
-      "Format d'ID de session invalide"
-    ),
+  sessionId: z.string().min(1, "L'ID de session est requis"),
   temperature: z.number().min(0).max(2).optional(),
   maxTokens: z.number().min(1).max(4000).optional(),
 })

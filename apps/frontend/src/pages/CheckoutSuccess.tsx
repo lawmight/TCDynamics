@@ -22,6 +22,11 @@ const CheckoutSuccess = () => {
   }, [])
 
   const handleSupportClick = () => {
+    if (typeof window !== 'undefined' && window.location?.assign) {
+      window.location.assign('mailto:support@tcdynamics.fr')
+      return
+    }
+    // Fallback for environments without assign (tests)
     window.location.href = 'mailto:support@tcdynamics.fr'
   }
 

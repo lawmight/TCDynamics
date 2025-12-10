@@ -13,25 +13,25 @@ const Index = () => {
       <section id="hero" aria-label="Présentation WorkFlowAI">
         <Hero />
       </section>
-      <section id="features">
+      <section id="features" aria-label="Fonctionnalités">
         <Features />
       </section>
-      <section id="how-it-works">
+      <section id="how-it-works" aria-label="Comment ça marche">
         <HowItWorks />
       </section>
-      <section id="local-advantages">
+      <section id="local-advantages" aria-label="Avantages locaux">
         <LocalAdvantages />
       </section>
-      <section id="social-proof">
+      <section id="social-proof" aria-label="Preuves sociales">
         <SocialProof />
       </section>
-      <section id="pricing">
+      <section id="pricing" aria-label="Tarifs">
         <Pricing />
       </section>
-      <section id="faq">
+      <section id="faq" aria-label="FAQ">
         <FAQ />
       </section>
-      <section id="contact">
+      <section id="contact" aria-label="Contact">
         <Contact />
       </section>
     </main>
