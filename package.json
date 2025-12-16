@@ -37,7 +37,8 @@
     "deploy": "npm run deploy:functions && npm run deploy:frontend",
     "deploy:functions": "cd apps/functions && func azure functionapp publish",
     "deploy:frontend": "cd apps/frontend && npm run build",
-    "deploy:vercel": "powershell -ExecutionPolicy Bypass -File ./scripts/deploy-vercel.ps1"
+    "deploy:vercel": "powershell -ExecutionPolicy Bypass -File ./scripts/deploy-vercel.ps1",
+    "deploy:vercel:frontend": "powershell -ExecutionPolicy Bypass -File ./scripts/deploy-vercel-frontend-only.ps1"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.81.1",

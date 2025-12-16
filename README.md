@@ -40,19 +40,21 @@ npm run type-check
 
 ### Vercel Deployment
 
-For production deployment to Vercel:
+For production deployment to Vercel, you have two options:
 
+**Option 1: Frontend + API (Full Deployment)**
 ```bash
 npm run deploy:vercel
 ```
+This script deploys both the frontend and API serverless functions. Note: Vercel Hobby plan has a limit of 12 serverless functions.
 
-This script will:
+**Option 2: Frontend Only (Static Build)**
+```bash
+npm run deploy:vercel:frontend
+```
+This script deploys only the frontend static build without serverless functions. Use this if you're hitting the 12 function limit or if your APIs are hosted elsewhere.
 
-1. Copy the `api` directory to `apps/frontend/api` (required for Vercel serverless functions)
-2. Install API dependencies
-3. Deploy to Vercel production from the `apps/frontend` directory
-
-**Note**: Automatic deployments are configured via GitHub Actions on pushes to the `main` branch. Use the script above for manual deployments.
+**Note**: Automatic deployments are configured via GitHub Actions on pushes to the `main` branch. Use the scripts above for manual deployments.
 
 ## Logging & Privacy
 
