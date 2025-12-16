@@ -34,9 +34,25 @@ npm run type-check
 
 ## Deployment
 
-- Frontend + serverless API: Vercel
-- AI/vision: Azure Functions (`apps/functions/function_app.py`)
-- Express backend: local/dev only
+- **Frontend + serverless API**: Vercel
+- **AI/vision**: Azure Functions (`apps/functions/function_app.py`)
+- **Express backend**: local/dev only
+
+### Vercel Deployment
+
+For production deployment to Vercel:
+
+```bash
+npm run deploy:vercel
+```
+
+This script will:
+
+1. Copy the `api` directory to `apps/frontend/api` (required for Vercel serverless functions)
+2. Install API dependencies
+3. Deploy to Vercel production from the `apps/frontend` directory
+
+**Note**: Automatic deployments are configured via GitHub Actions on pushes to the `main` branch. Use the script above for manual deployments.
 
 ## Logging & Privacy
 
