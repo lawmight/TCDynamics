@@ -1,7 +1,18 @@
 import { getSupabaseClient } from './_lib/supabase.js'
 
 export default async function handler(req, res) {
-  const supabase = getSupabaseClient()
+  // Get Supabase client with error handling
+  let supabase
+  try {
+    supabase = getSupabaseClient()
+  } catch (error) {
+    console.error('Supabase not configured:', error.message)
+    // Return consistent error for both GET and POST when database is unavailable
+    return res.status(503).json({
+      error: 'Analytics service unavailable',
+      message: 'Database not configured',
+    })
+  }
 
   if (req.method === 'POST') {
     const { event, metadata } = req.body || {}
@@ -47,11 +58,10 @@ export default async function handler(req, res) {
       })
     } catch (error) {
       console.error('Analytics summary error', error)
-      return res.status(200).json({
-        chatMessages: 0,
-        uploads: 0,
-        activeUsers: 0,
-        avgLatencyMs: null,
+      // Return consistent error when database query fails
+      return res.status(503).json({
+        error: 'Analytics service unavailable',
+        message: 'Database not configured',
       })
     }
   }

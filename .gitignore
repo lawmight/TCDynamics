@@ -21,7 +21,7 @@ local.settings.json
 add-env-vars.sh
 
 # MCP Configuration (contains sensitive tokens)
-
+.mcp.json
 
 # Azure Functions (keeping in case we need to reference)
 bin/
@@ -78,3 +78,6 @@ lerna-debug.log*
 .next
 out/
 .vercel
+
+# Local documentation (keep local, don't push to GitHub)
+md/

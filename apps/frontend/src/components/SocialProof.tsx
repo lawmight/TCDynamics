@@ -39,7 +39,7 @@ const SocialProof = () => {
       company: 'PME Île-de-France',
       rating: 5,
       image:
-        'https://images.unsplash.com/photo-1494790108755-2616b2e4b4b4?w=64&h=64&fit=crop&crop=face&auto=format&fm=webp',
+        'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=64&h=64&fit=crop&crop=face&auto=format&fm=webp',
     },
     {
       quote:
@@ -150,10 +150,12 @@ const SocialProof = () => {
         <div
           className={`fade-in-up mb-16 ${isIntersecting ? '' : 'opacity-0'}`}
         >
-          <div className="mb-4 text-center font-mono text-sm text-muted-foreground">
-            Remplacez par vos logos clients validés
-          </div>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-5">
+          {import.meta.env.DEV && (
+            <div className="mb-4 text-center font-mono text-sm text-muted-foreground">
+              Remplacez par vos logos clients validés
+            </div>
+          )}
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4">
             {logos.map(logo => (
               <div
                 key={logo.name}
@@ -172,7 +174,7 @@ const SocialProof = () => {
 
         {/* Testimonials */}
         <div
-          className={`stagger-fade mb-16 grid gap-8 md:grid-cols-3 ${isIntersecting ? '' : 'opacity-0'}`}
+          className={`stagger-fade mb-16 grid gap-8 lg:grid-cols-3 ${isIntersecting ? '' : 'opacity-0'}`}
         >
           {testimonials.map((testimonial, index) => (
             <Card
@@ -196,84 +198,20 @@ const SocialProof = () => {
                 <blockquote className="mb-6 italic leading-relaxed text-muted-foreground">
                   "{testimonial.quote}"
                 </blockquote>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                   <img
                     src={testimonial.image}
                     alt={`${testimonial.author}, ${testimonial.position} chez ${testimonial.company}`}
-                    className="h-12 w-12 rounded-full object-cover ring-2 ring-primary/20"
-                    loading="lazy"
+                    className="h-10 w-10 flex-shrink-0 rounded-full object-cover"
                     onError={e => {
-                      // #region agent log
-                      fetch(
-                        'http://127.0.0.1:7242/ingest/58095262-9eae-40ce-bf51-b3d6c86e36b2',
-                        {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                            sessionId: 'debug-session',
-                            runId: 'pre-fix',
-                            hypothesisId: 'H1',
-                            location: 'SocialProof.tsx:onError',
-                            message: 'img onError triggered',
-                            data: {
-                              currentSrc: e.currentTarget.src,
-                              fallbackApplied:
-                                e.currentTarget.dataset.fallbackApplied ===
-                                'true',
-                            },
-                            timestamp: Date.now(),
-                          }),
-                        }
-                      ).catch(() => {})
-                      // #endregion
-
                       if (e.currentTarget.dataset.fallbackApplied === 'true') {
-                        // #region agent log
-                        fetch(
-                          'http://127.0.0.1:7242/ingest/58095262-9eae-40ce-bf51-b3d6c86e36b2',
-                          {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                              sessionId: 'debug-session',
-                              runId: 'pre-fix',
-                              hypothesisId: 'H2',
-                              location: 'SocialProof.tsx:onError',
-                              message: 'fallback already applied, skipping',
-                              data: { currentSrc: e.currentTarget.src },
-                              timestamp: Date.now(),
-                            }),
-                          }
-                        ).catch(() => {})
-                        // #endregion
                         return
                       }
-
                       e.currentTarget.dataset.fallbackApplied = 'true'
-
-                      // #region agent log
-                      fetch(
-                        'http://127.0.0.1:7242/ingest/58095262-9eae-40ce-bf51-b3d6c86e36b2',
-                        {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                            sessionId: 'debug-session',
-                            runId: 'pre-fix',
-                            hypothesisId: 'H3',
-                            location: 'SocialProof.tsx:onError',
-                            message: 'applying fallback src',
-                            data: { newSrc: '/placeholder.svg' },
-                            timestamp: Date.now(),
-                          }),
-                        }
-                      ).catch(() => {})
-                      // #endregion
-
                       e.currentTarget.src = '/placeholder.svg'
                     }}
                   />
-                  <div>
+                  <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
                     <cite
                       id={`testimonial-${index}-author`}
                       className="font-semibold not-italic text-foreground transition-colors group-hover:text-primary"

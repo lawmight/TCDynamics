@@ -24,6 +24,7 @@ jobs:
           cache-dependency-path: |
             package-lock.json
             apps/frontend/package-lock.json
+            api/package-lock.json
 
       # Install root dependencies (needed for serverless functions)
       - name: Install root dependencies

@@ -1,4 +1,5 @@
 import { loadStripe, Stripe } from '@stripe/stripe-js'
+import type { Session } from '@supabase/supabase-js'
 
 import { logger } from './logger'
 // Stripe publishable key from environment
@@ -62,15 +63,32 @@ export interface CheckoutSessionResponse {
   error?: string
 }
 
+/**
+ * Create a Stripe checkout session
+ * @param params - Checkout parameters (priceId, planName)
+ * @param session - Supabase session (required for authentication)
+ * @returns Checkout session response with URL to redirect to
+ */
 export const createCheckoutSession = async (
-  params: CreateCheckoutSessionParams
+  params: CreateCheckoutSessionParams,
+  session: Session | null
 ): Promise<CheckoutSessionResponse> => {
+  // Require authentication
+  if (!session?.access_token) {
+    return {
+      success: false,
+      message: 'Authentication required. Please log in.',
+      error: 'AUTH_REQUIRED',
+    }
+  }
+
   try {
     // Use relative URL for API calls to work on any deployment
     const response = await fetch(`/api/stripe/create-checkout-session`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.access_token}`,
       },
       body: JSON.stringify(params),
     })
@@ -78,6 +96,14 @@ export const createCheckoutSession = async (
     const data = await response.json()
 
     if (!response.ok) {
+      // Handle specific auth errors
+      if (response.status === 401) {
+        return {
+          success: false,
+          message: 'Session expired. Please log in again.',
+          error: 'AUTH_EXPIRED',
+        }
+      }
       throw new Error(data.message || 'Failed to create checkout session')
     }
 
@@ -95,10 +121,24 @@ export const createCheckoutSession = async (
   }
 }
 
-// Redirect to Stripe Checkout
+/**
+ * Redirect to Stripe Checkout
+ * @param planName - Plan to checkout (starter, professional, enterprise)
+ * @param session - Supabase session (required for authentication)
+ * @returns Object with optional error
+ */
 export const redirectToCheckout = async (
-  planName: PlanType
-): Promise<{ error?: Error }> => {
+  planName: PlanType,
+  session: Session | null
+): Promise<{ error?: Error; authRequired?: boolean }> => {
+  // Check authentication first
+  if (!session?.access_token) {
+    return {
+      error: new Error('Authentication required. Please log in.'),
+      authRequired: true,
+    }
+  }
+
   try {
     const priceId = STRIPE_PRICE_IDS[planName]
 
@@ -106,11 +146,25 @@ export const redirectToCheckout = async (
       throw new Error(`Invalid plan: ${planName}`)
     }
 
-    // Create checkout session
-    const sessionResponse = await createCheckoutSession({
-      priceId,
-      planName,
-    })
+    // Create checkout session with auth
+    const sessionResponse = await createCheckoutSession(
+      {
+        priceId,
+        planName,
+      },
+      session
+    )
+
+    // Handle auth errors
+    if (
+      sessionResponse.error === 'AUTH_REQUIRED' ||
+      sessionResponse.error === 'AUTH_EXPIRED'
+    ) {
+      return {
+        error: new Error(sessionResponse.message || 'Authentication required'),
+        authRequired: true,
+      }
+    }
 
     if (!sessionResponse.success || !sessionResponse.url) {
       throw new Error(sessionResponse.message || 'Failed to create session')

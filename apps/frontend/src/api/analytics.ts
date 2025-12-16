@@ -13,8 +13,39 @@ export const fetchAnalytics = async (): Promise<AnalyticsSummary> => {
   }
   const data = await res.json()
   // Basic validation
+  if (Array.isArray(data)) {
+    throw new Error('Invalid analytics data format: expected object, got array')
+  }
   if (typeof data !== 'object' || data === null) {
-    throw new Error('Invalid analytics data format')
+    throw new Error('Invalid analytics data format: expected object')
+  }
+  // Verify required numeric fields
+  if (
+    typeof data.chatMessages !== 'number' ||
+    !Number.isFinite(data.chatMessages)
+  ) {
+    throw new Error(
+      'Invalid analytics data: chatMessages must be a finite number'
+    )
+  }
+  if (typeof data.uploads !== 'number' || !Number.isFinite(data.uploads)) {
+    throw new Error('Invalid analytics data: uploads must be a finite number')
+  }
+  if (
+    typeof data.activeUsers !== 'number' ||
+    !Number.isFinite(data.activeUsers)
+  ) {
+    throw new Error(
+      'Invalid analytics data: activeUsers must be a finite number'
+    )
+  }
+  // Validate optional avgLatencyMs field
+  if (
+    data.avgLatencyMs !== undefined &&
+    (typeof data.avgLatencyMs !== 'number' ||
+      !Number.isFinite(data.avgLatencyMs))
+  ) {
+    delete data.avgLatencyMs
   }
   return data as AnalyticsSummary
 }

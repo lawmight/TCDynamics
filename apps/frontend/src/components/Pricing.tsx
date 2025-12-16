@@ -159,79 +159,120 @@ const Pricing = () => {
           </p>
         </div>
 
-        {/* Pain Points - Old Way vs New Way */}
+        {/* Bento Grid: Old Way vs New Way + How it Works */}
         <div className="mb-16">
-          <div className="mx-auto max-w-4xl">
-            <div className="grid items-center gap-8 md:grid-cols-2">
-              <div>
-                <div className="mb-6 inline-flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 font-mono text-sm text-destructive">
-                  <X size={16} />
-                  L'ANCIENNE MÉTHODE
+          <div className="mx-auto max-w-6xl">
+            {/* Bento Grid Container */}
+            <div className="grid gap-6 md:grid-cols-3 md:grid-rows-2 lg:grid-cols-3 lg:grid-rows-2">
+              {/* Old Way - Smaller, Muted Card */}
+              <div className="relative overflow-hidden rounded-lg border border-destructive/20 bg-destructive/5 p-6 backdrop-blur-sm md:col-span-1 lg:col-span-1">
+                {/* Subtle diagonal strikethrough overlay */}
+                <div className="absolute inset-0 opacity-10">
+                  <div className="absolute left-0 top-0 h-full w-full">
+                    <div className="absolute left-0 top-1/2 h-px w-full origin-left -rotate-12 bg-destructive"></div>
+                  </div>
                 </div>
-                <h3 className="mb-4 text-3xl font-bold text-foreground">
-                  Saisie manuelle interminable
-                </h3>
-                <ul className="mb-8 space-y-3 text-muted-foreground">
-                  <li>• 10h/semaine perdues sur factures</li>
-                  <li>• Erreurs humaines (2-5%)</li>
-                  <li>• Support client réactif 9-17h</li>
-                  <li>• KPIs manuels en Excel</li>
-                </ul>
+                <div className="relative z-10">
+                  <div className="mb-4 inline-flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-1.5 font-mono text-xs text-destructive">
+                    <X size={14} />
+                    L'ANCIENNE MÉTHODE
+                  </div>
+                  <h3 className="mb-3 text-xl font-bold text-muted-foreground lg:text-2xl">
+                    Saisie manuelle interminable
+                  </h3>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li>• 10h/semaine perdues sur factures</li>
+                    <li>• Erreurs humaines (2-5%)</li>
+                    <li>• Support client réactif 9-17h</li>
+                    <li>• KPIs manuels en Excel</li>
+                  </ul>
+                </div>
               </div>
-              <div>
-                <div className="mb-6 inline-flex items-center gap-2 rounded-lg border border-primary/40 bg-primary/10 px-4 py-2 font-mono text-sm text-primary">
+
+              {/* New Way - Prominent, Larger Card */}
+              <div className="relative overflow-hidden rounded-lg border-2 border-primary/40 bg-gradient-to-br from-primary/10 via-primary/5 to-background p-8 shadow-lg shadow-primary/20 backdrop-blur-sm transition-all duration-300 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/30 md:col-span-2 lg:col-span-2">
+                <div className="mb-6 inline-flex items-center gap-2 rounded-lg border border-primary/50 bg-primary/20 px-4 py-2 font-mono text-sm font-semibold text-primary">
                   <Check size={16} className="text-primary" />
                   AVEC WORKFLOWAI
                 </div>
-                <h3 className="mb-4 text-3xl font-bold text-primary">
+                <h3 className="mb-4 text-3xl font-bold text-primary lg:text-4xl">
                   Automatisation IA en 3 clics
                 </h3>
-                <ul className="space-y-3 text-muted-foreground">
-                  <li>• 99.7% précision extraction</li>
-                  <li>• Chatbot 24/7 résout 80%</li>
-                  <li>• Dashboards temps réel</li>
-                  <li>• Économisez 10h/semaine</li>
+                <ul className="space-y-3 text-base text-foreground">
+                  <li className="flex items-start gap-2">
+                    <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
+                    <span>99.7% précision extraction</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
+                    <span>Chatbot 24/7 résout 80%</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
+                    <span>Dashboards temps réel</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
+                    <span>Économisez 10h/semaine</span>
+                  </li>
                 </ul>
               </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Product Walkthrough */}
-        <div className="mb-16 space-y-12">
-          <div className="text-center">
-            <div className="mx-auto mb-4 inline-flex items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-2 font-mono text-xs text-muted-foreground backdrop-blur-sm">
-              <Play size={14} aria-hidden="true" />
-              COMMENT ÇA MARCHE
-            </div>
-            <h3 className="mb-4 text-3xl font-bold text-foreground">
-              1. Onboard en 3 minutes
-            </h3>
-            <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-              Uploadez vos documents, activez le chatbot. Pas de migration, pas
-              de downtime.
-            </p>
-          </div>
-          <div className="grid gap-8 md:grid-cols-2">
-            <div>
-              <h4 className="mb-4 font-mono text-2xl font-bold text-primary">
-                2. Débloquez vos super-pouvoirs
-              </h4>
-              <ul className="space-y-2 text-muted-foreground">
-                <li>• Traitez 500+ docs/mois automatiquement</li>
-                <li>• Répondez 80% des clients sans humain</li>
-                <li>• Analysez KPIs en temps réel</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="mb-4 font-mono text-2xl font-bold text-primary-glow">
-                3. Atteignez vos objectifs business
-              </h4>
-              <ul className="space-y-2 text-muted-foreground">
-                <li>• Économisez 10h/semaine dès jour 1</li>
-                <li>• ROI 300% en 12 mois</li>
-                <li>• Support local Île-de-France</li>
-              </ul>
+              {/* Step 1 - Onboard */}
+              <div className="relative overflow-hidden rounded-lg border border-border/50 bg-card/30 p-6 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-card/50 md:col-span-1 lg:col-span-1">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-primary/10 font-mono text-sm font-bold text-primary">
+                    1
+                  </div>
+                  <div className="inline-flex items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-1 font-mono text-xs text-muted-foreground">
+                    <Play size={12} aria-hidden="true" />
+                    COMMENT ÇA MARCHE
+                  </div>
+                </div>
+                <h4 className="mb-3 font-mono text-xl font-bold text-foreground">
+                  Onboard en 3 minutes
+                </h4>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  Uploadez vos documents, activez le chatbot. Pas de migration,
+                  pas de downtime.
+                </p>
+              </div>
+
+              {/* Step 2 - Super-powers */}
+              <div className="relative overflow-hidden rounded-lg border border-border/50 bg-card/30 p-6 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-card/50 md:col-span-1 lg:col-span-1">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-primary/10 font-mono text-sm font-bold text-primary">
+                    2
+                  </div>
+                  <div className="h-px flex-1 bg-gradient-to-r from-primary/20 to-transparent"></div>
+                </div>
+                <h4 className="mb-3 font-mono text-xl font-bold text-primary">
+                  Débloquez vos super-pouvoirs
+                </h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li>• Traitez 500+ docs/mois automatiquement</li>
+                  <li>• Répondez 80% des clients sans humain</li>
+                  <li>• Analysez KPIs en temps réel</li>
+                </ul>
+              </div>
+
+              {/* Step 3 - Goals */}
+              <div className="relative overflow-hidden rounded-lg border border-border/50 bg-card/30 p-6 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-card/50 md:col-span-1 lg:col-span-1">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-primary/10 font-mono text-sm font-bold text-primary">
+                    3
+                  </div>
+                  <div className="h-px flex-1 bg-gradient-to-r from-primary/20 to-transparent"></div>
+                </div>
+                <h4 className="mb-3 font-mono text-xl font-bold text-primary">
+                  Atteignez vos objectifs business
+                </h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li>• Économisez 10h/semaine dès jour 1</li>
+                  <li>• ROI 300% en 12 mois</li>
+                  <li>• Support local Île-de-France</li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
@@ -279,7 +320,7 @@ const Pricing = () => {
                   {plan.description}
                 </p>
                 {plan.testimonial && (
-                  <div className="mt-4 rounded-lg border border-border/50 bg-muted/50 p-3">
+                  <div className="mt-4 flex min-h-[140px] flex-col justify-center rounded-lg border border-border/50 bg-muted/50 p-3">
                     <blockquote className="mb-2 text-sm italic text-muted-foreground">
                       "{plan.testimonial.quote}"
                     </blockquote>

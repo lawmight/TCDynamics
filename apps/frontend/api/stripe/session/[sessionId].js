@@ -10,8 +10,16 @@ const stripe = process.env.STRIPE_SECRET_KEY
 
 // Allow CORS for cross-origin usage (e.g., preview builds)
 const allowCors = fn => async (req, res) => {
-  res.setHeader('Access-Control-Allow-Credentials', true)
-  res.setHeader('Access-Control-Allow-Origin', '*')
+  const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    process.env.PREVIEW_URL,
+  ].filter(Boolean)
+
+  const origin = req.headers.origin
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin)
+    res.setHeader('Access-Control-Allow-Credentials', true)
+  }
   res.setHeader(
     'Access-Control-Allow-Methods',
     'GET,OPTIONS,PATCH,DELETE,POST,PUT'
@@ -59,7 +67,7 @@ const handler = async (req, res) => {
 
     const session = await stripe.checkout.sessions.retrieve(sessionId)
 
-    console.log('Stripe session retrieved', { sessionId })
+    console.log('Stripe session retrieved successfully')
 
     return res.status(200).json({
       success: true,
@@ -73,7 +81,11 @@ const handler = async (req, res) => {
       },
     })
   } catch (error) {
-    console.error('Error retrieving Stripe session', error)
+    console.error('Error retrieving Stripe session', {
+      type: error.type,
+      code: error.code,
+      statusCode: error.statusCode,
+    })
 
     if (error.type === 'StripeInvalidRequestError') {
       return res.status(404).json({
@@ -91,4 +103,3 @@ const handler = async (req, res) => {
 }
 
 module.exports = allowCors(handler)
-

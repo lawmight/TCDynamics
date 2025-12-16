@@ -139,7 +139,7 @@ const LocalAdvantages = () => {
               100% Français
             </Badge>
           </div>
-          <h2 className="text-gradient mb-6 text-4xl font-bold md:text-5xl">
+          <h2 className="text-gradient mb-6 text-4xl font-bold leading-tight md:text-5xl md:leading-[1.1]">
             Vos avantages locaux
           </h2>
           <p className="mx-auto max-w-3xl font-mono text-xl text-muted-foreground">

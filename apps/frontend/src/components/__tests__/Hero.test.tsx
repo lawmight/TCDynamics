@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
 import Hero from '../Hero'
@@ -65,5 +65,93 @@ describe('Hero Component', () => {
     // Vérifier que le SVG de fond est présent
     const svgElement = document.querySelector('svg')
     expect(svgElement).toBeInTheDocument()
+  })
+
+  describe('Video accessibility', () => {
+    it('should render video with proper accessibility attributes', () => {
+      renderWithRouter()
+
+      const video = screen.getByLabelText(
+        /Démonstration en direct de l'automatisation des workflows avec l'IA/i
+      )
+      expect(video).toBeInTheDocument()
+      expect(video).toHaveAttribute('autoplay')
+      expect(video).toHaveAttribute('muted')
+      expect(video).toHaveAttribute('playsinline')
+      expect(video).toHaveAttribute('controls')
+      // Video should NOT have loop attribute for accessibility
+      expect(video).not.toHaveAttribute('loop')
+    })
+
+    it('should render accessible pause/play control button', () => {
+      renderWithRouter()
+
+      const pauseButton = screen.getByRole('button', {
+        name: /Mettre en pause la vidéo de démonstration/i,
+      })
+      expect(pauseButton).toBeInTheDocument()
+      expect(pauseButton).toHaveAttribute('type', 'button')
+    })
+
+    it('should toggle play/pause when button is clicked', () => {
+      renderWithRouter()
+
+      const toggleButton = screen.getByRole('button', {
+        name: /Mettre en pause la vidéo de démonstration/i,
+      })
+
+      // Initially should show pause button
+      expect(toggleButton).toHaveTextContent('Pause')
+
+      // Click to pause
+      fireEvent.click(toggleButton)
+
+      // Should now show play button
+      const playButton = screen.getByRole('button', {
+        name: /Reprendre la lecture de la vidéo de démonstration/i,
+      })
+      expect(playButton).toHaveTextContent('Play')
+
+      // Click to play again
+      fireEvent.click(playButton)
+
+      // Should show pause button again
+      expect(
+        screen.getByRole('button', {
+          name: /Mettre en pause la vidéo de démonstration/i,
+        })
+      ).toHaveTextContent('Pause')
+    })
+
+    it('should support keyboard interaction for pause/play control', () => {
+      renderWithRouter()
+
+      const toggleButton = screen.getByRole('button', {
+        name: /Mettre en pause la vidéo de démonstration/i,
+      })
+
+      // Should be keyboard focusable
+      toggleButton.focus()
+      expect(toggleButton).toHaveFocus()
+
+      // Should toggle on Enter key
+      fireEvent.keyDown(toggleButton, { key: 'Enter', code: 'Enter' })
+      expect(
+        screen.getByRole('button', {
+          name: /Reprendre la lecture de la vidéo de démonstration/i,
+        })
+      ).toBeInTheDocument()
+
+      // Should toggle on Space key
+      const playButton = screen.getByRole('button', {
+        name: /Reprendre la lecture de la vidéo de démonstration/i,
+      })
+      fireEvent.keyDown(playButton, { key: ' ', code: 'Space' })
+      expect(
+        screen.getByRole('button', {
+          name: /Mettre en pause la vidéo de démonstration/i,
+        })
+      ).toBeInTheDocument()
+    })
   })
 })

@@ -33,16 +33,27 @@ function isRateLimited(key) {
   const existingHistory = rateLimitStore.get(key) || []
   const filteredHistory = existingHistory.filter(ts => ts > cutoff)
 
-  if (filteredHistory.length === 0) {
-    rateLimitStore.delete(key)
-  } else {
+  // Compute whether adding this request would exceed the limit
+  const wouldExceedLimit = filteredHistory.length >= MAX_REQUESTS_PER_WINDOW
+
+  if (wouldExceedLimit) {
+    // Request is rate-limited: update store with filtered history (evict old entries)
+    // but do NOT add the current timestamp
+  if (wouldExceedLimit) {
+    // Request is rate-limited: update store with filtered history (evict old entries)
+    // but do NOT add the current timestamp
     rateLimitStore.set(key, filteredHistory)
+    return true
+  }
+      rateLimitStore.set(key, filteredHistory)
+    }
+    return true
   }
 
+  // Request is allowed: add current timestamp and persist
   const updatedHistory = [...filteredHistory, now]
-  const limited = updatedHistory.length > MAX_REQUESTS_PER_WINDOW
   rateLimitStore.set(key, updatedHistory)
-  return limited
+  return false
 }
 
 // Helper to parse request body manually

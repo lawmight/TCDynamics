@@ -197,25 +197,29 @@ const Contact = () => {
           </p>
         </div>
 
-        <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-2">
-          {/* Demo Request Form */}
-          <div className="fade-in-up fade-delay-02">
-            <Card className="border-primary/20 bg-card/60 backdrop-blur-sm transition-all duration-300 hover:border-primary/40">
-              <CardHeader>
-                <div className="mb-2 flex items-center gap-3">
-                  <div className="rounded-full bg-primary/10 p-2">
-                    <Calendar className="h-5 w-5 text-primary" />
-                  </div>
-                  <CardTitle className="text-2xl">Réserver une démo</CardTitle>
+        {/* Bento Grid Layout */}
+        <div className="mx-auto max-w-6xl">
+          <div className="grid items-start gap-6 md:grid-cols-3 lg:grid-cols-3">
+            {/* Hero Card - Demo Request Form (Full Width) */}
+            <div className="fade-in-up fade-delay-02 relative overflow-hidden rounded-lg border-2 border-primary/40 bg-gradient-to-br from-primary/10 via-primary/5 to-background p-8 shadow-lg shadow-primary/20 backdrop-blur-sm transition-all duration-300 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/30 md:col-span-3 lg:col-span-3">
+              <div className="mb-6 flex items-center gap-3">
+                <div className="rounded-full bg-primary/20 p-2">
+                  <Calendar className="h-6 w-6 text-primary" />
                 </div>
-                <p className="font-mono text-sm text-muted-foreground">
-                  Démonstration personnalisée avec vos données
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Benefits */}
-                <div className="rounded-lg border border-primary/10 bg-primary/5 p-4">
-                  <h4 className="mb-3 flex items-center gap-2 font-semibold">
+                <div>
+                  <h3 className="text-2xl font-bold text-primary lg:text-3xl">
+                    Réserver une démo
+                  </h3>
+                  <p className="font-mono text-sm text-muted-foreground">
+                    Démonstration personnalisée avec vos données
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-2">
+                {/* Benefits Section */}
+                <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+                  <h4 className="mb-3 flex items-center gap-2 font-semibold text-primary">
                     <CheckCircle className="h-4 w-4 text-primary" />
                     Inclus dans votre démonstration :
                   </h4>
@@ -421,74 +425,146 @@ const Contact = () => {
                     )}
                   </Button>
                 </form>
+              </div>
 
-                {demoForm.response && (
-                  <div
-                    role="alert"
-                    className={`mt-4 rounded-lg p-4 ${
-                      demoForm.response.success
-                        ? 'border border-primary/20 bg-primary/10 text-primary'
-                        : 'border border-destructive/20 bg-destructive/10 text-destructive'
-                    }`}
-                  >
-                    {demoForm.response.message}
-                    {demoForm.response.errors && (
-                      <ul className="mt-2 text-sm">
-                        {demoForm.response.errors.map((error, index) => (
-                          <li key={index}>• {error}</li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                )}
+              {demoForm.response && (
+                <div
+                  role="alert"
+                  className={`mt-4 rounded-lg p-4 ${
+                    demoForm.response.success
+                      ? 'border border-primary/20 bg-primary/10 text-primary'
+                      : 'border border-destructive/20 bg-destructive/10 text-destructive'
+                  }`}
+                >
+                  {demoForm.response.message}
+                  {demoForm.response.errors && (
+                    <ul className="mt-2 text-sm">
+                      {demoForm.response.errors.map((error, index) => (
+                        <li key={index}>• {error}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
 
-                <p className="text-center font-mono text-xs text-muted-foreground">
-                  Démonstration de 45min • Sans engagement • Réponse sous 2h
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Contact Information & General Form */}
-          <div className="space-y-8">
-            {/* Contact Info Cards */}
-            <div className="fade-in-up fade-delay-04 grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {contactInfo.map((info, index) => {
-                const IconComponent = info.icon
-                return (
-                  <Card
-                    key={index}
-                    className="border-primary/10 bg-card/40 backdrop-blur-sm transition-all duration-300 hover:border-primary/30"
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 rounded-full bg-primary/10 p-2">
-                          <IconComponent className="h-4 w-4 text-primary" />
-                        </div>
-                        <div>
-                          <h4 className="mb-2 text-sm font-semibold">
-                            {info.title}
-                          </h4>
-                          <div className="space-y-1">
-                            {info.details.map((detail, detailIndex) => (
-                              <p
-                                key={detailIndex}
-                                className="font-mono text-xs text-muted-foreground"
-                              >
-                                {detail}
-                              </p>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )
-              })}
+              <p className="mt-4 text-center font-mono text-xs text-muted-foreground">
+                Démonstration de 45min • Sans engagement • Réponse sous 2h
+              </p>
             </div>
 
-            {/* General Contact Form */}
-            <Card className="fade-in-up fade-delay-06 border-primary/20 bg-card/60 backdrop-blur-sm">
+            {/* Supporting Card 1 - Contact Info (Combined) */}
+            <div className="fade-in-up fade-delay-04 relative overflow-hidden rounded-lg border border-border/50 bg-card/30 p-4 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-card/50 md:col-span-1 lg:col-span-1">
+              <div className="mb-3 flex items-center gap-2">
+                <div className="rounded-full bg-primary/10 p-1.5">
+                  <Building className="h-4 w-4 text-primary" />
+                </div>
+                <h4 className="font-mono text-base font-bold text-foreground">
+                  Contact
+                </h4>
+              </div>
+              <div className="space-y-3">
+                {contactInfo.slice(0, 2).map((info, index) => {
+                  const IconComponent = info.icon
+                  return (
+                    <div key={index} className="space-y-0.5">
+                      <h5 className="text-xs font-semibold text-foreground">
+                        {info.title}
+                      </h5>
+                      <div className="space-y-0.5">
+                        {info.details.map((detail, detailIndex) => (
+                          <p
+                            key={detailIndex}
+                            className="font-mono text-xs leading-tight text-muted-foreground"
+                          >
+                            {detail}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Supporting Card 2 - More Contact Info */}
+            <div className="fade-in-up fade-delay-06 relative overflow-hidden rounded-lg border border-border/50 bg-card/30 p-4 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-card/50 md:col-span-1 lg:col-span-1">
+              <div className="mb-3 flex items-center gap-2">
+                <div className="rounded-full bg-primary/10 p-1.5">
+                  <Mail className="h-4 w-4 text-primary" />
+                </div>
+                <h4 className="font-mono text-base font-bold text-foreground">
+                  Accès & Email
+                </h4>
+              </div>
+              <div className="space-y-3">
+                {contactInfo.slice(2).map((info, index) => {
+                  const IconComponent = info.icon
+                  return (
+                    <div key={index} className="space-y-0.5">
+                      <h5 className="text-xs font-semibold text-foreground">
+                        {info.title}
+                      </h5>
+                      <div className="space-y-0.5">
+                        {info.details.map((detail, detailIndex) => (
+                          <p
+                            key={detailIndex}
+                            className="font-mono text-xs leading-tight text-muted-foreground"
+                          >
+                            {detail}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Supporting Card 3 - Local Office Highlight */}
+            <div className="fade-in-up fade-delay-08 relative overflow-hidden rounded-lg border border-primary/20 bg-gradient-to-br from-primary/10 to-primary/5 p-4 backdrop-blur-sm transition-all duration-300 hover:border-primary/40 hover:bg-gradient-to-br hover:from-primary/15 hover:to-primary/10 md:col-span-1 lg:col-span-1">
+              <div className="mb-3 flex items-center gap-2">
+                <div className="rounded-full bg-primary/20 p-1.5">
+                  <MapPin className="h-4 w-4 text-primary" />
+                </div>
+                <h4 className="font-mono text-base font-bold text-primary">
+                  Bureau local
+                </h4>
+              </div>
+              <div>
+                <h5 className="mb-1.5 text-sm font-bold text-foreground">
+                  Île-de-France
+                </h5>
+                <p className="mb-3 font-mono text-xs leading-tight text-muted-foreground">
+                  Équipe française basée à Montigny-le-Bretonneux, proche de
+                  Guyancourt
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  <Badge
+                    variant="secondary"
+                    className="bg-primary/10 font-mono text-xs text-primary"
+                  >
+                    Intervention sur site
+                  </Badge>
+                  <Badge
+                    variant="secondary"
+                    className="bg-primary/10 font-mono text-xs text-primary"
+                  >
+                    Support local
+                  </Badge>
+                  <Badge
+                    variant="secondary"
+                    className="bg-primary/10 font-mono text-xs text-primary"
+                  >
+                    Formation en français
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* General Contact Form - Below Bento Grid */}
+          <div className="mt-6">
+            <Card className="fade-in-up fade-delay-10 border-primary/20 bg-card/60 backdrop-blur-sm">
               <CardHeader>
                 <div className="mb-2 flex items-center gap-3">
                   <div className="rounded-full bg-primary/10 p-2">
@@ -534,13 +610,13 @@ const Contact = () => {
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <label
-                        htmlFor="firstName"
+                        htmlFor="contact-firstName"
                         className="mb-2 block text-sm font-medium"
                       >
                         Prénom *
                       </label>
                       <Input
-                        id="firstName"
+                        id="contact-firstName"
                         name="firstName"
                         placeholder="Prénom"
                         className="bg-background/50"
@@ -551,13 +627,13 @@ const Contact = () => {
                     </div>
                     <div>
                       <label
-                        htmlFor="lastName"
+                        htmlFor="contact-lastName"
                         className="mb-2 block text-sm font-medium"
                       >
                         Nom *
                       </label>
                       <Input
-                        id="lastName"
+                        id="contact-lastName"
                         name="lastName"
                         placeholder="Nom"
                         className="bg-background/50"
@@ -569,13 +645,13 @@ const Contact = () => {
 
                   <div>
                     <label
-                      htmlFor="email"
+                      htmlFor="contact-email"
                       className="mb-2 block text-sm font-medium"
                     >
                       Email *
                     </label>
                     <Input
-                      id="email"
+                      id="contact-email"
                       name="email"
                       type="email"
                       placeholder="votre@email.fr"
@@ -588,13 +664,13 @@ const Contact = () => {
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <label
-                        htmlFor="phone"
+                        htmlFor="contact-phone"
                         className="mb-2 block text-sm font-medium"
                       >
                         Téléphone
                       </label>
                       <Input
-                        id="phone"
+                        id="contact-phone"
                         name="phone"
                         placeholder="01 23 45 67 89"
                         className="bg-background/50"
@@ -602,13 +678,13 @@ const Contact = () => {
                     </div>
                     <div>
                       <label
-                        htmlFor="company"
+                        htmlFor="contact-company"
                         className="mb-2 block text-sm font-medium"
                       >
                         Entreprise
                       </label>
                       <Input
-                        id="company"
+                        id="contact-company"
                         name="company"
                         placeholder="Nom de votre entreprise"
                         className="bg-background/50"
@@ -618,7 +694,7 @@ const Contact = () => {
 
                   <div>
                     <label
-                      htmlFor="message"
+                      htmlFor="contact-message"
                       className="mb-2 block text-sm font-medium"
                     >
                       Message *{' '}
@@ -627,7 +703,7 @@ const Contact = () => {
                       </span>
                     </label>
                     <Textarea
-                      id="message"
+                      id="contact-message"
                       name="message"
                       placeholder="Décrivez votre demande (minimum 10 caractères)..."
                       className="min-h-[120px] bg-background/50"
@@ -679,46 +755,6 @@ const Contact = () => {
                     )}
                   </div>
                 )}
-              </CardContent>
-            </Card>
-
-            {/* Local Office Highlight */}
-            <Card className="fade-in-up fade-delay-08 border-primary/20 bg-gradient-to-r from-primary/10 to-primary/5">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="rounded-full bg-primary/20 p-3">
-                    <MapPin className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="mb-2 text-lg font-bold">
-                      Bureau local Île-de-France
-                    </h3>
-                    <p className="mb-3 font-mono text-sm text-muted-foreground">
-                      Équipe française basée à Montigny-le-Bretonneux, proche de
-                      Guyancourt
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge
-                        variant="secondary"
-                        className="bg-primary/10 font-mono text-xs text-primary"
-                      >
-                        Intervention sur site
-                      </Badge>
-                      <Badge
-                        variant="secondary"
-                        className="bg-primary/10 font-mono text-xs text-primary"
-                      >
-                        Support local
-                      </Badge>
-                      <Badge
-                        variant="secondary"
-                        className="bg-primary/10 font-mono text-xs text-primary"
-                      >
-                        Formation en français
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
               </CardContent>
             </Card>
           </div>

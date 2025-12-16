@@ -43,13 +43,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           const code = url.searchParams.get('code')
           if (code) {
             const { error } = await supabase.auth.exchangeCodeForSession(code)
+            // Always clean URL to prevent retry loops
+            url.searchParams.delete('code')
+            url.searchParams.delete('state')
+            const cleanUrl = `${url.pathname}${url.search}${url.hash}`
+            window.history.replaceState({}, document.title, cleanUrl)
+
             if (error) {
               console.error('Auth code exchange failed', error)
-            } else {
-              url.searchParams.delete('code')
-              url.searchParams.delete('state')
-              const cleanUrl = `${url.pathname}${url.search}${url.hash}`
-              window.history.replaceState({}, document.title, cleanUrl)
+              // Optionally: set an error state or redirect to login with error message
             }
           }
         }

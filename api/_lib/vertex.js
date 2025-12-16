@@ -180,7 +180,10 @@ export const generateText = async ({ messages, temperature = 0.4 }) => {
     Array.isArray(candidates) && candidates.length > 0
       ? candidates[0]?.content?.parts || []
       : []
-  const message = textParts.map(part => part.text).join('')
+  const message = textParts
+    .filter(part => typeof part?.text === 'string')
+    .map(part => part.text)
+    .join('')
   const usage = response.data?.usageMetadata || {}
 
   return { message, usage }

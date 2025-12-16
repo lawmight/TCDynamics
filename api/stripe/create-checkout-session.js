@@ -1,9 +1,11 @@
 /**
  * Vercel Serverless Function for Stripe Checkout
  * This replaces the backend route for MVP deployment
+ * Requires Supabase authentication to link checkout to org_id
  */
 
 import Stripe from 'stripe'
+import { verifySupabaseAuth } from '../_lib/auth.js'
 
 // Enhanced logging for debugging
 console.log('Environment check at startup:', {
@@ -46,7 +48,7 @@ const allowCors = fn => async (req, res) => {
   )
   res.setHeader(
     'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
   )
 
   if (req.method === 'OPTIONS') {
@@ -88,9 +90,23 @@ const handler = async (req, res) => {
       })
     }
 
+    // Verify Supabase authentication to get org_id
+    const authHeader = req.headers.authorization
+    const { userId: orgId, error: authError } =
+      await verifySupabaseAuth(authHeader)
+
+    if (authError || !orgId) {
+      console.warn('Authentication failed:', authError)
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required',
+        error: authError || 'Invalid token',
+      })
+    }
+
     const { priceId, planName } = req.body
 
-    console.log('Received request:', { priceId, planName })
+    console.log('Received request:', { priceId, planName, orgId })
 
     if (!priceId || !planName) {
       return res.status(400).json({
@@ -106,7 +122,7 @@ const handler = async (req, res) => {
         ? `https://${process.env.VERCEL_URL}`
         : 'http://localhost:5173')
 
-    // Create Stripe checkout session
+    // Create Stripe checkout session with org_id for tenancy
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
@@ -118,8 +134,16 @@ const handler = async (req, res) => {
       ],
       success_url: `${frontendUrl}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${frontendUrl}/pricing`,
+      client_reference_id: orgId,
       metadata: {
         planName,
+        org_id: orgId,
+      },
+      subscription_data: {
+        metadata: {
+          org_id: orgId,
+          planName,
+        },
       },
       billing_address_collection: 'required',
       allow_promotion_codes: true,
@@ -157,3 +181,4 @@ const handler = async (req, res) => {
 }
 
 export default allowCors(handler)
+

@@ -41,6 +41,7 @@ const SimpleNavigation = () => {
       return
     }
     navigate(appUrl)
+    setIsMobileMenuOpen(false)
   }
   useEffect(() => {
     const handleScroll = () => {

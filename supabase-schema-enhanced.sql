@@ -450,6 +450,99 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- ================================================
+-- Table: stripe_events
+-- Purpose: Store Stripe webhook events for idempotency
+-- ================================================
+CREATE TABLE IF NOT EXISTS stripe_events (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    event_id TEXT NOT NULL UNIQUE, -- Stripe event.id
+    type TEXT NOT NULL,
+    payload JSONB NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for stripe_events
+CREATE INDEX IF NOT EXISTS idx_stripe_events_event_id ON stripe_events(event_id);
+CREATE INDEX IF NOT EXISTS idx_stripe_events_type ON stripe_events(type);
+CREATE INDEX IF NOT EXISTS idx_stripe_events_created_at ON stripe_events(created_at DESC);
+
+-- RLS for stripe_events
+ALTER TABLE stripe_events ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Service role can manage stripe_events"
+ON stripe_events FOR ALL
+USING (auth.role() = 'service_role');
+
+-- ================================================
+-- Table: orgs
+-- Purpose: Tenancy table (1 user = 1 org for MVP)
+-- Stores plan and subscription status
+-- ================================================
+CREATE TABLE IF NOT EXISTS orgs (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    plan TEXT CHECK (plan IN ('starter', 'professional', 'enterprise')),
+    subscription_status TEXT CHECK (subscription_status IN ('active', 'trialing', 'past_due', 'canceled', 'unpaid', 'incomplete')),
+    stripe_customer_id TEXT UNIQUE,
+    stripe_subscription_id TEXT UNIQUE,
+    trial_ends_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+    updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+-- Indexes for orgs
+CREATE INDEX IF NOT EXISTS idx_orgs_stripe_customer_id ON orgs(stripe_customer_id);
+CREATE INDEX IF NOT EXISTS idx_orgs_stripe_subscription_id ON orgs(stripe_subscription_id);
+CREATE INDEX IF NOT EXISTS idx_orgs_subscription_status ON orgs(subscription_status);
+
+-- RLS Policies for orgs
+ALTER TABLE orgs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can read their own org"
+ON orgs FOR SELECT
+USING (auth.uid() = id);
+
+CREATE POLICY "Service role can manage orgs"
+ON orgs FOR ALL
+USING (auth.role() = 'service_role');
+
+-- Trigger for orgs updated_at
+CREATE TRIGGER update_orgs_updated_at
+    BEFORE UPDATE ON orgs
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- ================================================
+-- Table: api_keys
+-- Purpose: Tenant API keys for n8n/internal tools
+-- Stores hashed keys for secure verification
+-- ================================================
+CREATE TABLE IF NOT EXISTS api_keys (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    org_id UUID NOT NULL REFERENCES orgs(id) ON DELETE CASCADE,
+    key_hash TEXT NOT NULL UNIQUE, -- bcrypt hash
+    key_prefix TEXT NOT NULL, -- e.g., "tc_live_abc123..." for display
+    created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+    revoked_at TIMESTAMPTZ,
+    last_used_at TIMESTAMPTZ
+);
+
+-- Indexes for api_keys
+CREATE INDEX IF NOT EXISTS idx_api_keys_org_id ON api_keys(org_id);
+CREATE INDEX IF NOT EXISTS idx_api_keys_key_hash ON api_keys(key_hash);
+CREATE INDEX IF NOT EXISTS idx_api_keys_revoked_at ON api_keys(revoked_at) WHERE revoked_at IS NULL;
+
+-- RLS Policies for api_keys
+ALTER TABLE api_keys ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can read their own API keys"
+ON api_keys FOR SELECT
+USING (auth.uid() = org_id);
+
+CREATE POLICY "Service role can manage API keys"
+ON api_keys FOR ALL
+USING (auth.role() = 'service_role');
+
+-- ================================================
 -- Schema Setup Complete
 -- ================================================
 -- Next Steps:

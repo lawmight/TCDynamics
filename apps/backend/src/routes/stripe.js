@@ -89,6 +89,7 @@ router.post('/stripe/create-checkout-session', async (req, res) => {
       `checkout_${uuidv4()}`
 
     // Create Stripe checkout session
+    // Note: Idempotency is handled via the Idempotency-Key header if provided
     const session = await stripe.checkout.sessions.create(
       {
         mode: 'subscription',
@@ -103,12 +104,15 @@ router.post('/stripe/create-checkout-session', async (req, res) => {
         cancel_url: `${frontendUrl}/pricing`,
         metadata: {
           planName,
+          idempotencyKey, // Store for reference/debugging
         },
         // Enable customer portal for subscription management
         billing_address_collection: 'required',
         allow_promotion_codes: true,
       },
-      { idempotencyKey }
+      {
+        idempotencyKey: idempotencyKey,
+      }
     )
 
     logger.info('Stripe checkout session created', {
@@ -128,7 +132,7 @@ router.post('/stripe/create-checkout-session', async (req, res) => {
       stack: error.stack,
     })
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Failed to create checkout session',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined,

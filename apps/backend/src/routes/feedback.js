@@ -58,17 +58,20 @@ router.post('/feedback', formRateLimit, async (req, res) => {
       })
     }
 
-    // If Supabase is not configured, log and return success
+    // If Supabase is not configured, log and return service unavailable
+    // (production case already handled above, this is for non-production)
     if (!supabase) {
       logger.warn('Supabase not configured, logging feedback to console', {
         form_type,
         rating,
         user_company,
+        allow_followup,
+        pii_omitted: true,
       })
 
-      return res.status(200).json({
-        success: true,
-        message: 'Feedback received (Supabase not configured)',
+      return res.status(503).json({
+        success: false,
+        message: 'Feedback service unavailable',
       })
     }
 
@@ -99,16 +102,14 @@ router.post('/feedback', formRateLimit, async (req, res) => {
 
     logger.info('Feedback saved successfully', {
       form_type,
-    logger.info('Feedback saved successfully', {
-      form_type,
       rating,
     })
+
+    return res.status(200).json({
       success: true,
       message: 'Feedback saved successfully',
       data,
     })
-  } catch (error) {
-    logger.error('Error processing feedback request', {
   } catch (error) {
     logger.error('Error processing feedback request', {
       error: error.message,
@@ -117,10 +118,13 @@ router.post('/feedback', formRateLimit, async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: process.env.NODE_ENV === 'production' 
-        ? 'An error occurred while processing your feedback. Please try again later.'
-        : 'Failed to process feedback',
+      message:
+        process.env.NODE_ENV === 'production'
+          ? 'An error occurred while processing your feedback. Please try again later.'
+          : 'Failed to process feedback',
       ...(process.env.NODE_ENV !== 'production' && { errors: [error.message] }),
     })
   }
+})
+
 module.exports = router

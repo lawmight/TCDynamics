@@ -99,7 +99,9 @@ jobs:
         working-directory: ./api
         run: |
           # Check that all .js files use ESM syntax (no CommonJS)
-          # Exclude node_modules
+          # NOTE: This only validates Vercel serverless functions in ./api
+          # Backend routes in apps/backend/src/routes/ use CommonJS and are excluded
+          # Exclude node_modules and any backend/apps directories
           failed=0
           while IFS= read -r file; do
             if grep -q "require(" "$file" 2>/dev/null || grep -q "module.exports" "$file" 2>/dev/null; then
@@ -107,7 +109,7 @@ jobs:
               echo "   All API files must use ESM (import/export) syntax"
               failed=1
             fi
-          done < <(find . -name "*.js" -not -path "./node_modules/*")
+          done < <(find . -name "*.js" -not -path "./node_modules/*" -not -path "./apps/*")
 
           if [ $failed -eq 1 ]; then
             exit 1

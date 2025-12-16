@@ -5,11 +5,13 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useAuth } from '@/hooks/useAuth'
 import { redirectToCheckout, type PlanType } from '@/utils/stripe'
 
 const Checkout = () => {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
+  const { session, loading: authLoading } = useAuth()
   const planParam = searchParams.get('plan') || 'starter'
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -86,7 +88,15 @@ const Checkout = () => {
         return
       }
 
-      const result = await redirectToCheckout(plan)
+      const result = await redirectToCheckout(plan, session)
+
+      if (result.authRequired) {
+        // Redirect to login with return URL
+        navigate(
+          `/login?returnTo=${encodeURIComponent(`/checkout?plan=${plan}`)}`
+        )
+        return
+      }
 
       if (result.error) {
         setError(

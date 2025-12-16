@@ -1,6 +1,6 @@
 import Stripe from 'stripe'
 import { getResendClient } from '../_lib/email.js'
-import { saveStripeEvent } from '../_lib/supabase.js'
+import { saveStripeEvent, getSupabaseClient } from '../_lib/supabase.js'
 
 // Lazy initialization of Stripe to handle missing environment variables
 let stripe = null
@@ -61,6 +61,127 @@ function getStripeClient() {
     stripe = new Stripe(secretKey)
   }
   return stripe
+}
+
+/**
+ * Sync subscription data to orgs table in Supabase
+ * @param {Object} subscription - Stripe subscription object
+ * @param {string} eventType - Stripe event type (for logging)
+ * @returns {Promise<{success: boolean, error?: string}>}
+ */
+async function syncSubscriptionToOrg(subscription, eventType) {
+  const supabase = getSupabaseClient()
+  const orgId = subscription.metadata?.org_id
+
+  if (!orgId) {
+    console.warn('No org_id in subscription metadata', {
+      subscriptionId: subscription.id,
+      eventType,
+    })
+    return { success: false, error: 'Missing org_id in subscription metadata' }
+  }
+
+  // Derive plan from metadata (set during checkout)
+  const plan = subscription.metadata?.planName || 'starter'
+
+  // Map Stripe subscription status to our status
+  const statusMap = {
+    active: 'active',
+    trialing: 'trialing',
+    past_due: 'past_due',
+    canceled: 'canceled',
+    unpaid: 'unpaid',
+    incomplete: 'incomplete',
+    incomplete_expired: 'canceled',
+    paused: 'past_due',
+  }
+  const subscriptionStatus = statusMap[subscription.status] || 'incomplete'
+
+  try {
+    const { error } = await supabase.from('orgs').upsert(
+      {
+        id: orgId,
+        plan,
+        subscription_status: subscriptionStatus,
+        stripe_customer_id: subscription.customer,
+        stripe_subscription_id: subscription.id,
+        updated_at: new Date().toISOString(),
+      },
+      {
+        onConflict: 'id',
+      }
+    )
+
+    if (error) {
+      console.error('Failed to sync subscription to org', {
+        error: error.message,
+        orgId,
+        subscriptionId: subscription.id,
+        eventType,
+      })
+      return { success: false, error: error.message }
+    }
+
+    console.log('Successfully synced subscription to org', {
+      orgId,
+      subscriptionId: subscription.id,
+      status: subscriptionStatus,
+      plan,
+      eventType,
+    })
+
+    return { success: true }
+  } catch (err) {
+    console.error('Exception syncing subscription to org', err)
+    return { success: false, error: err.message }
+  }
+}
+
+/**
+ * Handle subscription deletion - mark org as canceled
+ * @param {Object} subscription - Stripe subscription object
+ * @returns {Promise<{success: boolean, error?: string}>}
+ */
+async function handleSubscriptionDeleted(subscription) {
+  const supabase = getSupabaseClient()
+  const orgId = subscription.metadata?.org_id
+
+  if (!orgId) {
+    console.warn('No org_id in deleted subscription metadata', {
+      subscriptionId: subscription.id,
+    })
+    return { success: false, error: 'Missing org_id' }
+  }
+
+  try {
+    const { error } = await supabase
+      .from('orgs')
+      .update({
+        subscription_status: 'canceled',
+        stripe_subscription_id: null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', orgId)
+
+    if (error) {
+      console.error('Failed to mark org as canceled', {
+        error: error.message,
+        orgId,
+        subscriptionId: subscription.id,
+      })
+      return { success: false, error: error.message }
+    }
+
+    console.log('Successfully marked org as canceled', {
+      orgId,
+      subscriptionId: subscription.id,
+    })
+
+    return { success: true }
+  } catch (err) {
+    console.error('Exception marking org as canceled', err)
+    return { success: false, error: err.message }
+  }
 }
 
 export default async function handler(req, res) {
@@ -133,6 +254,19 @@ export default async function handler(req, res) {
         console.log('Customer email:', session.customer_email)
         console.log('Payment status:', session.payment_status)
 
+        // If session has a subscription, sync it to orgs table
+        if (session.subscription) {
+          const stripeClient = getStripeClient()
+          try {
+            const subscription = await stripeClient.subscriptions.retrieve(
+              session.subscription
+            )
+            await syncSubscriptionToOrg(subscription, event.type)
+          } catch (subErr) {
+            console.error('Failed to retrieve subscription for sync', subErr)
+          }
+        }
+
         await sendStripeEmail(
           'Checkout session completed',
           `Session ${session.id} for ${session.customer_email || 'unknown'}`
@@ -169,18 +303,23 @@ export default async function handler(req, res) {
         console.log('Subscription event:', event.type, subscription.id)
         console.log('Status:', subscription.status)
 
+        // Sync subscription to orgs table
+        await syncSubscriptionToOrg(subscription, event.type)
+
         await sendStripeEmail(
-  } catch (error) {
-    console.error('Error processing webhook:', error)
-    // Remove from in-memory cache so retries can reprocess
-    processedEvents.delete(event.id)
-    res.status(500).json({ error: 'Webhook processing failed' })
-  }
+          `Subscription ${event.type}`,
+          `Subscription ${subscription.id} status: ${subscription.status}`
+        )
+
+        break
       }
 
       case 'customer.subscription.deleted': {
         const subscription = event.data.object
         console.log('Subscription cancelled:', subscription.id)
+
+        // Mark org as canceled
+        await handleSubscriptionDeleted(subscription)
 
         await sendStripeEmail(
           'Subscription cancelled',
@@ -219,7 +358,9 @@ export default async function handler(req, res) {
     res.json({ received: true, type: event.type })
   } catch (error) {
     console.error('Error processing webhook:', error)
-    res.status(500).json({ error: 'Webhook processing failed' })
+    // Remove from in-memory cache so retries can reprocess
+    processedEvents.delete(event.id)
+    return res.status(500).json({ error: 'Webhook processing failed' })
   }
 }
 

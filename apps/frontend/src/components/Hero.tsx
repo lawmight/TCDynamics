@@ -1,15 +1,21 @@
 import {
+  AlertCircle,
   ArrowRight,
   CheckCircle,
   Cpu,
   Database,
   Network,
+  Pause,
   Play,
+  RefreshCw,
   Shield,
 } from 'lucide-react'
+import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import heroAutomation from '@/assets/hero-automation.jpg'
+import heroAutomationVideo from '@/assets/hero-automation-video.mp4'
+import heroAutomationPoster from '@/assets/hero-automation.jpg'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 
 const Hero = () => {
@@ -17,6 +23,10 @@ const Hero = () => {
   const demoLink = import.meta.env.VITE_DEMO_URL || '/demo'
   const contactLink = '/#contact'
   const securityLink = '/security'
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [isPlaying, setIsPlaying] = useState(true)
+  const [videoError, setVideoError] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const goTo = (target: string) => {
     if (target.startsWith('http')) {
@@ -24,6 +34,29 @@ const Hero = () => {
       return
     }
     navigate(target)
+  }
+
+  const togglePlayPause = async () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause()
+        setIsPlaying(false)
+      } else {
+        try {
+          await videoRef.current.play()
+          setIsPlaying(true)
+        } catch (error) {
+          console.error('Playback failed:', error)
+          // Keep isPlaying as false since play failed
+        }
+      }
+    }
+  }
+
+  const handleRetry = () => {
+    setVideoError(false)
+    setErrorMessage(null)
+    videoRef.current?.load()
   }
 
   return (
@@ -184,7 +217,7 @@ const Hero = () => {
                 <div className="flex items-center gap-2">
                   <span className="h-2 w-2 animate-pulse rounded-full bg-primary"></span>
                   <p className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
-                    Aperçu produit (remplacez par capture/vidéo)
+                    Démonstration en direct
                   </p>
                 </div>
                 <Button
@@ -197,24 +230,113 @@ const Hero = () => {
                 </Button>
               </div>
               <div className="relative">
-                <img
-                  src={heroAutomation}
-                  alt="Aperçu produit WorkFlowAI"
-                  className="h-auto w-full object-cover"
-                  loading="eager"
-                  decoding="async"
-                  fetchPriority="high"
-                />
-                <div className="absolute inset-0 bg-gradient-to-tr from-background/40 via-transparent to-background/10"></div>
-                <div className="absolute bottom-4 left-4 rounded-lg border border-border/60 bg-background/70 px-4 py-3 shadow-lg backdrop-blur">
-                  <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
-                    <Network size={14} />
-                    Workflow en direct
+                {videoError ? (
+                  <div className="flex min-h-[400px] items-center justify-center p-8">
+                    <Alert
+                      variant="destructive"
+                      className="w-full max-w-md border-destructive/50 bg-destructive/10"
+                    >
+                      <AlertCircle className="h-5 w-5 text-destructive" />
+                      <AlertTitle className="font-mono text-base font-semibold">
+                        Erreur de chargement
+                      </AlertTitle>
+                      <AlertDescription className="mt-2 space-y-4">
+                        <p className="text-sm">
+                          La vidéo de démonstration n'a pas pu être chargée.
+                        </p>
+                        {errorMessage && (
+                          <p className="text-xs text-muted-foreground">
+                            {errorMessage}
+                          </p>
+                        )}
+                        <p className="text-xs text-muted-foreground">
+                          Veuillez vérifier votre connexion ou réessayer plus
+                          tard.
+                        </p>
+                        <Button
+                          type="button"
+                          variant="default"
+                          size="sm"
+                          onClick={handleRetry}
+                          aria-label="Réessayer de charger la vidéo"
+                          className="mt-2 font-mono"
+                        >
+                          <RefreshCw size={16} aria-hidden="true" />
+                          Réessayer
+                        </Button>
+                      </AlertDescription>
+                    </Alert>
                   </div>
-                  <p className="text-sm font-semibold text-foreground">
-                    Extraction + réponses IA orchestrées
-                  </p>
-                </div>
+                ) : (
+                  <>
+                    <video
+                      ref={videoRef}
+                      src={heroAutomationVideo}
+                      aria-label="Démonstration en direct de l'automatisation des workflows avec l'IA"
+                      poster={heroAutomationPoster}
+                      controls
+                      preload="metadata"
+                      autoPlay
+                      muted
+                      playsInline
+                      onPlay={() => setIsPlaying(true)}
+                      onPause={() => setIsPlaying(false)}
+                      onError={e => {
+                        const error = e.currentTarget.error
+                        const message =
+                          error?.message || 'Erreur de chargement de la vidéo'
+                        setVideoError(true)
+                        setErrorMessage(message)
+                      }}
+                      className="h-auto w-full object-cover"
+                    >
+                      Votre navigateur ne supporte pas la lecture de vidéos.
+                    </video>
+                    <div className="absolute inset-0 bg-gradient-to-tr from-background/40 via-transparent to-background/10"></div>
+                    {/* Accessible Pause/Play Control Overlay */}
+                    <div className="absolute right-4 top-4 z-20">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={togglePlayPause}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault()
+                            togglePlayPause()
+                          }
+                        }}
+                        aria-label={
+                          isPlaying
+                            ? 'Mettre en pause la vidéo de démonstration'
+                            : 'Reprendre la lecture de la vidéo de démonstration'
+                        }
+                        className="flex items-center gap-2 bg-background/90 shadow-lg backdrop-blur-sm hover:bg-background/95 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                      >
+                        {isPlaying ? (
+                          <>
+                            <Pause size={16} aria-hidden="true" />
+                            <span className="font-mono text-xs">Pause</span>
+                          </>
+                        ) : (
+                          <>
+                            <Play size={16} aria-hidden="true" />
+                            <span className="font-mono text-xs">Play</span>
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    <div className="absolute bottom-4 left-4 rounded-lg border border-border/60 bg-background/70 px-4 py-3 shadow-lg backdrop-blur">
+                      <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
+                        <Network size={14} />
+                        Workflow en direct
+                      </div>
+                      <p className="text-sm font-semibold text-foreground">
+                        Extraction + réponses IA orchestrées
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
