@@ -88,7 +88,19 @@
     }
   ],
   "functions": {
-    "api/**/*.js": {
+    "api/*.js": {
+      "maxDuration": 10,
+      "memory": 1024
+    },
+    "api/stripe/*.js": {
+      "maxDuration": 10,
+      "memory": 1024
+    },
+    "api/stripe/**/*.js": {
+      "maxDuration": 10,
+      "memory": 1024
+    },
+    "api/app/*.js": {
       "maxDuration": 10,
       "memory": 1024
     }
