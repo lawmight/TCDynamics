@@ -1,7 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "npm install && cd apps/frontend && npm run build",
-  "outputDirectory": "apps/frontend/dist",
+  "rootDirectory": "apps/frontend",
+  "buildCommand": "npm install && npm run build",
+  "outputDirectory": "dist",
   "framework": "vite",
   "headers": [
     {
