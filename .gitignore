@@ -81,3 +81,4 @@ out/
 
 # Local documentation (keep local, don't push to GitHub)
 md/
+.env*.local
