@@ -27,6 +27,7 @@ const Hero = () => {
   const [isPlaying, setIsPlaying] = useState(true)
   const [videoError, setVideoError] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [videoReady, setVideoReady] = useState(false)
 
   const goTo = (target: string) => {
     if (target.startsWith('http')) {
@@ -273,12 +274,13 @@ const Hero = () => {
                       ref={videoRef}
                       src={heroAutomationVideo}
                       aria-label="Démonstration en direct de l'automatisation des workflows avec l'IA"
-                      poster={heroAutomationPoster}
+                      poster={videoReady ? undefined : heroAutomationPoster}
                       controls
                       preload="metadata"
                       autoPlay
                       muted
                       playsInline
+                      onLoadedMetadata={() => setVideoReady(true)}
                       onPlay={() => setIsPlaying(true)}
                       onPause={() => setIsPlaying(false)}
                       onError={e => {
@@ -326,7 +328,7 @@ const Hero = () => {
                         )}
                       </Button>
                     </div>
-                    <div className="absolute bottom-4 left-4 rounded-lg border border-border/60 bg-background/70 px-4 py-3 shadow-lg backdrop-blur">
+                    <div className="absolute bottom-4 left-4 z-50 rounded-lg border border-border/60 bg-background/70 px-4 py-3 shadow-lg backdrop-blur">
                       <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
                         <Network size={14} />
                         Workflow en direct
