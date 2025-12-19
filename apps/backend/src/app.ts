@@ -4,12 +4,13 @@
  */
 
 import express, { Express } from 'express'
-import { loadEnvironment, validateEnvironment } from './config/environment'
 import { initializeDatabase } from './config/database'
+import { loadEnvironment, validateEnvironment } from './config/environment'
 import {
-  configureMiddleware,
   configureErrorHandling,
+  configureMiddleware,
 } from './config/middleware'
+import stripeRoutes from './routes/stripe'
 import { initializeEmailService } from './services/email.service'
 import { initializeStripeService } from './services/stripe.service'
 
@@ -17,7 +18,6 @@ import { initializeStripeService } from './services/stripe.service'
 const contactRoutes = require('./routes/contact')
 const demoRoutes = require('./routes/demo')
 const monitoringModule = require('./routes/monitoring')
-const stripeRoutes = require('./routes/stripe')
 const rumRoutes = require('./routes/rum')
 const feedbackRoutes = require('./routes/feedback')
 

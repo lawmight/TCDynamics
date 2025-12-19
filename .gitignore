@@ -80,4 +80,4 @@ out/
 .vercel
 
 # Local documentation (keep local, don't push to GitHub)
-md/
+

@@ -27,6 +27,8 @@ const Hero = () => {
   const [isPlaying, setIsPlaying] = useState(true)
   const [videoError, setVideoError] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [isVideoHovered, setIsVideoHovered] = useState(false)
+  const [isVideoEnded, setIsVideoEnded] = useState(false)
 
   const goTo = (target: string) => {
     if (target.startsWith('http')) {
@@ -229,7 +231,11 @@ const Hero = () => {
                   Voir la démo
                 </Button>
               </div>
-              <div className="relative">
+              <div
+                className="relative"
+                onMouseEnter={() => setIsVideoHovered(true)}
+                onMouseLeave={() => setIsVideoHovered(false)}
+              >
                 {videoError ? (
                   <div className="flex min-h-[400px] items-center justify-center p-8">
                     <Alert
@@ -279,8 +285,12 @@ const Hero = () => {
                       autoPlay
                       muted
                       playsInline
-                      onPlay={() => setIsPlaying(true)}
+                      onPlay={() => {
+                        setIsPlaying(true)
+                        setIsVideoEnded(false)
+                      }}
                       onPause={() => setIsPlaying(false)}
+                      onEnded={() => setIsVideoEnded(true)}
                       onError={e => {
                         const error = e.currentTarget.error
                         const message =
@@ -326,7 +336,13 @@ const Hero = () => {
                         )}
                       </Button>
                     </div>
-                    <div className="absolute bottom-4 left-4 rounded-lg border border-border/60 bg-background/70 px-4 py-3 shadow-lg backdrop-blur">
+                    <div
+                      className={`absolute bottom-4 left-4 rounded-lg border border-border/60 bg-background/70 px-4 py-3 shadow-lg backdrop-blur transition-opacity duration-200 ${
+                        isVideoHovered || !isPlaying || isVideoEnded
+                          ? 'pointer-events-none opacity-0'
+                          : 'opacity-100'
+                      }`}
+                    >
                       <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
                         <Network size={14} />
                         Workflow en direct
