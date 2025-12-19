@@ -21,7 +21,7 @@ export const sendVertexChat = async ({
   sessionId: string
   temperature?: number
 }): Promise<VertexChatResponse> => {
-  const res = await fetch('/api/vertex-chat', {
+  const res = await fetch('/api/vertex?action=chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ messages, sessionId, temperature }),
@@ -36,7 +36,7 @@ export const sendVertexChat = async ({
 }
 
 export const embedText = async (text: string): Promise<number[]> => {
-  const res = await fetch('/api/vertex-embed', {
+  const res = await fetch('/api/vertex?action=embed', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ text }),

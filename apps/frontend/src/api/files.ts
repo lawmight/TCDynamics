@@ -18,7 +18,7 @@ type UploadPayload = {
 export const uploadKnowledgeFile = async (
   payload: UploadPayload
 ): Promise<{ success: boolean; path?: string; summary?: string }> => {
-  const res = await fetch('/api/files-upload', {
+  const res = await fetch('/api/files', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -33,7 +33,7 @@ export const uploadKnowledgeFile = async (
 }
 
 export const listKnowledgeFiles = async (): Promise<KnowledgeFile[]> => {
-  const res = await fetch('/api/files-list')
+  const res = await fetch('/api/files')
   if (!res.ok) {
     const errorText = await res.text()
     throw new Error(errorText || 'Listing failed')
