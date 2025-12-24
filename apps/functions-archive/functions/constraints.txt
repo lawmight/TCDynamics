@@ -2,12 +2,14 @@
 # These versions are known to work together
 
 # Core Azure Functions runtime
-azure-functions>=1.18.0
+azure-functions>=1.18.0,<2.0.0
 
 # Azure SDK - compatible with azure-functions>=1.18.0
 azure-core>=1.30.0,<2.0.0
 azure-cosmos==4.5.1
-azure-ai-vision-imageanalysis==1.0.0b2
+# Note: Azure Computer Vision - Image Analysis API will be retired on September 25, 2028
+# Migration recommended by September 2026. See docs/azure-vision-migration.md for tracking.
+azure-ai-vision-imageanalysis==1.0.0
 
 # OpenAI - pinned to avoid breaking changes
 openai>=1.35.0,<2.0.0
