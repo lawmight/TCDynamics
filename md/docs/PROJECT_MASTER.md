@@ -1,12 +1,14 @@
 # 🎯 TCDynamics Master Status - Single Source of Truth
 
-**Last Updated**: November 23, 2025  
+**Last Updated**: December 20, 2025
 **Status**: 🟢 Production Live | 🟡 Customer Feedback Instrumentation Live (metrics pending) | 🟡 Stripe Not Production-Ready
+
+**Azure Functions Verification** (December 20, 2025): Verified as archived and inactive based on codebase evidence: directory renamed to `apps/functions-archive/`, CI/CD workflows only deploy to Vercel (no Azure deployment), frontend defaults to Vercel API routes, and archive README confirms December 2025 archiving. No active Azure Function App deployment detected in codebase or CI/CD pipelines.
 
 ---
 
 > **AUTHORITATIVE SOURCE**: This is the single source of truth for TCDynamics project status.
-> All other documentation should reference this document. Last verified: November 23, 2025
+> All other documentation should reference this document. Last verified: December 20, 2025
 
 ## 🚨 CRITICAL: Documentation Inconsistencies Resolved
 
@@ -14,9 +16,9 @@ This document serves as the definitive reference for TCDynamics project status. 
 
 ### Key Corrections Made:
 
-- **Azure Functions**: Confirmed deployed and operational (not removed as claimed in WHAT_CHANGED.md)
+- **Azure Functions**: Archived to `apps/functions-archive/` (December 2025) - see archive README for restoration
 - **Stripe Integration**: Fully implemented and working locally (not removed as claimed in WHAT_CHANGED.md)
-- **Architecture**: Hybrid system (React + Node.js + Azure Functions) actively maintained
+- **Architecture**: Serverless system (React + Vercel serverless functions) - Azure Functions archived
 - **Hosting Migration**: Migrated from OVHcloud to Vercel during Week 5-6 (November 2025) for improved developer experience and serverless architecture
 
 ---
@@ -25,13 +27,14 @@ This document serves as the definitive reference for TCDynamics project status. 
 
 ### Production Status: 🟢 OPERATIONAL
 
-| Component       | Status  | Location                                     | Health     |
-| --------------- | ------- | -------------------------------------------- | ---------- |
-| **Frontend**    | ✅ Live | Vercel (https://tcdynamics.fr)               | 🟢 Healthy |
-| **API Routes**  | ✅ Live | Vercel Serverless Functions (`/api/**/*.js`) | 🟢 Healthy |
-| **AI Services** | ✅ Live | Azure Functions                              | 🟢 Healthy |
-| **Database**    | ✅ Live | Supabase (feedback) + Cosmos DB (documents)  | 🟢 Healthy |
-| **Email**       | ✅ Live | Zoho Mail                                    | 🟢 Healthy |
+| Component           | Status                                     | Location                                     | Health      |
+| ------------------- | ------------------------------------------ | -------------------------------------------- | ----------- |
+| **Frontend**        | ✅ Live                                    | Vercel (https://tcdynamics.fr)               | 🟢 Healthy  |
+| **API Routes**      | ✅ Live                                    | Vercel Serverless Functions (`/api/**/*.js`) | 🟢 Healthy  |
+| **AI Services**     | ✅ Live                                    | Vercel Serverless Functions                  | 🟢 Healthy  |
+| **Database**        | ✅ Live                                    | Supabase (feedback) + Cosmos DB (documents)  | 🟢 Healthy  |
+| **Email**           | ✅ Live                                    | Zoho Mail                                    | 🟢 Healthy  |
+| **Azure Functions** | 📦 Archived — inactive, kept for reference | `apps/functions-archive/` (Dec 2025)         | 📦 Archived |
 
 ### What's Working:
 
@@ -87,15 +90,15 @@ This document serves as the definitive reference for TCDynamics project status. 
 │         │                             │                      │
 │         ▼                             ▼                      │
 │  ┌──────────────────────────────────────────────┐          │
-│  │         Azure Functions (Python 3.11)         │          │
-│  │  • AI Chat (Azure OpenAI)                    │          │
-│  │  • Vision API (Document Processing)          │          │
+│  │    All API endpoints via Vercel Serverless    │          │
+│  │  • AI Chat (via /api/chat)                   │          │
+│  │  • Vision API (via /api/vision)             │          │
 │  └──────────────────────────────────────────────┘          │
 │                                                               │
 │  Deployment:                                                  │
 │  • Frontend → Vercel (https://tcdynamics.fr)                │
 │  • API Routes → Vercel Serverless Functions (`/api/**/*.js`)│
-│  • AI Functions → Azure (func-tcdynamics-contact)          │
+│  • Azure Functions → Archived (apps/functions-archive/)     │
 │  • Express Backend (`apps/backend`) → Local dev only        │
 │                                                               │
 └─────────────────────────────────────────────────────────────┘
@@ -134,18 +137,20 @@ This document serves as the definitive reference for TCDynamics project status. 
 
 #### AI & Azure Services
 
-- **Azure Functions**: Python 3.11 (serverless AI processing)
-- **Azure OpenAI**: GPT models for chatbots
-- **Azure Computer Vision**: Document processing (99.7% accuracy)
-- **Cosmos DB**: NoSQL database for documents
-- **Azure Storage**: File storage
+- **Azure Functions**: Archived — inactive, kept for reference. Located in `apps/functions-archive/` (archived December 2025)
+- **Vercel Serverless Functions**: Handle all AI endpoints (chat, vision) via `/api/chat` and `/api/vision`
+- **Azure OpenAI**: GPT models for chatbots (accessed via Vercel functions)
+- **Azure Computer Vision**: Document processing (99.7% accuracy, accessed via Vercel functions)
+- **Cosmos DB**: NoSQL database for documents (if needed, can be accessed via Vercel functions)
+- **Azure Storage**: File storage (if needed)
 
 #### DevOps & Infrastructure
 
-- **Hosting**: Vercel (frontend + API serverless functions), Azure Functions (AI services)
+- **Hosting**: Vercel (frontend + API serverless functions)
 - **API Architecture**: Vercel serverless functions (`/api/**/*.js`) handle contact, demo, chat, vision, health, and Stripe endpoints
 - **Express Backend**: `apps/backend` is a traditional Express server used for local development only, not deployed to production
-- **CI/CD**: Vercel auto-deploy (GitHub integration) + GitHub Actions for Azure Functions
+- **CI/CD**: Vercel auto-deploy (GitHub integration)
+- **Azure Functions**: Archived (see `apps/functions-archive/` for restoration)
 - **Containerization**: Docker support (local development)
 
 ---
@@ -241,19 +246,19 @@ This document serves as the definitive reference for TCDynamics project status. 
 
 ### WHAT_CHANGED.md Claims vs Reality
 
-| Document               | Claimed                             | Reality                                   | Status           |
-| ---------------------- | ----------------------------------- | ----------------------------------------- | ---------------- |
-| **Azure Functions**    | Removed, simplified to Node.js only | Deployed and operational                  | ❌ **INCORRECT** |
-| **Stripe Integration** | Removed, not needed for MVP         | Fully implemented, working locally        | ❌ **INCORRECT** |
-| **Architecture**       | Node.js + React only                | Hybrid: React + Node.js + Azure Functions | ❌ **INCORRECT** |
-| **Deployment**         | FileZilla + PM2 only                | Vercel + Azure Functions                  | ❌ **INCORRECT** |
+| Document               | Claimed                             | Reality                                                         | Status           |
+| ---------------------- | ----------------------------------- | --------------------------------------------------------------- | ---------------- |
+| **Azure Functions**    | Removed, simplified to Node.js only | Archived — inactive, kept for reference                         | ✅ **CORRECT**   |
+| **Stripe Integration** | Removed, not needed for MVP         | Fully implemented, working locally                              | ❌ **INCORRECT** |
+| **Architecture**       | Node.js + React only                | Serverless: React + Vercel Functions (Azure Functions archived) | ✅ **CORRECT**   |
+| **Deployment**         | FileZilla + PM2 only                | Vercel (Azure Functions archived)                               | ✅ **CORRECT**   |
 
 ### Why This Matters:
 
-- WHAT_CHANGED.md was written as if a major simplification occurred
-- In reality, the hybrid architecture was maintained and is working
-- This caused confusion about current capabilities
-- **Result**: WHAT_CHANGED.md archived as outdated/incorrect
+- WHAT_CHANGED.md correctly stated that Azure Functions were removed/archived (December 2025)
+- However, WHAT_CHANGED.md incorrectly claimed Stripe integration was removed (it's fully implemented, just needs production setup)
+- The architecture simplification did occur (Azure Functions → Vercel serverless functions)
+- **Result**: WHAT_CHANGED.md partially correct; archived due to Stripe claim inaccuracy
 
 ---
 
