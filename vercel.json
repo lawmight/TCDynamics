@@ -3,7 +3,6 @@
   "version": 2,
   "buildCommand": "npm install && npm run -w tcdynamics-frontend build",
   "outputDirectory": "apps/frontend/dist",
-  "rootDirectory": "apps/frontend",
   "framework": "vite",
   "cleanUrls": true,
   "trailingSlash": false,
