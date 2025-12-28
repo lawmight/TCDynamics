@@ -86,7 +86,7 @@ export const Captcha = forwardRef<CaptchaHandle, CaptchaProps>(
       return () => {
         script.onload = null
       }
-    }, [onToken])
+    }, [onToken, onError])
 
     // Render widget when ready
     useEffect(() => {
@@ -119,7 +119,7 @@ export const Captcha = forwardRef<CaptchaHandle, CaptchaProps>(
         }
         widgetIdRef.current = null
       }
-    }, [scriptLoaded, action, onToken])
+    }, [scriptLoaded, action, onToken, onError])
 
     if (!TURNSTILE_SITE_KEY) {
       return null
