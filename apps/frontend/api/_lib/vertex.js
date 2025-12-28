@@ -40,7 +40,7 @@ export const getAuthClient = async () => {
 
 export const getProjectConfig = () => {
   const projectId = process.env.VERTEX_PROJECT_ID
-  const location = process.env.VERTEX_LOCATION || 'europe-west1'
+  const location = process.env.VERTEX_LOCATION || 'global'
   const model = process.env.VERTEX_MODEL || 'gemini-3-flash-preview'
   const embedModel = process.env.VERTEX_EMBED_MODEL || 'text-embedding-005'
 
@@ -55,7 +55,10 @@ export const generateText = async ({ messages, temperature = 0.4 }) => {
   const client = await getAuthClient()
   const { projectId, location, model } = getProjectConfig()
 
-  const url = `https://${location}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/${model}:generateContent`
+  // For global region, use us-central1 endpoint but global location
+  const endpoint = location === 'global' ? 'us-central1' : location
+  const pathLocation = location === 'global' ? 'global' : location
+  const url = `https://${endpoint}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${pathLocation}/publishers/google/models/${model}:generateContent`
 
   const toSafeText = value => {
     if (value === undefined || value === null) return ''
@@ -193,7 +196,10 @@ export const embedText = async text => {
   const client = await getAuthClient()
   const { projectId, location, embedModel } = getProjectConfig()
 
-  const url = `https://${location}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/${embedModel}:predict`
+  // For global region, use us-central1 endpoint but global location
+  const endpoint = location === 'global' ? 'us-central1' : location
+  const pathLocation = location === 'global' ? 'global' : location
+  const url = `https://${endpoint}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${pathLocation}/publishers/google/models/${embedModel}:predict`
 
   const response = await client.request({
     url,
