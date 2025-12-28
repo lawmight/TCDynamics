@@ -493,7 +493,7 @@ export const paymentAPI = {
   ): Promise<ApiResponse<PaymentIntentResponse>> {
     try {
       const response = await apiRequest<ApiResponse<PaymentIntentResponse>>(
-        '/create-payment-intent',
+        '/api/payments?action=payment-intent',
         {
           method: 'POST',
           body: JSON.stringify(request),
@@ -518,7 +518,7 @@ export const paymentAPI = {
   ): Promise<ApiResponse<SubscriptionResponse>> {
     try {
       const response = await apiRequest<ApiResponse<SubscriptionResponse>>(
-        '/create-subscription',
+        '/api/payments?action=subscription',
         {
           method: 'POST',
           body: JSON.stringify(request),
@@ -670,7 +670,7 @@ export const healthAPI = {
         status: string
         uptime: number
         timestamp: string
-      }>('/health', {
+      }>('/api/analytics?health=true', {
         method: 'GET',
       })
 

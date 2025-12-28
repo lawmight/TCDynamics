@@ -5,11 +5,11 @@ export const API_ENDPOINTS = {
   // All endpoints now use Vercel serverless functions (relative URLs)
   contact: `/api/contactform`,
   demo: `/api/demoform`,
-  health: `/api/health`,
+  health: `/api/analytics?health=true`,
   chat: `/api/chat`,
   vision: `/api/vision`,
-  paymentIntent: `/api/create-payment-intent`,
-  subscription: `/api/create-subscription`,
+  paymentIntent: `/api/payments?action=payment-intent`,
+  subscription: `/api/payments?action=subscription`,
 }
 
 export interface ApiResponse {
