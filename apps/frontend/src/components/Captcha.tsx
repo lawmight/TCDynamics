@@ -11,6 +11,7 @@ const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY
 type CaptchaProps = {
   onToken: (token?: string) => void
   action?: string
+  onError?: (error: Error) => void
 }
 
 export type CaptchaHandle = {
@@ -42,7 +43,7 @@ declare global {
  * Renders only when VITE_TURNSTILE_SITE_KEY is provided.
  */
 export const Captcha = forwardRef<CaptchaHandle, CaptchaProps>(
-  ({ onToken, action }, ref) => {
+  ({ onToken, action, onError }, ref) => {
     const containerRef = useRef<HTMLDivElement | null>(null)
     const widgetIdRef = useRef<string | null>(null)
     const [scriptLoaded, setScriptLoaded] = useState(false)
@@ -72,7 +73,12 @@ export const Captcha = forwardRef<CaptchaHandle, CaptchaProps>(
       script.crossOrigin = 'anonymous' // CSP compliance: ensure CORS is handled properly
       script.onload = () => setScriptLoaded(true)
       script.onerror = () => {
-        console.error('Failed to load Turnstile script')
+        const error = new Error('Failed to load Turnstile script from Cloudflare CDN')
+        if (onError) {
+          onError(error)
+        } else {
+          console.error('Turnstile script loading error:', error.message)
+        }
         onToken(undefined)
       }
       document.head.appendChild(script)
@@ -96,7 +102,14 @@ export const Captcha = forwardRef<CaptchaHandle, CaptchaProps>(
         })
         widgetIdRef.current = renderedId ?? null
       } catch (error) {
-        console.error('Turnstile render failed', error)
+        const renderError = error instanceof Error
+          ? error
+          : new Error('Turnstile widget render failed with unknown error')
+        if (onError) {
+          onError(renderError)
+        } else {
+          console.error('Turnstile render error:', renderError.message, error)
+        }
         onToken(undefined)
       }
 

@@ -1,0 +1,11 @@
+{
+  "excludedAuthors": [
+    "dependabot[bot]",
+    "renovate[bot]"
+  ],
+  "customRules": {
+    "enforceTypeSafety": true,
+    "preferAsyncAwait": true,
+    "requireErrorHandling": true
+  }
+}
