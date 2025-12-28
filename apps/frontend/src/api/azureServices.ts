@@ -394,10 +394,10 @@ async function apiRequest<T>(
       throw new ApiError('Request timeout', 408)
     }
 
-    throw new ApiError(
-      error instanceof Error ? error.message : 'Unknown error occurred',
-      0
-    )
+    const errorMessage = error instanceof Error
+      ? `Network error: ${error.message}`
+      : 'Unknown error occurred'
+    throw new ApiError(errorMessage, 0, error)
   }
 }
 
