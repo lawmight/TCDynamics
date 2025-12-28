@@ -3,36 +3,95 @@ name: 'Deploy MVP to Vercel'
 on:
   push:
     branches: [main]
+    paths:
+      - 'apps/frontend/**'
+      - 'api/**'
+      - '.github/workflows/deploy-mvp.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        type: choice
+        options:
+          - production
+          - staging
+        default: 'production'
+      force:
+        description: 'Force deployment even if quality gate fails'
+        required: false
+        type: boolean
+        default: false
+      confirm_production_force:
+        description: 'Type "FORCE_PRODUCTION_DEPLOY" to confirm forced production deployment (required if force=true and environment=production)'
+        required: false
+        type: string
 
 jobs:
   # Run quality gate first
   quality-gate:
     uses: ./.github/workflows/quality-gate.yml
 
+  # Validate forced production deployments
+  validate-production-force:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production' && github.event.inputs.force == 'true'
+    steps:
+      - name: Validate production force deployment
+        run: |
+          if [ "${{ github.event.inputs.confirm_production_force }}" != "FORCE_PRODUCTION_DEPLOY" ]; then
+            echo "❌ ERROR: Forced production deployments require explicit confirmation."
+            echo "Please set 'confirm_production_force' input to 'FORCE_PRODUCTION_DEPLOY' to proceed."
+            echo ""
+            echo "This is a safety measure to prevent accidental bypassing of quality gates in production."
+            exit 1
+          fi
+          echo "✅ Production force deployment confirmed"
+  # Manual approval for production forced deploys
+  # Uses GitHub environment protection rules - requires manual approval if configured
+  production-force-approval:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production' && github.event.inputs.force == 'true' && github.event.inputs.confirm_production_force == 'FORCE_PRODUCTION_DEPLOY'
+    environment:
+      name: production
+      # GitHub environment protection rules will require manual approval here if configured
+    steps:
+      - name: Production Force Deployment Approval
+        run: |
+          echo "⚠️  WARNING: This is a FORCED production deployment bypassing quality gates"
+          echo "Environment: ${{ github.event.inputs.environment }}"
+          echo "Force flag: ${{ github.event.inputs.force }}"
+          echo "Confirmation: ${{ github.event.inputs.confirm_production_force }}"
+          echo ""
+          echo "✅ Manual approval granted for forced production deployment"
   deploy:
-    needs: quality-gate
+    needs:
+      - quality-gate
+      - validate-production-force
+      - production-force-approval
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+       needs.quality-gate.result == 'success') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production' && github.event.inputs.force == 'true' &&
+       github.event.inputs.confirm_production_force == 'FORCE_PRODUCTION_DEPLOY' &&
+       (needs.validate-production-force.result == 'success' || needs.validate-production-force.result == 'skipped') &&
+       (needs.production-force-approval.result == 'success' || needs.production-force-approval.result == 'skipped')) ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production' && github.event.inputs.force != 'true' &&
+       needs.quality-gate.result == 'success') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging' &&
+       (github.event.inputs.force == 'true' || needs.quality-gate.result == 'success'))
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Node.js with Caching
+        uses: ./.github/actions/setup-node-cache
+
+      - name: Install Dependencies
+        uses: ./.github/actions/install-dependencies
         with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: |
-            package-lock.json
-            apps/frontend/package-lock.json
-            api/package-lock.json
-
-      # Install root dependencies (needed for serverless functions)
-      - name: Install root dependencies
-        run: npm install
-
-      - name: Install frontend dependencies
-        working-directory: ./apps/frontend
-        run: npm install
+          skip-api: 'false'
 
       # Basic safety check - continue even with warnings
       - name: Lint frontend (non-blocking)
@@ -56,10 +115,41 @@ jobs:
         working-directory: ./apps/frontend
         run: npm run build
 
+      # Push events (null input) default to production deployment; staging only happens via manual input
+      - name: Determine Vercel deployment args
+        id: vercel-args
+        run: |
+          if [ "${{ github.event.inputs.environment }}" == "staging" ]; then
+            echo "args=--prod=false" >> $GITHUB_OUTPUT
+          else
+            echo "args=--prod" >> $GITHUB_OUTPUT
+          fi
+
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./apps/frontend
+          vercel-args: ${{ steps.vercel-args.outputs.args }}
+          working-directory: ./
+        env:
+          VERCEL_ENV: ${{ github.event.inputs.environment || 'production' }}
+
+      - name: Deployment Summary
+        if: always()
+        run: |
+          echo "## Deployment Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          env="${{ github.event.inputs.environment || 'production' }}"
+          echo "- **Environment**: $env" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Quality Gate**: ${{ needs.quality-gate.result }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ github.event.inputs.force }}" == "true" ]; then
+            echo "- **Force Deploy**: Yes ⚠️" >> $GITHUB_STEP_SUMMARY
+            if [ "$env" == "production" ]; then
+              echo "- **Production Force Confirmation**: ${{ github.event.inputs.confirm_production_force }}" >> $GITHUB_STEP_SUMMARY
+              echo "- **Validation**: ${{ needs.validate-production-force.result }}" >> $GITHUB_STEP_SUMMARY
+              echo "- **Manual Approval**: ${{ needs.production-force-approval.result }}" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi

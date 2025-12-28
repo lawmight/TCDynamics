@@ -1,0 +1,64 @@
+name: 'Install Dependencies'
+description: 'Installs root, frontend, and API dependencies'
+
+inputs:
+  skip-root:
+    description: 'Skip root dependencies installation'
+    required: false
+    default: 'false'
+  skip-frontend:
+    description: 'Skip frontend dependencies installation'
+    required: false
+    default: 'false'
+  skip-api:
+    description: 'Skip API dependencies installation'
+    required: false
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Cache root node_modules
+      if: inputs.skip-root != 'true'
+      uses: actions/cache@v4
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - name: Install root dependencies
+      if: inputs.skip-root != 'true'
+      shell: bash
+      run: npm ci
+
+    - name: Cache frontend node_modules
+      if: inputs.skip-frontend != 'true'
+      uses: actions/cache@v4
+      with:
+        path: apps/frontend/node_modules
+        key: ${{ runner.os }}-node-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-frontend-
+
+    - name: Install frontend dependencies
+      if: inputs.skip-frontend != 'true'
+      shell: bash
+      working-directory: ./apps/frontend
+      run: npm ci
+
+    - name: Cache API node_modules
+      if: inputs.skip-api != 'true'
+      uses: actions/cache@v4
+      with:
+        path: api/node_modules
+        key: ${{ runner.os }}-node-api-${{ hashFiles('api/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-api-
+          ${{ runner.os }}-node-api-
+
+    - name: Install API dependencies
+      if: inputs.skip-api != 'true'
+      shell: bash
+      working-directory: ./api
+      run: npm ci

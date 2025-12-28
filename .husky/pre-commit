@@ -1,15 +1,70 @@
-#!/usr/bin/env sh
+#!/bin/sh
 set -e
 # Quick pre-commit checks (fast feedback)
 echo "🔍 Running pre-commit checks..."
 
-# Change to frontend directory (monorepo structure)
+# Get repository root
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
 if [ -z "$REPO_ROOT" ]; then
   echo "❌ Unable to locate repository root. Make sure git is installed and you're inside the repo."
   exit 1
 fi
 
+cd "$REPO_ROOT"
+
+# Check for large files in staged changes (5MB threshold)
+echo "📏 Checking for large files..."
+LARGE_FILES=""
+# Use temporary file to avoid subshell issues with pipes (POSIX-compliant)
+TMPFILE=$(mktemp) || {
+  echo "❌ Failed to create temporary file"
+  exit 1
+}
+trap 'rm -f "$TMPFILE"' EXIT
+
+# Use -z flag to get null-delimited filenames for safe iteration
+git diff --cached --name-only -z 2>/dev/null | while IFS= read -r -d '' file; do
+  if [ -f "$file" ]; then
+    # Use git to get file size (works cross-platform)
+    SIZE=$(git cat-file -s ":$file" 2>/dev/null || echo "0")
+    THRESHOLD=5242880  # 5MB threshold
+    if [ "$SIZE" -gt "$THRESHOLD" ]; then
+      # Format size in MB using awk for POSIX-compliant division
+      SIZE_MB=$(echo "$SIZE" | awk '{printf "%.2f", $1/1048576}')
+      # Append to temporary file using printf for POSIX-compliant newline
+      printf "  - %s (~%sMB)\n" "$file" "$SIZE_MB" >> "$TMPFILE"
+    fi
+  fi
+done
+
+# Read collected output from temporary file
+if [ -s "$TMPFILE" ]; then
+  LARGE_FILES=$(cat "$TMPFILE")
+fi
+rm -f "$TMPFILE"
+trap - EXIT
+
+if [ -n "$LARGE_FILES" ]; then
+  echo "⚠️  WARNING: Large files detected in staged changes (>5MB):"
+  echo "$LARGE_FILES"
+  echo "Consider adding these to .gitignore if they are build artifacts or dependencies."
+  echo ""
+fi
+
+# Check for unexpectedly tracked files that should be ignored
+echo "🔍 Checking for tracked files that should be ignored..."
+TRACKED_IGNORED=$(git ls-files | grep -E "(node_modules|dist|build|\.venv|__pycache__|\.log$|coverage/)" || true)
+if [ -n "$TRACKED_IGNORED" ]; then
+  echo "⚠️  WARNING: Found tracked files that should be in .gitignore:"
+  echo "$TRACKED_IGNORED" | head -10
+  COUNT=$(echo "$TRACKED_IGNORED" | wc -l)
+  if [ "$COUNT" -gt 10 ]; then
+    echo "... and $((COUNT - 10)) more"
+  fi
+  echo "Consider running: git rm --cached <file> to untrack them"
+fi
+
+# Change to frontend directory for remaining checks
 FRONTEND_DIR="$REPO_ROOT/apps/frontend"
 if [ ! -d "$FRONTEND_DIR" ]; then
   echo "❌ Frontend directory not found at $FRONTEND_DIR"

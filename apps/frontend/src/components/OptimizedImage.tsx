@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface OptimizedImageProps {
   src: string
@@ -49,14 +49,17 @@ export const OptimizedImage = ({
   }
 
   return (
-    <div ref={imgRef} className={`relative ${className}`}>
+    <div
+      ref={imgRef}
+      className={`image-placeholder-wrapper relative ${className}`}
+    >
       {!loaded && (
         <div
-          className="animate-pulse rounded bg-gray-300 dark:bg-gray-700"
+          className="image-placeholder animate-pulse rounded bg-gray-300 dark:bg-gray-700"
           style={{
-            width: width || '100%',
-            height: height || 200,
-            aspectRatio: width && height ? `${width}/${height}` : undefined,
+            width: width ? `${width}px` : '100%',
+            height: height ? `${height}px` : 'auto',
+            aspectRatio: width && height ? `${width} / ${height}` : undefined,
           }}
         />
       )}

@@ -3,8 +3,8 @@
  * Verifies API keys for n8n/internal tools
  */
 
-import { getSupabaseClient } from './supabase.js'
 import bcrypt from 'bcryptjs'
+import { getSupabaseClient } from './supabase.js'
 
 /**
  * Verify tenant API key and return org_id
@@ -92,14 +92,3 @@ export default {
   verifyTenantApiKey,
   getOrgEntitlements,
 }
-
-
-
-
-
-
-
-
-
-
-

@@ -2,14 +2,14 @@
 
 AI-powered automation platform for French SMEs.
 
-Hybrid system: Vercel serverless API + React frontend + Azure Functions (Python) for AI/vision. Express backend exists for local dev only.
+Hybrid system: Vercel serverless API + React frontend. Express backend exists for local dev only.
 
 ## Project Structure
 
 - `apps/frontend` — React 18 + Vite; deployed on Vercel (includes `/api` serverless routes copied from root `api/` during CI)
 - `api` — Vercel serverless functions (contact, demo, chat, vision, stripe, health)
-- `apps/functions` — Azure Functions (Python 3.11) for AI chat and vision; `function_app.py` is the active entrypoint
 - `apps/backend` — Express server for local development/testing (not deployed to production)
+- `apps/functions-archive/` — Archived Azure Functions (Python) code (see archive README for details)
 - `tests/e2e` — Playwright e2e tests
 - `docker/` — local docker-compose + nginx config
 
@@ -21,13 +21,12 @@ npm run dev           # runs frontend + backend (local)
 # or per app
 npm run dev:frontend
 npm run dev:backend   # local Express only
-npm run dev:functions # Azure Functions local host
 ```
 
 ## Testing & Linting
 
 ```bash
-npm run test          # frontend + backend + functions
+npm run test          # frontend + backend
 npm run lint          # frontend + backend
 npm run type-check
 ```
@@ -35,10 +34,22 @@ npm run type-check
 ## Deployment
 
 - **Frontend + serverless API**: Vercel
-- **AI/vision**: Azure Functions (`apps/functions/function_app.py`)
 - **Express backend**: local/dev only
 
+**Note**: Azure Functions have been archived to `apps/functions-archive/`. See the archive README for restoration instructions if needed.
+
+**Important**: The archived Azure Functions use `azure-ai-vision-imageanalysis` which depends on Azure Computer Vision - Image Analysis API. This API will be retired on September 25, 2028, with migration recommended by September 2026. See `docs/azure-vision-migration.md` for migration tracking and planning.
+
 ### Vercel Deployment
+
+**Configuration**: Vercel deployment uses a single root-level `vercel.json` configuration file (located at the project root). This is the canonical source for all Vercel settings including:
+
+- Build commands and output directories (configured for monorepo structure)
+- Security headers (including `Cross-Origin-Embedder-Policy: credentialless`; see `docs/coep-header-fix.md` for rationale)
+- Rewrites, redirects, and caching rules
+- Environment variables
+
+**Rationale**: Using a single root config prevents configuration drift, ensures consistency across deployments, and aligns with Vercel's best practices for monorepo deployments. The previous `apps/frontend/vercel.json` has been renamed to `vercel.json.backup` for reference.
 
 For production deployment to Vercel, you have two options:
 

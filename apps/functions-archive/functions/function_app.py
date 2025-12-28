@@ -38,6 +38,7 @@ storage_setting = os.environ.get("AzureWebJobsStorage", "")
 is_local_dev = storage_setting == "UseDevelopmentStorage=true" or not storage_setting
 
 if not is_local_dev:
+
     @app.schedule(schedule="0 */5 * * * *", arg_name="timer", run_on_startup=True)
     def warm_instances(timer: func.TimerRequest) -> None:
         """
@@ -46,19 +47,26 @@ if not is_local_dev:
         Only active in production (not local development).
         """
         logging.info("Warmup timer triggered at %s", datetime.utcnow().isoformat())
+
 else:
-    logging.info("Timer trigger 'warm_instances' disabled for local development (requires Azure Storage)")
+    logging.info(
+        "Timer trigger 'warm_instances' disabled for local development (requires Azure Storage)"
+    )
 
 
 @app.route(route="health", auth_level=func.AuthLevel.ANONYMOUS)
 def health_check(req: func.HttpRequest) -> func.HttpResponse:
     """Health check endpoint"""
+    # Read environment from ENVIRONMENT or PYTHON_ENV, default to "production"
+    environment = os.environ.get("ENVIRONMENT") or os.environ.get(
+        "PYTHON_ENV", "production"
+    )
     return ResponseBuilder.success(
         "healthy",
         {
             "timestamp": datetime.utcnow().isoformat(),
             "python_version": sys.version,
-            "environment": "production",
+            "environment": environment,
         },
     )
 
@@ -93,6 +101,7 @@ def contact_form(req: func.HttpRequest) -> func.HttpResponse:
         if not message_id:
             return ResponseBuilder.error(
                 "Erreur lors de la sauvegarde des données",
+                status_code=500,
                 error_details="Failed to save to Cosmos DB",
             )
 
@@ -109,13 +118,21 @@ ID de référence: {message_id}
 
         email_sent = False
         if client_manager.is_email_configured():
-            email_sent = send_email_smtp(
-                client_manager.zoho_email,
-                client_manager.zoho_password,
-                client_manager.zoho_email,
-                f"Nouveau message de {contact_data['name']}",
-                email_body,
-            )
+            # Read credentials on-demand (not stored as instance attributes)
+            zoho_email = client_manager.get_zoho_email()
+            zoho_password = client_manager.get_zoho_password()
+            if zoho_email and zoho_password:
+                email_sent = send_email_smtp(
+                    zoho_email,
+                    zoho_password,
+                    zoho_email,
+                    f"Nouveau message de {contact_data['name']}",
+                    email_body,
+                )
+                # Clear local variables after use
+                zoho_email = None
+                zoho_password = None
+                del zoho_email, zoho_password
 
         return ResponseBuilder.success(
             "Message envoyé avec succès",
@@ -147,39 +164,7 @@ def demo_form(req: func.HttpRequest) -> func.HttpResponse:
             "email": data.get("email", ""),
             "company": data.get("company", ""),
             "businessNeeds": data.get("businessNeeds", ""),
-            "type": "demo_request",
         }
-
-        # Save to Cosmos DB
-        container = client_manager.get_cosmos_container("demos")
-        message_id = save_to_cosmos(container, demo_data)
-
-        # Send email notification
-        email_body = f"""
-Nouvelle demande de démonstration:
-
-Nom: {demo_data['name']}
-Email: {demo_data['email']}
-Entreprise: {demo_data['company']}
-Besoins: {demo_data['businessNeeds']}
-
-ID de référence: {message_id}
-        """
-
-        email_sent = False
-        if client_manager.is_email_configured():
-            email_sent = send_email_smtp(
-                client_manager.zoho_email,
-                client_manager.zoho_password,
-                client_manager.zoho_email,
-                f"Demande de démo de {demo_data['name']}",
-                email_body,
-            )
-
-        return ResponseBuilder.success(
-            "Demande de démonstration envoyée",
-            {"messageId": message_id, "emailSent": email_sent},
-        )
 
         # Save to Cosmos DB
         container = client_manager.get_cosmos_container("demos")
@@ -188,6 +173,7 @@ ID de référence: {message_id}
         if not message_id:
             return ResponseBuilder.error(
                 "Erreur lors de la sauvegarde des données",
+                status_code=500,
                 error_details="Failed to save to Cosmos DB",
             )
 
@@ -205,89 +191,54 @@ ID de référence: {message_id}
 
         email_sent = False
         if client_manager.is_email_configured():
-            email_sent = send_email_smtp(
-                client_manager.zoho_email,
-                client_manager.zoho_password,
-                client_manager.zoho_email,
-                f"Demande de démo de {demo_data['name']}",
-                email_body,
-            )
+            # Read credentials on-demand (not stored as instance attributes)
+            zoho_email = client_manager.get_zoho_email()
+            zoho_password = client_manager.get_zoho_password()
+            if zoho_email and zoho_password:
+                email_sent = send_email_smtp(
+                    zoho_email,
+                    zoho_password,
+                    zoho_email,
+                    f"Demande de démo de {demo_data['name']}",
+                    email_body,
+                )
+                # Clear local variables after use
+                zoho_email = None
+                zoho_password = None
+                del zoho_email, zoho_password
 
         return ResponseBuilder.success(
             "Demande de démonstration envoyée",
             {"messageId": message_id, "emailSent": email_sent},
         )
 
-        ai_response = response.choices[0].message.content
-
-        # Save conversation to Cosmos DB (if configured)
-        if client_manager.is_cosmos_configured():
-            conversation_data = {
-                "conversationId": conversation_id,
-                "userMessage": message,
-                "aiResponse": ai_response,
-                "timestamp": datetime.utcnow().isoformat(),
-                "type": "chat",
-            }
-            container = client_manager.get_cosmos_container("conversations")
-            save_to_cosmos(container, conversation_data)
-
-        return ResponseBuilder.success(
-            ai_response, {"conversationId": conversation_id}
-        )
-
     except (OSError, ValueError, json.JSONDecodeError) as e:
-        return ResponseBuilder.from_exception(e, "Erreur du service IA")
+        return ResponseBuilder.from_exception(e, "Erreur serveur")
 
 
 @app.route(route="vision", auth_level=func.AuthLevel.ANONYMOUS)
 def ai_vision(req: func.HttpRequest) -> func.HttpResponse:
-    """Handle AI vision requests for document processing"""
+    """Analyze image using Azure Vision AI"""
     try:
         data = req.get_json()
-        image_url = data.get("imageUrl", "").strip()
+        image_url = data.get("imageUrl", "").strip() if data else ""
 
+        # Validate image URL
         if not image_url:
-            return ResponseBuilder.validation_error("URL d'image requise")
+            return ResponseBuilder.validation_error("URL d'image requise", ["imageUrl"])
 
-        # Validate URL format
-        if not validate_url(image_url):
-            return ResponseBuilder.validation_error("URL d'image invalide")
+        error = validate_url(image_url)
+        if error:
+            return ResponseBuilder.validation_error(error)
 
-        # Check Vision configuration
+        # Check Vision client configuration
         if not client_manager.is_vision_configured():
-            return ResponseBuilder.service_unavailable("Vision")
+            return ResponseBuilder.service_unavailable("Vision AI")
 
-        # Analyze image
+        # Get vision client and analyze image
         vision_client = client_manager.get_vision_client()
         result = vision_client.analyze(
-            image_data=None,
-            image_url=image_url,
-            visual_features=[VisualFeatures.CAPTION, VisualFeatures.READ],
-        )
-@app.route(route="vision", auth_level=func.AuthLevel.ANONYMOUS)
-def ai_vision(req: func.HttpRequest) -> func.HttpResponse:
-    """Handle AI vision requests for document processing"""
-    try:
-        data = req.get_json()
-        image_url = data.get("imageUrl", "").strip()
-
-        if not image_url:
-            return ResponseBuilder.validation_error("URL d'image requise")
-
-        # Validate URL format
-        if not validate_url(image_url):
-            return ResponseBuilder.validation_error("URL d'image invalide")
-
-        # Check Vision configuration
-        if not client_manager.is_vision_configured():
-            return ResponseBuilder.service_unavailable("Vision")
-
-        # Analyze image
-        vision_client = client_manager.get_vision_client()
-        result = vision_client.analyze(
-            image_data=None,
-            image_url=image_url,
+            image_url,
             visual_features=[VisualFeatures.CAPTION, VisualFeatures.READ],
         )
 
@@ -310,23 +261,52 @@ def ai_vision(req: func.HttpRequest) -> func.HttpResponse:
 
     except (OSError, ValueError, json.JSONDecodeError) as e:
         return ResponseBuilder.from_exception(e, "Erreur du service de vision")
-            "Payment intent créé",
-            {
-                "clientSecret": payment_intent.client_secret,
-                "paymentIntentId": payment_intent.id,
-            },
-        )
-
-    except stripe.error.StripeError as e:
-        return ResponseBuilder.from_exception(e, "Erreur de paiement")
-    except (OSError, ValueError, json.JSONDecodeError) as e:
-        return ResponseBuilder.from_exception(e, "Erreur de paiement")
 
 
-@app.route(route="create-subscription", auth_level=func.AuthLevel.ANONYMOUS)
+@app.route(route="create-subscription", auth_level=func.AuthLevel.FUNCTION)
 def create_subscription(req: func.HttpRequest) -> func.HttpResponse:
     """Create a Stripe subscription"""
     try:
+        # Explicit authentication check
+        # Check for Authorization header (Bearer token) or x-functions-key header
+        auth_header = req.headers.get("Authorization", "")
+        function_key = req.headers.get("x-functions-key", "")
+
+        # Get expected key from environment variable
+        expected_key = os.environ.get("SUBSCRIPTION_API_KEY") or os.environ.get(
+            "FUNCTION_KEY"
+        )
+
+        if not expected_key:
+            logging.error("SUBSCRIPTION_API_KEY or FUNCTION_KEY not configured")
+        except (OSError, ValueError, stripe.error.StripeError) as e:
+            logging.warning("Could not retrieve client secret", exc_info=True)
+                status_code=500,
+                error_details="Authentication not configured",
+            )
+
+        # Extract token from Authorization header if present (Bearer <token>)
+        provided_key = None
+        if auth_header.startswith("Bearer "):
+            provided_key = auth_header.replace("Bearer ", "").strip()
+        elif function_key:
+            provided_key = function_key.strip()
+
+        # Validate the provided key
+        if not provided_key or provided_key != expected_key:
+            logging.warning(
+                "Unauthorized subscription creation attempt - "
+                "has_auth_header=%s, has_function_key=%s, ip=%s",
+                bool(auth_header),
+                bool(function_key),
+                req.headers.get("X-Forwarded-For", "unknown"),
+            )
+            return ResponseBuilder.error(
+                "Unauthorized",
+                status_code=401,
+                error_details="Invalid or missing authentication credentials",
+            )
+
         data = req.get_json()
         customer_email = data.get("email", "").strip()
         price_id = data.get("priceId", "").strip()
@@ -387,4 +367,3 @@ def create_subscription(req: func.HttpRequest) -> func.HttpResponse:
         return ResponseBuilder.from_exception(e, "Erreur d'abonnement")
     except (OSError, ValueError, json.JSONDecodeError) as e:
         return ResponseBuilder.from_exception(e, "Erreur d'abonnement")
-

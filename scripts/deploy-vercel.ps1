@@ -30,9 +30,9 @@ if ($LASTEXITCODE -ne 0) {
 }
 Write-Host "API dependencies installed" -ForegroundColor Green
 
-# Step 3: Change to frontend directory and deploy
-Set-Location ..
-Write-Host "Deploying to Vercel production from apps/frontend..." -ForegroundColor Yellow
+# Step 3: Deploy from project root (uses root vercel.json)
+Set-Location $ProjectRoot
+Write-Host "Deploying to Vercel production from project root..." -ForegroundColor Yellow
 vercel --prod --yes
 
 if ($LASTEXITCODE -eq 0) {

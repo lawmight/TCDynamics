@@ -4,14 +4,23 @@
   "typescript.suggest.autoImports": true,
   "typescript.updateImportsOnFileMove.enabled": "always",
   "typescript.preferences.preferTypeOnlyAutoImports": true,
+  "typescript.tsdk": "${workspaceFolder}/node_modules/typescript/lib",
+  "typescript.tsserver.useSeparateSyntaxServer": true,
+  "typescript.preferences.useAliasesForRenames": false,
+  "typescript.preferences.quoteStyle": "single",
+  "typescript.suggest.completeFunctionCalls": true,
 
   // JavaScript Configuration
   "javascript.preferences.importModuleSpecifier": "relative",
   "javascript.suggest.autoImports": true,
   "javascript.updateImportsOnFileMove.enabled": "always",
 
-  // ESLint Configuration
-  "eslint.workingDirectories": ["src", "backend"],
+  // ESLint Configuration - FIXED PATHS
+  "eslint.workingDirectories": [
+    { "pattern": "apps/frontend" },
+    { "pattern": "apps/backend" },
+    { "pattern": "api" }
+  ],
   "eslint.validate": [
     "javascript",
     "javascriptreact",
@@ -52,14 +61,17 @@
   "[html]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter"
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
 
   // Tailwind CSS
   "tailwindCSS.includeLanguages": {
     "typescript": "javascript",
-    "typescriptreact": "HTML"
+    "typescriptreact": "html"
   },
   "editor.quickSuggestions": {
     "strings": true
@@ -68,16 +80,29 @@
     ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
     ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
   ],
+  "tailwindCSS.rootFontSize": 16,
+  "tailwindCSS.files.exclude": [
+    "**/.git/**",
+    "**/node_modules/**",
+    "**/.next/**",
+    "**/dist/**"
+  ],
 
-  // Testing Configuration
-  "jest.runMode": "on-demand",
-  "jest.showCoverageOnLoad": true,
-  "jest.coverageFormatter": "GutterFormatter",
+  // Testing Configuration - UPDATED FOR VITEST
+  "vitest.enable": true,
+  "vitest.commandLine": "npm test --",
+  "vitest.include": ["**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+  "vitest.nodeEnv": {
+    "NODE_ENV": "test"
+  },
 
   // Git Configuration
   "git.autofetch": true,
   "git.confirmSync": false,
   "git.enableSmartCommit": true,
+  // Suppress large-repository warnings for monorepo structure (multiple apps: frontend, backend, functions)
+  // Safeguards in place: .gitignore excludes build artifacts, pre-commit hook checks for large files
+  "git.ignoreLimitWarning": true,
 
   // Editor Configuration
   "editor.codeActionsOnSave": {
@@ -88,14 +113,26 @@
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
   "editor.detectIndentation": false,
+  "editor.rulers": [80, 120],
+  "editor.wordWrap": "on",
+  "editor.bracketPairColorization.enabled": true,
+  "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+  "editor.guides.bracketPairs": "active",
+  "editor.stickyScroll.enabled": true,
+  "editor.inlineSuggest.enabled": true,
   "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
 
   // File Associations
   "files.associations": {
     "*.css": "css",
     "*.scss": "scss",
     "*.mdx": "markdown",
-    "Dockerfile*": "dockerfile"
+    "Dockerfile*": "dockerfile",
+    "*.env.*": "dotenv",
+    "vercel.json": "jsonc",
+    "staticwebapp.config.json": "jsonc"
   },
 
   // Search Configuration
@@ -108,13 +145,49 @@
     "**/coverage": true,
     "**/.venv": true,
     "**/__pycache__": true,
-    "**/*.log": true
+    "**/*.log": true,
+    "**/.git": true,
+    "**/tmp": true,
+    "**/temp": true
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/.venv/**": true,
+    "**/coverage/**": true,
+    "**/.turbo/**": true,
+    "**/.next/**": true
   },
 
-  // Python Configuration (Azure Functions)
-  "python.terminal.activateEnvironment": true,
+  // ============================================
+  // ARCHIVED: Azure Functions Settings
+  // ============================================
+  // These settings are kept for the archived Azure Functions in apps/functions-archive/
+  // Azure Functions were archived on 2025-12-20 and replaced by Vercel serverless API routes.
+  // These settings remain for maintenance of the archived code and potential restoration.
+  // See apps/functions-archive/README.md for restoration instructions.
+  // ============================================
 
-  // Azure Functions (existing)
+  // Python Configuration (Azure Functions - Archived)
+  "python.terminal.activateEnvironment": true,
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.typeCheckingMode": "basic",
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+
+  // Azure Functions Configuration (Archived)
   "azureFunctions.deploySubpath": "TCDynamics",
   "azureFunctions.scmDoBuildDuringDeployment": true,
   "azureFunctions.pythonVenv": ".venv",
@@ -129,8 +202,27 @@
   // YAML Configuration
   "yaml.schemas": {
     "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml",
-    "https://json.schemastore.org/github-action.json": ".github/action.yml"
+    "https://json.schemastore.org/github-action.json": ".github/action.yml",
+    "https://json.schemastore.org/docker-compose.json": "docker/docker-compose.yml"
   },
+  "yaml.customTags": [
+    "!And sequence",
+    "!If sequence",
+    "!Not sequence",
+    "!Equals sequence",
+    "!Or sequence",
+    "!FindInMap sequence",
+    "!Base64 sequence",
+    "!Cidr sequence",
+    "!Ref sequence",
+    "!Sub sequence",
+    "!GetAtt sequence",
+    "!GetAZs sequence",
+    "!ImportValue sequence",
+    "!Select sequence",
+    "!Split sequence",
+    "!Join sequence"
+  ],
 
   // Performance & Monitoring
   "performance-monitor.showStatusBarItem": true,
@@ -146,5 +238,31 @@
     "[ ]",
     "[x]"
   ],
-  "jest.enable": false
+  "todo-tree.highlights.customHighlight": {
+    "BUG": {
+      "icon": "bug",
+      "type": "text",
+      "foreground": "#ff0000"
+    },
+    "FIXME": {
+      "icon": "wrench",
+      "type": "text",
+      "foreground": "#ff9900"
+    }
+  },
+
+  // Playwright Configuration
+  "playwright.reuseBrowser": false,
+  "playwright.showTrace": false,
+
+  // Path Intellisense
+  "path-intellisense.mappings": {
+    "@": "${workspaceFolder}/apps/frontend/src",
+    "@components": "${workspaceFolder}/apps/frontend/src/components",
+    "@utils": "${workspaceFolder}/apps/frontend/src/utils",
+    "@hooks": "${workspaceFolder}/apps/frontend/src/hooks",
+    "@pages": "${workspaceFolder}/apps/frontend/src/pages",
+    "@api": "${workspaceFolder}/apps/frontend/src/api",
+    "@lib": "${workspaceFolder}/apps/frontend/src/lib"
+  }
 }

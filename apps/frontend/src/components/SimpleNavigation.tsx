@@ -183,7 +183,7 @@ const SimpleNavigation = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="border-b border-border bg-background/95 backdrop-blur-sm md:hidden">
+          <div className="border-b border-border bg-background/95 backdrop-blur-sm lg:hidden">
             <div className="container mx-auto px-4 py-4">
               <nav className="flex flex-col space-y-3">
                 {location.pathname === '/' ? (

@@ -1,0 +1,75 @@
+name: 'Validate API'
+description: 'Validates API ESM syntax and file structure'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install dependencies for ESM validation
+      shell: bash
+      working-directory: ./api
+      - name: Check API file structure
+        shell: bash
+        working-directory: ./api
+        run: |
+          set -euo pipefail
+          # Verify critical API files exist
+        set -euo pipefail
+        # Install acorn parser for AST-based CommonJS detection
+        echo "Installing acorn@8.15.0..."
+        if ! npm_output=$(npm install --no-save acorn@8.15.0 2>&1); then
+          exit_code=$?
+          echo "❌ Failed to install acorn@8.15.0"
+          echo "npm install exited with status: $exit_code"
+          echo "npm output:"
+          echo "$npm_output"
+          exit $exit_code
+        fi
+        echo "$npm_output"
+
+    - name: Validate API ESM syntax
+      shell: bash
+      working-directory: ./api
+      run: |
+        set -euo pipefail
+        # Check that all .js files use ESM syntax (no CommonJS)
+        # NOTE: This only validates Vercel serverless functions in ./api
+        # Backend routes in apps/backend/src/routes/ use CommonJS and are excluded
+        # Uses AST-based detection to avoid false positives from comments/strings
+        SCRIPT_PATH="../../.github/actions/validate-api/check-esm.js"
+        if [ ! -f "$SCRIPT_PATH" ]; then
+          echo "❌ Error: ESM validation script not found at expected path: $SCRIPT_PATH"
+          echo "   Please ensure the check-esm.js file exists in .github/actions/validate-api/"
+          exit 1
+        fi
+        node "$SCRIPT_PATH"
+
+    - name: Check API file structure
+      shell: bash
+      working-directory: ./api
+      run: |
+        # Verify critical API files exist
+        # Read required files from configuration, filtering out empty lines and comments
+        required_files=()
+        while IFS= read -r line || [ -n "$line" ]; do
+          # Trim leading and trailing whitespace
+          IFS=$' \t\n' read -r trimmed <<< "$line"
+          # Skip empty lines and lines starting with #
+          if [ -n "$trimmed" ] && [ "${trimmed#\#}" = "$trimmed" ]; then
+            required_files+=("$trimmed")
+          fi
+        done < ../../.github/actions/validate-api/required-files.txt
+
+        missing_files=()
+        for file in "${required_files[@]}"; do
+          if [ ! -f "$file" ]; then
+            missing_files+=("$file")
+          fi
+        done
+
+        if [ ${#missing_files[@]} -gt 0 ]; then
+          echo "❌ Missing required API files:"
+          printf '  - %s\n' "${missing_files[@]}"
+          exit 1
+        fi
+
+        echo "✅ All required API files present"

@@ -69,6 +69,7 @@ export const Captcha = forwardRef<CaptchaHandle, CaptchaProps>(
       script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js'
       script.async = true
       script.defer = true
+      script.crossOrigin = 'anonymous' // CSP compliance: ensure CORS is handled properly
       script.onload = () => setScriptLoaded(true)
       script.onerror = () => {
         console.error('Failed to load Turnstile script')

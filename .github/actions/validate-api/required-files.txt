@@ -1,0 +1,21 @@
+# Required API files configuration
+# One relative API path per line (relative to ./api directory)
+# Empty lines and lines starting with # are ignored
+
+# Core API endpoints
+health.js
+chat.js
+contactform.js
+
+# Payment endpoints
+create-payment-intent.js
+create-subscription.js
+
+# Stripe integration
+stripe/webhook.js
+stripe/create-checkout-session.js
+
+# Shared libraries
+_lib/cache.js
+_lib/supabase.js
+_lib/email.js

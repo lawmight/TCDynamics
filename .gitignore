@@ -1,5 +1,7 @@
 # Dependencies
 node_modules/
+# Python virtual environments
+# (General patterns below cover all venv directories recursively)
 .venv/
 venv/
 
@@ -80,4 +82,5 @@ out/
 .vercel
 
 # Local documentation (keep local, don't push to GitHub)
+md/
 

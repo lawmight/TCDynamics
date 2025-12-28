@@ -1,0 +1,28 @@
+name: 'Setup Node.js with Caching'
+description: 'Sets up Node.js with npm caching for multiple package-lock files'
+
+inputs:
+  node-version:
+    description: 'Node.js version'
+    required: false
+    default: '20'
+  cache-paths:
+    description: 'Cache dependency paths (newline-separated)'
+    required: false
+    default: |
+      package-lock.json
+      apps/frontend/package-lock.json
+      api/package-lock.json
+      apps/backend/package-lock.json
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      # Pinned to v4.1.0 (2024-12-24) for reproducible builds and security
+      # Update periodically: https://github.com/actions/setup-node/releases
+      uses: actions/setup-node@v4.1.0
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: 'npm'
+        cache-dependency-path: ${{ inputs.cache-paths }}

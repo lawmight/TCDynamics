@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- FOUC Prevention: Apply theme before page renders -->
+    <!-- Inline script with CSP hash (sha256-B0YeSIgQkU25t8JsAxqLZDvivwg+N1UjPV6BiObAslw=) -->
     <script>
       ;(function () {
         try {
@@ -83,28 +84,7 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
-      window.fbAsyncInit = function () {
-        FB.init({
-          appId: '1508926600336855',
-          cookie: true,
-          xfbml: true,
-          version: 'v24.0',
-        })
-
-        FB.AppEvents.logPageView()
-      }
-      ;(function (d, s, id) {
-        var js,
-          fjs = d.getElementsByTagName(s)[0]
-        if (d.getElementById(id)) {
-          return
-        }
-        js = d.createElement(s)
-        js.id = id
-        js.src = 'https://connect.facebook.net/en_US/sdk.js'
-        fjs.parentNode.insertBefore(js, fjs)
-      })(document, 'script', 'facebook-jssdk')
-    </script>
+    <!-- Facebook SDK initialization - moved to external file for CSP compliance -->
+    <script src="/scripts/facebook-sdk.js" defer></script>
   </body>
 </html>

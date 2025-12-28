@@ -49,14 +49,7 @@ const HowItWorks = () => {
     <section className="relative overflow-hidden bg-background py-24">
       {/* Network Background */}
       <div className="absolute inset-0 opacity-5">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `radial-gradient(circle at 20% 50%, hsl(var(--primary)) 0%, transparent 50%),
-                           radial-gradient(circle at 80% 20%, hsl(var(--primary)) 0%, transparent 50%),
-                           radial-gradient(circle at 40% 80%, hsl(var(--primary)) 0%, transparent 50%)`,
-          }}
-        >
+        <div className="absolute inset-0 network-background-gradient">
           <svg
             className="absolute inset-0 h-full w-full"
             xmlns="http://www.w3.org/2000/svg"

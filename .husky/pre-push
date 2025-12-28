@@ -1,5 +1,40 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
+#!/bin/sh
+set -e
+# Pre-push validation (fast checks before CI)
+echo "🔍 Running pre-push checks..."
 
-# Pre-push validation removed - script deleted during cleanup
+# Get repository root
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
+if [ -z "$REPO_ROOT" ]; then
+  echo "❌ Unable to locate repository root. Make sure git is installed and you're inside the repo."
+  exit 1
+fi
 
+cd "$REPO_ROOT"
+
+# Frontend checks
+FRONTEND_DIR="$REPO_ROOT/apps/frontend"
+if [ -d "$FRONTEND_DIR" ]; then
+  echo "📝 Running frontend lint..."
+  cd "$FRONTEND_DIR"
+  npm run lint || exit 1
+
+  echo "🔧 Checking frontend TypeScript types..."
+  npm run type-check || exit 1
+  cd "$REPO_ROOT"
+fi
+
+# Backend checks
+BACKEND_DIR="$REPO_ROOT/apps/backend"
+if [ -d "$BACKEND_DIR" ]; then
+  echo "📝 Running backend lint..."
+  cd "$BACKEND_DIR"
+  npm run lint || exit 1
+
+  echo "🔧 Checking backend TypeScript types..."
+  npm run type-check || exit 1
+  cd "$REPO_ROOT"
+fi
+
+echo "✅ Pre-push checks passed!"
+echo "ℹ️  Full test suite and build verification will run in CI"

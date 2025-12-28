@@ -11,28 +11,38 @@
     // React/TypeScript
     "pranaygp.vscode-css-peek",
     "zignd.html-css-class-completion",
+    "dsznajder.es7-react-js-snippets",
 
     // Testing & Quality
     "orta.vscode-jest",
     "ms-playwright.playwright",
+    "ZixuanChen.vitest-explorer",
     "ms-vscode.test-adapter-converter",
 
-    // Azure & Python (existing)
+    // Azure & Python
     "ms-azuretools.vscode-azurefunctions",
     "ms-python.python",
     "ms-python.black-formatter",
     "ms-python.pylint",
+    "ms-python.debugpy",
 
     // Git & Collaboration
     "mhutchie.git-graph",
     "donjayamanne.githistory",
     "gruntfuggly.todo-tree",
+    "eamodio.gitlens",
 
     // Docker & Deployment
     "ms-azuretools.vscode-docker",
     "redhat.vscode-yaml",
 
     // Performance & Monitoring
-    "ms-vscode.vscode-js-profile-flame"
+    "ms-vscode.vscode-js-profile-flame",
+
+    // Additional Helpers
+    "usernamehw.errorlens",
+    "streetsidesoftware.code-spell-checker",
+    "bierner.color-info",
+    "christian-kohler.npm-intellisense"
   ]
 }

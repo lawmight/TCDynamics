@@ -65,19 +65,21 @@ jobs:
 
       - name: Install Dependencies
         uses: ./.github/actions/install-dependencies
+        with:
+          node-version: ${{ matrix.node-version }}
 
       - name: Type Check
-        if: github.event.inputs.skip_lint != 'true'
+        if: (inputs.skip_lint != true && inputs.skip_lint != 'true') && (github.event.inputs.skip_lint != true && github.event.inputs.skip_lint != 'true')
         working-directory: ./apps/frontend
         run: npm run type-check
 
       - name: Lint
-        if: github.event.inputs.skip_lint != 'true'
+        if: (inputs.skip_lint != true && inputs.skip_lint != 'true') && (github.event.inputs.skip_lint != true && github.event.inputs.skip_lint != 'true')
         working-directory: ./apps/frontend
         run: npm run lint
 
       - name: Unit Tests
-        if: github.event.inputs.skip_tests != 'true'
+        if: (inputs.skip_tests != true && inputs.skip_tests != 'true') && (github.event.inputs.skip_tests != true && github.event.inputs.skip_tests != 'true')
         working-directory: ./apps/frontend
         run: npm run test:coverage
         id: test-run
@@ -99,7 +101,7 @@ jobs:
           fi
 
       - name: Check Coverage Threshold
-        if: github.event.inputs.skip_tests != 'true'
+        if: (inputs.skip_tests != true && inputs.skip_tests != 'true') && (github.event.inputs.skip_tests != true && github.event.inputs.skip_tests != 'true')
         id: coverage-check
         working-directory: ./apps/frontend
         run: |
@@ -122,12 +124,12 @@ jobs:
           echo "coverage=$coverage" >> $GITHUB_OUTPUT
 
       - name: Build Check
-        if: github.event.inputs.skip_build != 'true'
+        if: (inputs.skip_build != true && inputs.skip_build != 'true') && (github.event.inputs.skip_build != true && github.event.inputs.skip_build != 'true')
         working-directory: ./apps/frontend
         run: npm run build
 
       - name: Upload Coverage
-        if: github.event.inputs.skip_tests != 'true'
+        if: (inputs.skip_tests != true && inputs.skip_tests != 'true') && (github.event.inputs.skip_tests != true && github.event.inputs.skip_tests != 'true')
         uses: codecov/codecov-action@v3
         with:
           file: ./apps/frontend/coverage/lcov.info
@@ -138,13 +140,25 @@ jobs:
       - name: Validate API
         uses: ./.github/actions/validate-api
 
+      - name: Audit API Dependencies
+        working-directory: ./api
+        run: |
+          echo "Running npm audit for API dependencies..."
+          npm audit --audit-level=moderate || {
+            echo "⚠️ npm audit found vulnerabilities. Review and address as needed."
+            exit 1
+          }
+          echo "✅ npm audit passed"
+
       - name: Job Summary
         if: always()
         run: |
           echo "## Quality Gate Results (Node.js ${{ matrix.node-version }})" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Node Version**: ${{ matrix.node-version }}" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ github.event.inputs.skip_tests }}" != "true" ] && [ -n "${{ steps.coverage-check.outputs.coverage }}" ]; then
-            echo "- **Coverage**: ${{ steps.coverage-check.outputs.coverage }}%" >> $GITHUB_STEP_SUMMARY
-          fi
           echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Append Coverage to Summary
+        if: always() && inputs.skip_tests != true && steps.coverage-check.outputs.coverage != ''
+        run: |
+          echo "- **Coverage**: ${{ steps.coverage-check.outputs.coverage }}%" >> $GITHUB_STEP_SUMMARY

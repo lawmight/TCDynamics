@@ -82,13 +82,7 @@ const LocalAdvantages = () => {
     <section className="relative overflow-hidden bg-gradient-to-b from-background to-background/50 py-24">
       {/* French Flag Colors Background */}
       <div className="absolute inset-0 opacity-5">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `linear-gradient(45deg, #002395 0%, #FFFFFF 33.33%, #ED2939 66.66%, transparent 100%)`,
-            backgroundSize: '300px 300px',
-          }}
-        />
+        <div className="absolute inset-0 french-flag-gradient" />
       </div>
 
       {/* Network Pattern */}

@@ -493,3 +493,41 @@ html {
     transform: translateX(100%);
   }
 }
+
+/* Background gradient patterns for CSP compliance (replaces inline styles) */
+.network-background-gradient {
+  background-image: radial-gradient(
+      circle at 20% 50%,
+      hsl(var(--primary)) 0%,
+      transparent 50%
+    ),
+    radial-gradient(circle at 80% 20%, hsl(var(--primary)) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, hsl(var(--primary)) 0%, transparent 50%);
+}
+
+.french-flag-gradient {
+  background-image: linear-gradient(
+    45deg,
+    #002395 0%,
+    #ffffff 33.33%,
+    #ed2939 66.66%,
+    transparent 100%
+  );
+  background-size: 300px 300px;
+}
+
+/* OptimizedImage placeholder styles - fixed sizing for CSP compliance */
+.image-placeholder {
+  width: 100%;
+  height: 200px;
+}
+
+/* Placeholder matches image dimensions when provided via wrapper */
+.image-placeholder-wrapper {
+  display: inline-block;
+}
+
+.image-placeholder-wrapper img {
+  max-width: 100%;
+  height: auto;
+}

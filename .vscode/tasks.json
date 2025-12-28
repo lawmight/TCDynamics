@@ -5,15 +5,6 @@
       "type": "shell",
       "label": "func: host start",
       "command": "func host start",
-      "windows": {
-        "command": "func host start"
-      },
-      "osx": {
-        "command": "func host start"
-      },
-      "linux": {
-        "command": "func host start"
-      },
       "problemMatcher": [],
       "isBackground": true,
       "dependsOn": "pip install (functions)",
@@ -25,15 +16,6 @@
       "type": "shell",
       "label": "func: host start (debug)",
       "command": "func host start",
-      "windows": {
-        "command": "func host start"
-      },
-      "osx": {
-        "command": "func host start"
-      },
-      "linux": {
-        "command": "func host start"
-      },
       "args": [
         "--language-worker",
         "--workerId",
@@ -73,15 +55,6 @@
       "label": "Deploy to Azure Functions",
       "type": "shell",
       "command": "func azure functionapp publish func-tcdynamics-contact",
-      "windows": {
-        "command": "func azure functionapp publish func-tcdynamics-contact"
-      },
-      "osx": {
-        "command": "func azure functionapp publish func-tcdynamics-contact"
-      },
-      "linux": {
-        "command": "func azure functionapp publish func-tcdynamics-contact"
-      },
       "problemMatcher": [],
       "dependsOn": "pip install (functions)",
       "options": {
@@ -89,72 +62,7 @@
       },
       "group": {
         "kind": "build",
-        "isDefault": true
-      }
-    },
-    {
-      "label": "Deploy Frontend to OVHcloud",
-      "type": "shell",
-      "command": "echo 'Deploying frontend files to OVHcloud...' && echo 'Please upload these files to your OVHcloud hosting:' && echo '  - index.html' && echo '  - style.css' && echo '  - script.js' && echo '  - README.md'",
-      "windows": {
-        "command": "echo 'Deploying frontend files to OVHcloud...' && echo 'Please upload these files to your OVHcloud hosting:' && echo '  - index.html' && echo '  - style.css' && echo '  - script.js' && echo '  - README.md'"
-      },
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": false
-      },
-      "group": "build"
-    },
-    {
-      "label": "Full Deployment (Backend + Frontend)",
-      "dependsOrder": "sequence",
-      "dependsOn": ["Deploy to Azure Functions", "Deploy Frontend to OVHcloud"],
-      "group": {
-        "kind": "build",
         "isDefault": false
-      }
-    },
-    {
-      "label": "Test Local Development",
-      "type": "shell",
-      "command": "python -m http.server 8000",
-      "windows": {
-        "command": "python -m http.server 8000"
-      },
-      "options": {
-        "cwd": "${workspaceFolder}/TCDynamics"
-      },
-      "isBackground": true,
-      "problemMatcher": [],
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": false
-      },
-      "group": "test"
-    },
-    {
-      "label": "Git: Commit and Push",
-      "type": "shell",
-      "command": "git add . && git commit -m \"Auto-deploy: $(date)\" && git push",
-      "windows": {
-        "command": "git add . && git commit -m \"Auto-deploy: %date% %time%\" && git push"
-      },
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared",
-        "showReuseMessage": true,
-        "clear": false
       }
     },
     {
@@ -162,11 +70,8 @@
       "type": "shell",
       "command": "npm install",
       "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
+      "options": {
+        "cwd": "${workspaceFolder}/apps/frontend"
       },
       "problemMatcher": []
     },
@@ -176,37 +81,66 @@
       "command": "npm run dev",
       "group": "build",
       "isBackground": true,
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
+      "options": {
+        "cwd": "${workspaceFolder}/apps/frontend"
       },
-      "problemMatcher": []
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^([^\\s].*)\\s\\((\\d+):(\\d+)\\)$",
+          "file": 1,
+          "line": 2,
+          "column": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*VITE.*",
+          "endsPattern": ".*Local:.*http://localhost:\\d+.*"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      }
     },
     {
       "label": "Frontend: Build for Production",
       "type": "shell",
       "command": "npm run build",
       "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
+      "options": {
+        "cwd": "${workspaceFolder}/apps/frontend"
+      },
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "Frontend: Run Tests (Vitest)",
+      "type": "shell",
+      "command": "npm test",
+      "group": "test",
+      "options": {
+        "cwd": "${workspaceFolder}/apps/frontend"
       },
       "problemMatcher": []
     },
     {
-      "label": "Frontend: Run Tests",
+      "label": "Frontend: Run Tests with UI",
       "type": "shell",
-      "command": "npm test",
+      "command": "npm run test:ui",
       "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
+      "isBackground": true,
+      "options": {
+        "cwd": "${workspaceFolder}/apps/frontend"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Frontend: Run E2E Tests (Playwright)",
+      "type": "shell",
+      "command": "npm run test:e2e",
+      "group": "test",
+      "options": {
+        "cwd": "${workspaceFolder}/apps/frontend"
       },
       "problemMatcher": []
     },
@@ -215,13 +149,20 @@
       "type": "shell",
       "command": "npm run lint",
       "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
+      "options": {
+        "cwd": "${workspaceFolder}/apps/frontend"
       },
-      "problemMatcher": []
+      "problemMatcher": "$eslint-stylish"
+    },
+    {
+      "label": "Frontend: Type Check",
+      "type": "shell",
+      "command": "npm run type-check",
+      "group": "test",
+      "options": {
+        "cwd": "${workspaceFolder}/apps/frontend"
+      },
+      "problemMatcher": "$tsc"
     },
     {
       "label": "Backend: Install Dependencies",
@@ -229,13 +170,7 @@
       "command": "npm install",
       "group": "build",
       "options": {
-        "cwd": "${workspaceFolder}/backend"
-      },
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
+        "cwd": "${workspaceFolder}/apps/backend"
       },
       "problemMatcher": []
     },
@@ -246,15 +181,36 @@
       "group": "build",
       "isBackground": true,
       "options": {
-        "cwd": "${workspaceFolder}/backend"
+        "cwd": "${workspaceFolder}/apps/backend"
+      },
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^([^\\s].*)\\s\\((\\d+):(\\d+)\\)$",
+          "file": 1,
+          "line": 2,
+          "column": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*Server.*",
+          "endsPattern": ".*listening.*"
+        }
       },
       "presentation": {
-        "echo": true,
         "reveal": "always",
-        "focus": false,
-        "panel": "shared"
+        "panel": "dedicated",
+        "focus": false
+      }
+    },
+    {
+      "label": "Backend: Build TypeScript",
+      "type": "shell",
+      "command": "npm run build",
+      "group": "build",
+      "options": {
+        "cwd": "${workspaceFolder}/apps/backend"
       },
-      "problemMatcher": []
+      "problemMatcher": "$tsc"
     },
     {
       "label": "Backend: Run Tests",
@@ -262,13 +218,7 @@
       "command": "npm test",
       "group": "test",
       "options": {
-        "cwd": "${workspaceFolder}/backend"
-      },
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
+        "cwd": "${workspaceFolder}/apps/backend"
       },
       "problemMatcher": []
     },
@@ -278,67 +228,41 @@
       "command": "npm run lint",
       "group": "test",
       "options": {
-        "cwd": "${workspaceFolder}/backend"
+        "cwd": "${workspaceFolder}/apps/backend"
       },
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": []
+      "problemMatcher": "$eslint-stylish"
     },
     {
-      "label": "Docker: Build Frontend",
+      "label": "Backend: Type Check",
       "type": "shell",
-      "command": "docker build -t tcdynamics-frontend .",
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
+      "command": "npm run type-check",
+      "group": "test",
+      "options": {
+        "cwd": "${workspaceFolder}/apps/backend"
       },
-      "problemMatcher": []
-    },
-    {
-      "label": "Docker: Build Backend",
-      "type": "shell",
-      "command": "docker build -t tcdynamics-backend ./backend",
-      "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
-      "problemMatcher": []
+      "problemMatcher": "$tsc"
     },
     {
       "label": "Docker: Compose Up",
       "type": "shell",
-      "command": "docker-compose up -d",
+      "command": "docker compose up -d",
       "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
+      "options": {
+        "cwd": "${workspaceFolder}/docker"
       },
-      "problemMatcher": []
+      "problemMatcher": [],
+      "_comment": "Requires Docker CLI with Compose V2 plugin (docker compose, not docker-compose)"
     },
     {
       "label": "Docker: Compose Down",
       "type": "shell",
-      "command": "docker-compose down",
+      "command": "docker compose down",
       "group": "build",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
+      "options": {
+        "cwd": "${workspaceFolder}/docker"
       },
-      "problemMatcher": []
+      "problemMatcher": [],
+      "_comment": "Requires Docker CLI with Compose V2 plugin (docker compose, not docker-compose)"
     },
     {
       "label": "MCP: Start NIA Server",
@@ -346,24 +270,15 @@
       "command": "cursor-mcp",
       "group": "build",
       "isBackground": true,
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
-      },
       "problemMatcher": []
     },
     {
-      "label": "Pre-commit: Run Checks",
+      "label": "Pre-push: Run Checks",
       "type": "shell",
-      "command": "npm run pre-commit",
+      "command": "npm run pre-push-checks",
       "group": "test",
-      "presentation": {
-        "echo": true,
-        "reveal": "always",
-        "focus": false,
-        "panel": "shared"
+      "options": {
+        "cwd": "${workspaceFolder}/apps/frontend"
       },
       "problemMatcher": []
     },
@@ -378,6 +293,19 @@
       "group": {
         "kind": "build",
         "isDefault": true
+      }
+    },
+    {
+      "label": "Start Full Stack Dev",
+      "dependsOrder": "parallel",
+      "dependsOn": [
+        "Frontend: Start Development Server",
+        "Backend: Start Development Server"
+      ],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
       }
     }
   ]
