@@ -41,7 +41,7 @@ export const getAuthClient = async () => {
 export const getProjectConfig = () => {
   const projectId = process.env.VERTEX_PROJECT_ID
   const location = process.env.VERTEX_LOCATION || 'us-central1'
-  const model = process.env.VERTEX_MODEL || 'gemini-1.5-flash'
+  const model = process.env.VERTEX_MODEL || 'gemini-3-flash-preview'
   const embedModel = process.env.VERTEX_EMBED_MODEL || 'text-embedding-005'
 
   if (!projectId) {
