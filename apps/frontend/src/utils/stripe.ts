@@ -200,7 +200,7 @@ export const getCheckoutSession = async (
 ): Promise<CheckoutSession | null> => {
   try {
     // Use relative URL for API calls to work on any deployment
-    const response = await fetch(`/api/stripe/session/${sessionId}`, {
+    const response = await fetch(`/api/stripe/create-checkout-session?sessionId=${sessionId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
