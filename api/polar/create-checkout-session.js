@@ -36,9 +36,19 @@ const handler = async (req, res) => {
     const { checkoutId } = req.query
 
     if (!checkoutId) {
-      return res
-        .status(400)
-        .json({ success: false, message: 'Checkout ID required' })
+      return res.status(400).json({
+        success: false,
+        message: 'Checkout ID required',
+        hint: 'Use GET /api/polar/create-checkout-session?checkoutId=<id> to retrieve a checkout, or POST to create one',
+      })
+    }
+
+    if (!polar) {
+      return res.status(500).json({
+        success: false,
+        message: 'Payment service not configured',
+        error: 'POLAR_NOT_CONFIGURED',
+      })
     }
 
     try {
