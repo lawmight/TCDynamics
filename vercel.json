@@ -137,7 +137,13 @@
       ]
     }
   ],
-  "redirects": [],
+  "redirects": [
+    {
+      "source": "https://www.tcdynamics.fr/:path*",
+      "destination": "https://tcdynamics.fr/:path*",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/((?!api).*)",
