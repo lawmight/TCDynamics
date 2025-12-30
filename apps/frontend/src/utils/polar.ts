@@ -118,7 +118,7 @@ export const getCheckoutSession = async (
   checkoutId: string
 ): Promise<CheckoutSession | null> => {
   try {
-    const response = await fetch(`/api/polar/checkout/${checkoutId}`)
+    const response = await fetch(`/api/polar/create-checkout-session?checkoutId=${checkoutId}`)
     const data = await response.json()
     if (!response.ok || !data.success) throw new Error(data.message)
     return data.session
