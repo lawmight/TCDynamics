@@ -140,15 +140,7 @@
   "redirects": [],
   "rewrites": [
     {
-      "source": "/checkout",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/checkout-success",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/((?!api/|_next/|.*\\..*).*)",
+      "source": "/((?!api).*)",
       "destination": "/index.html"
     }
   ],
