@@ -148,15 +148,11 @@
   ],
   "rewrites": [
     {
-      "source": "/checkout",
+      "source": "/checkout*",
       "destination": "/index.html"
     },
     {
-      "source": "/checkout-success",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/((?!api/).*)",
+      "source": "/((?!api/|_next/|.*\\..*).*)",
       "destination": "/index.html"
     }
   ],
