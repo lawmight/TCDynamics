@@ -138,6 +138,7 @@
     }
   ],
   "redirects": [],
+  // Rewrite rules for client-side routing - all non-API routes go to index.html
   "rewrites": [
     {
       "source": "/checkout*",
