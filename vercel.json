@@ -139,7 +139,13 @@
   ],
   "redirects": [
     {
-      "source": "https://www.tcdynamics.fr/:path*",
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.tcdynamics.fr"
+        }
+      ],
       "destination": "https://tcdynamics.fr/:path*",
       "permanent": true
     }
