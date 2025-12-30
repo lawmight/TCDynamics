@@ -18,10 +18,24 @@ export interface DemoFormData {
  * Uses Vercel serverless functions
  */
 export const useDemoForm = () => {
-  return useFormSubmit<DemoFormData>({
+  const formSubmit = useFormSubmit<DemoFormData>({
     primaryEndpoint: API_ENDPOINTS.demo,
     fallbackEndpoint: API_ENDPOINTS.demo, // No fallback needed - unified backend
     enableFallback: false,
     errorMessage: "Erreur lors de l'envoi de la demande de démo",
   })
+
+  // Wrap submitForm to add formType
+  const originalSubmitForm = formSubmit.submitForm
+  const submitForm = async (
+    data: DemoFormData,
+    options?: Parameters<typeof originalSubmitForm>[1]
+  ) => {
+    return originalSubmitForm({ ...data, formType: 'demo' }, options)
+  }
+
+  return {
+    ...formSubmit,
+    submitForm,
+  }
 }

@@ -3,8 +3,8 @@
 
 export const API_ENDPOINTS = {
   // All endpoints now use Vercel serverless functions (relative URLs)
-  contact: `/api/contactform`,
-  demo: `/api/demoform`,
+  contact: `/api/forms`,
+  demo: `/api/forms`,
   health: `/api/analytics?health=true`,
   chat: `/api/chat`,
   vision: `/api/vision`,
