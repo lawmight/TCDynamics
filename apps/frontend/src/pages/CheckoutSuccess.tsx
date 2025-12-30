@@ -9,7 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 const CheckoutSuccess = () => {
   const [searchParams] = useSearchParams()
-  const sessionId = searchParams.get('session_id')
+  // Support both Stripe (session_id) and Polar (checkout_id) for migration period
+  const sessionId = searchParams.get('session_id') || searchParams.get('checkout_id')
 
   useEffect(() => {
     // Trigger confetti animation on component mount

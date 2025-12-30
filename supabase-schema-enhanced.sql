@@ -474,6 +474,30 @@ ON stripe_events FOR ALL
 USING (auth.role() = 'service_role');
 
 -- ================================================
+-- Table: polar_events
+-- Purpose: Store Polar webhook events for idempotency and auditing
+-- ================================================
+CREATE TABLE IF NOT EXISTS polar_events (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    event_id TEXT NOT NULL UNIQUE, -- Polar event.id
+    type TEXT NOT NULL,
+    payload JSONB NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for polar_events
+CREATE INDEX IF NOT EXISTS idx_polar_events_event_id ON polar_events(event_id);
+CREATE INDEX IF NOT EXISTS idx_polar_events_type ON polar_events(type);
+CREATE INDEX IF NOT EXISTS idx_polar_events_created_at ON polar_events(created_at DESC);
+
+-- RLS for polar_events
+ALTER TABLE polar_events ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Service role can manage polar_events"
+ON polar_events FOR ALL
+USING (auth.role() = 'service_role');
+
+-- ================================================
 -- Table: orgs
 -- Purpose: Tenancy table (1 user = 1 org for MVP)
 -- Stores plan and subscription status
@@ -482,8 +506,12 @@ CREATE TABLE IF NOT EXISTS orgs (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     plan TEXT CHECK (plan IN ('starter', 'professional', 'enterprise')),
     subscription_status TEXT CHECK (subscription_status IN ('active', 'trialing', 'past_due', 'canceled', 'unpaid', 'incomplete')),
+    -- Stripe columns (legacy - to be removed after migration)
     stripe_customer_id TEXT UNIQUE,
     stripe_subscription_id TEXT UNIQUE,
+    -- Polar columns
+    polar_customer_id TEXT UNIQUE,
+    polar_subscription_id TEXT UNIQUE,
     trial_ends_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
@@ -492,6 +520,8 @@ CREATE TABLE IF NOT EXISTS orgs (
 -- Indexes for orgs
 CREATE INDEX IF NOT EXISTS idx_orgs_stripe_customer_id ON orgs(stripe_customer_id);
 CREATE INDEX IF NOT EXISTS idx_orgs_stripe_subscription_id ON orgs(stripe_subscription_id);
+CREATE INDEX IF NOT EXISTS idx_orgs_polar_customer_id ON orgs(polar_customer_id);
+CREATE INDEX IF NOT EXISTS idx_orgs_polar_subscription_id ON orgs(polar_subscription_id);
 CREATE INDEX IF NOT EXISTS idx_orgs_subscription_status ON orgs(subscription_status);
 
 -- RLS Policies for orgs

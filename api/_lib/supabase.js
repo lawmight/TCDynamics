@@ -276,10 +276,54 @@ export async function saveStripeEvent(stripeEvent) {
   }
 }
 
+/**
+ * Save a Polar event for idempotency and auditing
+ * @param {Object} polarEvent - Polar event payload
+ * @returns {Promise<{success: boolean, id?: string, error?: string, duplicate?: boolean}>}
+ */
+export async function savePolarEvent(polarEvent) {
+  try {
+    const supabase = getSupabaseClient()
+
+    const { data, error } = await supabase
+      .from('polar_events')
+      .insert([
+        {
+          event_id: polarEvent.id,
+          type: polarEvent.type,
+          payload: polarEvent,
+        },
+      ])
+      .select('id')
+      .single()
+
+    if (error) {
+      // Unique constraint violation (duplicate event) - treat as idempotent replay
+      const isDuplicate =
+        error.code === '23505' ||
+        (typeof error.message === 'string' &&
+          error.message.toLowerCase().includes('duplicate'))
+
+      if (isDuplicate) {
+        return { success: true, duplicate: true }
+      }
+
+      console.error('Supabase polar event insert error:', error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, id: data.id, duplicate: false }
+  } catch (error) {
+    console.error('Save polar event error:', error)
+    return { success: false, error: error.message }
+  }
+}
+
 export default {
   getSupabaseClient,
   saveContact,
   saveDemoRequest,
   saveConversation,
   saveStripeEvent,
+  savePolarEvent,
 }
