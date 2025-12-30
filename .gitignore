@@ -33,7 +33,7 @@ AzureFunctionsTools/
 # IDE
 .vscode/
 .idea/
-.cursor/*
+cursor/*
 !.cursor/rules/
 .claude/
 *.swp

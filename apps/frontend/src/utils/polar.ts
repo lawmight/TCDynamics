@@ -164,7 +164,7 @@ export const createOnDemandCheckout = async (
   }
 
   try {
-    const response = await fetch('/api/polar/create-on-demand-checkout', {
+    const response = await fetch('/api/polar/create-checkout-session', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

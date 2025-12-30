@@ -1,8 +1,68 @@
-# Azure Vision API Migration Plan
+# Azure Functions Archive & Migration
 
-## Issue Summary
+This document covers the archived Azure Functions and the required migration plan for the Azure Vision API.
 
-The archived Azure Functions (`apps/functions-archive/`) use `azure-ai-vision-imageanalysis` package, which depends on the Azure Computer Vision - Image Analysis API.
+## Archive Overview
+
+### Archived Date
+December 20, 2025
+
+### Reason for Archiving
+Azure Functions were archived to simplify the project structure. The functionality may have been replaced by Vercel serverless API routes or is no longer actively used.
+
+### Location
+`apps/functions-archive/`
+
+---
+
+## Archive Contents
+
+- `functions/` - Original Azure Functions code
+  - `function_app.py` - Main function app with HTTP endpoints
+  - `services/` - Service layer implementation
+  - `requirements.txt` - Python dependencies
+  - `constraints.txt` - Pinned dependency versions
+  - All configuration and deployment files
+
+- `workflow-python-functions.yml` - CI/CD workflow for Python Functions
+
+### Original Functionality
+
+The archived functions included:
+
+- Health check endpoint
+- Contact form handler
+- Demo form handler
+- AI chat endpoint
+- Vision/image analysis endpoint
+- Payment intent creation
+- Subscription creation
+- Warm-up timer trigger
+
+---
+
+## How to Restore
+
+1. Move `apps/functions-archive/functions/` back to `apps/functions/`
+2. Restore `.github/workflows/python-functions.yml` from archive (copy `workflow-python-functions.yml` back)
+3. Update `.github/dependabot.yml` to re-enable Python package ecosystem
+4. Reinstall Python virtual environment: `cd apps/functions && python -m venv .venv`
+5. Install dependencies: `pip install -r requirements.txt -c constraints.txt`
+6. Update documentation to reflect restored functions
+
+### Notes
+
+- Virtual environment (`.venv/`) is not included in archive (gitignored)
+- Local settings may need to be reconfigured
+- Azure deployment scripts are included for reference
+
+---
+
+## Azure Vision API Migration Plan
+
+### Issue Summary
+
+The archived Azure Functions use `azure-ai-vision-imageanalysis` package, which depends on the Azure Computer Vision - Image Analysis API.
 
 **Microsoft has announced the retirement of this API:**
 
@@ -10,13 +70,13 @@ The archived Azure Functions (`apps/functions-archive/`) use `azure-ai-vision-im
 - **Migration Deadline**: September 2026 (recommended)
 - **Current Status**: Using stable version `1.0.0` (updated from beta `1.0.0b2`)
 
-## Current Implementation
+### Current Implementation
 
 - **Package**: `azure-ai-vision-imageanalysis==1.0.0`
 - **Location**: `apps/functions-archive/functions/requirements.txt`
 - **Usage**: Vision/image analysis endpoint in archived Azure Functions
 
-## Migration Options
+### Migration Options
 
 Microsoft recommends migrating to one of these alternatives:
 
@@ -24,6 +84,8 @@ Microsoft recommends migrating to one of these alternatives:
 2. **Azure AI Services - Computer Vision v3.2** - Updated API
 3. **Alternative cloud providers** (AWS Rekognition, Google Cloud Vision API)
 4. **Open-source solutions** (if applicable)
+
+---
 
 ## Migration Timeline
 
@@ -35,6 +97,8 @@ Microsoft recommends migrating to one of these alternatives:
 **Total Estimated Effort**: 36-54 hours (4.5-7 working days)
 
 **Backlog Reference**: See `md/docs/implementation-tasks.md` for detailed epic breakdown with steps, owners, and effort estimates.
+
+---
 
 ## Action Items
 
@@ -66,6 +130,8 @@ Microsoft recommends migrating to one of these alternatives:
 
 **See `md/docs/implementation-tasks.md` for detailed epic with owner assignments and effort estimates.**
 
+---
+
 ## Risk Assessment
 
 **Current Risk Level**: LOW (functions are archived, not actively used)
@@ -76,17 +142,14 @@ Microsoft recommends migrating to one of these alternatives:
 - Service disruption risk if migration is delayed
 - Potential breaking changes in new API versions
 
-## References
-
-- [Microsoft Migration Guide](https://learn.microsoft.com/azure/ai-services/computer-vision/migration-options)
-- [Azure AI Vision Documentation](https://learn.microsoft.com/azure/ai-services/computer-vision/)
-- Package: [azure-ai-vision-imageanalysis on PyPI](https://pypi.org/project/azure-ai-vision-imageanalysis/)
+---
 
 ## Dependency Policy
 
 To prevent pre-release dependencies in production requirements:
 
 1. **Manual Review**: Always review `requirements.txt` and `constraints.txt` for pre-release versions (indicated by `a`, `b`, `rc`, or `dev` suffixes)
+
 2. **CI Check** (if functions are restored): Add a validation step to CI/CD pipeline:
    ```bash
    # Check for pre-release versions in requirements.txt
@@ -95,7 +158,18 @@ To prevent pre-release dependencies in production requirements:
      exit 1
    fi
    ```
+
 3. **Dependabot**: Ensure `.github/dependabot.yml` is configured to update Python dependencies
+
+---
+
+## References
+
+- [Microsoft Migration Guide](https://learn.microsoft.com/azure/ai-services/computer-vision/migration-options)
+- [Azure AI Vision Documentation](https://learn.microsoft.com/azure/ai-services/computer-vision/)
+- Package: [azure-ai-vision-imageanalysis on PyPI](https://pypi.org/project/azure-ai-vision-imageanalysis/)
+
+---
 
 ## Notes
 

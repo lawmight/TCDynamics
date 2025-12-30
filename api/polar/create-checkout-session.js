@@ -55,38 +55,81 @@ const handler = async (req, res) => {
         .json({ success: false, message: 'Authentication required' })
     }
 
-    const { planName } = req.body
+    // Support both standard subscription and on-demand checkout
+    // If 'amount' is provided, use on-demand pricing; otherwise use standard subscription
+    const { planName, productId, amount, currency = 'eur', amountType = 'fixed', metadata = {} } = req.body
 
-    if (!planName || !POLAR_PRODUCTS[planName]) {
-      return res
-        .status(400)
-        .json({ success: false, message: 'Invalid plan name' })
+    // Resolve product ID: planName takes precedence, fallback to productId
+    let resolvedProductId = null
+    if (planName && POLAR_PRODUCTS[planName]) {
+      resolvedProductId = POLAR_PRODUCTS[planName]
+    } else if (productId) {
+      resolvedProductId = productId
+    } else if (planName) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid plan name: ${planName}. Must be one of: ${Object.keys(POLAR_PRODUCTS).join(', ')}`,
+      })
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: 'Either planName or productId is required',
+      })
     }
 
-    const productId = POLAR_PRODUCTS[planName]
+    // Validate amount for on-demand checkout
+    const isOnDemand = amount !== undefined && amount !== null
+    if (isOnDemand && amountType === 'fixed' && amount <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'amount is required and must be greater than 0 for fixed pricing',
+      })
+    }
+
     const frontendUrl =
       process.env.VITE_FRONTEND_URL ||
       (process.env.VERCEL_URL
         ? `https://${process.env.VERCEL_URL}`
         : 'http://localhost:5173')
 
-    // NIA-verified: Use 'products' array (not deprecated product_id)
-    // NIA-verified: Use 'externalCustomerId' (renamed from customer_external_id June 2025)
-    // NIA-verified: Metadata flows from checkout → order/subscription
-    const checkout = await polar.checkouts.create({
-      products: [productId],
+    // Build checkout config
+    const checkoutConfig = {
+      products: [resolvedProductId],
       externalCustomerId: orgId, // Links to org, becomes customer.external_id
       successUrl: `${frontendUrl}/checkout-success?checkout_id={CHECKOUT_ID}`,
       metadata: {
-        plan_name: planName, // Stored in resulting subscription for easy access
+        ...metadata,
+        plan_name: planName || undefined,
         org_id: orgId,
         created_via: 'api',
       },
-    })
+    }
 
-    console.log('✅ Polar checkout created:', {
+    // Add on-demand pricing if amount is provided
+    if (isOnDemand) {
+      checkoutConfig.prices = {
+        [resolvedProductId]: [
+          {
+            amountType: amountType,
+            priceAmount: amountType === 'fixed' ? amount : undefined,
+            priceCurrency: currency,
+          },
+        ],
+      }
+      checkoutConfig.metadata.payment_type = 'on_demand'
+      checkoutConfig.metadata.amount_type = amountType
+    }
+
+    // NIA-verified: Use 'products' array (not deprecated product_id)
+    // NIA-verified: Use 'externalCustomerId' (renamed from customer_external_id June 2025)
+    // NIA-verified: Metadata flows from checkout → order/subscription
+    const checkout = await polar.checkouts.create(checkoutConfig)
+
+    console.log(`✅ Polar ${isOnDemand ? 'on-demand ' : ''}checkout created:`, {
       checkoutId: checkout.id,
-      planName,
+      planName: planName || 'custom',
+      productId: resolvedProductId,
+      ...(isOnDemand && { amount: amountType === 'fixed' ? amount : 'custom', currency, amountType }),
     })
 
     return res.status(200).json({
