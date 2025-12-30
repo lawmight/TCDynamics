@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/hooks/useAuth'
-import { redirectToCheckout, type PlanType } from '@/utils/stripe'
+import { redirectToCheckout, type PlanType } from '@/utils/polar'
 
 const Checkout = () => {
   const [searchParams] = useSearchParams()
@@ -105,7 +105,7 @@ const Checkout = () => {
         )
         setIsLoading(false)
       }
-      // If successful, user will be redirected to Stripe Checkout
+      // If successful, user will be redirected to Polar Checkout
     } catch {
       setError(
         'Une erreur est survenue. Veuillez réessayer ou contacter notre support.'
@@ -244,7 +244,7 @@ const Checkout = () => {
                     <CreditCard className="mx-auto h-16 w-16 text-primary/50" />
                     <div>
                       <h3 className="mb-2 text-lg font-semibold">
-                        Paiement sécurisé par Stripe
+                        Paiement sécurisé par Polar
                       </h3>
                       <p className="mb-4 text-sm text-muted-foreground">
                         Vos informations de paiement sont traitées de manière
