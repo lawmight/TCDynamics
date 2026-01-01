@@ -28,7 +28,7 @@ const pricingPlans = [
       { name: 'Suivez une formation personnalisée', included: false },
       { name: 'Déployez sur votre site interne', included: false },
     ],
-    cta: 'Planifier une démo',
+    cta: "Démarrer l'essai gratuit",
     popular: false,
   },
   {
@@ -54,7 +54,7 @@ const pricingPlans = [
       { name: 'Suivez une formation personnalisée', included: false },
       { name: 'Déployez sur votre site interne', included: false },
     ],
-    cta: 'Planifier une démo',
+    cta: "Démarrer l'essai gratuit",
     popular: true,
   },
   {
@@ -80,7 +80,7 @@ const pricingPlans = [
       { name: 'Suivez formations personnalisées', included: true },
       { name: 'Déployez entièrement sur site', included: true },
     ],
-    cta: 'Parler à un expert',
+    cta: 'Nous contacter',
     popular: false,
   },
 ]
@@ -112,6 +112,15 @@ const Pricing = () => {
       return
     }
     navigate(demoLink)
+  }
+
+  const goToCheckout = (planName: string) => {
+    // Enterprise plan redirects to contact
+    if (planName === 'enterprise') {
+      navigate('/contact')
+      return
+    }
+    navigate(`/checkout?plan=${planName}`)
   }
 
   return (
@@ -154,8 +163,8 @@ const Pricing = () => {
             Plans IA, activation après démo guidée
           </h2>
           <p className="mx-auto max-w-2xl font-mono text-lg text-muted-foreground">
-            Les paiements/Stripe arrivent. Aujourd'hui, réservez une démo pour
-            valider le fit produit, la sécurité et la mise en place.
+            14 jours d'essai gratuit. Aucune carte bancaire requise. Annulez à
+            tout moment.
           </p>
         </div>
 
@@ -362,7 +371,7 @@ const Pricing = () => {
                   variant={plan.popular ? 'hero' : 'hero-outline'}
                   size="lg"
                   className="mt-auto w-full"
-                  onClick={() => goToDemo(plan.name.toLowerCase())}
+                  onClick={() => goToCheckout(plan.name.toLowerCase())}
                 >
                   {plan.cta}
                 </Button>
@@ -411,8 +420,7 @@ const Pricing = () => {
               </h4>
               <p className="mb-6 font-mono text-sm text-muted-foreground">
                 Contactez notre équipe pour une démo personnalisée et un devis
-                adapté à vos besoins spécifiques. Stripe et essais auto arrivent
-                après validation.
+                adapté à vos besoins spécifiques.
               </p>
               <Button variant="hero-outline" onClick={() => goToDemo()}>
                 Découvrez votre ROI en 15 minutes

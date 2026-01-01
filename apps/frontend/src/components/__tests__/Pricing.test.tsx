@@ -59,8 +59,8 @@ describe('Pricing Component', () => {
     renderPricing()
 
     expect(
-      screen.getAllByText('Planifier une démo', { exact: false })
+      screen.getAllByText("Démarrer l'essai gratuit", { exact: false })
     ).not.toHaveLength(0)
-    expect(screen.getByText('Parler à un expert')).toBeInTheDocument()
+    expect(screen.getByText('Nous contacter')).toBeInTheDocument()
   })
 })
