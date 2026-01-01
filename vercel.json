@@ -144,19 +144,6 @@
       ]
     }
   ],
-  "redirects": [
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.tcdynamics.fr"
-        }
-      ],
-      "destination": "https://tcdynamics.fr/:path*",
-      "permanent": true
-    }
-  ],
   "rewrites": [
     { "source": "/api/:path*", "destination": "/api/:path*" },
     { "source": "/:path*", "destination": "/index.html" }
