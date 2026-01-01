@@ -65,6 +65,9 @@ export interface CheckoutSessionResponse {
 
 /**
  * Create a Stripe checkout session
+ *
+ * RESTful endpoint: POST /api/stripe/checkout-sessions
+ *
  * @param params - Checkout parameters (priceId, planName)
  * @param session - Supabase session (required for authentication)
  * @returns Checkout session response with URL to redirect to
@@ -84,7 +87,8 @@ export const createCheckoutSession = async (
 
   try {
     // Use relative URL for API calls to work on any deployment
-    const response = await fetch(`/api/stripe/create-checkout-session`, {
+    // RESTful endpoint: POST /api/stripe/checkout-sessions
+    const response = await fetch(`/api/stripe/checkout-sessions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -195,12 +199,21 @@ export interface CheckoutSession {
   paymentStatus?: string
 }
 
+/**
+ * Retrieve a Stripe checkout session by ID
+ *
+ * RESTful endpoint: GET /api/stripe/checkout-sessions/{sessionId}
+ *
+ * @param sessionId - Stripe checkout session ID
+ * @returns Checkout session details or null if not found
+ */
 export const getCheckoutSession = async (
   sessionId: string
 ): Promise<CheckoutSession | null> => {
   try {
     // Use relative URL for API calls to work on any deployment
-    const response = await fetch(`/api/stripe/create-checkout-session?sessionId=${sessionId}`, {
+    // RESTful endpoint: GET /api/stripe/checkout-sessions/{sessionId}
+    const response = await fetch(`/api/stripe/checkout-sessions/${sessionId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

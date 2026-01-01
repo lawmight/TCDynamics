@@ -1,7 +1,7 @@
-import { saveContact, saveDemoRequest } from './_lib/supabase.js'
 import { sendContactNotification, sendDemoNotification } from './_lib/email.js'
 import { withGuards } from './_lib/request-guards.js'
 import { withSentry } from './_lib/sentry.js'
+import { saveContact, saveDemoRequest } from './_lib/supabase.js'
 
 // Disable Vercel's automatic body parsing - we handle size + JSON manually
 export const config = {
@@ -191,8 +191,6 @@ async function handleDemoForm(req, res, body, requestId) {
   console.log('New demo request:', {
     requestId,
     name,
-    email: sanitizedEmail,
-    company,
   })
 
   // Save to Supabase

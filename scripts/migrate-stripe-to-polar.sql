@@ -16,7 +16,7 @@ CREATE INDEX IF NOT EXISTS idx_orgs_polar_subscription_id ON orgs(polar_subscrip
 
 -- Step 3: Create polar_events table for webhook event tracking
 CREATE TABLE IF NOT EXISTS polar_events (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     event_id TEXT NOT NULL UNIQUE,
     type TEXT NOT NULL,
     payload JSONB NOT NULL,
@@ -32,6 +32,7 @@ CREATE INDEX IF NOT EXISTS idx_polar_events_created_at ON polar_events(created_a
 ALTER TABLE polar_events ENABLE ROW LEVEL SECURITY;
 
 -- Step 6: RLS Policy for polar_events (service role only)
+DROP POLICY IF EXISTS "Service role can manage polar_events" ON polar_events;
 CREATE POLICY "Service role can manage polar_events"
 ON polar_events FOR ALL
 USING (auth.role() = 'service_role');

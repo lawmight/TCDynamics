@@ -223,29 +223,31 @@ Between 13:38 and 13:53 CET on December 28, 2025, 17 consecutive Vercel deployme
 
 Eleven commits were pushed in rapid succession, each attempting to fix the Vercel build configuration:
 
-| Commit | Time | Issue |
-|--------|------|-------|
-| e68018b | 13:38:21 | Invalid redirect pattern |
-| a9904d5 | 13:39:55 | Header source pattern |
+| Commit  | Time     | Issue                                  |
+| ------- | -------- | -------------------------------------- |
+| e68018b | 13:38:21 | Invalid redirect pattern               |
+| a9904d5 | 13:39:55 | Header source pattern                  |
 | 7af9195 | 13:41:47 | Build command using `cd apps/frontend` |
-| 3316a35 | 13:43:27 | Workspace command syntax |
-| 05e3143 | 13:45:23 | Root-level build script |
-| 1c5fccb | 13:46:46 | Build command from frontend directory |
-| 869b83d | 13:48:15 | Subshell for build command |
-| c263ab6 | 13:49:43 | npm workspace flag |
-| df6c977 | 13:51:48 | Invalid `rootDirectory` property |
-| e1b5136 | 13:53:04 | Missing `tsconfig.e2e.json` file |
+| 3316a35 | 13:43:27 | Workspace command syntax               |
+| 05e3143 | 13:45:23 | Root-level build script                |
+| 1c5fccb | 13:46:46 | Build command from frontend directory  |
+| 869b83d | 13:48:15 | Subshell for build command             |
+| c263ab6 | 13:49:43 | npm workspace flag                     |
+| df6c977 | 13:51:48 | Invalid `rootDirectory` property       |
+| e1b5136 | 13:53:04 | Missing `tsconfig.e2e.json` file       |
 
 ##### 2. Latest Failure: Missing File in Build Context
 
 **Deployment ID**: `dpl_8XxdqZb1wGdY9bDmS8o82HiAjQHm` (most recent)
 **Error**:
+
 ```
 [vite:build-html] parsing /vercel/path0/apps/frontend/tsconfig.e2e.json failed:
 Error: ENOENT: no such file or directory, open '/vercel/path0/apps/frontend/tsconfig.e2e.json'
 ```
 
 **Root Cause**: The file `apps/frontend/tsconfig.e2e.json` is:
+
 - Referenced in `apps/frontend/tsconfig.json` (line 6)
 - Excluded from Vercel deployment via `apps/frontend/.vercelignore` (line 42)
 - Required by Vite during the build process
@@ -256,11 +258,13 @@ Error: ENOENT: no such file or directory, open '/vercel/path0/apps/frontend/tsco
 
 **Deployment ID**: `dpl_FU7xdg5Q4UJLsPRw5G751vp7qEHx` (commit df6c977)
 **Error**:
+
 ```
 Error: No Output Directory named "dist" found after the Build completed.
 ```
 
 **Root Cause**: The `vercel.json` contained an invalid `rootDirectory` property:
+
 ```json
 {
   "rootDirectory": "apps/frontend",  // ❌ Invalid in vercel.json v2
@@ -269,6 +273,7 @@ Error: No Output Directory named "dist" found after the Build completed.
 ```
 
 The `rootDirectory` property is **not valid** in `vercel.json` version 2. It's only valid in:
+
 - Vercel dashboard project settings
 - `vercel.json` version 1 (deprecated)
 
@@ -277,6 +282,7 @@ This was correctly fixed in commit e1b5136 by removing the property.
 #### Current Configuration Status
 
 ##### ✅ Working Build Command (Current)
+
 ```json
 {
   "buildCommand": "npm install && npm run -w tcdynamics-frontend build",
@@ -285,6 +291,7 @@ This was correctly fixed in commit e1b5136 by removing the property.
 ```
 
 This command correctly:
+
 - Installs all workspace dependencies
 - Uses npm workspace flag (`-w`) to run the build script in the `tcdynamics-frontend` package
 - Outputs to the correct directory (`apps/frontend/dist`)
@@ -292,6 +299,7 @@ This command correctly:
 ##### ❌ Outstanding Issue
 
 The `tsconfig.e2e.json` file exclusion in `.vercelignore` is causing build failures because:
+
 1. `tsconfig.json` references it via project references
 2. Vite's HTML build plugin tries to parse all TypeScript config files
 3. The file is excluded from deployment, causing `ENOENT` error
@@ -304,6 +312,7 @@ The `tsconfig.e2e.json` file exclusion in `.vercelignore` is causing build failu
 
 **Option 1: Include the file in deployment** (Recommended)
 Remove line 42 from `apps/frontend/.vercelignore`:
+
 ```diff
 # Test configs
 playwright.config.ts
@@ -313,6 +322,7 @@ vitest.config.ts
 
 **Option 2: Remove the reference** (If e2e tests aren't needed for production)
 Remove line 6 from `apps/frontend/tsconfig.json`:
+
 ```diff
   "references": [
     { "path": "./tsconfig.app.json" },
@@ -327,6 +337,7 @@ Only include the reference if the file exists (requires build script modificatio
 ### Prevent Future Issues
 
 1. **Test build commands locally** before pushing:
+
    ```bash
    npm install && npm run -w tcdynamics-frontend build
    ```
@@ -382,7 +393,7 @@ Based on Nia research of GitHub Actions best practices for monorepos:
 ### Why Keep Workflows Separate?
 
 1. ✅ **Modularity** - Workflows separated = easier to maintain and understand
-2. ✅ **Pattern Réutilisable** - Quality Gate is called via `workflow_call` (best practice)
+2. ✅ **Reusable Pattern** - Quality Gate is called via `workflow_call` (best practice)
 3. ✅ **Path Filters** - Saves CI/CD minutes (already implemented)
 4. ✅ **Separation of Responsibilities** - Each workflow has a unique objective
 5. ✅ **Custom Actions** - Shared logic extracted in `.github/actions/` (DRY)
@@ -395,4 +406,4 @@ Based on Nia research of GitHub Actions best practices for monorepos:
 
 ---
 
-**Last Updated**: January 2025
+**Last Updated**: January 2026

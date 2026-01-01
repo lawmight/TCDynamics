@@ -46,7 +46,8 @@ const csrfProtection = (req, res, next) => {
     '/health',
     '/api/test',
     '/api/rum/collect',
-    '/api/stripe/create-checkout-session',
+    '/api/stripe/create-checkout-session', // Deprecated, kept for backward compatibility
+    '/api/stripe/checkout-sessions', // RESTful endpoint
   ]
   if (skipRoutes.includes(req.path)) {
     return next()

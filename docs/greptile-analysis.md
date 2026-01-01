@@ -18,10 +18,12 @@ Your repository exceeds Greptile's 10MB free tier limit when considering the tot
 ### 2. Repository Size Calculation
 
 Based on the API reference, Greptile tracks:
+
 - `filesProcessed`: Number of files processed
 - `numFiles`: Total number of files
 
 **Important Question:** Does the 10MB limit apply to:
+
 - **Option A:** Entire repository (including `node_modules/`, `dist/`, `.venv/`) = ❌ **502.28 MB exceeds limit**
 - **Option B:** Only code files (excluding dependencies) = ✅ **9.15 MB is under limit**
 
@@ -30,12 +32,14 @@ Based on the API reference, Greptile tracks:
 Greptile can analyze **individual Pull Requests** even if the full repository exceeds size limits. This is your best option:
 
 **How it works:**
+
 - Greptile's code review bot automatically reviews PRs
 - It builds a graph of your codebase to understand context
 - Reviews are based on the PR changes, not the entire repo
 - The bot charges per file modified in the PR
 
 **Advantages:**
+
 - ✅ Works regardless of repository size
 - ✅ Only analyzes relevant changes
 - ✅ More cost-effective than full repository indexing
@@ -51,6 +55,7 @@ Greptile can analyze **individual Pull Requests** even if the full repository ex
 4. **Cost:** $0.45 per file modified (capped at $50/dev/month)
 
 **Steps:**
+
 ```bash
 # 1. Create a feature branch
 git checkout -b feature/greptile-analysis
@@ -100,6 +105,7 @@ You can configure Greptile behavior via `greptile.json` in your repository root:
 ### Exclusions
 
 From documentation:
+
 - You can exclude bot authors (e.g., `dependabot[bot]`, `renovate[bot]`)
 - Excluded authors don't count toward billing
 
@@ -130,11 +136,10 @@ From documentation:
 
 ## Sources
 
-- Greptile Documentation: `greptile.com` (indexed in Nia)
-- Pricing Information: `greptile.live/docs/pricing.html`
-- API Reference: `/api-reference/get-repository.md`
-- Code Review Guide: `/code-review/first-pr-review.md`
-- Configuration: `/code-review/greptile-json-reference.md`
+- Greptile Documentation: [greptile.com](https://www.greptile.com) (indexed in [Nia](https://docs.trynia.ai/) - a knowledge agent tool using Model Context Protocol for indexing and searching repositories and documentation)
+- Pricing Information: [greptile.live/docs/pricing.html](https://greptile.live/docs/pricing.html)
+- API Reference: [greptile.com/docs/api-reference](https://www.greptile.com/docs/api-reference)
+- Code Review Guide: [greptile.com/docs/code-review](https://www.greptile.com/docs/code-review)
 
 ## Questions to Clarify
 

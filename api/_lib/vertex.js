@@ -40,7 +40,10 @@ export const getAuthClient = async () => {
 
 export const getProjectConfig = () => {
   const projectId = process.env.VERTEX_PROJECT_ID
-  const location = process.env.VERTEX_LOCATION || 'global'
+  // Default to 'us-central1' for backward compatibility. Using 'global' (via VERTEX_LOCATION env var)
+  // changes data residency (data may be processed outside your region) and some features may be
+  // unavailable. Set VERTEX_LOCATION=global explicitly if you need global endpoint access.
+  const location = process.env.VERTEX_LOCATION || 'us-central1'
   const model = process.env.VERTEX_MODEL || 'gemini-3-flash-preview'
   const embedModel = process.env.VERTEX_EMBED_MODEL || 'text-embedding-005'
 
@@ -55,10 +58,13 @@ export const generateText = async ({ messages, temperature = 0.4 }) => {
   const client = await getAuthClient()
   const { projectId, location, model } = getProjectConfig()
 
-  // For global region, use us-central1 endpoint but global location
-  const endpoint = location === 'global' ? 'us-central1' : location
+  // For global region, use aiplatform.googleapis.com (no regional prefix)
+  const host =
+    location === 'global'
+      ? 'aiplatform.googleapis.com'
+      : `${location}-aiplatform.googleapis.com`
   const pathLocation = location === 'global' ? 'global' : location
-  const url = `https://${endpoint}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${pathLocation}/publishers/google/models/${model}:generateContent`
+  const url = `https://${host}/v1/projects/${projectId}/locations/${pathLocation}/publishers/google/models/${model}:generateContent`
 
   const toSafeText = value => {
     if (value === undefined || value === null) return ''
@@ -196,10 +202,13 @@ export const embedText = async text => {
   const client = await getAuthClient()
   const { projectId, location, embedModel } = getProjectConfig()
 
-  // For global region, use us-central1 endpoint but global location
-  const endpoint = location === 'global' ? 'us-central1' : location
+  // For global region, use aiplatform.googleapis.com (no regional prefix)
+  const host =
+    location === 'global'
+      ? 'aiplatform.googleapis.com'
+      : `${location}-aiplatform.googleapis.com`
   const pathLocation = location === 'global' ? 'global' : location
-  const url = `https://${endpoint}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${pathLocation}/publishers/google/models/${embedModel}:predict`
+  const url = `https://${host}/v1/projects/${projectId}/locations/${pathLocation}/publishers/google/models/${embedModel}:predict`
 
   const response = await client.request({
     url,

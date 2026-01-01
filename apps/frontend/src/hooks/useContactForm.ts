@@ -12,11 +12,18 @@ export interface ContactFormData {
 }
 
 /**
+ * Contact form submission data with formType field
+ */
+export interface ContactFormSubmission extends ContactFormData {
+  formType: 'contact'
+}
+
+/**
  * Contact form submission hook
  * Uses Vercel serverless functions
  */
 export const useContactForm = () => {
-  const formSubmit = useFormSubmit<ContactFormData>({
+  const formSubmit = useFormSubmit<ContactFormSubmission>({
     primaryEndpoint: API_ENDPOINTS.contact,
     fallbackEndpoint: API_ENDPOINTS.contact, // No fallback needed - unified backend
     enableFallback: false,
@@ -29,7 +36,11 @@ export const useContactForm = () => {
     data: ContactFormData,
     options?: Parameters<typeof originalSubmitForm>[1]
   ) => {
-    return originalSubmitForm({ ...data, formType: 'contact' }, options)
+    const submissionData: ContactFormSubmission = {
+      ...data,
+      formType: 'contact',
+    }
+    return originalSubmitForm(submissionData, options)
   }
 
   return {

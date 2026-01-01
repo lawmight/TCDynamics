@@ -1,11 +1,29 @@
 import type { Session } from '@supabase/supabase-js'
+
 import { logger } from './logger'
 
 export const POLAR_PRODUCT_IDS = {
-  starter: import.meta.env.VITE_POLAR_PRODUCT_STARTER || '',
-  professional: import.meta.env.VITE_POLAR_PRODUCT_PROFESSIONAL || '',
-  enterprise: '',
+  starter: import.meta.env.VITE_POLAR_PRODUCT_STARTER,
+  professional: import.meta.env.VITE_POLAR_PRODUCT_PROFESSIONAL,
+  enterprise: import.meta.env.VITE_POLAR_PRODUCT_ENTERPRISE,
 } as const
+
+// Startup validation: ensure required environment variables are set
+if (typeof window !== 'undefined') {
+  const missingVars: string[] = []
+  if (!POLAR_PRODUCT_IDS.starter) {
+    missingVars.push('VITE_POLAR_PRODUCT_STARTER')
+  }
+  if (!POLAR_PRODUCT_IDS.professional) {
+    missingVars.push('VITE_POLAR_PRODUCT_PROFESSIONAL')
+  }
+  // Enterprise is optional (can be undefined for custom pricing)
+  if (missingVars.length > 0) {
+    throw new Error(
+      `Missing required Polar product ID environment variables: ${missingVars.join(', ')}`
+    )
+  }
+}
 
 export type PlanType = keyof typeof POLAR_PRODUCT_IDS
 
@@ -84,7 +102,7 @@ export const redirectToCheckout = async (
   }
 
   try {
-    if (!POLAR_PRODUCT_IDS[planName]) {
+    if (!(planName in POLAR_PRODUCT_IDS)) {
       throw new Error(`Invalid plan: ${planName}`)
     }
 
@@ -115,12 +133,33 @@ export const redirectToCheckout = async (
 }
 
 export const getCheckoutSession = async (
-  checkoutId: string
+  checkoutId: string,
+  session: Session | null
 ): Promise<CheckoutSession | null> => {
+  if (!session?.access_token) {
+    logger.error('Authentication required to retrieve checkout session')
+    return null
+  }
+
   try {
-    const response = await fetch(`/api/polar/create-checkout-session?checkoutId=${checkoutId}`)
+    const response = await fetch(
+      `/api/polar/checkout-session?checkoutId=${checkoutId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      }
+    )
     const data = await response.json()
-    if (!response.ok || !data.success) throw new Error(data.message)
+    if (!response.ok || !data.success) {
+      if (response.status === 401) {
+        logger.error('Session expired while retrieving checkout')
+        return null
+      }
+      throw new Error(data.message || 'Failed to retrieve checkout session')
+    }
     return data.session
   } catch (error) {
     logger.error('Failed to retrieve checkout', error)

@@ -11,6 +11,7 @@ export interface DemoFormData {
   industry?: string
   message?: string
   captchaToken?: string
+  formType?: 'demo'
 }
 
 /**

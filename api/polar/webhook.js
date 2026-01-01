@@ -1,6 +1,6 @@
 import { validateEvent, WebhookVerificationError } from '@polar-sh/sdk/webhooks'
 import { getResendClient } from '../_lib/email.js'
-import { savePolarEvent, getSupabaseClient } from '../_lib/supabase.js'
+import { getSupabaseClient, savePolarEvent } from '../_lib/supabase.js'
 
 // Reverse mapping: product_id → plan name
 const PRODUCT_TO_PLAN = {
@@ -212,7 +212,7 @@ export default async function handler(req, res) {
         const orgId = subscription.customer?.external_id
         if (orgId) {
           const supabase = getSupabaseClient()
-          await supabase
+          const { error, status } = await supabase
             .from('orgs')
             .update({
               subscription_status: 'canceled',
@@ -220,6 +220,30 @@ export default async function handler(req, res) {
               updated_at: new Date().toISOString(),
             })
             .eq('id', orgId)
+
+          if (error) {
+            console.error('Failed to revoke subscription in orgs table', {
+              error: error.message,
+              status,
+              orgId,
+              subscriptionId: subscription.id,
+              eventType: event.type,
+            })
+            // Throw to trigger webhook retry by Polar, ensuring data consistency
+            throw new Error(
+              `Failed to update org ${orgId} for revoked subscription ${subscription.id}: ${error.message}`
+            )
+          }
+
+          console.log('✅ Revoked subscription in org', {
+            orgId,
+            subscriptionId: subscription.id,
+          })
+        } else {
+          console.warn('No external_id in customer for revoked subscription', {
+            subscriptionId: subscription.id,
+            eventType: event.type,
+          })
         }
         await sendPolarEmail(
           'Subscription revoked',

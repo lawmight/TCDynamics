@@ -1,6 +1,8 @@
 /**
  * Vercel Serverless Function for Polar Checkout
  * Creates checkout sessions using Polar SDK with externalCustomerId for org linkage
+ *
+ * Note: For retrieving checkout sessions, use GET /api/polar/checkout-session?checkoutId=<id>
  */
 
 import { Polar } from '@polar-sh/sdk'
@@ -23,58 +25,13 @@ const polar = process.env.POLAR_ACCESS_TOKEN
 const allowCors = fn => async (req, res) => {
   res.setHeader('Access-Control-Allow-Credentials', true)
   res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST')
+  res.setHeader('Access-Control-Allow-Methods', 'OPTIONS,POST')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
   if (req.method === 'OPTIONS') return res.status(200).end()
   return await fn(req, res)
 }
 
 const handler = async (req, res) => {
-  // Support both GET (retrieve checkout) and POST (create checkout)
-  if (req.method === 'GET') {
-    // Retrieve checkout session
-    const { checkoutId } = req.query
-
-    if (!checkoutId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Checkout ID required',
-        hint: 'Use GET /api/polar/create-checkout-session?checkoutId=<id> to retrieve a checkout, or POST to create one',
-      })
-    }
-
-    if (!polar) {
-      return res.status(500).json({
-        success: false,
-        message: 'Payment service not configured',
-        error: 'POLAR_NOT_CONFIGURED',
-      })
-    }
-
-    try {
-      const checkout = await polar.checkouts.get(checkoutId)
-
-      // NIA-verified: Use net_amount (not deprecated subtotal_amount)
-      return res.json({
-        success: true,
-        session: {
-          id: checkout.id,
-          status: checkout.status,
-          customerEmail: checkout.customer?.email,
-          amountTotal: checkout.net_amount,
-          currency: checkout.currency,
-          paymentStatus:
-            checkout.status === 'succeeded' ? 'paid' : checkout.status,
-        },
-      })
-    } catch (error) {
-      console.error('Failed to retrieve checkout:', error)
-      return res
-        .status(404)
-        .json({ success: false, message: 'Checkout not found' })
-    }
-  }
-
   if (req.method !== 'POST') {
     return res
       .status(405)
@@ -102,7 +59,14 @@ const handler = async (req, res) => {
 
     // Support both standard subscription and on-demand checkout
     // If 'amount' is provided, use on-demand pricing; otherwise use standard subscription
-    const { planName, productId, amount, currency = 'eur', amountType = 'fixed', metadata = {} } = req.body
+    const {
+      planName,
+      productId,
+      amount,
+      currency = 'eur',
+      amountType = 'fixed',
+      metadata = {},
+    } = req.body
 
     // Resolve product ID: planName takes precedence, fallback to productId
     let resolvedProductId = null
@@ -124,10 +88,17 @@ const handler = async (req, res) => {
 
     // Validate amount for on-demand checkout
     const isOnDemand = amount !== undefined && amount !== null
+    if (isOnDemand && typeof amount !== 'number') {
+      return res.status(400).json({
+        success: false,
+        message: 'amount must be a number',
+      })
+    }
     if (isOnDemand && amountType === 'fixed' && amount <= 0) {
       return res.status(400).json({
         success: false,
-        message: 'amount is required and must be greater than 0 for fixed pricing',
+        message:
+          'amount is required and must be greater than 0 for fixed pricing',
       })
     }
 
@@ -174,7 +145,11 @@ const handler = async (req, res) => {
       checkoutId: checkout.id,
       planName: planName || 'custom',
       productId: resolvedProductId,
-      ...(isOnDemand && { amount: amountType === 'fixed' ? amount : 'custom', currency, amountType }),
+      ...(isOnDemand && {
+        amount: amountType === 'fixed' ? amount : 'custom',
+        currency,
+        amountType,
+      }),
     })
 
     return res.status(200).json({

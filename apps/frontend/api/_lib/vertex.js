@@ -40,7 +40,10 @@ export const getAuthClient = async () => {
 
 export const getProjectConfig = () => {
   const projectId = process.env.VERTEX_PROJECT_ID
-  const location = process.env.VERTEX_LOCATION || 'global'
+  // Default to 'us-central1' for backward compatibility. Using 'global' (via VERTEX_LOCATION env var)
+  // changes data residency (data may be processed outside your region) and some features may be
+  // unavailable. Set VERTEX_LOCATION=global explicitly if you need global endpoint access.
+  const location = process.env.VERTEX_LOCATION || 'us-central1'
   const model = process.env.VERTEX_MODEL || 'gemini-3-flash-preview'
   const embedModel = process.env.VERTEX_EMBED_MODEL || 'text-embedding-005'
 

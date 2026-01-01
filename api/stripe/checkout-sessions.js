@@ -1,12 +1,7 @@
 /**
- * Vercel Serverless Function for Stripe Checkout (DEPRECATED)
- *
- * @deprecated This endpoint is deprecated. Use RESTful endpoints instead:
- * - POST /api/stripe/checkout-sessions - Create a checkout session
- * - GET /api/stripe/checkout-sessions/{sessionId} - Retrieve a checkout session
- *
- * This file is kept for backward compatibility but will be removed in a future version.
- * Please migrate to the new RESTful endpoints.
+ * Vercel Serverless Function for Stripe Checkout Sessions (RESTful)
+ * POST /api/stripe/checkout-sessions - Create a new checkout session
+ * Requires Supabase authentication to link checkout to org_id
  */
 
 import Stripe from 'stripe'
@@ -65,119 +60,13 @@ const allowCors = fn => async (req, res) => {
 }
 
 const handler = async (req, res) => {
-  // DEPRECATED: Redirect GET requests to RESTful endpoint
-  if (req.method === 'GET') {
-    const { sessionId } = req.query
-    if (sessionId) {
-      console.warn(
-        '⚠️ Deprecated endpoint used. Please migrate to GET /api/stripe/checkout-sessions/{sessionId}'
-      )
-    // Retrieve checkout session
-    try {
-      if (!stripe) {
-        console.error('❌ Stripe is not initialized - missing STRIPE_SECRET_KEY')
-        return res.status(500).json({
-          success: false,
-          message:
-            'Payment service is not configured. Please add STRIPE_SECRET_KEY to environment variables.',
-          error: 'STRIPE_NOT_CONFIGURED',
-        })
-      }
-
-      // Verify authentication
-      const authHeader = req.headers.authorization
-      const { userId: orgId, error: authError } =
-        await verifySupabaseAuth(authHeader)
-
-      if (authError || !orgId) {
-        console.warn('Authentication failed:', authError)
-        return res.status(401).json({
-          success: false,
-          message: 'Authentication required',
-          error: authError || 'Invalid token',
-        })
-      }
-
-      const { sessionId } = req.query
-
-      if (!sessionId) {
-        return res.status(400).json({
-          success: false,
-          message: 'Session ID is required',
-        })
-      }
-
-      const session = await stripe.checkout.sessions.retrieve(sessionId)
-
-      // Verify the session belongs to the authenticated org
-      if (session.metadata?.org_id !== orgId) {
-        return res.status(403).json({
-          success: false,
-          message: 'Access denied',
-        })
-      }
-
-      console.log('Stripe session retrieved:', sessionId)
-
-      return res.status(200).json({
-        success: true,
-        session: {
-          id: session.id,
-          status: session.status,
-          customerEmail: session.customer_details?.email,
-          amountTotal: session.amount_total,
-          currency: session.currency,
-          metadata: session.metadata,
-        },
-      })
-    } catch (error) {
-      console.error('Error retrieving Stripe session:', error)
-
-      if (error.type === 'StripeInvalidRequestError') {
-        return res.status(404).json({
-          success: false,
-          message: 'Session not found',
-        })
-      }
-
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to retrieve session',
-        error: process.env.NODE_ENV === 'development' ? error.message : undefined,
-      })
-    }
+  // Only support POST for creating sessions
+  if (req.method !== 'POST') {
+    return res.status(405).json({
+      success: false,
+      message: 'Method not allowed. Use POST to create a checkout session.',
+    })
   }
-          status: session.status,
-          customerEmail: session.customer_details?.email,
-          amountTotal: session.amount_total,
-          currency: session.currency,
-          metadata: session.metadata,
-        },
-      })
-    } catch (error) {
-      console.error('Error retrieving Stripe session:', error)
-
-      if (error.type === 'StripeInvalidRequestError') {
-        return res.status(404).json({
-          success: false,
-          message: 'Session not found',
-        })
-      }
-
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to retrieve session',
-        error:
-          process.env.NODE_ENV === 'development' ? error.message : undefined,
-      })
-    }
-  }
-
-  // DEPRECATED: Redirect POST requests to RESTful endpoint
-  if (req.method === 'POST') {
-    console.warn(
-      '⚠️ Deprecated endpoint used. Please migrate to POST /api/stripe/checkout-sessions'
-    )
 
   try {
     // Check if Stripe is properly initialized
