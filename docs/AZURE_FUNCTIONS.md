@@ -5,12 +5,15 @@ This document covers the archived Azure Functions and the required migration pla
 ## Archive Overview
 
 ### Archived Date
+
 December 20, 2025
 
 ### Reason for Archiving
+
 Azure Functions were archived to simplify the project structure. The functionality may have been replaced by Vercel serverless API routes or is no longer actively used.
 
 ### Location
+
 `apps/functions-archive/`
 
 ---
@@ -96,24 +99,27 @@ Microsoft recommends migrating to one of these alternatives:
 
 **Total Estimated Effort**: 36-54 hours (4.5-7 working days)
 
-**Backlog Reference**: See `md/docs/implementation-tasks.md` for detailed epic breakdown with steps, owners, and effort estimates.
+**Backlog Reference**: See `docs/implementation-tasks.md` for detailed epic breakdown with steps, owners, and effort estimates.
 
 ---
 
 ## Action Items
 
 ### Phase 1: Research & Evaluation (Q1 2026)
+
 - [ ] Research Azure AI Vision v4.0 capabilities and migration path
 - [ ] Evaluate alternative solutions (AWS, Google Cloud, open-source)
 - [ ] Assess impact on existing functionality
 - [ ] Document findings and recommendation
 
 ### Phase 2: Implementation Planning (Q2 2026)
+
 - [ ] Create detailed migration implementation plan
 - [ ] Identify breaking changes and required code modifications
 - [ ] Plan test strategy for dev environment validation
 
 ### Phase 3: Development & Testing (Q2-Q3 2026)
+
 - [ ] Update `requirements.txt` and `constraints.txt` with new dependency
 - [ ] Refactor `services/client_manager.py` to use new Vision API client
 - [ ] Update `function_app.py` `ai_vision` endpoint for new API
@@ -122,13 +128,14 @@ Microsoft recommends migrating to one of these alternatives:
 - [ ] Validate feature parity (caption extraction, text reading)
 
 ### Phase 4: Validation & Deployment (Q3 2026, before September)
+
 - [ ] Deploy to staging environment (if functions are restored)
 - [ ] End-to-end testing with real image samples
 - [ ] Update documentation and migration guide
 - [ ] Remove deprecated `azure-ai-vision-imageanalysis` dependency
 - [ ] Monitor for issues post-migration
 
-**See `md/docs/implementation-tasks.md` for detailed epic with owner assignments and effort estimates.**
+**See `docs/implementation-tasks.md` for detailed epic with owner assignments and effort estimates.**
 
 ---
 
@@ -151,6 +158,7 @@ To prevent pre-release dependencies in production requirements:
 1. **Manual Review**: Always review `requirements.txt` and `constraints.txt` for pre-release versions (indicated by `a`, `b`, `rc`, or `dev` suffixes)
 
 2. **CI Check** (if functions are restored): Add a validation step to CI/CD pipeline:
+
    ```bash
    # Check for pre-release versions in requirements.txt
    if grep -E "==[0-9]+\.[0-9]+\.[0-9]+(a|b|rc|dev)" apps/functions/requirements.txt; then
@@ -179,5 +187,5 @@ To prevent pre-release dependencies in production requirements:
 
 ---
 
-**Last Updated**: January 2025
+**Last Updated**: December 30, 2025
 **Next Review**: Q2 2026
