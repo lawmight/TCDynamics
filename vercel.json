@@ -149,10 +149,11 @@
       "permanent": true
     }
   ],
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    {
+      "source": "/((?!api|_next|assets|.*\\..*).*)",
+      "destination": "/index.html"
+    }
   ],
   "env": {
     "USE_BYTECODE_CACHING": "1"
