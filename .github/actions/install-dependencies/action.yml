@@ -21,6 +21,7 @@ runs:
     - name: Cache root node_modules
       if: inputs.skip-root != 'true'
       uses: actions/cache@v4
+      continue-on-error: true
       with:
         path: node_modules
         key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
@@ -35,6 +36,7 @@ runs:
     - name: Cache frontend node_modules
       if: inputs.skip-frontend != 'true'
       uses: actions/cache@v4
+      continue-on-error: true
       with:
         path: apps/frontend/node_modules
         key: ${{ runner.os }}-node-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}
@@ -50,6 +52,7 @@ runs:
     - name: Cache API node_modules
       if: inputs.skip-api != 'true'
       uses: actions/cache@v4
+      continue-on-error: true
       with:
         path: api/node_modules
         key: ${{ runner.os }}-node-api-${{ hashFiles('api/package-lock.json') }}
