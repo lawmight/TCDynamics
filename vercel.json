@@ -149,39 +149,10 @@
       "permanent": true
     }
   ],
-  "rewrites": [
-    {
-      "source": "/checkout",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/checkout/:path*",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/checkout-success",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/login",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/get-started",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/demo",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/contact",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/((?!api|assets|.*\\.).*)",
-      "destination": "/index.html"
-    }
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ],
   "env": {
     "USE_BYTECODE_CACHING": "1"
