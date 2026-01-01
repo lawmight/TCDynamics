@@ -150,10 +150,8 @@
     }
   ],
   "rewrites": [
-    {
-      "source": "/((?!api|_next|assets|.*\\..*).*)",
-      "destination": "/index.html"
-    }
+    { "source": "/api/:path*", "destination": "/api/:path*" },
+    { "source": "/:path*", "destination": "/index.html" }
   ],
   "env": {
     "USE_BYTECODE_CACHING": "1"
