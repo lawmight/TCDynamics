@@ -144,10 +144,7 @@
       ]
     }
   ],
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "/api/:path*" },
-    { "source": "/((?!api/.*).*)", "destination": "/index.html" }
-  ],
+  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/index.html" }],
   "env": {
     "USE_BYTECODE_CACHING": "1"
   }
