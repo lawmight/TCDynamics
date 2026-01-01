@@ -33,27 +33,6 @@ const PerformanceMonitor = () => {
     return envMode === 'development' || isVitest || envMode === 'test'
   })()
 
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/58095262-9eae-40ce-bf51-b3d6c86e36b2', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      sessionId: 'debug-session',
-      runId: 'perf-fix',
-      hypothesisId: 'H4',
-      location: 'PerformanceMonitor.tsx:init',
-      message: 'env snapshot',
-      data: {
-        processExists: typeof process !== 'undefined',
-        envMode,
-        isVitest,
-        storedPreference: getStoredPreference(),
-      },
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {})
-  // #endregion
-
   const [metrics, setMetrics] = useState<PerformanceMetrics | null>(null)
   const [isVisible, setIsVisible] = useState(initialVisibility)
 
