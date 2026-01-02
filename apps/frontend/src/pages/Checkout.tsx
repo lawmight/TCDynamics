@@ -1,5 +1,5 @@
 import { ArrowLeft, CheckCircle, CreditCard, Lock, Shield } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 
 import { Badge } from '@/components/ui/badge'
@@ -70,24 +70,11 @@ const Checkout = () => {
 
   const currentPlan = planDetails[plan]
 
-  // Redirect to contact for Enterprise plan
-  useEffect(() => {
-    if (plan === 'enterprise') {
-      navigate('/contact')
-    }
-  }, [plan, navigate])
-
   const handleCheckout = async () => {
     setIsLoading(true)
     setError(null)
 
     try {
-      // Enterprise plan should redirect to contact, not checkout
-      if (plan === 'enterprise') {
-        navigate('/contact')
-        return
-      }
-
       const result = await redirectToCheckout(plan, session)
 
       if (result.authRequired) {

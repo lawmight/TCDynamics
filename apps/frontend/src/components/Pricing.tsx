@@ -115,11 +115,6 @@ const Pricing = () => {
   }
 
   const goToCheckout = (planName: string) => {
-    // Enterprise plan redirects to contact
-    if (planName === 'enterprise') {
-      navigate('/contact')
-      return
-    }
     navigate(`/checkout?plan=${planName}`)
   }
 
@@ -287,7 +282,11 @@ const Pricing = () => {
         </div>
 
         {/* Pricing Cards */}
-        <div className="mb-16 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div
+          id="pricing-cards"
+          style={{ scrollMarginTop: '6rem' }}
+          className="mb-16 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3"
+        >
           {pricingPlans.map((plan, index) => (
             <Card
               key={index}
