@@ -1,5 +1,4 @@
 import { loadStripe, Stripe } from '@stripe/stripe-js'
-import type { Session } from '@supabase/supabase-js'
 
 import { logger } from './logger'
 // Stripe publishable key from environment
@@ -69,15 +68,16 @@ export interface CheckoutSessionResponse {
  * RESTful endpoint: POST /api/stripe/checkout-sessions
  *
  * @param params - Checkout parameters (priceId, planName)
- * @param session - Supabase session (required for authentication)
+ * @param getToken - Function to get Clerk JWT token (required for authentication)
  * @returns Checkout session response with URL to redirect to
  */
 export const createCheckoutSession = async (
   params: CreateCheckoutSessionParams,
-  session: Session | null
+  getToken: () => Promise<string | null>
 ): Promise<CheckoutSessionResponse> => {
   // Require authentication
-  if (!session?.access_token) {
+  const token = await getToken()
+  if (!token) {
     return {
       success: false,
       message: 'Authentication required. Please log in.',
@@ -92,7 +92,7 @@ export const createCheckoutSession = async (
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${session.access_token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(params),
     })
@@ -128,15 +128,16 @@ export const createCheckoutSession = async (
 /**
  * Redirect to Stripe Checkout
  * @param planName - Plan to checkout (starter, professional, enterprise)
- * @param session - Supabase session (required for authentication)
+ * @param getToken - Function to get Clerk JWT token (required for authentication)
  * @returns Object with optional error
  */
 export const redirectToCheckout = async (
   planName: PlanType,
-  session: Session | null
+  getToken: () => Promise<string | null>
 ): Promise<{ error?: Error; authRequired?: boolean }> => {
   // Check authentication first
-  if (!session?.access_token) {
+  const token = await getToken()
+  if (!token) {
     return {
       error: new Error('Authentication required. Please log in.'),
       authRequired: true,
@@ -156,7 +157,7 @@ export const redirectToCheckout = async (
         priceId,
         planName,
       },
-      session
+      getToken
     )
 
     // Handle auth errors

@@ -1,5 +1,3 @@
-import type { Session } from '@supabase/supabase-js'
-
 import { logger } from './logger'
 
 export const POLAR_PRODUCT_IDS = {
@@ -52,9 +50,10 @@ export interface CheckoutSession {
 
 export const createCheckoutSession = async (
   planName: PlanType,
-  session: Session | null
+  getToken: () => Promise<string | null>
 ): Promise<CheckoutSessionResponse> => {
-  if (!session?.access_token) {
+  const token = await getToken()
+  if (!token) {
     return {
       success: false,
       message: 'Authentication required',
@@ -67,7 +66,7 @@ export const createCheckoutSession = async (
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${session.access_token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ planName }),
     })
@@ -95,9 +94,10 @@ export const createCheckoutSession = async (
 
 export const redirectToCheckout = async (
   planName: PlanType,
-  session: Session | null
+  getToken: () => Promise<string | null>
 ): Promise<{ error?: Error; authRequired?: boolean }> => {
-  if (!session?.access_token) {
+  const token = await getToken()
+  if (!token) {
     return { error: new Error('Authentication required'), authRequired: true }
   }
 
@@ -106,7 +106,7 @@ export const redirectToCheckout = async (
       throw new Error(`Invalid plan: ${planName}`)
     }
 
-    const response = await createCheckoutSession(planName, session)
+    const response = await createCheckoutSession(planName, getToken)
 
     if (
       response.error === 'AUTH_REQUIRED' ||
@@ -134,9 +134,10 @@ export const redirectToCheckout = async (
 
 export const getCheckoutSession = async (
   checkoutId: string,
-  session: Session | null
+  getToken: () => Promise<string | null>
 ): Promise<CheckoutSession | null> => {
-  if (!session?.access_token) {
+  const token = await getToken()
+  if (!token) {
     logger.error('Authentication required to retrieve checkout session')
     return null
   }
@@ -148,7 +149,7 @@ export const getCheckoutSession = async (
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     )
@@ -192,9 +193,10 @@ export interface OnDemandCheckoutParams {
 
 export const createOnDemandCheckout = async (
   params: OnDemandCheckoutParams,
-  session: Session | null
+  getToken: () => Promise<string | null>
 ): Promise<CheckoutSessionResponse> => {
-  if (!session?.access_token) {
+  const token = await getToken()
+  if (!token) {
     return {
       success: false,
       message: 'Authentication required',
@@ -207,7 +209,7 @@ export const createOnDemandCheckout = async (
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${session.access_token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         planName: params.planName,
@@ -245,14 +247,15 @@ export const createOnDemandCheckout = async (
  */
 export const redirectToOnDemandCheckout = async (
   params: OnDemandCheckoutParams,
-  session: Session | null
+  getToken: () => Promise<string | null>
 ): Promise<{ error?: Error; authRequired?: boolean }> => {
-  if (!session?.access_token) {
+  const token = await getToken()
+  if (!token) {
     return { error: new Error('Authentication required'), authRequired: true }
   }
 
   try {
-    const response = await createOnDemandCheckout(params, session)
+    const response = await createOnDemandCheckout(params, getToken)
 
     if (
       response.error === 'AUTH_REQUIRED' ||

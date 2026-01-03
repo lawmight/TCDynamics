@@ -6,6 +6,7 @@ import {
   Moon,
   Sun,
 } from 'lucide-react'
+import { UserButton, useUser } from '@clerk/clerk-react'
 import { useMemo } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 
@@ -25,12 +26,13 @@ const baseNavClasses =
 
 export const AppLayout = () => {
   const { resolvedTheme, setTheme, theme } = useTheme()
-  const { user, signOut } = useAuth()
+  const { signOut } = useAuth()
+  const { user } = useUser()
 
   const initials = useMemo(() => {
-    const email = user?.email || 'user'
+    const email = user?.primaryEmailAddress?.emailAddress || user?.emailAddresses[0]?.emailAddress || 'user'
     return email.slice(0, 2).toUpperCase()
-  }, [user?.email])
+  }, [user])
 
   const toggleTheme = () =>
     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
@@ -80,8 +82,12 @@ export const AppLayout = () => {
                   {initials}
                 </div>
                 <div className="text-sm">
-                  <p className="font-semibold">{user?.email || 'Guest'}</p>
-                  <p className="text-muted-foreground">Google OAuth</p>
+                  <p className="font-semibold">
+                    {user?.primaryEmailAddress?.emailAddress ||
+                      user?.emailAddresses[0]?.emailAddress ||
+                      'Guest'}
+                  </p>
+                  <p className="text-muted-foreground">Clerk Auth</p>
                 </div>
               </div>
             </div>
@@ -102,15 +108,9 @@ export const AppLayout = () => {
                   </div>
                 )}
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => void signOut()}
-                className="w-full text-destructive hover:text-destructive"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </Button>
+              <div className="flex items-center">
+                <UserButton afterSignOutUrl="/" />
+              </div>
             </div>
           </div>
         </aside>
@@ -155,7 +155,9 @@ export const AppLayout = () => {
                       Signed in as
                     </p>
                     <p className="text-sm font-semibold">
-                      {user?.email || 'Guest'}
+                      {user?.primaryEmailAddress?.emailAddress ||
+                        user?.emailAddresses[0]?.emailAddress ||
+                        'Guest'}
                     </p>
                   </div>
                   <div className="flex items-center gap-1">

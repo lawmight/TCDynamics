@@ -1,159 +1,62 @@
-import type { Session, User } from '@supabase/supabase-js'
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import { useAuth as useClerkAuth, useUser } from '@clerk/clerk-react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { getSupabaseClient } from '@/lib/supabaseClient'
+import type { User } from '@clerk/clerk-react'
 
+// Adapter type to maintain compatibility with existing code
 type AuthContextType = {
   user: User | null
-  session: Session | null
+  session: { access_token?: string; id?: string } | null
   loading: boolean
   authReady: boolean
   signInWithGoogle: () => Promise<void>
   signOut: () => Promise<void>
   refreshSession: () => Promise<void>
+  getToken: () => Promise<string | null>
+  isSignedIn: boolean | undefined
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
-
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null)
-  const [session, setSession] = useState<Session | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [authReady, setAuthReady] = useState(false)
-
-  useEffect(() => {
-    let cancelled = false
-    let unsubscribe: { unsubscribe: () => void } | undefined
-
-    const init = async () => {
-      try {
-        const supabase = getSupabaseClient()
-
-        // If returning from OAuth redirect, exchange the code for a session before we gate routes.
-        if (typeof window !== 'undefined') {
-          const url = new URL(window.location.href)
-          const code = url.searchParams.get('code')
-          if (code) {
-            const { error } = await supabase.auth.exchangeCodeForSession(code)
-            // Always clean URL to prevent retry loops
-            url.searchParams.delete('code')
-            url.searchParams.delete('state')
-            const cleanUrl = `${url.pathname}${url.search}${url.hash}`
-            window.history.replaceState({}, document.title, cleanUrl)
-
-            if (error) {
-              console.error('Auth code exchange failed', error)
-              // Optionally: set an error state or redirect to login with error message
-            }
-          }
-        }
-
-        const {
-          data: { session: currentSession },
-        } = await supabase.auth.getSession()
-
-        if (!cancelled) {
-          setSession(currentSession)
-          setUser(currentSession?.user ?? null)
-          setAuthReady(true)
-        }
-
-        unsubscribe = supabase.auth.onAuthStateChange((_event, nextSession) => {
-          if (cancelled) return
-          setSession(nextSession)
-          setUser(nextSession?.user ?? null)
-          setLoading(false)
-        }).data.subscription
-      } catch (error) {
-        console.error('Auth initialization failed', error)
-        setAuthReady(false)
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    }
-
-    void init()
-
-    return () => {
-      cancelled = true
-      unsubscribe?.unsubscribe()
-    }
-  }, [])
-
-  const signInWithGoogle = useCallback(async () => {
-    const supabase = getSupabaseClient()
-    const redirectTo =
-      typeof window !== 'undefined'
-        ? `${window.location.origin}/app/chat`
-        : undefined
-
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo,
-      },
-    })
-
-    if (error) throw error
-  }, [])
-
-  const signOut = useCallback(async () => {
-    const supabase = getSupabaseClient()
-    const { error } = await supabase.auth.signOut()
-    if (error) throw error
-    setUser(null)
-    setSession(null)
-  }, [])
-
-  const refreshSession = useCallback(async () => {
-    const supabase = getSupabaseClient()
-    const {
-      data: { session: currentSession },
-      error,
-    } = await supabase.auth.getSession()
-    if (error) throw error
-    setSession(currentSession)
-    setUser(currentSession?.user ?? null)
-  }, [])
-
-  const value = useMemo(
-    () => ({
-      user,
-      session,
-      loading,
-      authReady,
-      signInWithGoogle,
-      signOut,
-      refreshSession,
-    }),
-    [
-      authReady,
-      loading,
-      refreshSession,
-      session,
-      signInWithGoogle,
-      signOut,
-      user,
-    ]
-  )
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-}
-
+/**
+ * Custom hook that wraps Clerk's auth hooks to maintain compatibility
+ * with existing code that expects Supabase-style auth interface
+ */
 export const useAuth = (): AuthContextType => {
-  const ctx = useContext(AuthContext)
-  if (!ctx) {
-    throw new Error('useAuth must be used within AuthProvider')
+  const { isLoaded, isSignedIn, getToken, signOut } = useClerkAuth()
+  const { user } = useUser()
+
+  const signInWithGoogle = async () => {
+    // Clerk handles OAuth redirects automatically via SignInButton component
+    // This function is kept for compatibility but should use SignInButton instead
+    throw new Error(
+      'Use Clerk SignInButton component instead of signInWithGoogle function'
+    )
   }
-  return ctx
+
+  const refreshSession = async () => {
+    // Clerk handles session refresh automatically
+    // This is a no-op for compatibility
+  }
+
+  // Create a session-like object for compatibility
+  const session = isSignedIn && user
+    ? {
+        access_token: undefined, // Use getToken() instead
+        id: user.id,
+      }
+    : null
+
+  return {
+    user: user ?? null,
+    session,
+    loading: !isLoaded,
+    authReady: isLoaded,
+    signInWithGoogle,
+    signOut,
+    refreshSession,
+    getToken,
+    isSignedIn,
+  }
 }
 
 export const useRequireAuth = () => {
@@ -161,14 +64,10 @@ export const useRequireAuth = () => {
   const auth = useAuth()
 
   useEffect(() => {
-    const hasAuthCode =
-      typeof window !== 'undefined' &&
-      new URLSearchParams(window.location.search).has('code')
-
-    if (!auth.loading && !auth.user && !hasAuthCode) {
+    if (!auth.loading && !auth.isSignedIn) {
       navigate('/login')
     }
-  }, [auth.loading, auth.user, navigate])
+  }, [auth.loading, auth.isSignedIn, navigate])
 
   return auth
 }

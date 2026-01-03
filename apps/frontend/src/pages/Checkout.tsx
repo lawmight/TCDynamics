@@ -11,7 +11,7 @@ import { redirectToCheckout, type PlanType } from '@/utils/polar'
 const Checkout = () => {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  const { session, loading: authLoading } = useAuth()
+  const { getToken, loading: authLoading } = useAuth()
   const planParam = searchParams.get('plan') || 'starter'
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -75,7 +75,7 @@ const Checkout = () => {
     setError(null)
 
     try {
-      const result = await redirectToCheckout(plan, session)
+      const result = await redirectToCheckout(plan, getToken)
 
       if (result.authRequired) {
         // Redirect to login with return URL

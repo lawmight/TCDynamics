@@ -21,7 +21,7 @@ import ScrollToTop from './components/ScrollToTop'
 import SimpleNavigation from './components/SimpleNavigation'
 import { ThemeProvider } from './components/ThemeProvider'
 import { AppLayout } from './components/app/AppLayout'
-import { AuthProvider, useAuth } from './hooks/useAuth'
+import { useAuth } from './hooks/useAuth'
 
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import { Toaster } from '@/components/ui/toaster'
@@ -111,13 +111,13 @@ const handleAppError = (
 }
 
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-  const { user, loading } = useAuth()
+  const { isSignedIn, loading } = useAuth()
 
   if (loading) {
     return <PageLoader />
   }
 
-  if (!user) {
+  if (!isSignedIn) {
     return <Navigate to="/login" replace />
   }
 
@@ -197,9 +197,7 @@ const App = () => (
           <PerformanceMonitor />
           <Analytics />
           <BrowserRouter>
-            <AuthProvider>
-              <AppRouter />
-            </AuthProvider>
+            <AppRouter />
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>

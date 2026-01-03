@@ -1,21 +1,24 @@
-import { LogIn, ShieldCheck } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { ShieldCheck } from 'lucide-react'
+import { useEffect } from 'react'
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  useAuth,
+} from '@clerk/clerk-react'
 import { useNavigate } from 'react-router-dom'
 
-import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { useAuth } from '@/hooks/useAuth'
 
 const Login = () => {
-  const { user, signInWithGoogle, loading } = useAuth()
+  const { isSignedIn, isLoaded } = useAuth()
   const navigate = useNavigate()
-  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!loading && user) {
+    if (isLoaded && isSignedIn) {
       navigate('/app/chat', { replace: true })
     }
-  }, [loading, navigate, user])
+  }, [isLoaded, isSignedIn, navigate])
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-hero px-4">
@@ -26,38 +29,25 @@ const Login = () => {
           </div>
           <h1 className="text-2xl font-semibold">Sign in to TCDynamics</h1>
           <p className="text-sm text-muted-foreground">
-            Continue with your Google account to access chat, knowledge base,
-            and analytics.
+            Continue with your account to access chat, knowledge base, and
+            analytics.
           </p>
         </div>
-        <Button
-          size="lg"
-          className="w-full"
-          onClick={async () => {
-            setError(null)
-            try {
-              await signInWithGoogle()
-            } catch (err) {
-              const message =
-                err instanceof Error ? err.message : 'Login failed'
-              setError(message)
-            }
-          }}
-          disabled={loading}
-        >
-          {loading ? (
-            <>Loading...</>
-          ) : (
-            <>
-              <LogIn className="mr-2 h-4 w-4" />
-              Continue with Google
-            </>
-          )}
-        </Button>
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        <SignedOut>
+          <SignInButton mode="redirect" redirectUrl="/app/chat">
+            <button className="w-full rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50">
+              Sign In
+            </button>
+          </SignInButton>
+        </SignedOut>
+        <SignedIn>
+          <div className="text-center text-sm text-muted-foreground">
+            Redirecting...
+          </div>
+        </SignedIn>
         <p className="text-center text-xs text-muted-foreground">
-          Single-sign-on via Supabase Google OAuth. You can revoke access at any
-          time from your Google account.
+          Secure authentication via Clerk. You can manage your account settings
+          at any time.
         </p>
       </Card>
     </div>
