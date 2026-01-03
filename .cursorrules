@@ -507,6 +507,11 @@ npm run build                 # Build all
 npm run deploy:vercel         # Deploy to Vercel
 ```
 
+## Deployment Shortcuts
+
+# ship - Commit, push, and deploy to Vercel production
+# preview - Commit, push, and deploy to Vercel preview
+
 ---
 
 **Last Updated**: 2026-01-02

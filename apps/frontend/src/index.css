@@ -516,6 +516,16 @@ html {
   background-size: 300px 300px;
 }
 
+/* Clerk Badge Overrides */
+.cl-badge[data-color='primary'] {
+  color: rgba(0, 0, 0, 0.62) !important;
+}
+
+/* Clerk UserButton Popover Action Button Overrides */
+.cl-userButtonPopoverActionButton__manageAccount {
+  color: rgba(0, 0, 0, 0.73) !important;
+}
+
 /* OptimizedImage placeholder styles - fixed sizing for CSP compliance */
 .image-placeholder {
   width: 100%;
