@@ -530,6 +530,23 @@ html {
   color: rgba(0, 0, 0, 0.73) !important;
 }
 
+/* Clerk UserButton Avatar - Remove unwanted outline/ring */
+.cl-userButton,
+.cl-userButtonTrigger,
+.cl-userButtonAvatarBox,
+.cl-userButtonAvatar {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.cl-userButton:focus-visible,
+.cl-userButtonTrigger:focus-visible,
+.cl-userButtonAvatarBox:focus-visible,
+.cl-userButtonAvatar:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 /* OptimizedImage placeholder styles - fixed sizing for CSP compliance */
 .image-placeholder {
   width: 100%;
