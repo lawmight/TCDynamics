@@ -6,7 +6,7 @@
  */
 
 import { Polar } from '@polar-sh/sdk'
-import { verifySupabaseAuth } from '../_lib/auth.js'
+import { verifyClerkAuth } from '../_lib/auth.js'
 
 // Product ID mapping (NIA-verified: use products array, not product_id)
 const POLAR_PRODUCTS = {
@@ -49,7 +49,7 @@ const handler = async (req, res) => {
 
     const authHeader = req.headers.authorization
     const { userId: orgId, error: authError } =
-      await verifySupabaseAuth(authHeader)
+      await verifyClerkAuth(authHeader)
 
     if (authError || !orgId) {
       return res

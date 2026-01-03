@@ -4,7 +4,7 @@
  */
 
 import { getSupabaseClient } from '../_lib/supabase.js'
-import { verifySupabaseAuth } from '../_lib/auth.js'
+import { verifyClerkAuth } from '../_lib/auth.js'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
 
@@ -39,10 +39,10 @@ const allowCors = fn => async (req, res) => {
 }
 
 const handler = async (req, res) => {
-  // Verify Supabase authentication
+  // Verify Clerk authentication
   const authHeader = req.headers.authorization
   const { userId: orgId, error: authError } =
-    await verifySupabaseAuth(authHeader)
+    await verifyClerkAuth(authHeader)
 
   if (authError || !orgId) {
     return res.status(401).json({

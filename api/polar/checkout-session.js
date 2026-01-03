@@ -5,7 +5,7 @@
  */
 
 import { Polar } from '@polar-sh/sdk'
-import { verifySupabaseAuth } from '../_lib/auth.js'
+import { verifyClerkAuth } from '../_lib/auth.js'
 
 const polar = process.env.POLAR_ACCESS_TOKEN
   ? new Polar({
@@ -44,7 +44,7 @@ const handler = async (req, res) => {
   // Require authentication for GET requests to protect customer PII
   const authHeader = req.headers.authorization
   const { userId: orgId, error: authError } =
-    await verifySupabaseAuth(authHeader)
+    await verifyClerkAuth(authHeader)
 
   if (authError || !orgId) {
     return res
