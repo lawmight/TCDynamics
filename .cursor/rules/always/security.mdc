@@ -1,0 +1,47 @@
+---
+description: Security standards and practices
+globs: ["**/*.{ts,tsx,js,jsx}"]
+alwaysApply: true
+---
+
+# Security Standards
+
+## Input Sanitization
+Always sanitize user inputs using DOMPurify:
+
+```javascript
+const DOMPurify = require('isomorphic-dompurify')
+
+const sanitizeString = (str) => {
+  if (typeof str !== 'string') return str
+  return DOMPurify.sanitize(str)
+}
+```
+
+## Authentication
+- Use Supabase JWT verification for protected routes
+- Always validate `Authorization: Bearer <token>` header format
+- Return standardized error responses for auth failures
+
+```javascript
+if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  return { userId: null, error: 'Missing or invalid Authorization header' }
+}
+```
+
+## API Security Headers
+Apply Helmet configuration with strict CSP:
+- `defaultSrc: ["'self'"]`
+- `frameSrc: ["'none'"]`
+- `objectSrc: ["'none'"]`
+- Enable HSTS with preload
+
+## Rate Limiting
+- Apply rate limiting to all form submissions
+- Default: 5 requests per 15 minutes per IP
+- Use environment variables for configuration
+
+## Sensitive Data
+- Never log request bodies containing passwords or tokens
+- Use environment variables for all secrets
+- Reference `.env.example` for required variables

@@ -7,8 +7,8 @@ import { defineConfig } from 'vite'
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
-    host: '::',
-    port: 8080,
+    host: '127.0.0.1',
+    port: 5173,
     // Pre-warm frequently used files for faster dev server
     warmup: {
       clientFiles: [

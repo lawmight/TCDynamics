@@ -1,31 +1,514 @@
 # Cursor Rules for TCDynamics Project
-# This file contains project-specific rules and startup configurations
 
-# NIA MCP Integration
-# The NIA MCP server should be running for optimal AI assistance
-# Auto-start options:
-# 1. Run: .\setup-auto-start.ps1 (Windows login auto-start)
-# 2. Use: .\start-mcp-silent.bat (silent background start)
-# 3. Add: cursor-mcp-config.json to .vscode/tasks.json (Cursor auto-start)
+## Project Context
 
-# Project Structure
-- /src: React/TypeScript frontend
-- /backend: Node.js backend API
-- /TCDynamics: Python Azure Functions
-- /TCDynamics-Functions: Additional Azure Functions
+**TCDynamics WorkFlowAI** is an AI-powered automation platform targeting French SMEs (Small and Medium Enterprises). The project is a monorepo using npm workspaces, deployed on Vercel.
 
-# Coding Standards
-- Use TypeScript for frontend components
-- Use Python for Azure Functions
-- Follow existing code patterns and naming conventions
-- Keep components modular and reusable
+**Target Market**: French SMEs seeking workflow automation solutions
 
-# Development Workflow
-1. Start MCP server: .\start-mcp-background.ps1
-2. Use AI assistance for code analysis and suggestions
-3. Test changes thoroughly before committing
-4. Follow existing commit message patterns
+**Deployment**: Vercel (frontend + serverless API functions)
 
-# File Exclusions (for AI analysis)
-- Exclude: AzureFunctionsTools/, .venv/, node_modules/
-- Focus on: Source code, configurations, documentation
+**Architecture**: Monorepo with three main areas:
+
+- Frontend: React SPA deployed to Vercel
+- API: Vercel serverless functions (production)
+- Backend: Express server (local development only, not deployed)
+
+---
+
+## Tech Stack Quick Reference
+
+### Frontend (`apps/frontend`)
+
+- **Runtime**: React 18.3.1 + Vite 7.1.7
+- **Language**: TypeScript 5.8.3
+- **Styling**: Tailwind CSS 3.4.17 with shadcn/ui patterns
+- **UI Components**: Radix UI primitives + Lucide icons
+- **State Management**: TanStack Query 5.90.2
+- **Validation**: Zod 3.25.76
+- **Testing**: Vitest 3.2.4 + Testing Library + Playwright
+- **Build**: Vite with SWC plugin
+
+### API (`api/`)
+
+- **Runtime**: Vercel serverless functions (Node.js)
+- **Language**: JavaScript ESM (`type: "module"`)
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth
+- **Payments**: Polar SDK (migrated from Stripe)
+- **Email**: Resend 6.4.2
+- **Error Tracking**: Sentry 7.0.0
+- **Caching**: LRU Cache 11.0.1
+
+### Backend (`apps/backend`)
+
+- **Runtime**: Express 4.21.2 (local dev only)
+- **Language**: TypeScript 5.9.3
+- **Testing**: Jest 30.2.0
+- **Validation**: Joi 17.13.3
+- **Logging**: Pino 8.19.0 + Winston 3.17.0
+
+### Infrastructure
+
+- **Database**: Supabase (PostgreSQL)
+- **Hosting**: Vercel
+- **CDN**: Vercel Edge Network
+- **Monitoring**: Sentry (frontend + backend)
+
+---
+
+## Architecture Patterns
+
+### Frontend Architecture
+
+```
+apps/frontend/src/
+├── pages/          # Route-level components (Index, About, Pricing, etc.)
+├── components/     # Reusable components
+│   ├── ui/        # shadcn/ui primitives (button, input, card, etc.)
+│   └── app/       # App-specific components (AppLayout)
+├── hooks/          # Custom React hooks
+├── lib/            # Utilities (supabaseClient, utils)
+├── utils/          # Helper functions (config, security, analytics)
+└── api/            # API client functions (vertex, files, analytics)
+```
+
+**Data Flow**:
+
+- Pages → Components → UI Primitives
+- React Query → API clients → Supabase/Vercel Functions
+- Zod validation at form boundaries
+
+### API Architecture
+
+```
+api/
+├── _lib/           # Shared utilities (auth, supabase, cache, email)
+├── polar/          # Payment integration (checkout, webhook)
+├── *.js            # Serverless function endpoints
+└── app/            # App-specific routes (api-keys)
+```
+
+**Pattern**: Each serverless function is self-contained with shared utilities in `_lib/`
+
+### Backend Architecture (Local Dev Only)
+
+```
+apps/backend/src/
+├── routes/         # Express route handlers
+├── middleware/     # Express middleware (auth, CSRF, rate limiting)
+├── services/       # Business logic (email, stripe)
+├── config/         # Configuration (database, environment)
+└── utils/          # Utilities (validation, logging)
+```
+
+---
+
+## Code Style Rules
+
+### TypeScript/JavaScript
+
+- **Frontend**: TypeScript strict mode, prefer type inference
+- **API**: JavaScript ESM (`type: "module"`), no TypeScript
+- **Backend**: TypeScript with strict checks
+
+### Formatting (Prettier)
+
+- **No semicolons** (except where required)
+- **Single quotes** for strings
+- **2-space indentation**
+- **80 character line width** (soft limit)
+- **Trailing commas** where valid
+- **No semicolons** in JSX/TSX
+
+### ESLint Configuration
+
+- **ESLint 9** flat config format
+- **TypeScript ESLint** with recommended rules
+- **React Hooks** plugin (exhaustive-deps)
+- **Import ordering**: externals → internals → relative
+- **Security plugin** enabled
+- **Accessibility plugin** (jsx-a11y) enabled
+- **Prettier integration** (prettier/prettier: error)
+- **Console warnings** (no-console: warn) - debug only in development
+
+### Import Organization
+
+```typescript
+// 1. External dependencies
+import React from 'react'
+import { useQuery } from '@tanstack/react-query'
+
+// 2. Internal absolute imports (@/ alias)
+import { Button } from '@/components/ui/button'
+import { useAuth } from '@/hooks/useAuth'
+
+// 3. Relative imports
+import { cn } from '../lib/utils'
+import './styles.css'
+```
+
+### TypeScript Best Practices
+
+- Prefer `interface` for object shapes, `type` for unions/intersections
+- Use `const` assertions for literal types
+- Avoid `any` - use `unknown` and type guards instead
+- Use `@typescript-eslint/no-unused-vars: error`
+- Use `@typescript-eslint/no-explicit-any: warn`
+- Prefer nullish coalescing (`??`) and optional chaining (`?.`)
+
+---
+
+## Component Patterns
+
+### React Components
+
+- **Functional components only** - no class components
+- **Hooks-based** - use hooks for state, effects, context
+- **Named exports** for components
+- **Forward refs** when needed (e.g., `Button`, `Input`)
+
+### Styling Pattern
+
+```typescript
+import { cn } from '@/lib/utils'
+
+// Use cn() for conditional classes
+<div className={cn('base-classes', isActive && 'active-class', className)} />
+```
+
+### Component Variants (CVA Pattern)
+
+```typescript
+import { cva, type VariantProps } from 'class-variance-authority'
+
+const buttonVariants = cva('base-classes', {
+  variants: {
+    variant: { default: '...', outline: '...' },
+    size: { sm: '...', lg: '...' },
+  },
+  defaultVariants: { variant: 'default', size: 'default' },
+})
+
+export interface ButtonProps extends VariantProps<typeof buttonVariants> {
+  // ...
+}
+```
+
+### UI Component Library
+
+- **shadcn/ui** patterns with Radix UI primitives
+- **Tailwind CSS** for styling
+- **CVA** (class-variance-authority) for variant management
+- **cn()** utility (`clsx` + `tailwind-merge`) for class merging
+- Components in `components/ui/` use kebab-case filenames
+
+### Accessibility
+
+- Use **Radix UI** primitives (built-in a11y)
+- Proper ARIA labels and roles
+- Keyboard navigation support
+- Focus management for modals/dialogs
+- Screen reader considerations
+
+---
+
+## File and Naming Conventions
+
+### File Naming
+
+- **Components**: PascalCase (`Button.tsx`, `ContactForm.tsx`)
+- **Pages**: PascalCase (`Index.tsx`, `Pricing.tsx`)
+- **Hooks**: camelCase with `use` prefix (`useAuth.tsx`, `useContactForm.ts`)
+- **Utilities**: camelCase (`utils.ts`, `config.ts`)
+- **UI Components**: kebab-case (`button.tsx`, `input.tsx`) - shadcn convention
+- **Constants**: UPPER_SNAKE_CASE (`API_ENDPOINTS.ts`)
+- **Types**: PascalCase (`User.ts`, `ApiResponse.ts`)
+
+### Directory Structure
+
+- **Co-locate tests**: `__tests__/` directories next to source files
+- **Group by feature**: Related components/hooks/utils together
+- **Separate concerns**: `components/`, `hooks/`, `utils/`, `lib/`
+
+### Export Patterns
+
+- **Named exports** preferred over default exports
+- **Barrel exports** (`index.ts`) for public APIs only
+- **Type exports**: `export type { ButtonProps }`
+
+---
+
+## Testing Requirements
+
+### Frontend Testing (`apps/frontend`)
+
+- **Unit Tests**: Vitest + Testing Library
+- **E2E Tests**: Playwright (in `tests/e2e/`)
+- **Test Location**: Co-located in `__tests__/` directories
+- **Coverage**: Aim for >80% coverage on critical paths
+- **Mocking**: Use Vitest mocks, MSW for API mocking
+
+### Backend Testing (`apps/backend`)
+
+- **Unit Tests**: Jest + Supertest
+- **Test Location**: `src/**/__tests__/`
+- **Coverage**: Jest coverage reports
+
+### Test Naming
+
+- Test files: `*.test.ts` or `*.test.tsx`
+- Describe blocks: Component/function name
+- Test cases: `it('should ...')` or `test('...')`
+
+### Running Tests
+
+```bash
+npm run test              # Frontend + backend
+npm run test:frontend     # Frontend only (Vitest)
+npm run test:backend      # Backend only (Jest)
+npm run test:e2e          # Playwright E2E tests
+npm run test:coverage     # Coverage reports
+```
+
+---
+
+## Security Guidelines
+
+### Data Protection
+
+- **Hash PII before logging**: Use SHA-256 for `orgId`, `userId`, etc.
+- **Never log sensitive data**: Passwords, tokens, API keys
+- **Validate all inputs**: Use Zod (frontend) or Joi (backend)
+
+### Authentication & Authorization
+
+- **Supabase Auth** for user authentication
+- **API Key authentication** in `api/_lib/api-key-auth.js`
+- **CSRF protection** enabled (backend middleware)
+
+### Environment Variables
+
+- **Never commit secrets**: Use `.env` files (gitignored)
+- **Use Vercel environment variables** for production
+- **Validate env vars** at startup with Zod/Joi
+
+### API Security
+
+- **Rate limiting** on Express routes
+- **CORS** configured in `vercel.json`
+- **CSP headers** configured in `vercel.json`
+- **Security headers**: HSTS, X-Frame-Options, etc. (see `vercel.json`)
+
+### Input Validation
+
+- **Frontend**: Zod schemas for form validation
+- **Backend**: Joi schemas for API validation
+- **Sanitize HTML**: Use `isomorphic-dompurify` for user content
+
+---
+
+## Development Workflow
+
+### Getting Started
+
+```bash
+# Install dependencies
+npm run install:all
+
+# Start development servers
+npm run dev              # Frontend + backend concurrently
+
+# Or individually
+npm run dev:frontend     # Frontend only (Vite dev server)
+npm run dev:backend      # Backend only (Express server)
+```
+
+### Code Quality
+
+```bash
+# Linting
+npm run lint             # Check all
+npm run lint:fix         # Auto-fix issues
+
+# Type checking
+npm run type-check       # TypeScript validation
+
+# Formatting
+npm run format           # Prettier format all files
+
+# Full verification
+npm run verify           # Lint + type-check + tests
+```
+
+### Building
+
+```bash
+npm run build            # Build frontend + backend
+npm run build:frontend   # Frontend only
+npm run build:backend    # Backend only
+```
+
+### Deployment
+
+```bash
+# Vercel deployment (frontend + API)
+npm run deploy:vercel
+
+# Frontend only
+npm run deploy:vercel:frontend
+```
+
+### Git Workflow
+
+- **Commit messages**: Follow Conventional Commits (see `commitlint.config.cjs`)
+- **Pre-commit**: Husky runs lint-staged (ESLint + Prettier)
+- **Pre-push**: Runs pre-push checks (`pre-push-checks.js`)
+
+**Commit Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `perf`, `ci`, `build`, `revert`
+
+---
+
+## Common Patterns
+
+### API Client Pattern
+
+```typescript
+// apps/frontend/src/api/vertex.ts
+export async function callVertexAI(prompt: string) {
+  const response = await fetch('/api/vertex', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt }),
+  })
+  return response.json()
+}
+```
+
+### React Query Pattern
+
+```typescript
+import { useQuery } from '@tanstack/react-query'
+
+const { data, isLoading, error } = useQuery({
+  queryKey: ['user', userId],
+  queryFn: () => fetchUser(userId),
+})
+```
+
+### Form Validation Pattern
+
+```typescript
+import { z } from 'zod'
+
+const contactSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email'),
+})
+
+type ContactFormData = z.infer<typeof contactSchema>
+```
+
+### Error Handling
+
+- **Frontend**: Error boundaries for React components
+- **API**: Try-catch with proper error responses
+- **Logging**: Use Sentry for error tracking
+- **User feedback**: Toast notifications (Sonner)
+
+---
+
+## File Exclusions
+
+**Exclude from AI analysis**:
+
+- `node_modules/` - Dependencies
+- `dist/` - Build outputs
+- `.venv/` - Python virtual environment
+- `functions-archive/` - Archived Azure Functions
+- `coverage/` - Test coverage reports
+- `.git/` - Git metadata
+
+**Focus on**:
+
+- Source code (`src/`, `apps/`, `api/`)
+- Configuration files (`*.config.*`, `*.json`)
+- Documentation (`docs/`, `README.md`)
+
+---
+
+## NIA MCP Integration
+
+The NIA MCP server should be running for optimal AI assistance with external knowledge discovery.
+
+**Auto-start options**:
+
+1. Run: `.\setup-auto-start.ps1` (Windows login auto-start)
+2. Use: `.\start-mcp-silent.bat` (silent background start)
+3. Add: `cursor-mcp-config.json` to `.vscode/tasks.json` (Cursor auto-start)
+
+See `.cursor/rules/nia-oracle.mdc` for NIA research agent guidelines.
+
+---
+
+## Additional Notes
+
+### Payment Integration
+
+- **Current**: Polar SDK (migrated from Stripe)
+- **Payment routes**: `api/polar/` directory
+- **Webhook handling**: `api/polar/webhook.js`
+
+### Database
+
+- **Supabase**: PostgreSQL database
+- **Client**: `@supabase/supabase-js` v2.81.1
+- **Auth**: Supabase Auth integration
+
+### Performance
+
+- **Code splitting**: Vite automatic code splitting
+- **Lazy loading**: React.lazy() for route components
+- **Image optimization**: OptimizedImage component
+- **Analytics**: Vercel Analytics + custom tracking
+
+### Browser Support
+
+- Modern browsers (ES2020+)
+- No IE11 support
+- Mobile-responsive design (Tailwind breakpoints)
+
+---
+
+## Quick Reference Commands
+
+```bash
+# Development
+npm run dev                    # Start all dev servers
+npm run dev:frontend           # Frontend only
+npm run dev:backend            # Backend only
+
+# Testing
+npm run test                   # All tests
+npm run test:frontend          # Frontend tests (Vitest)
+npm run test:backend          # Backend tests (Jest)
+npm run test:e2e              # E2E tests (Playwright)
+npm run test:coverage         # Coverage reports
+
+# Code Quality
+npm run lint                   # ESLint check
+npm run lint:fix              # Auto-fix linting
+npm run format                # Prettier format
+npm run type-check            # TypeScript check
+npm run verify                # Full verification
+
+# Building & Deployment
+npm run build                 # Build all
+npm run deploy:vercel         # Deploy to Vercel
+```
+
+---
+
+**Last Updated**: 2026-01-02
+**Project**: TCDynamics WorkFlowAI
+**Version**: 1.0.0

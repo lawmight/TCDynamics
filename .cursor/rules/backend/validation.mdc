@@ -1,0 +1,54 @@
+---
+description: Input validation patterns using Joi
+globs: ["apps/backend/**/*.{ts,js}"]
+---
+
+# Validation Patterns
+
+## Joi Schema Structure
+Use reusable validation helpers:
+
+```javascript
+const { commonFields } = require('./validationHelpers')
+
+const contactSchema = Joi.object({
+  name: commonFields.fullName(),
+  email: commonFields.email(),
+  phone: commonFields.phone(),
+  company: commonFields.company(false), // optional
+  message: commonFields.message(),
+})
+```
+
+## Validation Middleware
+Apply validation as middleware:
+
+```javascript
+const validateData = (schema) => (req, res, next) => {
+  const { error, value } = schema.validate(req.body, {
+    abortEarly: false,
+    stripUnknown: true,
+  })
+
+  if (error) {
+    const errorMessages = error.details.map(d => d.message)
+    return res.status(400).json({
+      success: false,
+      message: 'Données invalides',
+      errors: errorMessages,
+    })
+  }
+
+  req.body = value // Use sanitized data
+  next()
+}
+```
+
+## Database Error Handling
+Map PostgreSQL error codes to appropriate responses:
+
+| Code | Type | HTTP Status |
+|------|------|-------------|
+| 23505 | Unique constraint | 409 Conflict |
+| 23503 | Foreign key | 404 Not Found |
+| 23502 | Not null | 400 Validation |

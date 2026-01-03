@@ -4,9 +4,9 @@ import { Analytics } from '@vercel/analytics/react'
 import { Suspense, lazy } from 'react'
 import {
   BrowserRouter,
+  Navigate,
   Route,
   Routes,
-  Navigate,
   useLocation,
 } from 'react-router-dom'
 
@@ -41,6 +41,8 @@ const Diagnostics = lazy(() => import('./pages/Diagnostics'))
 const Recommendations = lazy(() => import('./pages/Recommendations'))
 const Settings = lazy(() => import('./pages/Settings'))
 const Login = lazy(() => import('./pages/auth/Login'))
+const Waitlist = lazy(() => import('./pages/auth/Waitlist'))
+const WaitlistSuccess = lazy(() => import('./pages/auth/WaitlistSuccess'))
 const ChatApp = lazy(() => import('./pages/app/Chat'))
 const FilesApp = lazy(() => import('./pages/app/Files'))
 const AnalyticsApp = lazy(() => import('./pages/app/Analytics'))
@@ -128,7 +130,8 @@ const AppRouter = () => {
   const location = useLocation()
   const hideMarketingChrome =
     location.pathname.startsWith('/app') ||
-    location.pathname.startsWith('/login')
+    location.pathname.startsWith('/login') ||
+    location.pathname.startsWith('/waitlist')
 
   return (
     <>
@@ -163,6 +166,8 @@ const AppRouter = () => {
           />
 
           <Route path="/login" element={<Login />} />
+          <Route path="/waitlist" element={<Waitlist />} />
+          <Route path="/waitlist-success" element={<WaitlistSuccess />} />
           <Route
             path="/app"
             element={

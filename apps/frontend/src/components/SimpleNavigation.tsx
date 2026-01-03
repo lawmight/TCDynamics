@@ -86,7 +86,7 @@ const SimpleNavigation = () => {
   const navigationItems = [
     { label: 'Accueil', scrollId: 'hero' },
     { label: 'Fonctionnalités', scrollId: 'features' },
-    { label: 'Tarifs', scrollId: 'pricing' },
+    { label: 'Tarifs', scrollId: 'pricing-cards' },
     { label: 'À propos', path: '/about' },
     { label: 'Démo', path: '/demo' },
     { label: 'Démarrer', path: '/get-started' },

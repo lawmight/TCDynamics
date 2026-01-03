@@ -1,8 +1,9 @@
+import { ClerkProvider } from '@clerk/clerk-react'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { ClerkProvider } from '@clerk/clerk-react'
 
 import App from './App.tsx'
+import { clerkAppearance } from './config/clerkTheme'
 import './index.css'
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
@@ -17,7 +18,12 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
+    <ClerkProvider
+      publishableKey={PUBLISHABLE_KEY}
+      afterSignOutUrl="/"
+      waitlistUrl="/waitlist"
+      appearance={clerkAppearance}
+    >
       <App />
     </ClerkProvider>
   </StrictMode>
