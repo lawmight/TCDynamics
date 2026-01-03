@@ -1,3 +1,4 @@
+import { UserButton, useUser } from '@clerk/clerk-react'
 import {
   BarChart3,
   Folder,
@@ -6,7 +7,6 @@ import {
   Moon,
   Sun,
 } from 'lucide-react'
-import { UserButton, useUser } from '@clerk/clerk-react'
 import { useMemo } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 
@@ -30,7 +30,10 @@ export const AppLayout = () => {
   const { user } = useUser()
 
   const initials = useMemo(() => {
-    const email = user?.primaryEmailAddress?.emailAddress || user?.emailAddresses[0]?.emailAddress || 'user'
+    const email =
+      user?.primaryEmailAddress?.emailAddress ||
+      user?.emailAddresses[0]?.emailAddress ||
+      'user'
     return email.slice(0, 2).toUpperCase()
   }, [user])
 
@@ -109,7 +112,7 @@ export const AppLayout = () => {
                 )}
               </Button>
               <div className="flex items-center">
-                <UserButton afterSignOutUrl="/" />
+                <UserButton afterSignOutUrl="/" appearance={clerkAppearance} />
               </div>
             </div>
           </div>
