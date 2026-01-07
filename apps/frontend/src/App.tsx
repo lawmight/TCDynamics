@@ -1,13 +1,14 @@
 // FIXED: Using simple navigation to prevent black page
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Analytics } from '@vercel/analytics/react'
-import { Suspense, lazy } from 'react'
+import { Suspense, lazy, useEffect } from 'react'
 import {
   BrowserRouter,
   Navigate,
   Route,
   Routes,
   useLocation,
+  useNavigate,
 } from 'react-router-dom'
 
 import ErrorBoundary from './components/ErrorBoundary'
@@ -126,6 +127,17 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   return children
 }
 
+// Component to handle hash fragment redirects for React Router 6.30.3+
+const HashRedirect = ({ hash }: { hash: string }) => {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    navigate(`/#${hash}`, { replace: true })
+  }, [hash, navigate])
+
+  return null
+}
+
 const AppRouter = () => {
   const location = useLocation()
   const hideMarketingChrome =
@@ -154,15 +166,15 @@ const AppRouter = () => {
 
           <Route
             path="/features"
-            element={<Navigate to="/#features" replace />}
+            element={<HashRedirect hash="features" />}
           />
           <Route
             path="/pricing"
-            element={<Navigate to="/#pricing" replace />}
+            element={<HashRedirect hash="pricing" />}
           />
           <Route
             path="/contact"
-            element={<Navigate to="/#contact" replace />}
+            element={<HashRedirect hash="contact" />}
           />
 
           <Route path="/login" element={<Login />} />
