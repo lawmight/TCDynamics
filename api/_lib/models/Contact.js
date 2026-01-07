@@ -4,7 +4,6 @@
  */
 
 import mongoose from 'mongoose'
-import uniqueValidator from 'mongoose-unique-validator'
 
 const ContactSchema = new mongoose.Schema(
   {
@@ -59,12 +58,7 @@ ContactSchema.index({ status: 1, createdAt: -1 })
 // Sparse index for linking authenticated contacts to users
 ContactSchema.index({ clerkId: 1 }, { sparse: true })
 
-// mongoose-unique-validator provides cleaner validation errors
-ContactSchema.plugin(uniqueValidator, {
-  message: 'Cette {PATH} est déjà utilisée',
-})
-
-// Global post-save error handler for E11000 (backup for plugin)
+// Handle duplicate key errors (E11000) from MongoDB unique index
 ContactSchema.post('save', function (error, doc, next) {
   if (error.name === 'MongoServerError' && error.code === 11000) {
     const field = Object.keys(error.keyPattern || {})[0] || 'email'

@@ -34,7 +34,7 @@ export async function saveContact(contactData) {
 
     return { success: true, id: contact._id.toString() }
   } catch (error) {
-    // Handle duplicate key error (E11000) - from plugin or native
+    // Handle duplicate key error (E11000) - from MongoDB unique index
     if (error.code === 11000 || error.code === 'DUPLICATE_EMAIL') {
       return {
         success: false,
@@ -44,7 +44,7 @@ export async function saveContact(contactData) {
       }
     }
 
-    // Handle mongoose-unique-validator errors
+    // Handle Mongoose validation errors
     if (error.name === 'ValidationError' && error.errors) {
       const messages = Object.values(error.errors)
         .map(e => e.message)
