@@ -33,7 +33,6 @@
     "pg": "^8.11.5",
     "pino": "^8.19.0",
     "pino-http": "^8.6.1",
-    "stripe": "^19.1.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "uuid": "^9.0.1",

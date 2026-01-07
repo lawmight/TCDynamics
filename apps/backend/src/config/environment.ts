@@ -22,11 +22,6 @@ export interface EnvironmentConfig {
     user: string
     pass: string
   }
-  stripe: {
-    secretKey: string
-    publishableKey: string
-    webhookSecret: string
-  }
   security: {
     sessionSecret: string
     adminApiKey: string
@@ -76,11 +71,6 @@ export function loadEnvironment(): EnvironmentConfig {
       user: process.env.EMAIL_USER || '',
       pass: process.env.EMAIL_PASS || '',
     },
-    stripe: {
-      secretKey: process.env.STRIPE_SECRET_KEY || '',
-      publishableKey: process.env.STRIPE_PUBLISHABLE_KEY || '',
-      webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
-    },
     security: {
       sessionSecret: process.env.SESSION_SECRET || '',
       adminApiKey: process.env.ADMIN_API_KEY || '',
@@ -103,11 +93,6 @@ export function validateEnvironment(config: EnvironmentConfig): void {
     errors.push('EMAIL_PASS is required')
   }
 
-  if (config.stripe.secretKey && !config.stripe.secretKey.startsWith('sk_')) {
-    errors.push(
-      'STRIPE_SECRET_KEY must start with "sk_test_" or "sk_live_"'
-    )
-  }
 
   if (errors.length > 0) {
     console.warn('⚠️  Environment validation warnings:')

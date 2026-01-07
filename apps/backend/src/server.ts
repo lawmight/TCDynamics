@@ -43,7 +43,6 @@ function startServer(): void {
       console.log(`Port: ${PORT}`)
       console.log(`Environment: ${config.nodeEnv}`)
       console.log(`Frontend URL: ${config.frontendUrl}`)
-      console.log(`Stripe Configured: ${!!config.stripe.secretKey}`)
       console.log(`Email Configured: ${!!config.email.user}`)
       console.log('')
       console.log('📋 Available Endpoints:')
@@ -61,7 +60,6 @@ function startServer(): void {
           port: PORT,
           environment: config.nodeEnv,
           emailConfigured: !!config.email.user,
-          stripeConfigured: !!config.stripe.secretKey,
           frontendUrl: config.frontendUrl,
           apiDocsUrl: `http://localhost:${PORT}/api-docs`,
           openApiUrl: `http://localhost:${PORT}/api-docs.json`,

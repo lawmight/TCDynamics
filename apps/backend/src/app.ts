@@ -10,9 +10,7 @@ import {
   configureErrorHandling,
   configureMiddleware,
 } from './config/middleware'
-import stripeRoutes from './routes/stripe'
 import { initializeEmailService } from './services/email.service'
-import { initializeStripeService } from './services/stripe.service'
 
 // Import routes
 const contactRoutes = require('./routes/contact')
@@ -36,16 +34,6 @@ export function createApp(): Express {
   console.log('🔧 Initializing services...')
   initializeDatabase(config.database)
   initializeEmailService(config.email)
-  if (config.stripe.secretKey) {
-    try {
-      initializeStripeService(config.stripe)
-    } catch (error) {
-      console.warn(
-        '⚠️  Stripe service initialization failed:',
-        (error as Error).message
-      )
-    }
-  }
   console.log('✅ Services initialized')
 
   // Create Express app
@@ -93,7 +81,6 @@ export function createApp(): Express {
   app.use('/api', contactRoutes)
   app.use('/api', demoRoutes)
   app.use('/api', monitoringModule.router)
-  app.use('/api', stripeRoutes)
   app.use('/api', rumRoutes)
   app.use('/api', feedbackRoutes)
   console.log('✅ Routes loaded')

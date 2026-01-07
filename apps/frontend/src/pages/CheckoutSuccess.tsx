@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 const CheckoutSuccess = () => {
   const [searchParams] = useSearchParams()
-  // Support both Stripe (session_id) and Polar (checkout_id) for migration period
+  // Support both session_id (legacy) and checkout_id (Polar) for backward compatibility
   const sessionId = searchParams.get('session_id') || searchParams.get('checkout_id')
 
   useEffect(() => {

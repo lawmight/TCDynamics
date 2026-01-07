@@ -37,7 +37,7 @@ export const PostSubmissionFeedback = ({
         timestamp: new Date().toISOString(),
       })
 
-      // Save feedback to Supabase
+      // Save feedback to MongoDB
       const feedbackData = {
         form_type: formType,
         rating,

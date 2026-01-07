@@ -1,9 +1,12 @@
-import { getSupabaseClient } from './_lib/supabase.js'
+import { AnalyticsEvent } from './_lib/models/AnalyticsEvent.js'
+import { ChatConversation } from './_lib/models/ChatConversation.js'
+import { KnowledgeFile } from './_lib/models/KnowledgeFile.js'
+import { connectToDatabase } from './_lib/mongodb.js'
 
 /**
  * Consolidated Analytics API
  * Handles analytics events, stats, and health checks
- * 
+ *
  * Usage:
  * - GET /api/analytics?health=true - Health check (simple status)
  * - GET /api/analytics - Get analytics summary stats
@@ -15,19 +18,18 @@ export default async function handler(req, res) {
     return res.status(200).json({
       status: 'ok',
       timestamp: new Date().toISOString(),
-      environment: process.env.VERCEL_ENV || process.env.NODE_ENV || 'development',
+      environment:
+        process.env.VERCEL_ENV || process.env.NODE_ENV || 'development',
       version: '1.0.0',
-      uptime: process.uptime(), // Seconds since process started
+      uptime: process.uptime(),
     })
   }
 
-  // Get Supabase client with error handling
-  let supabase
+  // Connect to MongoDB with error handling
   try {
-    supabase = getSupabaseClient()
+    await connectToDatabase()
   } catch (error) {
-    console.error('Supabase not configured:', error.message)
-    // Return consistent error for both GET and POST when database is unavailable
+    console.error('MongoDB not configured:', error.message)
     return res.status(503).json({
       error: 'Analytics service unavailable',
       message: 'Database not configured',
@@ -35,19 +37,15 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const { event, metadata } = req.body || {}
+    const { event, metadata, clerkId } = req.body || {}
     if (!event) return res.status(400).json({ error: 'event is required' })
 
     try {
-      const { error } = await supabase.from('analytics_events').insert({
+      await AnalyticsEvent.create({
         event,
         metadata: metadata || {},
+        clerkId: clerkId || null,
       })
-
-      if (error) {
-        console.warn('Analytics insert error', error)
-        return res.status(500).json({ error: 'Failed to record event' })
-      }
 
       return res.status(200).json({ success: true })
     } catch (error) {
@@ -58,30 +56,23 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET') {
     try {
-      const [chatResult, uploadResult, userResult] = await Promise.all([
-        supabase
-          .from('chat_conversations')
-          .select('id', { count: 'exact', head: true }),
-        supabase
-          .from('knowledge_files')
-          .select('id', { count: 'exact', head: true }),
-        supabase
-          .from('analytics_events')
-          .select('user_id', { count: 'exact', head: true }),
+      const [chatCount, uploadCount, uniqueUserIds] = await Promise.all([
+        ChatConversation.countDocuments({}),
+        KnowledgeFile.countDocuments({}),
+        AnalyticsEvent.distinct('clerkId'),
       ])
 
       return res.status(200).json({
-        chatMessages: chatResult.count || 0,
-        uploads: uploadResult.count || 0,
-        activeUsers: userResult.count || 0,
+        chatMessages: chatCount,
+        uploads: uploadCount,
+        activeUsers: uniqueUserIds.filter(id => id !== null).length,
         avgLatencyMs: null, // TODO: Implement actual latency calculation
       })
     } catch (error) {
       console.error('Analytics summary error', error)
-      // Return consistent error when database query fails
       return res.status(503).json({
         error: 'Analytics service unavailable',
-        message: 'Database not configured',
+        message: 'Database query failed',
       })
     }
   }

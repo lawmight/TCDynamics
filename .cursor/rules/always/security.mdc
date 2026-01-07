@@ -19,12 +19,16 @@ const sanitizeString = (str) => {
 ```
 
 ## Authentication
-- Use Supabase JWT verification for protected routes
+- Use Clerk JWT verification for protected routes (`verifyClerkAuth`)
 - Always validate `Authorization: Bearer <token>` header format
 - Return standardized error responses for auth failures
+- Link authenticated users via `clerkId` in MongoDB documents
 
 ```javascript
-if (!authHeader || !authHeader.startsWith('Bearer ')) {
+import { verifyClerkAuth } from './_lib/auth.js'
+
+const { userId: clerkId, error } = await verifyClerkAuth(authHeader)
+if (error) {
   return { userId: null, error: 'Missing or invalid Authorization header' }
 }
 ```

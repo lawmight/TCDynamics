@@ -23,17 +23,6 @@ fi
 echo "✅ Vercel CLI found"
 echo ""
 
-# Prompt for Supabase credentials
-echo "📦 SUPABASE CONFIGURATION"
-echo "------------------------"
-echo "Enter your Supabase credentials:"
-echo ""
-
-read -p "SUPABASE_URL (e.g., https://xxx.supabase.co): " SUPABASE_URL
-read -p "SUPABASE_ANON_KEY: " SUPABASE_ANON_KEY
-read -sp "SUPABASE_SERVICE_KEY (hidden): " SUPABASE_SERVICE_KEY
-echo ""
-echo ""
 
 # Prompt for Resend credentials
 echo "📧 RESEND CONFIGURATION"
@@ -57,9 +46,6 @@ DEMO_EMAIL=${DEMO_EMAIL:-tom.coustols@tcdynamics.fr}
 echo ""
 echo "🔍 Review your configuration:"
 echo "----------------------------"
-echo "SUPABASE_URL: $SUPABASE_URL"
-echo "SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY:0:20}..."
-echo "SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY:0:20}..."
 echo "RESEND_API_KEY: ${RESEND_API_KEY:0:10}..."
 echo "CONTACT_EMAIL: $CONTACT_EMAIL"
 echo "DEMO_EMAIL: $DEMO_EMAIL"
@@ -95,9 +81,6 @@ add_vercel_env() {
 }
 
 # Add all environment variables
-add_vercel_env "SUPABASE_URL" "$SUPABASE_URL"
-add_vercel_env "SUPABASE_ANON_KEY" "$SUPABASE_ANON_KEY"
-add_vercel_env "SUPABASE_SERVICE_KEY" "$SUPABASE_SERVICE_KEY"
 add_vercel_env "RESEND_API_KEY" "$RESEND_API_KEY"
 add_vercel_env "CONTACT_EMAIL" "$CONTACT_EMAIL"
 add_vercel_env "DEMO_EMAIL" "$DEMO_EMAIL"

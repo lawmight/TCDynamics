@@ -18,20 +18,30 @@ vi.mock('canvas-confetti', () => ({
   default: vi.fn(),
 }))
 
-vi.mock('lucide-react', () => ({
-  CheckCircle: ({ className }: { className?: string }) => (
-    <div className={className} data-testid="check-circle" />
-  ),
-  Mail: ({ className }: { className?: string }) => (
-    <div className={className} data-testid="mail" />
-  ),
-  Download: ({ className }: { className?: string }) => (
-    <div className={className} data-testid="download" />
-  ),
-  ArrowRight: ({ className }: { className?: string }) => (
-    <div className={className} data-testid="arrow-right" />
-  ),
-}))
+vi.mock('lucide-react', () => {
+  // @ts-expect-error - Mock component, types not needed
+  const MockIcon = (props) => (
+    <div className={props.className} data-testid={props['data-testid']} />
+  )
+  return {
+    // @ts-expect-error - Mock component, types not needed
+    CheckCircle: (props) => (
+      <MockIcon className={props.className} data-testid="check-circle" />
+    ),
+    // @ts-expect-error - Mock component, types not needed
+    Mail: (props) => (
+      <MockIcon className={props.className} data-testid="mail" />
+    ),
+    // @ts-expect-error - Mock component, types not needed
+    Download: (props) => (
+      <MockIcon className={props.className} data-testid="download" />
+    ),
+    // @ts-expect-error - Mock component, types not needed
+    ArrowRight: (props) => (
+      <MockIcon className={props.className} data-testid="arrow-right" />
+    ),
+  }
+})
 
 const renderWithRouter = (component: React.ReactElement) => {
   return render(<BrowserRouter>{component}</BrowserRouter>)

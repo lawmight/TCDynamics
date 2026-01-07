@@ -33,8 +33,8 @@
 
 - **Runtime**: Vercel serverless functions (Node.js)
 - **Language**: JavaScript ESM (`type: "module"`)
-- **Database**: Supabase (PostgreSQL)
-- **Authentication**: Supabase Auth
+- **Database**: MongoDB Atlas (Mongoose v9.1.1)
+- **Authentication**: Clerk (`@clerk/backend` v1.0.0)
 - **Payments**: Polar SDK (migrated from Stripe)
 - **Email**: Resend 6.4.2
 - **Error Tracking**: Sentry 7.0.0
@@ -50,7 +50,7 @@
 
 ### Infrastructure
 
-- **Database**: Supabase (PostgreSQL)
+- **Database**: MongoDB Atlas
 - **Hosting**: Vercel
 - **CDN**: Vercel Edge Network
 - **Monitoring**: Sentry (frontend + backend)
@@ -68,7 +68,7 @@ apps/frontend/src/
 │   ├── ui/        # shadcn/ui primitives (button, input, card, etc.)
 │   └── app/       # App-specific components (AppLayout)
 ├── hooks/          # Custom React hooks
-├── lib/            # Utilities (supabaseClient, utils)
+├── lib/            # Utilities (clerkTheme, utils)
 ├── utils/          # Helper functions (config, security, analytics)
 └── api/            # API client functions (vertex, files, analytics)
 ```
@@ -76,7 +76,7 @@ apps/frontend/src/
 **Data Flow**:
 
 - Pages → Components → UI Primitives
-- React Query → API clients → Supabase/Vercel Functions
+- React Query → API clients → MongoDB/Vercel Functions
 - Zod validation at form boundaries
 
 ### API Architecture
@@ -283,7 +283,10 @@ npm run test:coverage     # Coverage reports
 
 ### Authentication & Authorization
 
-- **Supabase Auth** for user authentication
+- **Clerk** for user authentication (frontend + backend)
+- **Frontend**: `@clerk/clerk-react` with `ClerkProvider`, `useAuth`
+- **Backend**: `verifyClerkAuth` from `api/_lib/auth.js`
+- **User Sync**: Clerk webhooks → MongoDB `User` collection
 - **API Key authentication** in `api/_lib/api-key-auth.js`
 - **CSRF protection** enabled (backend middleware)
 
@@ -461,9 +464,10 @@ See `.cursor/rules/nia-oracle.mdc` for NIA research agent guidelines.
 
 ### Database
 
-- **Supabase**: PostgreSQL database
-- **Client**: `@supabase/supabase-js` v2.81.1
-- **Auth**: Supabase Auth integration
+- **MongoDB Atlas**: Document database with Mongoose ODM
+- **Connection**: Serverless singleton in `api/_lib/mongodb.js`
+- **Models**: Mongoose schemas in `api/_lib/models/` (User, Contact, ApiKey, etc.)
+- **Multi-tenancy**: `clerkId` field links documents to Clerk users
 
 ### Performance
 
@@ -514,6 +518,6 @@ npm run deploy:vercel         # Deploy to Vercel
 
 ---
 
-**Last Updated**: 2026-01-02
+**Last Updated**: 2026-01-06
 **Project**: TCDynamics WorkFlowAI
 **Version**: 1.0.0

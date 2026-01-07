@@ -4,91 +4,87 @@
  */
 
 import bcrypt from 'bcryptjs'
-import { getSupabaseClient } from './supabase.js'
+import { ApiKey } from './models/ApiKey.js'
+import { User } from './models/User.js'
+import { connectToDatabase } from './mongodb.js'
 
 /**
- * Verify tenant API key and return org_id
+ * Verify tenant API key and return clerkId
  * @param {string} apiKey - API key from X-API-Key header
- * @returns {Promise<{orgId: string | null, error: string | null}>}
+ * @returns {Promise<{clerkId: string | null, error: string | null}>}
  */
 export async function verifyTenantApiKey(apiKey) {
   if (!apiKey || !apiKey.startsWith('tc_live_')) {
-    return { orgId: null, error: 'Invalid API key format' }
+    return { clerkId: null, error: 'Invalid API key format' }
   }
 
-  const supabase = getSupabaseClient()
+  await connectToDatabase()
 
   try {
     // Find active (non-revoked) API keys
-    const { data: keys, error } = await supabase
-      .from('api_keys')
-      .select('id, org_id, key_hash')
-      .is('revoked_at', null)
-
-    if (error) {
-      console.error('Error fetching API keys', error)
-      return { orgId: null, error: error.message }
-    }
+    const keys = await ApiKey.find({ revokedAt: null }).select(
+      '_id clerkId keyHash'
+    )
 
     // Verify hash against provided key
     for (const keyRecord of keys || []) {
-      const isValid = await bcrypt.compare(apiKey, keyRecord.key_hash)
+      const isValid = await bcrypt.compare(apiKey, keyRecord.keyHash)
       if (isValid) {
         // Update last_used_at asynchronously (don't wait)
-        supabase
-          .from('api_keys')
-          .update({ last_used_at: new Date().toISOString() })
-          .eq('id', keyRecord.id)
+        ApiKey.findByIdAndUpdate(keyRecord._id, {
+          $set: { lastUsedAt: new Date() },
+        })
           .then(() => {})
-          .catch(err => console.warn('Failed to update last_used_at', err))
+          .catch(err => console.warn('Failed to update lastUsedAt', err))
 
-        return { orgId: keyRecord.org_id, error: null }
+        return { clerkId: keyRecord.clerkId, error: null }
       }
     }
 
-    return { orgId: null, error: 'Invalid API key' }
+    return { clerkId: null, error: 'Invalid API key' }
   } catch (err) {
     console.error('Exception verifying API key', err)
-    return { orgId: null, error: err.message }
+    return { clerkId: null, error: err.message }
   }
 }
 
 /**
- * Get org entitlements (plan + subscription status)
- * @param {string} orgId - Org ID
+ * Get user entitlements (plan + subscription status)
+ * @param {string} clerkId - Clerk user ID
  * @returns {Promise<{plan: string | null, subscriptionStatus: string | null, error: string | null}>}
  */
-export async function getOrgEntitlements(orgId) {
-  if (!orgId) {
-    return { plan: null, subscriptionStatus: null, error: 'Missing org_id' }
+export async function getUserEntitlements(clerkId) {
+  if (!clerkId) {
+    return { plan: null, subscriptionStatus: null, error: 'Missing clerkId' }
   }
 
-  const supabase = getSupabaseClient()
+  await connectToDatabase()
 
   try {
-    const { data, error } = await supabase
-      .from('orgs')
-      .select('plan, subscription_status')
-      .eq('id', orgId)
-      .single()
+    const user = await User.findOne({ clerkId }).select(
+      'plan subscriptionStatus'
+    )
 
-    if (error) {
-      console.error('Error fetching org entitlements', error)
-      return { plan: null, subscriptionStatus: null, error: error.message }
+    if (!user) {
+      return { plan: null, subscriptionStatus: null, error: 'User not found' }
     }
 
     return {
-      plan: data?.plan || null,
-      subscriptionStatus: data?.subscription_status || null,
+      plan: user.plan || null,
+      subscriptionStatus: user.subscriptionStatus || null,
       error: null,
     }
   } catch (err) {
-    console.error('Exception fetching org entitlements', err)
+    console.error('Exception fetching user entitlements', err)
     return { plan: null, subscriptionStatus: null, error: err.message }
   }
 }
 
+// Backward compatibility alias
+export const getOrgEntitlements = getUserEntitlements
+
 export default {
   verifyTenantApiKey,
+  getUserEntitlements,
   getOrgEntitlements,
 }

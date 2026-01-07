@@ -9,6 +9,14 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: '127.0.0.1',
     port: 5173,
+    // Proxy API requests to Vercel Dev (serverless functions with MongoDB)
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
     // Pre-warm frequently used files for faster dev server
     warmup: {
       clientFiles: [

@@ -1,35 +1,16 @@
 const express = require('express')
-const { createClient } = require('@supabase/supabase-js')
 const { formRateLimit } = require('../middleware/security')
 const { logger } = require('../utils/logger')
+const { saveFeedback } = require('../../../../api/_lib/mongodb-db.js')
 
 const router = express.Router()
 
-// Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-if (!supabaseUrl || !supabaseKey) {
-  logger.warn('Supabase credentials not found in environment variables')
-}
-
-const supabase =
-  supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null
-
 /**
  * POST /api/feedback
- * Save customer feedback to Supabase
+ * Save customer feedback to MongoDB
  */
 router.post('/feedback', formRateLimit, async (req, res) => {
   try {
-    if (!supabase && process.env.NODE_ENV === 'production') {
-      logger.error('Supabase service role key missing in production')
-      return res.status(503).json({
-        success: false,
-        message: 'Feedback service unavailable',
-      })
-    }
-
     // Validate request body
     const {
       form_type,
@@ -38,6 +19,7 @@ router.post('/feedback', formRateLimit, async (req, res) => {
       user_email,
       user_company,
       allow_followup,
+      clerkId,
     } = req.body
 
     // Validate required fields
@@ -58,39 +40,20 @@ router.post('/feedback', formRateLimit, async (req, res) => {
       })
     }
 
-    // If Supabase is not configured, log and return service unavailable
-    // (production case already handled above, this is for non-production)
-    if (!supabase) {
-      logger.warn('Supabase not configured, logging feedback to console', {
-        form_type,
-        rating,
-        user_company,
-        allow_followup,
-        pii_omitted: true,
-      })
+    // Save feedback to MongoDB
+    const result = await saveFeedback({
+      form_type,
+      rating,
+      feedback_text,
+      user_email,
+      user_company,
+      allow_followup,
+      clerkId,
+    })
 
-      return res.status(503).json({
-        success: false,
-        message: 'Feedback service unavailable',
-      })
-    }
-
-    // Save feedback to Supabase
-    const { data, error } = await supabase.from('feedback').insert([
-      {
-        form_type,
-        rating,
-        feedback_text: feedback_text || null,
-        user_email: user_email || null,
-        user_company: user_company || null,
-        allow_followup: allow_followup || false,
-        created_at: new Date().toISOString(),
-      },
-    ])
-
-    if (error) {
-      logger.error('Failed to save feedback to Supabase', {
-        error: error.message,
+    if (!result.success) {
+      logger.error('Failed to save feedback to MongoDB', {
+        error: result.error,
         feedback: { form_type, rating },
       })
 
@@ -103,12 +66,13 @@ router.post('/feedback', formRateLimit, async (req, res) => {
     logger.info('Feedback saved successfully', {
       form_type,
       rating,
+      id: result.id,
     })
 
     return res.status(200).json({
       success: true,
       message: 'Feedback saved successfully',
-      data,
+      data: { id: result.id },
     })
   } catch (error) {
     logger.error('Error processing feedback request', {

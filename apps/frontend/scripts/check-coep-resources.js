@@ -51,22 +51,22 @@
     results.errors.push(`Failed to check headers: ${e.message}`)
   }
 
-  // Check Stripe
+  // Check Polar (payment provider)
   try {
-    const stripeLoaded = typeof window.Stripe !== 'undefined'
-    const stripeScript = Array.from(document.querySelectorAll('script')).find(
-      s => s.src.includes('stripe.com')
+    const polarLoaded = typeof window.Polar !== 'undefined'
+    const polarScript = Array.from(document.querySelectorAll('script')).find(
+      s => s.src.includes('polar.sh') || s.src.includes('polar.com')
     )
-    results.resources.stripe = {
-      loaded: stripeLoaded,
-      scriptFound: !!stripeScript,
-      scriptUrl: stripeScript?.src || 'Not found',
+    results.resources.polar = {
+      loaded: polarLoaded,
+      scriptFound: !!polarScript,
+      scriptUrl: polarScript?.src || 'Not found',
     }
     console.log(
-      `💳 Stripe: ${stripeLoaded ? '✅ Loaded' : '❌ Not loaded'} ${stripeScript ? `(${stripeScript.src})` : ''}`
+      `💳 Polar: ${polarLoaded ? '✅ Loaded' : 'ℹ️ Not loaded (checkout redirects to Polar hosted page)'} ${polarScript ? `(${polarScript.src})` : ''}`
     )
   } catch (e) {
-    results.errors.push(`Stripe check failed: ${e.message}`)
+    results.errors.push(`Polar check failed: ${e.message}`)
   }
 
   // Check Sentry
@@ -132,7 +132,8 @@
     const resources = performance.getEntriesByType('resource')
     const thirdPartyResources = resources.filter(
       r =>
-        r.name.includes('stripe.com') ||
+        r.name.includes('polar.sh') ||
+        r.name.includes('polar.com') ||
         r.name.includes('sentry.io') ||
         r.name.includes('vercel-insights.com') ||
         r.name.includes('connect.facebook.net')

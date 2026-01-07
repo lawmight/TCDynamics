@@ -59,7 +59,7 @@ script-src 'self' 'sha256-B0YeSIgQkU25t8JsAxqLZDvivwg+N1UjPV6BiObAslw=' https://
 
 All third-party scripts are now properly configured:
 
-- **Stripe**: Loaded via `@stripe/stripe-js` package (bundled, served from `'self'`)
+- **Polar.sh**: Payment processing via server-side API (no client-side SDK required)
 - **Sentry**: Loaded via `@sentry/browser` package (bundled, served from `'self'`)
 - **Vercel Analytics**: Loaded via `@vercel/analytics` package (bundled, served from `'self'`)
 - **Facebook SDK**: External script from `https://connect.facebook.net` (explicitly allowed)
@@ -99,9 +99,9 @@ The `Captcha` component dynamically loads the Turnstile script:
 
 The `Cross-Origin-Embedder-Policy: require-corp` header in `vercel.json` was blocking third-party resources that don't support Cross-Origin-Resource-Policy (CORP) headers:
 
-- **Stripe**: Does NOT support CORP headers - would break
 - **Sentry**: Does NOT support CORP headers - would break
 - **Vercel Analytics**: ✅ DOES support CORP headers - works
+- **Polar.sh**: Payment processing is server-side only (no client-side SDK)
 - **Facebook SDK**: Does NOT support CORP headers - would break
 
 ### Solution
@@ -126,7 +126,7 @@ Changed `Cross-Origin-Embedder-Policy` from `require-corp` to `credentialless` i
 #### Trade-offs
 
 - **Credentialless mode**: Cookies and authentication are stripped from cross-origin requests
-- **Impact**: May affect cookie-based features (Facebook tracking, Stripe session cookies)
+- **Impact**: May affect cookie-based features (Facebook tracking)
 - **If issues persist**: Consider removing COEP entirely and keeping only COOP: same-origin
 
 ---
@@ -154,7 +154,6 @@ npm run test:e2e -- tests/e2e/third-party-resources.spec.ts
 ```
 
 The test verifies:
-- ✅ Stripe.js loads without COEP errors
 - ✅ Sentry SDK loads without COEP errors
 - ✅ Vercel Analytics loads without COEP errors
 - ✅ Facebook SDK loads without COEP errors
@@ -164,7 +163,7 @@ The test verifies:
 ### Testing Checklist
 - [ ] Theme applies correctly (no FOUC)
 - [ ] Facebook SDK initializes
-- [ ] Stripe checkout works
+- [ ] Polar.sh checkout works (server-side redirect)
 - [ ] Sentry error tracking works
 - [ ] Vercel Analytics loads
 - [ ] Turnstile CAPTCHA renders
@@ -239,8 +238,8 @@ If `credentialless` still causes issues:
 - [MDN: Cross-Origin-Embedder-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Embedder-Policy)
 - [MDN: IFrame credentialless](https://developer.mozilla.org/en-US/docs/Web/Security/IFrame_credentialless)
 - [CSP Hash Generator](https://cspscanner.com/)
-- [OWASP: Content Security Policy Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html)
-- [Stripe: Cross-origin isolation](https://docs.stripe.com/js/appendix/cross_origin_isolation)
+- [OWASP: Content Security Policy Cheat Sheet](https://cheatsheetseries.cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html)
+- [Polar.sh Documentation](https://docs.polar.sh/)
 - [Sentry Issue #41225](https://github.com/getsentry/sentry/issues/41225)
 
 ---

@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import { saveConversation } from './_lib/supabase.js'
+import { saveConversation } from './_lib/mongodb-db.js'
 
 // Disable Vercel's automatic body parsing - we'll handle it manually
 export const config = {
@@ -217,9 +217,9 @@ export default async function handler(req, res) {
     const tokensUsed = data.usage?.total_tokens || 0
     const clientIpHash = hashClientIp(clientIp)
 
-    // Save conversation to Supabase (best-effort)
+    // Save conversation to MongoDB (best-effort)
     try {
-      // IP logging is optional (ENABLE_CLIENT_IP_LOGGING + IP_HASH_SALT) and subject to the 90-day Supabase TTL retention in supabase-schema-enhanced.sql
+      // IP logging is optional (ENABLE_CLIENT_IP_LOGGING + IP_HASH_SALT)
       const metadata = {
         model: 'gpt-3.5-turbo',
         tokens_used: tokensUsed,

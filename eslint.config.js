@@ -14,7 +14,11 @@ export default tseslint.config(
       ecmaVersion: 2020,
       globals: globals.browser,
       parserOptions: {
-        projectService: true,
+        projectService: {
+          allowDefaultProject: [
+            'tests/e2e/third-party-resources.spec.ts',
+          ],
+        },
       },
     },
     plugins: {

@@ -9,7 +9,8 @@ globs: ["api/**/*.js"]
 Use ES modules with `.js` extension for Vercel functions:
 
 ```javascript
-import { getSupabaseClient } from './_lib/supabase.js'
+import { connectToDatabase } from './_lib/mongodb.js'
+import { verifyClerkAuth } from './_lib/auth.js'
 import { withGuards } from './_lib/request-guards.js'
 import { withSentry } from './_lib/sentry.js'
 
@@ -26,13 +27,13 @@ async function handler(req, res, body) {
 export default withSentry(withGuards(handler, options))
 ```
 
-## Supabase Auth Verification
+## Clerk Auth Verification
 Use the standardized auth verification pattern:
 
 ```javascript
-import { verifySupabaseAuth } from './_lib/auth.js'
+import { verifyClerkAuth } from './_lib/auth.js'
 
-const { userId, error } = await verifySupabaseAuth(req.headers.authorization)
+const { userId: clerkId, error } = await verifyClerkAuth(req.headers.authorization)
 
 if (error) {
   return res.status(401).json({
@@ -121,8 +122,9 @@ if (req.method === 'OPTIONS') {
 
 ## Shared Utilities Location
 Store shared utilities in `api/_lib/`:
-- `auth.js` - Supabase JWT verification
-- `supabase.js` - Supabase client singleton
+- `auth.js` - Clerk JWT verification (`verifyClerkAuth`)
+- `mongodb.js` - MongoDB connection singleton
+- `models/` - Mongoose schema definitions
 - `email.js` - Email notification helpers
 - `request-guards.js` - Request validation HOF
 - `sentry.js` - Error monitoring wrapper

@@ -3,10 +3,11 @@
  * Allows authenticated users to create, list, and revoke API keys
  */
 
-import { getSupabaseClient } from '../_lib/supabase.js'
-import { verifyClerkAuth } from '../_lib/auth.js'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
+import { verifyClerkAuth } from '../_lib/auth.js'
+import { ApiKey } from '../_lib/models/ApiKey.js'
+import { connectToDatabase } from '../_lib/mongodb.js'
 
 /**
  * Generate a new API key with tc_live_ prefix
@@ -21,10 +22,7 @@ function generateApiKey() {
 const allowCors = fn => async (req, res) => {
   res.setHeader('Access-Control-Allow-Credentials', true)
   res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader(
-    'Access-Control-Allow-Methods',
-    'GET,OPTIONS,POST,DELETE'
-  )
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST,DELETE')
   res.setHeader(
     'Access-Control-Allow-Headers',
     'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
@@ -41,10 +39,10 @@ const allowCors = fn => async (req, res) => {
 const handler = async (req, res) => {
   // Verify Clerk authentication
   const authHeader = req.headers.authorization
-  const { userId: orgId, error: authError } =
+  const { userId: clerkId, error: authError } =
     await verifyClerkAuth(authHeader)
 
-  if (authError || !orgId) {
+  if (authError || !clerkId) {
     return res.status(401).json({
       success: false,
       error: 'Authentication required',
@@ -52,29 +50,29 @@ const handler = async (req, res) => {
     })
   }
 
-  const supabase = getSupabaseClient()
+  await connectToDatabase()
 
   // GET - List API keys (prefixes only, never full keys)
   if (req.method === 'GET') {
     try {
-      const { data, error } = await supabase
-        .from('api_keys')
-        .select('id, key_prefix, created_at, revoked_at, last_used_at')
-        .eq('org_id', orgId)
-        .is('revoked_at', null)
-        .order('created_at', { ascending: false })
+      const keys = await ApiKey.find({
+        clerkId,
+        revokedAt: null,
+      })
+        .sort({ createdAt: -1 })
+        .select('_id keyPrefix createdAt revokedAt lastUsedAt')
 
-      if (error) {
-        console.error('Error listing API keys', error)
-        return res.status(500).json({
-          success: false,
-          error: error.message,
-        })
-      }
+      const data = keys.map(key => ({
+        id: key._id.toString(),
+        key_prefix: key.keyPrefix,
+        created_at: key.createdAt,
+        revoked_at: key.revokedAt,
+        last_used_at: key.lastUsedAt,
+      }))
 
       return res.json({
         success: true,
-        keys: data || [],
+        keys: data,
       })
     } catch (err) {
       console.error('Exception listing API keys', err)
@@ -93,33 +91,21 @@ const handler = async (req, res) => {
       const keyHash = await bcrypt.hash(apiKey, 10)
       const keyPrefix = apiKey.substring(0, 20) + '...' // For display
 
-      const { data, error } = await supabase
-        .from('api_keys')
-        .insert({
-          org_id: orgId,
-          key_hash: keyHash,
-          key_prefix: keyPrefix,
-        })
-        .select('id, key_prefix, created_at')
-        .single()
+      const newKey = await ApiKey.create({
+        clerkId,
+        keyHash,
+        keyPrefix,
+      })
 
-      if (error) {
-        console.error('Error creating API key', error)
-        return res.status(500).json({
-          success: false,
-          error: error.message,
-        })
-      }
-
-      console.log('API key created', { orgId, keyId: data.id })
+      console.log('API key created', { clerkId, keyId: newKey._id.toString() })
 
       // Return plaintext key ONCE (frontend must store securely)
       return res.json({
         success: true,
-        id: data.id,
+        id: newKey._id.toString(),
         key: apiKey, // Only returned on creation
-        key_prefix: data.key_prefix,
-        created_at: data.created_at,
+        key_prefix: newKey.keyPrefix,
+        created_at: newKey.createdAt,
       })
     } catch (err) {
       console.error('Exception creating API key', err)
@@ -142,21 +128,20 @@ const handler = async (req, res) => {
         })
       }
 
-      const { error } = await supabase
-        .from('api_keys')
-        .update({ revoked_at: new Date().toISOString() })
-        .eq('id', keyId)
-        .eq('org_id', orgId) // Ensure user owns the key
+      const result = await ApiKey.findOneAndUpdate(
+        { _id: keyId, clerkId }, // Ensure user owns the key
+        { $set: { revokedAt: new Date() } },
+        { new: true }
+      )
 
-      if (error) {
-        console.error('Error revoking API key', error)
-        return res.status(500).json({
+      if (!result) {
+        return res.status(404).json({
           success: false,
-          error: error.message,
+          error: 'API key not found or access denied',
         })
       }
 
-      console.log('API key revoked', { orgId, keyId })
+      console.log('API key revoked', { clerkId, keyId })
 
       return res.json({
         success: true,
@@ -180,15 +165,3 @@ const handler = async (req, res) => {
 }
 
 export default allowCors(handler)
-
-
-
-
-
-
-
-
-
-
-
-

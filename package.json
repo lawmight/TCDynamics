@@ -19,6 +19,11 @@
     "test:backend": "cd apps/backend && npm run test",
     "test:functions": "echo \"Azure Functions archived - see apps/functions-archive/\"",
     "test:e2e": "cd tests/e2e && npm run test",
+    "test-this": "node tools/scripts/test-this.js",
+    "test:watch": "cd apps/frontend && npm run test",
+    "test:ui": "cd apps/frontend && npm run test:ui",
+    "fix": "node tools/scripts/fix-current.js",
+    "quick-check": "node tools/scripts/quick-check.js",
     "lint": "npm run lint:frontend && npm run lint:backend",
     "lint:frontend": "cd apps/frontend && npm run lint",
     "lint:backend": "cd apps/backend && npm run lint",
@@ -41,12 +46,10 @@
     "deploy:vercel:frontend": "powershell -ExecutionPolicy Bypass -File ./scripts/deploy-vercel-frontend-only.ps1"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.81.1",
+    "google-auth-library": "^9.14.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.30.1",
-    "stripe": "^17.4.0",
-    "google-auth-library": "^9.14.1"
+    "react-router-dom": "^6.30.1"
   },
   "devDependencies": {
     "@typescript-eslint/scope-manager": "^8.48.0",

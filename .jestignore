@@ -1,0 +1,18 @@
+# Ignore API tests (uses Node.js test runner, not Jest)
+api/__tests__/
+api/**/*.test.js
+
+# Ignore frontend tests (uses Vitest, not Jest)
+apps/frontend/
+apps/frontend/**/*.test.ts
+apps/frontend/**/*.test.tsx
+apps/frontend/**/__tests__/
+
+# Ignore E2E tests (uses Playwright, not Jest)
+tests/e2e/
+
+# Ignore other test directories
+*.test.js
+*.test.ts
+*.test.tsx
+__tests__/

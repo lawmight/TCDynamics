@@ -226,7 +226,6 @@ const Checkout = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {/* TODO: Integrate Stripe Embedded Checkout here */}
                   <div className="space-y-4 rounded-lg bg-muted/30 p-8 text-center">
                     <CreditCard className="mx-auto h-16 w-16 text-primary/50" />
                     <div>

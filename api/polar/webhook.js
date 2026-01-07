@@ -1,6 +1,8 @@
 import { validateEvent, WebhookVerificationError } from '@polar-sh/sdk/webhooks'
 import { getResendClient } from '../_lib/email.js'
-import { getSupabaseClient, savePolarEvent } from '../_lib/supabase.js'
+import { User } from '../_lib/models/User.js'
+import { savePolarEvent } from '../_lib/mongodb-db.js'
+import { connectToDatabase } from '../_lib/mongodb.js'
 
 // Reverse mapping: product_id → plan name
 const PRODUCT_TO_PLAN = {
@@ -26,8 +28,8 @@ function pruneCache() {
 }
 
 /**
- * NIA-verified: Read raw body as Buffer for signature verification
- * This is REQUIRED for Vercel serverless functions
+ * Read raw body as Buffer for signature verification
+ * Required for Vercel serverless functions
  */
 async function getRawBody(req) {
   if (req.body && typeof req.body === 'string') {
@@ -37,7 +39,6 @@ async function getRawBody(req) {
     return req.body
   }
 
-  // Collect chunks as Buffers
   const chunks = []
   for await (const chunk of req) {
     chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
@@ -46,16 +47,16 @@ async function getRawBody(req) {
 }
 
 /**
- * Sync subscription to orgs table
- * NIA-verified: customer.external_id contains our org_id
+ * Sync subscription to User collection
+ * customer.external_id contains the Clerk userId
  */
-async function syncSubscriptionToOrg(subscription, eventType) {
-  const supabase = getSupabaseClient()
+async function syncSubscriptionToUser(subscription, eventType) {
+  await connectToDatabase()
 
-  // NIA-verified: external_id is immutable and unique per organization
-  const orgId = subscription.customer?.external_id
+  // external_id is the Clerk userId
+  const clerkId = subscription.customer?.external_id
 
-  if (!orgId) {
+  if (!clerkId) {
     console.warn('No external_id in customer', {
       subscriptionId: subscription.id,
       eventType,
@@ -63,40 +64,35 @@ async function syncSubscriptionToOrg(subscription, eventType) {
     return { success: false, error: 'Missing customer external_id' }
   }
 
-  // NIA-verified: Metadata flows from checkout → subscription
   // Primary: Use plan_name from metadata (set during checkout creation)
   // Fallback: Map product_id to plan name
   const metadataPlan = subscription.metadata?.plan_name
   const productId =
     subscription.product_id || subscription.prices?.[0]?.product_id
   const plan = metadataPlan || PRODUCT_TO_PLAN[productId] || 'starter'
-
-  // NIA-verified status mapping:
-  // - cancel_at_period_end: true + status: active = still active until period ends (customer can uncancel)
-  // - status: canceled = period ended OR immediate revocation happened
-  // Note: 'revoked' is a webhook EVENT, not a status. The final status is 'canceled'.
-  const subscriptionStatus = subscription.status // Use directly - Polar uses correct statuses
+  const subscriptionStatus = subscription.status
 
   try {
-    const { error } = await supabase.from('orgs').upsert(
+    // Upsert pattern: find by clerkId, update or create
+    await User.findOneAndUpdate(
+      { clerkId },
       {
-        id: orgId,
-        plan,
-        subscription_status: subscriptionStatus,
-        polar_customer_id: subscription.customer?.id,
-        polar_subscription_id: subscription.id,
-        updated_at: new Date().toISOString(),
+        $set: {
+          plan,
+          subscriptionStatus,
+          polarCustomerId: subscription.customer?.id,
+          polarSubscriptionId: subscription.id,
+        },
       },
-      { onConflict: 'id' }
+      {
+        upsert: true,
+        new: true,
+        setDefaultsOnInsert: true,
+      }
     )
 
-    if (error) {
-      console.error('Failed to sync subscription', error)
-      return { success: false, error: error.message }
-    }
-
-    console.log('✅ Synced subscription to org', {
-      orgId,
+    console.log('✅ Synced subscription to user', {
+      clerkId,
       status: subscriptionStatus,
       plan,
     })
@@ -136,10 +132,7 @@ export default async function handler(req, res) {
 
   let event
   try {
-    // NIA-verified: Must use raw body Buffer for signature verification
     const body = await getRawBody(req)
-
-    // NIA-verified: Use validateEvent from @polar-sh/sdk/webhooks
     event = validateEvent(body, req.headers, webhookSecret)
   } catch (err) {
     if (err instanceof WebhookVerificationError) {
@@ -175,11 +168,10 @@ export default async function handler(req, res) {
 
   try {
     switch (event.type) {
-      // NIA-verified: checkout.updated fires when status changes to 'succeeded'
       case 'checkout.updated': {
         const checkout = event.data
         if (checkout.status === 'succeeded' && checkout.subscription) {
-          await syncSubscriptionToOrg(checkout.subscription, event.type)
+          await syncSubscriptionToUser(checkout.subscription, event.type)
         }
         await sendPolarEmail(
           'Checkout updated',
@@ -189,7 +181,7 @@ export default async function handler(req, res) {
       }
 
       case 'subscription.created': {
-        await syncSubscriptionToOrg(event.data, event.type)
+        await syncSubscriptionToUser(event.data, event.type)
         await sendPolarEmail(
           'Subscription created',
           `Subscription ${event.data.id}`
@@ -197,9 +189,8 @@ export default async function handler(req, res) {
         break
       }
 
-      // NIA-verified: subscription.updated is catch-all for cancellations, un-cancellations
       case 'subscription.updated': {
-        await syncSubscriptionToOrg(event.data, event.type)
+        await syncSubscriptionToUser(event.data, event.type)
         await sendPolarEmail(
           'Subscription updated',
           `Status: ${event.data.status}`
@@ -209,34 +200,33 @@ export default async function handler(req, res) {
 
       case 'subscription.revoked': {
         const subscription = event.data
-        const orgId = subscription.customer?.external_id
-        if (orgId) {
-          const supabase = getSupabaseClient()
-          const { error, status } = await supabase
-            .from('orgs')
-            .update({
-              subscription_status: 'canceled',
-              polar_subscription_id: null,
-              updated_at: new Date().toISOString(),
-            })
-            .eq('id', orgId)
+        const clerkId = subscription.customer?.external_id
+        if (clerkId) {
+          await connectToDatabase()
+          const user = await User.findOneAndUpdate(
+            { clerkId },
+            {
+              $set: {
+                subscriptionStatus: 'canceled',
+                polarSubscriptionId: null,
+              },
+            },
+            { new: true }
+          )
 
-          if (error) {
-            console.error('Failed to revoke subscription in orgs table', {
-              error: error.message,
-              status,
-              orgId,
+          if (!user) {
+            console.error('Failed to revoke subscription in users collection', {
+              clerkId,
               subscriptionId: subscription.id,
               eventType: event.type,
             })
-            // Throw to trigger webhook retry by Polar, ensuring data consistency
             throw new Error(
-              `Failed to update org ${orgId} for revoked subscription ${subscription.id}: ${error.message}`
+              `Failed to update user ${clerkId} for revoked subscription ${subscription.id}`
             )
           }
 
-          console.log('✅ Revoked subscription in org', {
-            orgId,
+          console.log('✅ Revoked subscription for user', {
+            clerkId,
             subscriptionId: subscription.id,
           })
         } else {
@@ -252,9 +242,8 @@ export default async function handler(req, res) {
         break
       }
 
-      // NIA-verified: subscription.uncanceled fires when customer reverses cancellation
       case 'subscription.uncanceled': {
-        await syncSubscriptionToOrg(event.data, event.type)
+        await syncSubscriptionToUser(event.data, event.type)
         await sendPolarEmail(
           'Subscription uncanceled',
           `Subscription ${event.data.id} was reactivated`
@@ -262,13 +251,11 @@ export default async function handler(req, res) {
         break
       }
 
-      // NIA-verified: order.paid is recommended for payment confirmation
       case 'order.paid': {
         await sendPolarEmail('Order paid', `Order ${event.data.id} paid`)
         break
       }
 
-      // NIA-verified: customer.state_changed is comprehensive catch-all
       case 'customer.state_changed': {
         console.log('Customer state changed:', event.data.customer?.id)
         break
@@ -278,7 +265,6 @@ export default async function handler(req, res) {
         console.log(`Unhandled Polar event: ${event.type}`)
     }
 
-    // NIA-verified: Return 202 for successful processing
     return res.status(202).json({ received: true, type: event.type })
   } catch (error) {
     console.error('Error processing webhook:', error)
@@ -287,7 +273,7 @@ export default async function handler(req, res) {
   }
 }
 
-// NIA-verified: CRITICAL - Disable body parser for signature verification
+// CRITICAL - Disable body parser for signature verification
 export const config = {
   api: { bodyParser: false },
 }

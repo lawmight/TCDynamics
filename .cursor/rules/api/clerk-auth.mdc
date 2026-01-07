@@ -1,0 +1,114 @@
+---
+description: Clerk authentication patterns
+globs: ['api/**/*.js', 'apps/frontend/src/**/*.{ts,tsx}']
+---
+
+# Clerk Authentication Patterns
+
+## Frontend Setup
+
+### ClerkProvider
+
+Wrap your app with ClerkProvider in `main.tsx`:
+
+```tsx
+import { ClerkProvider } from '@clerk/clerk-react'
+import { clerkTheme } from './lib/clerkTheme'
+;<ClerkProvider
+  publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
+  appearance={clerkTheme}
+>
+  <App />
+</ClerkProvider>
+```
+
+### useAuth Hook
+
+Access authentication state:
+
+```tsx
+import { useAuth, useUser } from '@clerk/clerk-react'
+
+const { isSignedIn, getToken } = useAuth()
+const { user } = useUser()
+```
+
+### Protected Routes
+
+Use `SignedIn`/`SignedOut` components:
+
+```tsx
+import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react'
+
+<SignedIn>
+  <ProtectedContent />
+</SignedIn>
+<SignedOut>
+  <RedirectToSignIn />
+</SignedOut>
+```
+
+## Backend Verification
+
+### Verify Clerk Auth Token
+
+Use `verifyClerkAuth` from `api/_lib/auth.js`:
+
+```javascript
+import { verifyClerkAuth } from './_lib/auth.js'
+
+const { userId: clerkId, error } = await verifyClerkAuth(
+  req.headers.authorization
+)
+
+if (error) {
+  return res.status(401).json({
+    success: false,
+    error: 'Unauthorized',
+    message: error,
+  })
+}
+
+// Use clerkId for database queries
+const user = await User.findOne({ clerkId })
+```
+
+## Clerk Webhooks
+
+Handle user lifecycle events in `api/webhooks/clerk.js`:
+
+```javascript
+// Supported events: user.created, user.updated, user.deleted
+const { type, data } = req.body
+
+switch (type) {
+  case 'user.created': {
+    const { id, email_addresses, first_name, last_name, image_url } = data
+    const primaryEmail = email_addresses?.find(
+      e => e.id === data.primary_email_address_id
+    )?.email_address
+
+    await User.create({
+      clerkId: id,
+      email: primaryEmail?.toLowerCase() || '',
+      firstName: first_name || null,
+      lastName: last_name || null,
+      imageUrl: image_url || null,
+      plan: 'starter', // Default plan for new users
+    })
+    break
+  }
+}
+```
+
+## MongoDB User Model Pattern
+
+Link documents to Clerk users via `clerkId`:
+
+```javascript
+const userSchema = new Schema({
+  clerkId: { type: String, required: true, unique: true, index: true },
+  email: { type: String, required: true },
+  // ... other fields
+})
+```

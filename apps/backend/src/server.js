@@ -43,7 +43,6 @@ console.log('🔧 Loading route modules...')
 let contactRoutes,
   demoRoutes,
   monitoringRoutes,
-  stripeRoutes,
   rumRoutes,
   feedbackRoutes
 
@@ -74,16 +73,6 @@ try {
   console.error(error.stack)
   process.exit(1)
 }
-
-try {
-  stripeRoutes = require('./routes/stripe')
-  console.log('✅ Stripe routes loaded')
-} catch (error) {
-  console.error('❌ Failed to load stripe routes:', error.message)
-  console.error(error.stack)
-  process.exit(1)
-}
-
 
 try {
   rumRoutes = require('./routes/rum')
@@ -281,7 +270,6 @@ app.get('/api/csrf-token', (req, res) => {
 app.use('/api', contactRoutes)
 app.use('/api', demoRoutes)
 app.use('/api', monitoringRoutes)
-app.use('/api', stripeRoutes)
 app.use('/api', rumRoutes)
 app.use('/api', feedbackRoutes)
 
@@ -348,7 +336,6 @@ const server = app.listen(PORT, () => {
   console.log(
     `Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:8080'}`
   )
-  console.log(`Stripe Configured: ${!!process.env.STRIPE_SECRET_KEY}`)
   console.log(`Email Configured: ${!!process.env.EMAIL_USER}`)
   console.log('')
   console.log('📋 Available Endpoints:')
@@ -366,7 +353,6 @@ const server = app.listen(PORT, () => {
       port: PORT,
       environment: process.env.NODE_ENV,
       emailConfigured: !!process.env.EMAIL_USER,
-      stripeConfigured: !!process.env.STRIPE_SECRET_KEY,
       frontendUrl: process.env.FRONTEND_URL,
       apiDocsUrl: `http://localhost:${PORT}/api-docs`,
       openApiUrl: `http://localhost:${PORT}/api-docs.json`,

@@ -2,7 +2,8 @@ import { Page, expect, test } from '@playwright/test'
 
 /**
  * E2E tests to verify third-party resource loading with COEP/COOP headers
- * Tests Stripe, Sentry, Vercel Analytics, and Facebook SDK integration
+ * Tests Sentry, Vercel Analytics, and Facebook SDK integration
+ * Note: Payment processing uses Polar.sh (server-side, no client-side SDK)
  */
 
 interface ResourceTestContext {
@@ -58,37 +59,6 @@ test.describe('Third-Party Resource Loading', () => {
       // Delete the context from the map
       resourceContextMap.delete(page)
     }
-  })
-
-  test('should load Stripe.js without COEP blocking errors', async ({
-    page,
-  }) => {
-    await page.goto('/checkout')
-
-    // Wait for Stripe to initialize with condition-based wait
-    await page.waitForFunction(
-      () => typeof (window as any).Stripe !== 'undefined',
-      { timeout: 10000 }
-    )
-
-    // Verify Stripe is loaded
-    const stripeLoaded = await page.evaluate(() => {
-      return typeof (window as any).Stripe !== 'undefined'
-    })
-
-    expect(stripeLoaded).toBe(true)
-
-    // Check for COEP-related errors
-    const context = resourceContextMap.get(page)
-    const errors = context?.errors || []
-    const coepErrors = errors.filter(
-      (error: string) =>
-        error.includes('Cross-Origin-Embedder-Policy') ||
-        error.includes('COEP') ||
-        error.includes('require-corp')
-    )
-
-    expect(coepErrors.length).toBe(0)
   })
 
   test('should load Sentry SDK without COEP blocking errors', async ({
@@ -264,7 +234,6 @@ test.describe('Third-Party Resource Loading', () => {
         .map(entry => entry.name)
         .filter(
           url =>
-            url.includes('stripe.com') ||
             url.includes('sentry.io') ||
             url.includes('vercel-insights.com') ||
             url.includes('connect.facebook.net')
@@ -276,7 +245,6 @@ test.describe('Third-Party Resource Loading', () => {
     const failedRequests = context?.failedRequests || []
     const thirdPartyFailures = failedRequests.filter(
       (req: string) =>
-        req.includes('stripe.com') ||
         req.includes('sentry.io') ||
         req.includes('vercel-insights.com') ||
         req.includes('connect.facebook.net')

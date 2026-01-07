@@ -7,12 +7,7 @@ runs:
     - name: Install dependencies for ESM validation
       shell: bash
       working-directory: ./api
-      - name: Check API file structure
-        shell: bash
-        working-directory: ./api
-        run: |
-          set -euo pipefail
-          # Verify critical API files exist
+      run: |
         set -euo pipefail
         # Install acorn parser for AST-based CommonJS detection
         echo "Installing acorn@8.15.0..."
