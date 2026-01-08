@@ -1,13 +1,8 @@
 import { sentryVitePlugin } from '@sentry/vite-plugin'
 import react from '@vitejs/plugin-react-swc'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import path from 'path'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { defineConfig } from 'vite'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-// Use absolute path for alias resolution to ensure it works in monorepo/Vercel builds
-const srcPath = path.resolve(__dirname, 'src')
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -65,14 +60,8 @@ export default defineConfig(({ mode }) => ({
   ].filter(Boolean),
   resolve: {
     alias: {
-      '@': srcPath,
+      '@': path.resolve(__dirname, './src'),
     },
-    // Explicit extension resolution order - TypeScript first for better Vercel compatibility
-    extensions: ['.ts', '.tsx', '.mts', '.js', '.jsx', '.mjs', '.json'],
-    // Ensure proper extension resolution during build
-    mainFields: ['module', 'jsnext:main', 'jsnext', 'main'],
-    // Disable symlink preservation for Vercel builds (case-sensitive filesystem)
-    preserveSymlinks: false,
   },
   build: {
     target: 'es2020', // Good balance of modern features + browser support
