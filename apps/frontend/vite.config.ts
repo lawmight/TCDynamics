@@ -16,9 +16,13 @@ const metricsResolverPlugin = (): Plugin => {
   return {
     name: 'metrics-resolver',
     enforce: 'pre', // Run before other plugins to intercept resolution early
-    resolveId(id) {
-      // Handle @/api/metrics imports explicitly
-      if (id === '@/api/metrics') {
+    resolveId(id, importer) {
+      // Handle @/api/metrics imports explicitly (both alias and resolved paths)
+      if (
+        id === '@/api/metrics' ||
+        id.endsWith('/api/metrics') ||
+        id.endsWith('\\api\\metrics')
+      ) {
         const possiblePaths = [
           path.resolve(srcPath, 'api', 'metrics.ts'),
           path.resolve(srcPath, 'api', 'metrics.tsx'),
@@ -29,9 +33,16 @@ const metricsResolverPlugin = (): Plugin => {
             return filePath
           }
         }
-        // If file doesn't exist, still return a path to prevent load-fallback
-        // This should not happen, but prevents the ENOENT error
+        // Always return the .ts path - Vite will handle the file existence check
         return path.resolve(srcPath, 'api', 'metrics.ts')
+      }
+      return null
+    },
+    load(id) {
+      // If the resolved ID is the metrics file, ensure it loads correctly
+      if (id === path.resolve(srcPath, 'api', 'metrics.ts')) {
+        // Let Vite handle the actual loading - we just ensure the path is correct
+        return null
       }
       return null
     },
