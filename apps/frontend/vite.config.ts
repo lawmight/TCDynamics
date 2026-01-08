@@ -11,16 +11,33 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const srcPath = path.resolve(__dirname, 'src')
 
 // Custom plugin to ensure @/api/metrics resolves correctly in Vercel builds
-// Must run early (enforce: 'pre') to intercept before load-fallback plugin
+// Tries multiple path resolution strategies to find the file
 const metricsResolverPlugin = (): Plugin => {
-  const metricsFilePath = path.resolve(srcPath, 'api', 'metrics.ts')
+  // Try multiple possible paths for the metrics file
+  const getMetricsPath = () => {
+    const paths = [
+      path.resolve(srcPath, 'api', 'metrics.ts'),
+      path.join(process.cwd(), 'apps', 'frontend', 'src', 'api', 'metrics.ts'),
+      path.resolve(__dirname, 'src', 'api', 'metrics.ts'),
+      path.resolve(process.cwd(), 'src', 'api', 'metrics.ts'),
+    ]
+    
+    for (const filePath of paths) {
+      if (existsSync(filePath)) {
+        return filePath
+      }
+    }
+    // Return the most likely path even if it doesn't exist yet
+    return path.resolve(srcPath, 'api', 'metrics.ts')
+  }
+  
+  const metricsFilePath = getMetricsPath()
   
   return {
     name: 'metrics-resolver',
     enforce: 'pre', // Run before other plugins to intercept resolution early
-    resolveId(id, importer) {
-      // Handle @/api/metrics imports explicitly (both alias and resolved paths)
-      // Match various formats: @/api/metrics, /path/to/api/metrics, etc.
+    resolveId(id) {
+      // Handle @/api/metrics imports explicitly
       const isMetricsImport =
         id === '@/api/metrics' ||
         id.endsWith('/api/metrics') ||
@@ -29,20 +46,34 @@ const metricsResolverPlugin = (): Plugin => {
         (id.includes('\\api\\metrics') && !id.includes('.'))
       
       if (isMetricsImport) {
-        // Return the absolute path with .ts extension
-        // Use path.normalize to handle both Windows and Unix paths
-        return path.normalize(metricsFilePath)
+        // Return the resolved path with .ts extension
+        return metricsFilePath
       }
       return null
     },
     load(id) {
-      // If loading the metrics file and it exists, load it directly
-      // This bypasses Vite's file loading for this specific file
+      // Try to load the file from multiple possible locations
       const normalizedId = path.normalize(id)
       const normalizedMetricsPath = path.normalize(metricsFilePath)
       
-      if (normalizedId === normalizedMetricsPath && existsSync(metricsFilePath)) {
-        return readFileSync(metricsFilePath, 'utf-8')
+      if (normalizedId === normalizedMetricsPath || id.includes('api/metrics')) {
+        const pathsToTry = [
+          path.resolve(srcPath, 'api', 'metrics.ts'),
+          path.join(process.cwd(), 'apps', 'frontend', 'src', 'api', 'metrics.ts'),
+          path.resolve(__dirname, 'src', 'api', 'metrics.ts'),
+          path.resolve(process.cwd(), 'src', 'api', 'metrics.ts'),
+          normalizedMetricsPath,
+        ]
+        
+        for (const filePath of pathsToTry) {
+          try {
+            if (existsSync(filePath)) {
+              return readFileSync(filePath, 'utf-8')
+            }
+          } catch (error) {
+            // Continue to next path
+          }
+        }
       }
       return null
     },
