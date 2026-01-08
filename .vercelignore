@@ -1,7 +1,7 @@
 # Exclude root api/ directory from Vercel deployment
-# The api/ directory is copied to apps/frontend/api/ during deployment
-# We only want Vercel to detect the copied version to avoid duplicate functions
-api/
+# Using /api/ to explicitly match ONLY the root-level directory
+# The api/ folder at apps/frontend/api/ contains serverless functions that MUST be deployed
+/api/
 
 # Also exclude backend and other non-production directories
 apps/backend/
