@@ -67,9 +67,12 @@ export default defineConfig(({ mode }) => ({
     alias: {
       '@': srcPath,
     },
-    extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],
+    // Explicit extension resolution order - TypeScript first for better Vercel compatibility
+    extensions: ['.ts', '.tsx', '.mts', '.js', '.jsx', '.mjs', '.json'],
     // Ensure proper extension resolution during build
     mainFields: ['module', 'jsnext:main', 'jsnext', 'main'],
+    // Disable symlink preservation for Vercel builds (case-sensitive filesystem)
+    preserveSymlinks: false,
   },
   build: {
     target: 'es2020', // Good balance of modern features + browser support
