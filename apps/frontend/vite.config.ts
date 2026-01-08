@@ -4,7 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { defineConfig, type Plugin } from 'vite'
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 // Use absolute path for alias resolution to ensure it works in monorepo/Vercel builds
@@ -13,36 +13,36 @@ const srcPath = path.resolve(__dirname, 'src')
 // Custom plugin to ensure @/api/metrics resolves correctly in Vercel builds
 // Must run early (enforce: 'pre') to intercept before load-fallback plugin
 const metricsResolverPlugin = (): Plugin => {
+  const metricsFilePath = path.resolve(srcPath, 'api', 'metrics.ts')
+  
   return {
     name: 'metrics-resolver',
     enforce: 'pre', // Run before other plugins to intercept resolution early
     resolveId(id, importer) {
       // Handle @/api/metrics imports explicitly (both alias and resolved paths)
-      if (
+      // Match various formats: @/api/metrics, /path/to/api/metrics, etc.
+      const isMetricsImport =
         id === '@/api/metrics' ||
         id.endsWith('/api/metrics') ||
-        id.endsWith('\\api\\metrics')
-      ) {
-        const possiblePaths = [
-          path.resolve(srcPath, 'api', 'metrics.ts'),
-          path.resolve(srcPath, 'api', 'metrics.tsx'),
-          path.resolve(srcPath, 'api', 'metrics.js'),
-        ]
-        for (const filePath of possiblePaths) {
-          if (existsSync(filePath)) {
-            return filePath
-          }
-        }
-        // Always return the .ts path - Vite will handle the file existence check
-        return path.resolve(srcPath, 'api', 'metrics.ts')
+        id.endsWith('\\api\\metrics') ||
+        (id.includes('/api/metrics') && !id.includes('.')) ||
+        (id.includes('\\api\\metrics') && !id.includes('.'))
+      
+      if (isMetricsImport) {
+        // Return the absolute path with .ts extension
+        // Use path.normalize to handle both Windows and Unix paths
+        return path.normalize(metricsFilePath)
       }
       return null
     },
     load(id) {
-      // If the resolved ID is the metrics file, ensure it loads correctly
-      if (id === path.resolve(srcPath, 'api', 'metrics.ts')) {
-        // Let Vite handle the actual loading - we just ensure the path is correct
-        return null
+      // If loading the metrics file and it exists, load it directly
+      // This bypasses Vite's file loading for this specific file
+      const normalizedId = path.normalize(id)
+      const normalizedMetricsPath = path.normalize(metricsFilePath)
+      
+      if (normalizedId === normalizedMetricsPath && existsSync(metricsFilePath)) {
+        return readFileSync(metricsFilePath, 'utf-8')
       }
       return null
     },
