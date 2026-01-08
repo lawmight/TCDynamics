@@ -3,11 +3,35 @@ import react from '@vitejs/plugin-react-swc'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { visualizer } from 'rollup-plugin-visualizer'
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
+import { existsSync } from 'node:fs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 // Use absolute path for alias resolution to ensure it works in monorepo/Vercel builds
 const srcPath = path.resolve(__dirname, 'src')
+
+// Custom plugin to ensure @/api/metrics resolves correctly in Vercel builds
+const metricsResolverPlugin = (): Plugin => {
+  return {
+    name: 'metrics-resolver',
+    resolveId(id) {
+      // Handle @/api/metrics imports explicitly
+      if (id === '@/api/metrics') {
+        const possiblePaths = [
+          path.resolve(srcPath, 'api', 'metrics.ts'),
+          path.resolve(srcPath, 'api', 'metrics.tsx'),
+          path.resolve(srcPath, 'api', 'metrics.js'),
+        ]
+        for (const filePath of possiblePaths) {
+          if (existsSync(filePath)) {
+            return filePath
+          }
+        }
+      }
+      return null
+    },
+  }
+}
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -32,6 +56,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [
+    metricsResolverPlugin(),
     react(),
     // Sentry source maps plugin (production only)
     mode === 'production' &&
