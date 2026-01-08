@@ -11,9 +11,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const srcPath = path.resolve(__dirname, 'src')
 
 // Custom plugin to ensure @/api/metrics resolves correctly in Vercel builds
+// Must run early (enforce: 'pre') to intercept before load-fallback plugin
 const metricsResolverPlugin = (): Plugin => {
   return {
     name: 'metrics-resolver',
+    enforce: 'pre', // Run before other plugins to intercept resolution early
     resolveId(id) {
       // Handle @/api/metrics imports explicitly
       if (id === '@/api/metrics') {
@@ -27,6 +29,9 @@ const metricsResolverPlugin = (): Plugin => {
             return filePath
           }
         }
+        // If file doesn't exist, still return a path to prevent load-fallback
+        // This should not happen, but prevents the ENOENT error
+        return path.resolve(srcPath, 'api', 'metrics.ts')
       }
       return null
     },
