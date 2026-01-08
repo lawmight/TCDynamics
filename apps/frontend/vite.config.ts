@@ -1,11 +1,34 @@
 import { sentryVitePlugin } from '@sentry/vite-plugin'
 import react from '@vitejs/plugin-react-swc'
+import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { visualizer } from 'rollup-plugin-visualizer'
+import type { Plugin } from 'vite'
 import { defineConfig } from 'vite'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+// Custom plugin to ensure TypeScript files are resolved with extensions
+const resolveTypeScriptFiles = (): Plugin => {
+  return {
+    name: 'resolve-typescript-files',
+    resolveId(id) {
+      // Handle @/api/* imports
+      if (id.startsWith('@/api/')) {
+        const filePath = id.replace('@/', path.resolve(__dirname, './src/'))
+        const extensions = ['.ts', '.tsx', '.js', '.jsx']
+        for (const ext of extensions) {
+          const fullPath = filePath + ext
+          if (existsSync(fullPath)) {
+            return fullPath
+          }
+        }
+      }
+      return null
+    },
+  }
+}
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -30,6 +53,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [
+    resolveTypeScriptFiles(),
     react(),
     // Sentry source maps plugin (production only)
     mode === 'production' &&
