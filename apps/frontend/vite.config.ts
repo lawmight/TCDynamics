@@ -6,6 +6,8 @@ import { visualizer } from 'rollup-plugin-visualizer'
 import { defineConfig } from 'vite'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+// Use absolute path for alias resolution to ensure it works in monorepo/Vercel builds
+const srcPath = path.resolve(__dirname, 'src')
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -63,9 +65,11 @@ export default defineConfig(({ mode }) => ({
   ].filter(Boolean),
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': srcPath,
     },
     extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],
+    // Ensure proper extension resolution during build
+    mainFields: ['module', 'jsnext:main', 'jsnext', 'main'],
   },
   build: {
     target: 'es2020', // Good balance of modern features + browser support
