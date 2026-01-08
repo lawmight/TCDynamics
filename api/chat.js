@@ -39,14 +39,7 @@ function isRateLimited(key) {
   if (wouldExceedLimit) {
     // Request is rate-limited: update store with filtered history (evict old entries)
     // but do NOT add the current timestamp
-  if (wouldExceedLimit) {
-    // Request is rate-limited: update store with filtered history (evict old entries)
-    // but do NOT add the current timestamp
     rateLimitStore.set(key, filteredHistory)
-    return true
-  }
-      rateLimitStore.set(key, filteredHistory)
-    }
     return true
   }
 

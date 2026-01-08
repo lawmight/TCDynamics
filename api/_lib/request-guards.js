@@ -57,7 +57,7 @@ export async function parseJsonBody(req, { maxBytes = DEFAULT_MAX_BYTES } = {}) 
     req.on('end', () => {
       try {
         resolve(body ? JSON.parse(body) : {})
-      } catch (error) {
+      } catch {
         reject(new Error('InvalidJSON'))
       }
     })

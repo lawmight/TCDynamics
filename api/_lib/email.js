@@ -26,7 +26,7 @@ function escapeHtml(text) {
     "'": '&#39;',
     '/': '&#x2F;',
   }
-  return str.replace(/[&<>"'\/]/g, char => escapeMap[char])
+  return str.replace(/[&<>"'/]/g, char => escapeMap[char])
 }
 
 /**

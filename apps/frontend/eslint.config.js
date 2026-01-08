@@ -22,6 +22,9 @@ export default [
       'playwright-report/**',
       '*.js', // Ignore root-level .js files
       'api.old/**', // Ignore legacy API folder
+      'api/**', // Ignore copied API directory (copied during deployment workflow)
+      'scripts/**', // Ignore Node.js build scripts
+      'plugins/**', // Ignore Vite plugins
     ],
   },
   {
