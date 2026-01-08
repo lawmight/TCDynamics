@@ -3,89 +3,11 @@ import react from '@vitejs/plugin-react-swc'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { visualizer } from 'rollup-plugin-visualizer'
-import { defineConfig, type Plugin } from 'vite'
-import { existsSync, readFileSync } from 'node:fs'
+import { defineConfig } from 'vite'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 // Use absolute path for alias resolution to ensure it works in monorepo/Vercel builds
 const srcPath = path.resolve(__dirname, 'src')
-
-// Custom plugin to ensure @/api/metrics resolves correctly in Vercel builds
-// Tries multiple path resolution strategies to find the file
-const metricsResolverPlugin = (): Plugin => {
-  // Try multiple possible paths for the metrics file
-  const getMetricsPath = () => {
-    const paths = [
-      path.resolve(srcPath, 'api', 'metrics.ts'),
-      path.join(process.cwd(), 'apps', 'frontend', 'src', 'api', 'metrics.ts'),
-      path.resolve(__dirname, 'src', 'api', 'metrics.ts'),
-      path.resolve(process.cwd(), 'src', 'api', 'metrics.ts'),
-    ]
-    
-    for (const filePath of paths) {
-      if (existsSync(filePath)) {
-        return filePath
-      }
-    }
-    // Return the most likely path even if it doesn't exist yet
-    return path.resolve(srcPath, 'api', 'metrics.ts')
-  }
-  
-  const metricsFilePath = getMetricsPath()
-  
-  return {
-    name: 'metrics-resolver',
-    enforce: 'pre', // Run before other plugins to intercept resolution early
-    resolveId(id) {
-      // Handle @/api/metrics imports explicitly
-      const isMetricsImport =
-        id === '@/api/metrics' ||
-        id.endsWith('/api/metrics') ||
-        id.endsWith('\\api\\metrics') ||
-        (id.includes('/api/metrics') && !id.includes('.')) ||
-        (id.includes('\\api\\metrics') && !id.includes('.'))
-      
-      if (isMetricsImport) {
-        // Return the resolved path with .ts extension
-        return metricsFilePath
-      }
-      return null
-    },
-    load(id) {
-      // Try to load the file from multiple possible locations
-      // Match any ID that contains metrics.ts or api/metrics
-      const isMetricsFile =
-        id.includes('metrics.ts') ||
-        id.includes('api/metrics') ||
-        id.includes('api\\metrics') ||
-        id.endsWith('metrics')
-      
-      if (isMetricsFile) {
-        const pathsToTry = [
-          path.resolve(srcPath, 'api', 'metrics.ts'),
-          path.join(process.cwd(), 'apps', 'frontend', 'src', 'api', 'metrics.ts'),
-          path.resolve(__dirname, 'src', 'api', 'metrics.ts'),
-          path.resolve(process.cwd(), 'src', 'api', 'metrics.ts'),
-          path.normalize(metricsFilePath),
-          // Also try the ID itself if it looks like a file path
-          id.startsWith('/') ? id : null,
-        ].filter(Boolean)
-        
-        for (const filePath of pathsToTry) {
-          try {
-            if (filePath && existsSync(filePath)) {
-              const content = readFileSync(filePath, 'utf-8')
-              return content
-            }
-          } catch (error) {
-            // Continue to next path
-          }
-        }
-      }
-      return null
-    },
-  }
-}
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -110,7 +32,6 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [
-    metricsResolverPlugin(),
     react(),
     // Sentry source maps plugin (production only)
     mode === 'production' &&
