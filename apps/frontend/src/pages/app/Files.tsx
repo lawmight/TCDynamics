@@ -77,7 +77,7 @@ const Files = () => {
           Upload documents for Vertex retrieval
         </h1>
         <p className="text-sm text-muted-foreground">
-          Files are stored in Supabase Storage and embedded with Vertex AI for
+          Files are stored in MongoDB GridFS and embedded with Vertex AI for
           semantic search.
         </p>
       </div>

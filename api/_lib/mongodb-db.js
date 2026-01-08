@@ -1,7 +1,6 @@
 /**
  * MongoDB Database Utility
- * Drop-in replacement for supabase.js functions
- * Maintains identical function signatures for minimal code changes
+ * Provides database functions for MongoDB using Mongoose models
  */
 
 import { ChatConversation } from './models/ChatConversation.js'

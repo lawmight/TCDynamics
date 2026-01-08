@@ -13,7 +13,7 @@ import { featureModules } from '@/data/productHighlights'
 
 const integrationHighlights = [
   {
-    title: 'Stripe + Node.js',
+    title: 'Polar + Node.js',
     detail:
       'Checkout, Get Started et Demo sont prêts. La bascule production attend uniquement les clés LIVE et les webhooks.',
     benefits: [
@@ -33,9 +33,9 @@ const integrationHighlights = [
     ],
   },
   {
-    title: 'Boucle de feedback Supabase',
+    title: 'Boucle de feedback MongoDB',
     detail:
-      'Chaque formulaire déclenche un overlay PostSubmissionFeedback et alimente Supabase + analytics Vercel.',
+      'Chaque formulaire déclenche un overlay PostSubmissionFeedback et alimente MongoDB + analytics Vercel.',
     benefits: [
       'Stockage centralisé',
       'Alertes dans le backend Node',
@@ -266,7 +266,7 @@ const FeaturesPage = () => {
               Connectez vos équipes en moins d&apos;une semaine
             </h2>
             <p className="mx-auto mb-8 max-w-2xl text-muted-foreground">
-              Stripe production, réactivation du chatbot et optimisation bundle
+              Polar production, réactivation du chatbot et optimisation bundle
               &lt; 500 KB sont planifiés. Démarrons par une démo guidée ou un
               atelier de co-conception.
             </p>

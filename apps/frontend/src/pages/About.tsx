@@ -46,7 +46,7 @@ const deploymentFootprint = [
   {
     label: 'API Routes',
     detail:
-      'Routes serverless sécurisées déployées sur Vercel (`/api/**/*.js`) pour contact, demo, chat, vision et Stripe.',
+      'Routes serverless sécurisées déployées sur Vercel (`/api/**/*.js`) pour contact, demo, chat, vision et Polar.',
   },
   {
     label: 'Azure Functions',
@@ -56,7 +56,7 @@ const deploymentFootprint = [
   {
     label: 'Base de données',
     detail:
-      'Cosmos DB pour la persistance et Supabase pour le feedback post-soumission.',
+      'MongoDB pour la persistance et le feedback post-soumission.',
   },
 ]
 
@@ -69,7 +69,7 @@ const complianceCommitments = [
   {
     title: 'Sécurité opérationnelle',
     detail:
-      'Webhook Stripe sécurisé, chiffrement TLS systématique et surveillance des routes critiques.',
+      'Webhook Polar sécurisé, chiffrement TLS systématique et surveillance des routes critiques.',
   },
   {
     title: 'Gouvernance RGPD',
@@ -89,13 +89,13 @@ const milestones = [
     date: 'Semaine 5-6',
     title: 'Customer Validation',
     detail:
-      'Chatbot UI mis en pause pour prioriser les retours clients. Feedback modal connecté à Supabase.',
+      'Chatbot UI mis en pause pour prioriser les retours clients. Feedback modal connecté à MongoDB.',
   },
   {
     date: 'Novembre 2025',
-    title: 'Stripe prêt à basculer',
+    title: 'Polar prêt à basculer',
     detail:
-      'Checkout, Demo et Get Started finalisés. Passage en production en attente des clés Stripe LIVE.',
+      'Checkout, Demo et Get Started finalisés. Passage en production en attente des clés Polar LIVE.',
   },
   {
     date: 'Aujourd’hui',

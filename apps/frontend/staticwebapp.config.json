@@ -41,7 +41,7 @@
     "X-Frame-Options": "DENY",
     "X-XSS-Protection": "1; mode=block",
     "Referrer-Policy": "strict-origin-when-cross-origin",
-    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'sha256-B0YeSIgQkU25t8JsAxqLZDvivwg+N1UjPV6BiObAslw=' https://connect.facebook.net https://js.stripe.com https://browser.sentry-cdn.com https://cdn.vercel-insights.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.azurewebsites.net https://*.azurestaticapps.net https://*.stripe.com https://*.ingest.sentry.io https://vitals.vercel-insights.com https://*.facebook.com https://*.facebook.net;"
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'sha256-B0YeSIgQkU25t8JsAxqLZDvivwg+N1UjPV6BiObAslw=' https://connect.facebook.net https://browser.sentry-cdn.com https://cdn.vercel-insights.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.azurewebsites.net https://*.azurestaticapps.net https://*.ingest.sentry.io https://vitals.vercel-insights.com https://*.facebook.com https://*.facebook.net;"
   },
   "responseOverrides": {
     "404": {

@@ -1,3 +1,8 @@
+// Enable React 18 act() environment (prevents "Should not already be working" errors)
+;(
+  globalThis as unknown as { IS_REACT_ACT_ENVIRONMENT: boolean }
+).IS_REACT_ACT_ENVIRONMENT = true
+
 import '@testing-library/jest-dom'
 import * as matchers from '@testing-library/jest-dom/matchers'
 import { cleanup } from '@testing-library/react'
@@ -74,6 +79,12 @@ global.ResizeObserver = class ResizeObserver {
   disconnect() {}
   observe() {}
   unobserve() {}
+}
+
+// Mock HTMLMediaElement methods for video testing
+if (typeof HTMLMediaElement !== 'undefined') {
+  HTMLMediaElement.prototype.play = vi.fn().mockResolvedValue(undefined)
+  HTMLMediaElement.prototype.pause = vi.fn()
 }
 
 // Mock performance.now for happy-dom

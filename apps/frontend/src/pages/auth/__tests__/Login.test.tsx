@@ -4,30 +4,37 @@ import { describe, expect, it, vi } from 'vitest'
 
 import Login from '../Login'
 
-const signInWithGoogle = vi.fn()
-
 vi.mock('lucide-react', () => ({
   LogIn: () => null,
   ShieldCheck: () => null,
 }))
 
-vi.mock('@/hooks/useAuth', () => ({
-  useAuth: () => ({
-    user: null,
-    loading: false,
-    signInWithGoogle,
-  }),
-}))
+// Mock Clerk hooks directly since component uses @clerk/clerk-react
+vi.mock('@clerk/clerk-react', async () => {
+  const actual = await vi.importActual('@clerk/clerk-react')
+  return {
+    ...actual,
+    useAuth: () => ({
+      isSignedIn: false,
+      isLoaded: true,
+      user: null,
+    }),
+    SignedIn: ({ children }: { children: React.ReactNode }) => null,
+    SignedOut: ({ children }: { children: React.ReactNode }) => children,
+    SignInButton: ({ children }: { children: React.ReactNode }) => (
+      <div>{children}</div>
+    ),
+    ClerkProvider: ({ children }: { children: React.ReactNode }) => children,
+  }
+})
 
 describe('Login page', () => {
-  it('renders Google login button', () => {
+  it('renders Sign In button', () => {
     render(
       <MemoryRouter>
         <Login />
       </MemoryRouter>
     )
-    expect(
-      screen.getByRole('button', { name: /Continue with Google/i })
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Sign In/i })).toBeInTheDocument()
   })
 })

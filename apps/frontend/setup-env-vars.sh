@@ -4,7 +4,7 @@
 # TC Dynamics - Phase 2 Environment Variables Setup
 # ================================================
 # This script adds all required environment variables to Vercel
-# Run this after completing Supabase and Resend setup
+# Run this after completing MongoDB and Resend setup
 # ================================================
 
 set -e  # Exit on error

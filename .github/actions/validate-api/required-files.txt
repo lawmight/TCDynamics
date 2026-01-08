@@ -11,11 +11,12 @@ contactform.js
 create-payment-intent.js
 create-subscription.js
 
-# Stripe integration
-stripe/webhook.js
-stripe/create-checkout-session.js
+# Polar integration
+polar/webhook.js
+polar/create-checkout-session.js
+polar/checkout-session.js
 
 # Shared libraries
 _lib/cache.js
-_lib/supabase.js
+_lib/mongodb.js
 _lib/email.js

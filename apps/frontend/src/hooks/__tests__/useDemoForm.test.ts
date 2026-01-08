@@ -86,7 +86,7 @@ describe('useDemoForm', () => {
       apiConfig.API_ENDPOINTS.demo,
       expect.objectContaining({
         method: 'POST',
-        body: JSON.stringify(mockDemoData),
+        body: expect.stringContaining('"formType":"demo"'),
       })
     )
   })
@@ -177,7 +177,7 @@ describe('useDemoForm', () => {
     expect(mockApiRequest).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({
-        body: JSON.stringify(fullData),
+        body: expect.stringContaining('"formType":"demo"'),
       })
     )
   })

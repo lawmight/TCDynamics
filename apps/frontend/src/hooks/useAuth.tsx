@@ -18,8 +18,7 @@ type AuthContextType = {
 }
 
 /**
- * Custom hook that wraps Clerk's auth hooks to maintain compatibility
- * with existing code that expects Supabase-style auth interface
+ * Custom hook that wraps Clerk's auth hooks for authentication
  */
 export const useAuth = (): AuthContextType => {
   const { isLoaded, isSignedIn, getToken, signOut } = useClerkAuth()

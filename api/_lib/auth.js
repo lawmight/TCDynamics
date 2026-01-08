@@ -29,16 +29,8 @@ export async function verifyClerkAuth(authHeader) {
   }
 }
 
-// Keep verifySupabaseAuth for backward compatibility during migration
-// Can be removed after all routes are updated
-export async function verifySupabaseAuth(authHeader) {
-  // Delegate to Clerk auth
-  return verifyClerkAuth(authHeader)
-}
-
 export default {
   verifyClerkAuth,
-  verifySupabaseAuth,
 }
 
 

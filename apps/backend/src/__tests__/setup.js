@@ -5,8 +5,6 @@
 process.env.NODE_ENV = 'test'
 process.env.EMAIL_USER = 'test@example.com'
 process.env.EMAIL_PASS = 'test-password'
-process.env.STRIPE_SECRET_KEY = 'sk_test_mock'
-process.env.STRIPE_PUBLISHABLE_KEY = 'pk_test_mock'
 process.env.DATABASE_URL = 'sqlite::memory:'
 
 // Mock console methods to reduce noise in tests (optional)

@@ -43,7 +43,7 @@ describe('Features Page', () => {
     expect(
       screen.getByText(/Intégrations prêtes à déployer/i)
     ).toBeInTheDocument()
-    expect(screen.getByText(/Stripe \+ Node\.js/)).toBeInTheDocument()
+    expect(screen.getByText(/Polar \+ Node\.js/)).toBeInTheDocument()
     expect(screen.getByText(/Fiabilité prouvée/)).toBeInTheDocument()
   })
 })

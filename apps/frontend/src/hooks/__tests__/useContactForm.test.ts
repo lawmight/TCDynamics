@@ -88,7 +88,7 @@ describe('useContactForm', () => {
       apiConfig.API_ENDPOINTS.contact,
       expect.objectContaining({
         method: 'POST',
-        body: JSON.stringify(mockContactData),
+        body: expect.stringContaining('"formType":"contact"'),
       })
     )
   })

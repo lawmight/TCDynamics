@@ -169,7 +169,11 @@ describe('Azure Services API Client', () => {
       const result = await contactAPI.submitContactForm(validContactData)
 
       expect(result.success).toBe(false)
-      expect(result.errors).toContain('Network error')
+      expect(result.errors).toEqual(
+        expect.arrayContaining([
+          expect.stringMatching(/Network error:/)
+        ])
+      )
     })
 
     it('should handle HTTP errors', async () => {
@@ -457,7 +461,11 @@ describe('Azure Services API Client', () => {
 
       expect(result.success).toBe(false)
       expect(result.message).toBe('Health check failed')
-      expect(result.errors).toContain('Connection failed')
+      expect(result.errors).toEqual(
+        expect.arrayContaining([
+          expect.stringMatching(/Network error:.*Connection failed/)
+        ])
+      )
     })
   })
 

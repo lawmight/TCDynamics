@@ -23,7 +23,9 @@ describe('Pricing Component', () => {
   it('should display correct prices', () => {
     renderPricing()
 
-    expect(screen.getAllByText('Sur devis')).toHaveLength(2)
+    // Starter: 29€, Professional: 79€, Enterprise: Sur mesure
+    expect(screen.getByText('29€')).toBeInTheDocument()
+    expect(screen.getByText('79€')).toBeInTheDocument()
     expect(screen.getByText('Sur mesure')).toBeInTheDocument()
   })
 

@@ -82,7 +82,7 @@ async function handleContactForm(req, res, body, requestId) {
     email: sanitizedEmail,
   })
 
-  // Save to Supabase
+  // Save to MongoDB
   const result = await saveContact({
     name,
     email: sanitizedEmail,
@@ -193,7 +193,7 @@ async function handleDemoForm(req, res, body, requestId) {
     name,
   })
 
-  // Save to Supabase
+  // Save to MongoDB
   const result = await saveDemoRequest({
     name,
     email: sanitizedEmail,

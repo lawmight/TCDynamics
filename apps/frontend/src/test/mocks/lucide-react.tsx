@@ -74,3 +74,4 @@ export const Sparkles = mockIcon
 export const Workflow = mockIcon
 export const Server = mockIcon
 export const Twitter = mockIcon
+export const Pause = mockIcon

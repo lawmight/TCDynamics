@@ -28,9 +28,9 @@ npm run clean               # Clean dist + node_modules
 
 - **Frontend** (`apps/frontend`): React 18 + Vite + Tailwind CSS, deployed on Vercel
 - **Backend** (`apps/backend`): Express server (local dev only), not deployed to production
-- **API** (`api/`): Vercel serverless functions (contact, demo, chat, vision, stripe, health)
-- **Database**: Supabase (PostgreSQL)
-- **Payment**: Stripe integration (via serverless functions)
+- **API** (`api/`): Vercel serverless functions (contact, demo, chat, vision, polar, health)
+- **Database**: MongoDB Atlas (with Mongoose ODM)
+- **Payment**: Polar integration (via serverless functions)
 - **Archived**: `apps/functions-archive/` contains old Azure Functions (Python) — see archive README
 
 ## Code Style Guidelines

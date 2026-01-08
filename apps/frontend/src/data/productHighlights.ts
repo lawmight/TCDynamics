@@ -41,14 +41,14 @@ export const featureModules: FeatureModule[] = [
         'Remplacer la saisie manuelle par une capture automatisée adossée à Azure Computer Vision et Cosmos DB.',
       proofPoints: [
         'Contrôles RGPD appliqués dès la capture',
-        'Audit trail complet vers Supabase',
+        'Audit trail complet vers MongoDB',
         'Feedback utilisateur intégré après chaque import',
       ],
       metrics: [
         { label: 'Précision mesurée', value: '99.7%' },
         { label: 'Temps moyen', value: '< 5 s/document' },
       ],
-      integrations: ['Azure Vision', 'Cosmos DB', 'Supabase'],
+      integrations: ['Azure Vision', 'Cosmos DB', 'MongoDB'],
     },
   },
   {
@@ -96,13 +96,13 @@ export const featureModules: FeatureModule[] = [
       proofPoints: [
         'Instrumentation @vercel/analytics activée',
         'Alertes backend sur les routes critiques',
-        'Feedback post-soumission stocké dans Supabase',
+        'Feedback post-soumission stocké dans MongoDB',
       ],
       metrics: [
         { label: 'Temps de rafraîchissement', value: '< 60 s' },
         { label: 'KPIs suivis', value: '25+' },
       ],
-      integrations: ['TanStack Query', 'Supabase', 'Vercel Analytics'],
+      integrations: ['TanStack Query', 'MongoDB', 'Vercel Analytics'],
     },
   },
   {

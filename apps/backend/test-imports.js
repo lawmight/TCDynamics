@@ -11,7 +11,7 @@ console.log(
   'Environment variables loaded:',
   Object.keys(process.env).filter(
     key =>
-      key.includes('STRIPE') || key.includes('NODE') || key.includes('PORT')
+      key.includes('NODE') || key.includes('PORT')
   ).length,
   'relevant vars'
 )
@@ -26,8 +26,7 @@ const modules = [
   { name: 'Contact Routes', path: './src/routes/contact' },
   { name: 'Demo Routes', path: './src/routes/demo' },
   { name: 'Monitoring Routes', path: './src/routes/monitoring' },
-  { name: 'Stripe Routes', path: './src/routes/stripe' },
-    { name: 'RUM Routes', path: './src/routes/rum' },
+  { name: 'RUM Routes', path: './src/routes/rum' },
   { name: 'Swagger', path: './src/swagger' },
   { name: 'Logger', path: './src/utils/logger' },
   { name: 'Error Handler', path: './src/middleware/errorHandler' },

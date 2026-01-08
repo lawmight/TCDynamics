@@ -35,7 +35,7 @@
 - **Language**: JavaScript ESM (`type: "module"`)
 - **Database**: MongoDB Atlas (Mongoose v9.1.1)
 - **Authentication**: Clerk (`@clerk/backend` v1.0.0)
-- **Payments**: Polar SDK (migrated from Stripe)
+- **Payments**: Polar SDK
 - **Email**: Resend 6.4.2
 - **Error Tracking**: Sentry 7.0.0
 - **Caching**: LRU Cache 11.0.1
@@ -83,7 +83,7 @@ apps/frontend/src/
 
 ```
 api/
-├── _lib/           # Shared utilities (auth, supabase, cache, email)
+├── _lib/           # Shared utilities (auth, mongodb, cache, email)
 ├── polar/          # Payment integration (checkout, webhook)
 ├── *.js            # Serverless function endpoints
 └── app/            # App-specific routes (api-keys)
@@ -97,7 +97,7 @@ api/
 apps/backend/src/
 ├── routes/         # Express route handlers
 ├── middleware/     # Express middleware (auth, CSRF, rate limiting)
-├── services/       # Business logic (email, stripe)
+├── services/       # Business logic (email, payments)
 ├── config/         # Configuration (database, environment)
 └── utils/          # Utilities (validation, logging)
 ```
@@ -458,7 +458,7 @@ See `.cursor/rules/nia-oracle.mdc` for NIA research agent guidelines.
 
 ### Payment Integration
 
-- **Current**: Polar SDK (migrated from Stripe)
+- **Current**: Polar SDK
 - **Payment routes**: `api/polar/` directory
 - **Webhook handling**: `api/polar/webhook.js`
 

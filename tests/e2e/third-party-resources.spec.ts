@@ -67,7 +67,7 @@ test.describe('Third-Party Resource Loading', () => {
     await page.goto('/')
 
     // Wait for Sentry to initialize with condition-based wait
-    // Wait for window.Sentry to be defined (similar to Stripe test pattern)
+    // Wait for window.Sentry to be defined
     try {
       await page.waitForFunction(
         () => typeof (window as any).Sentry !== 'undefined',

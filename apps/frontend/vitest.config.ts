@@ -9,18 +9,14 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
     globals: true,
     css: true,
-    pool: 'forks',
-    poolOptions: {
-      forks: {
-        singleFork: true,
-        isolate: false, // Prevent location teardown issues
-      },
-    },
+    unstubEnvs: true, // Auto-restore vi.stubEnv() between tests
+    // Use default pool (threads) instead of forks for better jsdom compatibility
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
       '**/backend/**', // Exclude backend tests (uses Jest)
       '**/TCDynamics/**', // Exclude Azure Functions tests
+      '**/api/**', // Exclude API tests (uses Node.js test runner)
       '**/.{idea,git,cache,output,temp}/**',
       '**/pages/__tests__/NotFound.test.tsx', // Skip tests with location mocking issues
     ],

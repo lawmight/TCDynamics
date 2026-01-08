@@ -7,7 +7,7 @@ Hybrid system: Vercel serverless API + React frontend. Express backend exists fo
 ## Project Structure
 
 - `apps/frontend` — React 18 + Vite; deployed on Vercel (includes `/api` serverless routes copied from root `api/` during CI)
-- `api` — Vercel serverless functions (contact, demo, chat, vision, stripe, health)
+- `api` — Vercel serverless functions (contact, demo, chat, vision, polar, health)
 - `apps/backend` — Express server for local development/testing (not deployed to production)
 - `apps/functions-archive/` — Archived Azure Functions (Python) code (see archive README for details)
 - `tests/e2e` — Playwright e2e tests
@@ -79,7 +79,7 @@ Serverless API functions hash sensitive identifiers (orgId, userId) before loggi
 
 - Identifiers are hashed with optional salt from `PII_HASH_SALT` or `IP_HASH_SALT` environment variables
 - Error objects are sanitized to log only message and stack (dev only)
-- See `apps/frontend/api/stripe/create-checkout-session.js` for implementation
+- See `api/polar/create-checkout-session.js` for implementation
 
 ### Log Retention & Access Control
 
