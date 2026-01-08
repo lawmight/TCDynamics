@@ -56,7 +56,7 @@ jobs:
         node-version: [20, 22]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js with Caching
         uses: ./.github/actions/setup-node-cache
@@ -128,7 +128,7 @@ jobs:
 
       - name: Upload Coverage
         if: (inputs.skip_tests != true && inputs.skip_tests != 'true') && (github.event.inputs.skip_tests != true && github.event.inputs.skip_tests != 'true')
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           file: ./apps/frontend/coverage/lcov.info
           flags: frontend

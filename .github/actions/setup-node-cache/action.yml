@@ -19,9 +19,9 @@ runs:
   using: 'composite'
   steps:
     - name: Setup Node.js
-      # Pinned to v4.1.0 (2024-12-24) for reproducible builds and security
+      # Using v4 for compatibility, update to v5 when stable
       # Update periodically: https://github.com/actions/setup-node/releases
-      uses: actions/setup-node@v4.1.0
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
         cache: 'npm'
