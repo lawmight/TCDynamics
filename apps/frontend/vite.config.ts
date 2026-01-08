@@ -53,22 +53,29 @@ const metricsResolverPlugin = (): Plugin => {
     },
     load(id) {
       // Try to load the file from multiple possible locations
-      const normalizedId = path.normalize(id)
-      const normalizedMetricsPath = path.normalize(metricsFilePath)
+      // Match any ID that contains metrics.ts or api/metrics
+      const isMetricsFile =
+        id.includes('metrics.ts') ||
+        id.includes('api/metrics') ||
+        id.includes('api\\metrics') ||
+        id.endsWith('metrics')
       
-      if (normalizedId === normalizedMetricsPath || id.includes('api/metrics')) {
+      if (isMetricsFile) {
         const pathsToTry = [
           path.resolve(srcPath, 'api', 'metrics.ts'),
           path.join(process.cwd(), 'apps', 'frontend', 'src', 'api', 'metrics.ts'),
           path.resolve(__dirname, 'src', 'api', 'metrics.ts'),
           path.resolve(process.cwd(), 'src', 'api', 'metrics.ts'),
-          normalizedMetricsPath,
-        ]
+          path.normalize(metricsFilePath),
+          // Also try the ID itself if it looks like a file path
+          id.startsWith('/') ? id : null,
+        ].filter(Boolean)
         
         for (const filePath of pathsToTry) {
           try {
-            if (existsSync(filePath)) {
-              return readFileSync(filePath, 'utf-8')
+            if (filePath && existsSync(filePath)) {
+              const content = readFileSync(filePath, 'utf-8')
+              return content
             }
           } catch (error) {
             // Continue to next path
