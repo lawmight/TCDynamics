@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 
-import { fetchMetricsPages } from '@/api/metrics.ts'
+import { fetchMetricsPages } from '@/api/metrics'
 
 const getStoredProjectId = (): string => {
   try {
