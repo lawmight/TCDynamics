@@ -1,8 +1,9 @@
-import { ArrowUp, Menu, X } from 'lucide-react'
+import { ArrowUp, Menu, Settings, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import { useTheme } from '@/components/ThemeProvider'
+import { useAuth } from '@/hooks/useAuth'
 
 type NavigationItem =
   | { label: string; scrollId: string; path?: never }
@@ -13,6 +14,7 @@ const routePrefetchers: Record<string, () => Promise<unknown>> = {
   '/about': () => import('../pages/About'),
   '/demo': () => import('../pages/Demo'),
   '/get-started': () => import('../pages/GetStarted'),
+  '/settings': () => import('../pages/Settings'),
   '/app': () => import('../pages/app/Chat'),
 }
 
@@ -33,6 +35,7 @@ const SimpleNavigation = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const { resolvedTheme, setTheme } = useTheme()
+  const { isSignedIn } = useAuth()
   const appUrl = import.meta.env.VITE_APP_URL || '/app'
   const isExternalApp = appUrl.startsWith('http')
   const goToApp = () => {
@@ -90,6 +93,7 @@ const SimpleNavigation = () => {
     { label: 'À propos', path: '/about' },
     { label: 'Démo', path: '/demo' },
     { label: 'Démarrer', path: '/get-started' },
+    ...(isSignedIn ? [{ label: 'Settings', path: '/settings' }] : []),
   ]
 
   // Avoid rendering duplicate nav items in tests/mobile by hiding desktop set when the mobile menu is open.
@@ -132,7 +136,7 @@ const SimpleNavigation = () => {
                   <button
                     onClick={goToApp}
                     onMouseEnter={() => !isExternalApp && prefetchRoute('/app')}
-                    className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
                   >
                     Accéder à l'app
                   </button>
@@ -162,7 +166,7 @@ const SimpleNavigation = () => {
                   <button
                     onClick={goToApp}
                     onMouseEnter={() => !isExternalApp && prefetchRoute('/app')}
-                    className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
                   >
                     Accéder à l'app
                   </button>
@@ -212,7 +216,7 @@ const SimpleNavigation = () => {
                 )}
                 <button
                   onClick={goToApp}
-                  className="mt-2 rounded-full bg-primary px-4 py-2 text-left text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="mt-2 rounded-full bg-primary px-4 py-2 text-left text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
                   onMouseEnter={() => !isExternalApp && prefetchRoute('/app')}
                 >
                   Accéder à l'app
@@ -242,7 +246,7 @@ const SimpleNavigation = () => {
       {showBackToTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-6 left-6 z-50 rounded-full bg-primary p-3 text-white shadow-lg transition-all duration-300 hover:bg-primary-glow"
+          className="fixed bottom-6 left-6 z-50 rounded-full bg-primary p-3 text-primary-foreground shadow-lg transition-all duration-300 hover:bg-primary-glow"
           aria-label="Back to top"
         >
           <ArrowUp size={20} />

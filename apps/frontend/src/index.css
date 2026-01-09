@@ -5,32 +5,32 @@
 @layer base {
   :root {
     /* Industrial Luxury Light Theme */
-    --background: 50 50% 97%; /* Warm cream */
-    --foreground: 0 0% 10%; /* Deep graphite */
-    --card: 50 20% 95%;
-    --card-foreground: 0 0% 10%;
-    --popover: 50 20% 95%;
-    --popover-foreground: 0 0% 10%;
-    --primary: 200deg 95% 48%; /* sky-500 (old blue) */
-    --primary-foreground: 0 0% 100%;
+    --background: 0 0% 100%; /* Warm cream */
+    --foreground: 0 0% 3.9%; /* Deep graphite */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%; /* sky-500 (old blue) */
+    --primary-foreground: 0 0% 98%;
     --primary-glow: 200deg 95% 60%; /* sky-400 (old blue glow) */
-    --secondary: 50 30% 92%;
-    --secondary-foreground: 0 0% 20%;
-    --muted: 50 30% 92%;
-    --muted-foreground: 0 0% 40%;
-    --accent: 50 30% 92%;
-    --accent-foreground: 0 0% 10%;
-    --destructive: 0 84% 60%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 50 20% 85%;
-    --input: 50 20% 95%;
-    --ring: 200deg 95% 48%;
-    --chart-1: 200deg 95% 48%;
-    --chart-2: 142deg 76% 45%;
-    --chart-3: 25deg 95% 61%;
-    --chart-4: 262deg 83% 58%;
-    --chart-5: 330deg 81% 60%;
-    --radius: 0.75rem;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
 
     /* Custom Design Tokens - Light */
     --gradient-primary: linear-gradient(
@@ -69,31 +69,31 @@
 
   .dark {
     /* Industrial Dark Theme (unchanged) */
-    --background: 0 0% 4%;
+    --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
-    --card: 0 0% 6%;
+    --card: 0 0% 3.9%;
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 6%;
+    --popover: 0 0% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 200deg 95% 48%; /* sky-500 (old blue) */
-    --primary-foreground: 0 0% 100%;
+    --primary: 0 0% 98%; /* sky-500 (old blue) */
+    --primary-foreground: 0 0% 9%;
     --primary-glow: 200deg 95% 60%; /* sky-400 (old blue glow) */
-    --secondary: 0 0% 16%;
+    --secondary: 0 0% 14.9%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 16%;
-    --muted-foreground: 0 0% 64%;
-    --accent: 0 0% 16%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
     --accent-foreground: 0 0% 98%;
-    --destructive: 0 84% 60%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 16%;
-    --input: 0 0% 16%;
-    --ring: 200deg 95% 48%;
-    --chart-1: 200deg 95% 48%;
-    --chart-2: 142 76% 45%;
-    --chart-3: 25 95% 61%;
-    --chart-4: 262 83% 58%;
-    --chart-5: 330 81% 60%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
   }
 }
 
@@ -561,4 +561,15 @@ html {
 .image-placeholder-wrapper img {
   max-width: 100%;
   height: auto;
+}
+
+
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

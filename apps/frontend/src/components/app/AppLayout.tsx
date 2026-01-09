@@ -5,6 +5,7 @@ import {
   LogOut,
   MessageSquare,
   Moon,
+  Settings,
   Sun,
 } from 'lucide-react'
 import { useMemo } from 'react'
@@ -20,6 +21,7 @@ const navItems = [
   { to: '/app/chat', label: 'Chat', icon: MessageSquare },
   { to: '/app/files', label: 'Files / KB', icon: Folder },
   { to: '/app/analytics', label: 'Analytics', icon: BarChart3 },
+  { to: '/settings', label: 'Settings', icon: Settings },
 ]
 
 const baseNavClasses =

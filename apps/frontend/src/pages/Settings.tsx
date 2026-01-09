@@ -1,7 +1,14 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+import ApiKeyManager from '@/components/app/ApiKeyManager'
+import { Separator } from '@/components/ui/separator'
+import { useRequireAuth } from '@/hooks/useAuth'
+
 const Settings = () => {
+  // Require authentication for this page
+  const { isSignedIn, loading } = useRequireAuth()
+
   const [projectId, setProjectId] = useState('')
   const [writeKey, setWriteKey] = useState('')
 
@@ -18,68 +25,97 @@ const Settings = () => {
     try {
       localStorage.setItem('rum.projectId', projectId)
       localStorage.setItem('rum.writeKey', writeKey)
-      toast.success('Configuration enregistrée !', {
-        description: 'Vos paramètres ont été sauvegardés avec succès',
+      toast.success('Configuration saved!', {
+        description: 'Your settings have been saved successfully',
       })
     } catch {
-      toast.error('Erreur lors de la sauvegarde', {
-        description: 'Impossible de sauvegarder les paramètres',
+      toast.error('Error saving', {
+        description: 'Unable to save settings',
       })
     }
   }
 
   const snippet = `<script src="/rum/v1/rum.js" data-key="${writeKey || 'YOUR_WRITE_KEY'}" data-project="${projectId || 'YOUR_PROJECT_ID'}" defer></script>`
 
+  // Show loading while checking auth
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-3xl p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 w-32 rounded bg-muted" />
+          <div className="h-64 rounded bg-muted" />
+        </div>
+      </div>
+    )
+  }
+
+  // Don't render if not signed in (useRequireAuth will redirect)
+  if (!isSignedIn) {
+    return null
+  }
+
   return (
-    <div className="mx-auto max-w-3xl space-y-4 p-6">
+    <div className="mx-auto max-w-3xl space-y-6 p-6">
       <h1 className="text-2xl font-semibold">Settings</h1>
-      <div className="space-y-2">
-        <label htmlFor="projectId" className="block text-sm font-medium">
-          Project ID
-        </label>
-        <input
-          id="projectId"
-          aria-required="true"
-          className="w-full rounded-md border p-2"
-          value={projectId}
-          onChange={e => setProjectId(e.target.value)}
-          placeholder="UUID of your project"
-        />
-      </div>
-      <div className="space-y-2">
-        <label htmlFor="writeKey" className="block text-sm font-medium">
-          Public Write Key
-        </label>
-        <input
-          id="writeKey"
-          aria-required="true"
-          className="w-full rounded-md border p-2"
-          value={writeKey}
-          onChange={e => setWriteKey(e.target.value)}
-          placeholder="pk_..."
-        />
-      </div>
-      <button
-        aria-label="Save RUM configuration settings"
-        className="rounded-md bg-blue-600 px-4 py-2 text-white"
-        onClick={handleSave}
-      >
-        Save
-      </button>
-      <div>
-        <label
-          htmlFor="embedSnippet"
-          className="mb-1 block text-sm font-medium"
+
+      {/* API Keys Section */}
+      <section>
+        <ApiKeyManager />
+      </section>
+
+      <Separator />
+
+      {/* RUM Configuration Section */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold">RUM Configuration</h2>
+        <div className="space-y-2">
+          <label htmlFor="projectId" className="block text-sm font-medium">
+            Project ID
+          </label>
+          <input
+            id="projectId"
+            aria-required="true"
+            className="w-full rounded-md border p-2"
+            value={projectId}
+            onChange={e => setProjectId(e.target.value)}
+            placeholder="UUID of your project"
+          />
+        </div>
+        <div className="space-y-2">
+          <label htmlFor="writeKey" className="block text-sm font-medium">
+            Public Write Key
+          </label>
+          <input
+            id="writeKey"
+            aria-required="true"
+            className="w-full rounded-md border p-2"
+            value={writeKey}
+            onChange={e => setWriteKey(e.target.value)}
+            placeholder="pk_..."
+          />
+        </div>
+        <button
+          aria-label="Save RUM configuration settings"
+          className="rounded-md bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
+          onClick={handleSave}
         >
-          Embed Snippet
-        </label>
-        <pre
-          id="embedSnippet"
-          className="whitespace-pre-wrap break-all rounded-md border bg-muted p-3 text-xs"
-        >
-          {snippet}
-        </pre>
-      </div>
+          Save
+        </button>
+        <div>
+          <label
+            htmlFor="embedSnippet"
+            className="mb-1 block text-sm font-medium"
+          >
+            Embed Snippet
+          </label>
+          <pre
+            id="embedSnippet"
+            className="whitespace-pre-wrap break-all rounded-md border bg-muted p-3 text-xs"
+          >
+            {snippet}
+          </pre>
+        </div>
+      </section>
     </div>
   )
 }

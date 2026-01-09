@@ -45,6 +45,29 @@ export const useAuth = (): AuthContextType => {
       }
     : null
 
+  // Wrapper for getToken that ensures proper error handling
+  // In development, Clerk sessions might expire more frequently
+  // Clerk automatically refreshes tokens when needed
+  const getFreshToken = async (): Promise<string | null> => {
+    try {
+      // Clerk's getToken() automatically handles token refresh
+      // If the session is valid, it will return a fresh token
+      const token = await getToken()
+      return token
+    } catch (error) {
+      // If token retrieval fails, it usually means session is invalid
+      // In development, log this for debugging
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          '[Clerk Dev] Token retrieval failed - session may have expired:',
+          error
+        )
+      }
+      return null
+    }
+  }
+
   return {
     user: user ?? null,
     session,
@@ -53,7 +76,7 @@ export const useAuth = (): AuthContextType => {
     signInWithGoogle,
     signOut,
     refreshSession,
-    getToken,
+    getToken: getFreshToken,
     isSignedIn,
   }
 }

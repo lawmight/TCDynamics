@@ -6,6 +6,8 @@
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
 import { verifyClerkAuth } from '../_lib/auth.js'
+import { createErrorResponse } from '../_lib/error-handler.js'
+import { logger } from '../_lib/logger.js'
 import { ApiKey } from '../_lib/models/ApiKey.js'
 import { connectToDatabase } from '../_lib/mongodb.js'
 
@@ -43,14 +45,24 @@ const handler = async (req, res) => {
     await verifyClerkAuth(authHeader)
 
   if (authError || !clerkId) {
-    return res.status(401).json({
-      success: false,
-      error: 'Authentication required',
-      message: authError || 'Invalid token',
-    })
+    const { statusCode, response } = createErrorResponse(
+      authError || 'Authentication required',
+      401
+    )
+    return res.status(statusCode).json(response)
   }
 
-  await connectToDatabase()
+  // Connect to database with error handling
+  try {
+    await connectToDatabase()
+  } catch (dbError) {
+    logger.error('Database connection failed', dbError)
+    const { statusCode, response } = createErrorResponse(
+      'Database connection failed. Please try again later.',
+      503
+    )
+    return res.status(statusCode).json(response)
+  }
 
   // GET - List API keys (prefixes only, never full keys)
   if (req.method === 'GET') {
@@ -60,11 +72,12 @@ const handler = async (req, res) => {
         revokedAt: null,
       })
         .sort({ createdAt: -1 })
-        .select('_id keyPrefix createdAt revokedAt lastUsedAt')
+        .select('_id keyPrefix name createdAt revokedAt lastUsedAt')
 
       const data = keys.map(key => ({
         id: key._id.toString(),
         key_prefix: key.keyPrefix,
+        name: key.name || null,
         created_at: key.createdAt,
         revoked_at: key.revokedAt,
         last_used_at: key.lastUsedAt,
@@ -75,17 +88,70 @@ const handler = async (req, res) => {
         keys: data,
       })
     } catch (err) {
-      console.error('Exception listing API keys', err)
-      return res.status(500).json({
-        success: false,
-        error: err.message,
-      })
+      const { statusCode, response } = createErrorResponse(
+        'Exception listing API keys',
+        500,
+        err
+      )
+      return res.status(statusCode).json(response)
     }
   }
 
   // POST - Create new API key
   if (req.method === 'POST') {
     try {
+      const { name } = req.body || {}
+
+      // Validate API key name
+      if (name !== undefined && name !== null) {
+        if (typeof name !== 'string') {
+          const { statusCode, response } = createErrorResponse(
+            'API key name must be a string',
+            400
+          )
+          return res.status(statusCode).json(response)
+        }
+
+        const trimmedName = name.trim()
+
+        // Length validation: 1-100 characters
+        if (trimmedName.length === 0) {
+          const { statusCode, response } = createErrorResponse(
+            'API key name cannot be empty',
+            400
+          )
+          return res.status(statusCode).json(response)
+        }
+
+        if (trimmedName.length > 100) {
+          const { statusCode, response } = createErrorResponse(
+            'API key name must be 100 characters or less',
+            400
+          )
+          return res.status(statusCode).json(response)
+        }
+
+        // Pattern validation: alphanumeric, spaces, hyphens, underscores only
+        const namePattern = /^[a-zA-Z0-9\s\-_]+$/
+        if (!namePattern.test(trimmedName)) {
+          const { statusCode, response } = createErrorResponse(
+            'API key name can only contain letters, numbers, spaces, hyphens, and underscores',
+            400
+          )
+          return res.status(statusCode).json(response)
+        }
+
+        // Remove control characters
+        const sanitizedName = trimmedName.replace(/[\x00-\x1F\x7F]/g, '')
+        if (sanitizedName !== trimmedName) {
+          const { statusCode, response } = createErrorResponse(
+            'API key name contains invalid characters',
+            400
+          )
+          return res.status(statusCode).json(response)
+        }
+      }
+
       // Generate new API key
       const apiKey = generateApiKey()
       const keyHash = await bcrypt.hash(apiKey, 10)
@@ -95,9 +161,13 @@ const handler = async (req, res) => {
         clerkId,
         keyHash,
         keyPrefix,
+        name: name?.trim() || null,
       })
 
-      console.log('API key created', { clerkId, keyId: newKey._id.toString() })
+      logger.info('API key created', {
+        clerkId,
+        keyId: newKey._id.toString(),
+      })
 
       // Return plaintext key ONCE (frontend must store securely)
       return res.json({
@@ -108,11 +178,12 @@ const handler = async (req, res) => {
         created_at: newKey.createdAt,
       })
     } catch (err) {
-      console.error('Exception creating API key', err)
-      return res.status(500).json({
-        success: false,
-        error: err.message,
-      })
+      const { statusCode, response } = createErrorResponse(
+        'Exception creating API key',
+        500,
+        err
+      )
+      return res.status(statusCode).json(response)
     }
   }
 
@@ -122,10 +193,11 @@ const handler = async (req, res) => {
       const { keyId } = req.body || {}
 
       if (!keyId) {
-        return res.status(400).json({
-          success: false,
-          error: 'keyId is required',
-        })
+        const { statusCode, response } = createErrorResponse(
+          'keyId is required',
+          400
+        )
+        return res.status(statusCode).json(response)
       }
 
       const result = await ApiKey.findOneAndUpdate(
@@ -135,33 +207,36 @@ const handler = async (req, res) => {
       )
 
       if (!result) {
-        return res.status(404).json({
-          success: false,
-          error: 'API key not found or access denied',
-        })
+        const { statusCode, response } = createErrorResponse(
+          'API key not found or access denied',
+          404
+        )
+        return res.status(statusCode).json(response)
       }
 
-      console.log('API key revoked', { clerkId, keyId })
+      logger.info('API key revoked', { clerkId, keyId })
 
       return res.json({
         success: true,
         message: 'API key revoked',
       })
     } catch (err) {
-      console.error('Exception revoking API key', err)
-      return res.status(500).json({
-        success: false,
-        error: err.message,
-      })
+      const { statusCode, response } = createErrorResponse(
+        'Exception revoking API key',
+        500,
+        err
+      )
+      return res.status(statusCode).json(response)
     }
   }
 
   // Method not allowed
-  return res.status(405).json({
-    success: false,
-    error: 'Method not allowed',
-    allowedMethods: ['GET', 'POST', 'DELETE'],
-  })
+  const { statusCode, response } = createErrorResponse(
+    'Method not allowed',
+    405
+  )
+  response.allowedMethods = ['GET', 'POST', 'DELETE']
+  return res.status(statusCode).json(response)
 }
 
 export default allowCors(handler)
