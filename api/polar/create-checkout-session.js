@@ -77,7 +77,7 @@ const handler = async (req, res) => {
       const {
         planName = 'enterprise',
         amount,
-        currency = 'eur',
+        currency = 'usd',
         paymentType = 'one_time', // 'one_time' or 'subscription'
         customerEmail,
       } = req.body
@@ -195,7 +195,7 @@ const handler = async (req, res) => {
         planName,
         productId,
         amount,
-        currency = 'eur',
+        currency = 'usd',
         amountType = 'fixed',
         metadata = {},
       } = req.body

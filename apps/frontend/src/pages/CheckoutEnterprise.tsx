@@ -52,7 +52,7 @@ const CheckoutEnterprise = () => {
           body: JSON.stringify({
             planName: 'enterprise',
             amount: amountCents,
-            currency: 'eur',
+            currency: 'usd',
             paymentType,
           }),
         }

@@ -58,7 +58,6 @@ export const useAuth = (): AuthContextType => {
       // If token retrieval fails, it usually means session is invalid
       // In development, log this for debugging
       if (import.meta.env.DEV) {
-        // eslint-disable-next-line no-console
         console.warn(
           '[Clerk Dev] Token retrieval failed - session may have expired:',
           error

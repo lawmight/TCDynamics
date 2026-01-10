@@ -13,25 +13,15 @@ Set-Location $ProjectRoot
 
 Write-Host "Project root: $ProjectRoot" -ForegroundColor Gray
 
-# Step 1: Copy API directory to apps/frontend/api (mirroring GitHub Actions workflow)
-Write-Host "Copying API directory to apps/frontend/api..." -ForegroundColor Yellow
+# Step 1: Ensure apps/frontend/api is removed before deployment
+# Vercel will detect functions from root api/ directory only to avoid duplicates
+Write-Host "Ensuring apps/frontend/api is removed before deployment..." -ForegroundColor Yellow
 if (Test-Path "apps/frontend/api") {
     Remove-Item -Path "apps/frontend/api" -Recurse -Force
+    Write-Host "apps/frontend/api removed (functions will be detected from root api/)" -ForegroundColor Green
 }
-Copy-Item -Path "api" -Destination "apps/frontend/api" -Recurse -Force
-Write-Host "API directory copied to apps/frontend/api" -ForegroundColor Green
 
-# Step 2: Install API dependencies
-Write-Host "Installing API dependencies..." -ForegroundColor Yellow
-Set-Location "apps/frontend/api"
-npm install --production
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "Warning: npm install in api directory had issues (non-blocking)" -ForegroundColor Yellow
-}
-Write-Host "API dependencies installed" -ForegroundColor Green
-
-# Step 3: Deploy from project root (uses root vercel.json)
-Set-Location $ProjectRoot
+# Step 4: Deploy from project root (uses root vercel.json)
 Write-Host "Deploying to Vercel production from project root..." -ForegroundColor Yellow
 vercel --prod --yes
 

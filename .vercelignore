@@ -1,7 +1,12 @@
-# Exclude root api/ directory from Vercel deployment
-# Using /api/ to explicitly match ONLY the root-level directory
-# The api/ folder at apps/frontend/api/ contains serverless functions that MUST be deployed
-/api/
+# Note: Root api/ directory is now included for serverless functions
+# We remove apps/frontend/api/ before deployment to avoid duplicates
+# Vercel will detect and deploy functions from root api/ directory only
+# /api/
+
+# Exclude test/config files from being detected as functions
+api/**/jest.config.js
+api/**/*.test.js
+api/**/*.spec.js
 
 # Also exclude backend and other non-production directories
 apps/backend/
