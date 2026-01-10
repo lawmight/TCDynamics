@@ -44,7 +44,9 @@
     "deploy:functions": "echo \"Azure Functions archived - see apps/functions-archive/\"",
     "deploy:frontend": "cd apps/frontend && npm run build",
     "deploy:vercel": "powershell -ExecutionPolicy Bypass -File ./scripts/deploy-vercel.ps1",
-    "deploy:vercel:frontend": "powershell -ExecutionPolicy Bypass -File ./scripts/deploy-vercel-frontend-only.ps1"
+    "deploy:vercel:frontend": "powershell -ExecutionPolicy Bypass -File ./scripts/deploy-vercel-frontend-only.ps1",
+    "ship": "powershell -ExecutionPolicy Bypass -File ./scripts/ship.ps1",
+    "preview": "powershell -ExecutionPolicy Bypass -File ./scripts/ship.ps1 -Message \"chore: preview deployment\""
   },
   "dependencies": {
     "google-auth-library": "^9.14.1",

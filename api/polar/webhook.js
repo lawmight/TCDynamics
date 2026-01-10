@@ -49,24 +49,74 @@ async function getRawBody(req) {
 /**
  * Sync subscription to User collection
  * customer.external_id contains the Clerk userId
+ * Handles manual onboarding checkouts (no clerkId but manual_onboarding metadata)
  */
 async function syncSubscriptionToUser(subscription, eventType) {
   await connectToDatabase()
 
   // external_id is the Clerk userId
   const clerkId = subscription.customer?.external_id
+  const metadata = subscription.metadata || {}
+  const isManualOnboarding = metadata.manual_onboarding === 'true'
 
+  // Handle manual onboarding checkouts (no clerkId)
+  if (!clerkId && isManualOnboarding) {
+    const customerEmail = subscription.customer?.email
+    const paymentType = metadata.payment_type || 'unknown'
+    const planName = metadata.plan_name || 'enterprise'
+    const amount =
+      subscription.amount || subscription.prices?.[0]?.price_amount || 0
+
+    console.log('📝 Manual checkout detected (no clerkId):', {
+      subscriptionId: subscription.id,
+      eventType,
+      customerEmail,
+      amount: `${(amount / 100).toFixed(2)}€`,
+      paymentType,
+      planName,
+    })
+
+    // Send notification email to admin
+    try {
+      const emailBody = `Paiement manuel détecté (sans compte Clerk):
+
+Abonnement ID: ${subscription.id}
+Email client: ${customerEmail || 'Non fourni'}
+Montant: ${(amount / 100).toFixed(2)}€
+Type de paiement: ${paymentType === 'subscription' ? 'Abonnement récurrent' : 'Paiement unique'}
+Plan: ${planName}
+Statut: ${subscription.status}
+
+Ce paiement doit être lié manuellement à un compte Clerk lorsque le client s'inscrit.
+
+---
+Reçu le ${new Date().toLocaleString('fr-FR')} via webhook Polar`
+
+      await sendPolarEmail(
+        `Paiement manuel: ${customerEmail || 'Email non fourni'}`,
+        emailBody
+      )
+    } catch (err) {
+      console.warn('Failed to send manual checkout notification email', err)
+    }
+
+    // Return success with manualOnboarding flag (don't create User record)
+    return { success: true, manualOnboarding: true }
+  }
+
+  // Normal flow: require clerkId for authenticated checkouts
   if (!clerkId) {
     console.warn('No external_id in customer', {
       subscriptionId: subscription.id,
       eventType,
+      metadata,
     })
     return { success: false, error: 'Missing customer external_id' }
   }
 
   // Primary: Use plan_name from metadata (set during checkout creation)
   // Fallback: Map product_id to plan name
-  const metadataPlan = subscription.metadata?.plan_name
+  const metadataPlan = metadata.plan_name
   const productId =
     subscription.product_id || subscription.prices?.[0]?.product_id
   const plan = metadataPlan || PRODUCT_TO_PLAN[productId] || 'starter'
@@ -252,7 +302,55 @@ export default async function handler(req, res) {
       }
 
       case 'order.paid': {
-        await sendPolarEmail('Order paid', `Order ${event.data.id} paid`)
+        const order = event.data
+        const metadata = order.metadata || {}
+        const isManualOnboarding = metadata.manual_onboarding === 'true'
+
+        // Handle manual onboarding one-time payments
+        if (isManualOnboarding) {
+          const customerEmail = order.customer?.email
+          const paymentType = metadata.payment_type || 'one_time'
+          const planName = metadata.plan_name || 'enterprise'
+          const amount = order.total_amount || 0
+
+          console.log('📝 Manual one-time payment detected (no clerkId):', {
+            orderId: order.id,
+            customerEmail,
+            amount: `${(amount / 100).toFixed(2)}€`,
+            paymentType,
+            planName,
+          })
+
+          // Send notification email to admin
+          try {
+            const emailBody = `Paiement unique manuel détecté (sans compte Clerk):
+
+Commande ID: ${order.id}
+Email client: ${customerEmail || 'Non fourni'}
+Montant: ${(amount / 100).toFixed(2)}€
+Type de paiement: ${paymentType === 'subscription' ? 'Abonnement récurrent' : 'Paiement unique'}
+Plan: ${planName}
+Statut: ${order.status || 'paid'}
+
+Ce paiement doit être lié manuellement à un compte Clerk lorsque le client s'inscrit.
+
+---
+Reçu le ${new Date().toLocaleString('fr-FR')} via webhook Polar`
+
+            await sendPolarEmail(
+              `Paiement unique manuel: ${customerEmail || 'Email non fourni'}`,
+              emailBody
+            )
+          } catch (err) {
+            console.warn(
+              'Failed to send manual order notification email',
+              err
+            )
+          }
+        } else {
+          // Normal authenticated order
+          await sendPolarEmail('Order paid', `Order ${order.id} paid`)
+        }
         break
       }
 

@@ -14,7 +14,7 @@ import { Link, NavLink, Outlet } from 'react-router-dom'
 import { useTheme } from '@/components/ThemeProvider'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { clerkAppearance } from '@/config/clerkTheme'
+import { getClerkAppearance } from '@/config/clerkTheme'
 import { useAuth } from '@/hooks/useAuth'
 
 const navItems = [
@@ -115,7 +115,10 @@ export const AppLayout = () => {
                 )}
               </Button>
               <div className="flex items-center">
-                <UserButton afterSignOutUrl="/" appearance={clerkAppearance} />
+                <UserButton
+                  afterSignOutUrl="/"
+                  appearance={getClerkAppearance(resolvedTheme)}
+                />
               </div>
             </div>
           </div>

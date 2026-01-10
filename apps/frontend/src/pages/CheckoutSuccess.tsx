@@ -11,6 +11,8 @@ const CheckoutSuccess = () => {
   const [searchParams] = useSearchParams()
   // Support both session_id (legacy) and checkout_id (Polar) for backward compatibility
   const sessionId = searchParams.get('session_id') || searchParams.get('checkout_id')
+  const source = searchParams.get('source') // 'manual' for public checkouts
+  const isManualCheckout = source === 'manual'
 
   useEffect(() => {
     // Trigger confetti animation on component mount
@@ -49,8 +51,9 @@ const CheckoutSuccess = () => {
               </h1>
 
               <p className="mb-6 text-xl text-muted-foreground">
-                Merci pour votre confiance. Votre paiement a été traité avec
-                succès.
+                {isManualCheckout
+                  ? 'Votre paiement a été enregistré. Vous recevrez un email de confirmation avec les instructions pour créer votre compte.'
+                  : 'Merci pour votre confiance. Votre paiement a été traité avec succès.'}
               </p>
 
               {sessionId && (
@@ -76,9 +79,9 @@ const CheckoutSuccess = () => {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Un email de confirmation a été envoyé à votre adresse avec tous
-                les détails de votre commande et les prochaines étapes pour
-                commencer à utiliser TCDynamics.
+                {isManualCheckout
+                  ? 'Un email de confirmation a été envoyé à votre adresse avec tous les détails de votre paiement. Vous recevrez également les instructions pour créer votre compte et accéder à TCDynamics.'
+                  : 'Un email de confirmation a été envoyé à votre adresse avec tous les détails de votre commande et les prochaines étapes pour commencer à utiliser TCDynamics.'}
               </p>
             </CardContent>
           </Card>
@@ -111,11 +114,14 @@ const CheckoutSuccess = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground">
-                      Configurez votre compte
+                      {isManualCheckout
+                        ? 'Créez votre compte'
+                        : 'Configurez votre compte'}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      Suivez le lien dans l'email pour créer votre compte et
-                      accéder à votre tableau de bord.
+                      {isManualCheckout
+                        ? 'Suivez le lien dans l\'email pour créer votre compte et accéder à votre tableau de bord. Votre paiement sera automatiquement lié à votre compte.'
+                        : 'Suivez le lien dans l\'email pour créer votre compte et accéder à votre tableau de bord.'}
                     </p>
                   </div>
                 </li>

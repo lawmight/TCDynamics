@@ -1,4 +1,5 @@
 // FIXED: Using simple navigation to prevent black page
+import { ClerkProvider } from '@clerk/clerk-react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Analytics } from '@vercel/analytics/react'
 import { Suspense, lazy, useEffect } from 'react'
@@ -20,8 +21,9 @@ import OfflineIndicator from './components/OfflineIndicator'
 import PerformanceMonitor from './components/PerformanceMonitor'
 import ScrollToTop from './components/ScrollToTop'
 import SimpleNavigation from './components/SimpleNavigation'
-import { ThemeProvider } from './components/ThemeProvider'
+import { ThemeProvider, useTheme } from './components/ThemeProvider'
 import { AppLayout } from './components/app/AppLayout'
+import { getClerkAppearance } from './config/clerkTheme'
 import { useAuth } from './hooks/useAuth'
 
 import { Toaster as Sonner } from '@/components/ui/sonner'
@@ -32,6 +34,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 const Index = lazy(() => import('./pages/Index'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 const Checkout = lazy(() => import('./pages/Checkout'))
+const CheckoutEnterprise = lazy(() => import('./pages/CheckoutEnterprise'))
 const CheckoutSuccess = lazy(() => import('./pages/CheckoutSuccess'))
 const Demo = lazy(() => import('./pages/Demo'))
 const GetStarted = lazy(() => import('./pages/GetStarted'))
@@ -158,6 +161,10 @@ const AppRouter = () => {
           <Route path="/recommendations" element={<Recommendations />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route
+            path="/checkout-enterprise"
+            element={<CheckoutEnterprise />}
+          />
           <Route path="/checkout-success" element={<CheckoutSuccess />} />
           <Route path="/demo" element={<Demo />} />
           <Route path="/get-started" element={<GetStarted />} />
@@ -203,22 +210,52 @@ const AppRouter = () => {
   )
 }
 
+/**
+ * ClerkProvider wrapper that uses dynamic theming
+ * Must be inside ThemeProvider to access theme context
+ */
+const ThemedClerkProvider = ({
+  children,
+}: {
+  children: React.ReactNode
+}) => {
+  const { resolvedTheme } = useTheme()
+  const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+
+  if (!PUBLISHABLE_KEY) {
+    throw new Error('Missing Clerk Publishable Key')
+  }
+
+  return (
+    <ClerkProvider
+      publishableKey={PUBLISHABLE_KEY}
+      afterSignOutUrl="/"
+      waitlistUrl="/waitlist"
+      appearance={getClerkAppearance(resolvedTheme)}
+    >
+      {children}
+    </ClerkProvider>
+  )
+}
+
 const App = () => (
   <ThemeProvider>
-    <ErrorBoundary onError={handleAppError}>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <OfflineIndicator />
-          <PerformanceMonitor />
-          <Analytics />
-          <BrowserRouter>
-            <AppRouter />
-          </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </ErrorBoundary>
+    <ThemedClerkProvider>
+      <ErrorBoundary onError={handleAppError}>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <OfflineIndicator />
+            <PerformanceMonitor />
+            <Analytics />
+            <BrowserRouter>
+              <AppRouter />
+            </BrowserRouter>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </ErrorBoundary>
+    </ThemedClerkProvider>
   </ThemeProvider>
 )
 
