@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-// Minimum amount in euros (from MIN_CHECKOUT_AMOUNT env var, default: 2160€)
+// Minimum amount in dollars (from MIN_CHECKOUT_AMOUNT env var, default: 2160$)
 const MIN_AMOUNT_EUROS = 2160
 const MIN_AMOUNT_CENTS = MIN_AMOUNT_EUROS * 100
 
@@ -29,7 +29,7 @@ const CheckoutEnterprise = () => {
       const amountNum = parseFloat(amount.replace(',', '.'))
       if (isNaN(amountNum) || amountNum < MIN_AMOUNT_EUROS) {
         setError(
-          `Le montant minimum est de ${MIN_AMOUNT_EUROS.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}`
+          `Le montant minimum est de ${MIN_AMOUNT_EUROS.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`
         )
         setIsLoading(false)
         return
@@ -135,15 +135,15 @@ const CheckoutEnterprise = () => {
                     <div className="space-y-2">
                       <Label htmlFor="amount">
                         Montant (minimum{' '}
-                        {MIN_AMOUNT_EUROS.toLocaleString('fr-FR', {
+                        {MIN_AMOUNT_EUROS.toLocaleString('en-US', {
                           style: 'currency',
-                          currency: 'EUR',
+                          currency: 'USD',
                         })}
                         )
                       </Label>
                       <div className="relative">
                         <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 flex items-center">
-                          <span className="text-muted-foreground">€</span>
+                          <span className="text-muted-foreground">$</span>
                         </div>
                         <Input
                           id="amount"
@@ -162,17 +162,17 @@ const CheckoutEnterprise = () => {
                       {amount && !isAmountValid && (
                         <p className="text-sm text-destructive">
                           Le montant minimum est de{' '}
-                          {MIN_AMOUNT_EUROS.toLocaleString('fr-FR', {
+                          {MIN_AMOUNT_EUROS.toLocaleString('en-US', {
                             style: 'currency',
-                            currency: 'EUR',
+                            currency: 'USD',
                           })}
                         </p>
                       )}
                       {amount && isAmountValid && (
                         <p className="text-sm text-muted-foreground">
-                          Montant: {amountNum.toLocaleString('fr-FR', {
+                          Montant: {amountNum.toLocaleString('en-US', {
                             style: 'currency',
-                            currency: 'EUR',
+                            currency: 'USD',
                           })}
                         </p>
                       )}

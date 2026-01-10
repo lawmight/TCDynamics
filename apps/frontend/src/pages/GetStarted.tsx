@@ -38,7 +38,7 @@ const GetStarted = () => {
     {
       id: 'starter' as const,
       name: 'Starter',
-      price: '29€',
+      price: '29$',
       period: '/mois',
       description: 'Parfait pour commencer',
       features: [
@@ -51,7 +51,7 @@ const GetStarted = () => {
     {
       id: 'professional' as const,
       name: 'Professional',
-      price: '79€',
+      price: '79$',
       period: '/mois',
       description: 'Pour aller plus loin',
       features: [

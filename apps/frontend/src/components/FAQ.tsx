@@ -251,8 +251,8 @@ const FAQ = () => {
       badge: 'Tarifs',
       answer: [
         'Nos tarifs sont transparents et adaptés aux entreprises françaises :',
-        '• **Starter 29€/mois** : Parfait pour les petites entreprises (1-10 utilisateurs)',
-        "• **Professional 79€/mois** : Idéal pour les PME (jusqu'à 50 utilisateurs)",
+        '• **Starter 29$/mois** : Parfait pour les petites entreprises (1-10 utilisateurs)',
+        "• **Professional 79$/mois** : Idéal pour les PME (jusqu'à 50 utilisateurs)",
         '• **Enterprise sur mesure** : Solutions personnalisées pour les grandes entreprises',
         "• **Facturation mensuelle** : Pas d'engagement annuel obligatoire",
         "• **Réduction annuelle** : -20% sur les abonnements payés à l'année",

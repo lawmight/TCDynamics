@@ -26,9 +26,9 @@ if (typeof window !== 'undefined') {
 export type PlanType = keyof typeof POLAR_PRODUCT_IDS
 
 export const PLAN_PRICES = {
-  starter: { amount: 29, currency: 'EUR', interval: 'month' },
-  professional: { amount: 79, currency: 'EUR', interval: 'month' },
-  enterprise: { amount: null, currency: 'EUR', interval: 'month' },
+  starter: { amount: 29, currency: 'USD', interval: 'month' },
+  professional: { amount: 79, currency: 'USD', interval: 'month' },
+  enterprise: { amount: null, currency: 'USD', interval: 'month' },
 } as const
 
 export interface CheckoutSessionResponse {
@@ -170,10 +170,10 @@ export const getCheckoutSession = async (
 
 export const formatPrice = (
   amount: number | null,
-  currency = 'EUR'
+  currency = 'USD'
 ): string => {
   if (amount === null) return 'Sur mesure'
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency }).format(
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(
     amount
   )
 }
@@ -185,8 +185,8 @@ export const formatPrice = (
 export interface OnDemandCheckoutParams {
   planName?: PlanType // Plan name ('starter', 'professional', 'enterprise') - preferred
   productId?: string // Direct Polar product ID (use if planName not available)
-  amount: number // Amount in cents (e.g., 10000 for €100.00)
-  currency?: string // Defaults to 'eur'
+  amount: number // Amount in cents (e.g., 10000 for $100.00)
+  currency?: string // Defaults to 'usd'
   amountType?: 'fixed' | 'custom' | 'free' // Defaults to 'fixed'
   metadata?: Record<string, string>
 }

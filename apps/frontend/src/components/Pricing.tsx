@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 const pricingPlans = [
   {
     name: 'Starter',
-    price: '29€',
+    price: '29$',
     period: '',
     description:
       'Parfait pour les petites entreprises qui commencent leur digitalisation',
@@ -33,7 +33,7 @@ const pricingPlans = [
   },
   {
     name: 'Professional',
-    price: '79€',
+    price: '79$',
     period: '',
     description:
       'Idéal pour les PME qui veulent automatiser leurs processus métier',

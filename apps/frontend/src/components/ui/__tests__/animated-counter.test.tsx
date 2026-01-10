@@ -68,14 +68,14 @@ describe('AnimatedCounter Component', () => {
   })
 
   it('should format currency values', async () => {
-    render(<AnimatedCounter end={1250} suffix="€" />)
+    render(<AnimatedCounter end={1250} suffix="$" />)
 
     await waitFor(
       () => {
-        const text = screen.getByText(/€/)
+        const text = screen.getByText(/\$/)
         expect(text).toBeInTheDocument()
         // Check that it eventually reaches the target value
-        expect(text.textContent).toMatch(/1[\s\u00A0]*250[\s\u00A0]*€/)
+        expect(text.textContent).toMatch(/1[\s\u00A0]*250[\s\u00A0]*\$/)
       },
       { timeout: 3000 }
     )

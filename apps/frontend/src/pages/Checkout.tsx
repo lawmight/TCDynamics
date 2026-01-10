@@ -26,7 +26,7 @@ const Checkout = () => {
   const planDetails = {
     starter: {
       name: 'Starter',
-      price: '29€',
+      price: '29$',
       period: '/mois',
       features: [
         'Traitement de 50 documents/mois',
@@ -38,7 +38,7 @@ const Checkout = () => {
     },
     professional: {
       name: 'Professional',
-      price: '79€',
+      price: '79$',
       period: '/mois',
       features: [
         'Traitement de 500 documents/mois',
@@ -183,7 +183,7 @@ const Checkout = () => {
                     </div>
                     <div className="flex justify-between border-t border-border pt-3 text-lg font-bold">
                       <span>À payer aujourd'hui</span>
-                      <span className="text-primary">0€</span>
+                      <span className="text-primary">0$</span>
                     </div>
                     <p className="text-xs text-muted-foreground">
                       Vous serez facturé {currentPlan.price} après la période
