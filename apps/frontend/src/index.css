@@ -518,16 +518,20 @@ html {
 
 /* Clerk Badge Overrides */
 .cl-badge[data-color='primary'] {
-  color: rgba(0, 0, 0, 0.62) !important;
+  color: hsl(var(--foreground) / 0.62) !important;
 }
 
 /* Clerk UserButton Popover Action Button Overrides */
-.cl-userButtonPopoverActionButton__manageAccount {
-  color: rgba(0, 0, 0, 0.73) !important;
+.cl-userButtonPopoverActionButton__manageAccount,
+.cl-userButtonPopoverActionButton__signOut {
+  color: hsl(var(--popover-foreground)) !important;
 }
 
-.cl-userButtonPopoverActionButton__signOut {
-  color: rgba(0, 0, 0, 0.73) !important;
+/* Clerk UserButton Popover Background - ensure theme-aware background */
+.cl-userButtonPopoverContent,
+.cl-userButtonPopoverRootBox,
+.cl-userButtonPopoverMain {
+  background-color: hsl(var(--popover)) !important;
 }
 
 /* Clerk UserButton Avatar - Remove unwanted outline/ring */
