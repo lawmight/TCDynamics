@@ -88,4 +88,4 @@ const location = process.env.VERTEX_LOCATION || 'us-central1'
 
 ---
 
-**Last Updated**: 2025-01-01
+**Last Updated**: 2026-01-13
