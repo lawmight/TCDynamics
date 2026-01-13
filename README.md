@@ -32,7 +32,7 @@ npm run dev:backend   # local Express only
 **Frontend**:
 - `VITE_CLERK_PUBLISHABLE_KEY` - Clerk publishable key (starts with `pk_`)
 
-See `api/ENV_VARIABLES.md` for complete documentation of all environment variables.
+See `docs/development/environment-setup.md` for complete documentation of all environment variables.
 
 **⚠️ Important**: Use `CLERK_SECRET_KEY` (not `CLERK_API_KEY`) for backend authentication.
 
