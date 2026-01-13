@@ -1,6 +1,6 @@
 ---
 name: nia-oracle
-model: inherit
+model: claude-4.5-opus-high-thinking
 ---
 
 # Nia Rules

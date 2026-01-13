@@ -16,10 +16,13 @@ const ScrollToTop = () => {
       }, 100)
       return () => clearTimeout(timeoutId)
     } else {
-      // No hash, scroll to top
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth',
+      // No hash, scroll to top instantly
+      // Use requestAnimationFrame to ensure lazy-loaded components are rendered
+      requestAnimationFrame(() => {
+        // Small additional delay to ensure DOM is fully ready
+        setTimeout(() => {
+          window.scrollTo(0, 0)
+        }, 0)
       })
     }
   }, [pathname, hash])

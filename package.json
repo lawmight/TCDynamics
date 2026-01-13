@@ -46,7 +46,10 @@
     "deploy:vercel": "powershell -ExecutionPolicy Bypass -File ./scripts/deploy-vercel.ps1",
     "deploy:vercel:frontend": "powershell -ExecutionPolicy Bypass -File ./scripts/deploy-vercel-frontend-only.ps1",
     "ship": "powershell -ExecutionPolicy Bypass -File ./scripts/ship.ps1",
-    "preview": "powershell -ExecutionPolicy Bypass -File ./scripts/ship.ps1 -Message \"chore: preview deployment\""
+    "preview": "powershell -ExecutionPolicy Bypass -File ./scripts/ship.ps1 -Message \"chore: preview deployment\"",
+    "worktree:setup": "powershell -ExecutionPolicy Bypass -File ./scripts/setup-worktrees.ps1",
+    "worktree:list": "powershell -ExecutionPolicy Bypass -File ./scripts/list-worktrees.ps1",
+    "worktree:cleanup": "powershell -ExecutionPolicy Bypass -File ./scripts/cleanup-worktrees.ps1"
   },
   "dependencies": {
     "google-auth-library": "^9.14.1",

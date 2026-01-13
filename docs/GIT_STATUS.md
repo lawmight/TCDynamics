@@ -1,8 +1,11 @@
 # Git Status & Branch Management
 
+**Last Updated**: 2026-01-09
+**Status**: Active
+
 This document provides information about git branch status, remotes, and recommended workflows.
 
----
+**Note**: Branch listings in this document may become outdated. For current branch status, run `git branch -vv` (local branches with tracking info) or `git branch -a` (all branches including remotes).
 
 ## Git Remotes
 

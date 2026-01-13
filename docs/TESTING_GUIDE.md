@@ -1,5 +1,8 @@
 # Testing Guide - API Keys Feature Fixes
 
+**Last Updated**: 2026-01-09
+**Status**: Active
+
 This guide helps you test all the fixes implemented from the code review plan.
 
 ## Prerequisites

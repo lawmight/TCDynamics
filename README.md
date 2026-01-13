@@ -23,6 +23,19 @@ npm run dev:frontend
 npm run dev:backend   # local Express only
 ```
 
+### Environment Variables
+
+**Required for API functions**:
+- `CLERK_SECRET_KEY` - Clerk secret key for authentication (get from Clerk Dashboard)
+- `MONGODB_URI` - MongoDB Atlas connection string
+
+**Frontend**:
+- `VITE_CLERK_PUBLISHABLE_KEY` - Clerk publishable key (starts with `pk_`)
+
+See `api/ENV_VARIABLES.md` for complete documentation of all environment variables.
+
+**⚠️ Important**: Use `CLERK_SECRET_KEY` (not `CLERK_API_KEY`) for backend authentication.
+
 ## Testing & Linting
 
 ```bash
@@ -38,14 +51,14 @@ npm run type-check
 
 **Note**: Azure Functions have been archived to `apps/functions-archive/`. See the archive README for restoration instructions if needed.
 
-**Important**: The archived Azure Functions use `azure-ai-vision-imageanalysis` which depends on Azure Computer Vision - Image Analysis API. This API will be retired on September 25, 2028, with migration recommended by September 2026. See `docs/azure-vision-migration.md` for migration tracking and planning.
+**Important**: The archived Azure Functions use `azure-ai-vision-imageanalysis` which depends on Azure Computer Vision - Image Analysis API. This API will be retired on September 25, 2028, with migration recommended by September 2026. See `docs/migrations/azure-vision.md` for migration tracking and planning.
 
 ### Vercel Deployment
 
 **Configuration**: Vercel deployment uses a single root-level `vercel.json` configuration file (located at the project root). This is the canonical source for all Vercel settings including:
 
 - Build commands and output directories (configured for monorepo structure)
-- Security headers (including `Cross-Origin-Embedder-Policy: credentialless`; see `docs/coep-header-fix.md` for rationale)
+- Security headers (including `Cross-Origin-Embedder-Policy: credentialless`; see `docs/security/coep-config.md` for rationale)
 - Rewrites, redirects, and caching rules
 - Environment variables
 
