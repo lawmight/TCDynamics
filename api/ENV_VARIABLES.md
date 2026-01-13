@@ -27,6 +27,69 @@ PII_HASH_SALT=your-secure-random-salt-here
 
 **Note**: This is optional but recommended for production environments. Even without a salt, PII values are still hashed using SHA-256.
 
+## AI Prompt Configuration Variables
+
+### `AI_PROMPT_TYPE` (Optional)
+
+**Description**: Type of prompt template to use for AI interactions.
+
+**Type**: String
+
+**Default**: `chat`
+
+**Valid Values**: `chat`, `workspace`, `assistant`
+
+**Usage**: Used by `api/_lib/prompt-generator.js` to select the appropriate prompt template.
+
+- `chat`: Default chat assistant prompt (optimized for French SMEs)
+- `workspace`: Workspace chat prompt (optimized for workflow automation)
+- `assistant`: Generic assistant prompt
+
+**Example**:
+```bash
+AI_PROMPT_TYPE=workspace
+AI_PROMPT_TYPE=chat
+```
+
+**Note**: This affects all AI endpoints (`/api/chat`, `/api/vertex?action=chat`) unless overridden per-request.
+
+### `AI_PROMPT_LANGUAGE` (Optional)
+
+**Description**: Language preference for AI prompts and responses.
+
+**Type**: String
+
+**Default**: `fr` (for chat endpoint), `en` (for vertex endpoint)
+
+**Valid Values**: `fr`, `en`
+
+**Usage**: Used by `api/_lib/prompt-generator.js` to select the language-specific prompt variant.
+
+**Example**:
+```bash
+AI_PROMPT_LANGUAGE=fr
+AI_PROMPT_LANGUAGE=en
+```
+
+**Note**: This sets the default language, but individual requests can override this via the `promptLanguage` parameter.
+
+### `AI_CUSTOM_PROMPT` (Optional)
+
+**Description**: Custom system prompt to override default prompts.
+
+**Type**: String
+
+**Default**: Not set (uses default prompts based on `AI_PROMPT_TYPE` and `AI_PROMPT_LANGUAGE`)
+
+**Usage**: Used by `api/_lib/prompt-generator.js` as a complete override for all prompt templates.
+
+**Example**:
+```bash
+AI_CUSTOM_PROMPT="You are a specialized AI assistant for workflow automation. Always respond in French and focus on practical solutions for French SMEs."
+```
+
+**Note**: When set, this completely overrides all default prompts regardless of `AI_PROMPT_TYPE` or `AI_PROMPT_LANGUAGE` settings. Use this for complete customization of AI behavior.
+
 ## Payment Variables
 
 ### `PUBLIC_CHECKOUT_SECRET` (Optional)

@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 import { saveConversation } from './_lib/mongodb-db.js'
+import { generateSystemPrompt, getPromptMetadata } from './_lib/prompt-generator.js'
 
 // Disable Vercel's automatic body parsing - we'll handle it manually
 export const config = {
@@ -177,6 +178,9 @@ export default async function handler(req, res) {
         ? Math.max(1, Math.min(MAX_TOKENS, maxTokens))
         : MAX_TOKENS
 
+    // Generate system prompt using centralized prompt generator
+    const systemPrompt = generateSystemPrompt({ type: 'chat', language: 'fr' })
+
     // Call OpenAI (keep lightweight for internal/testing)
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -189,8 +193,7 @@ export default async function handler(req, res) {
         messages: [
           {
             role: 'system',
-            content:
-              'Tu es WorkFlowAI, assistant IA pour TCDynamics (PME FR). Réponds en français, professionnel et concis.',
+            content: systemPrompt,
           },
           { role: 'user', content: message.trim() },
         ],
@@ -213,12 +216,14 @@ export default async function handler(req, res) {
     // Save conversation to MongoDB (best-effort)
     try {
       // IP logging is optional (ENABLE_CLIENT_IP_LOGGING + IP_HASH_SALT)
+      const promptMetadata = getPromptMetadata({ type: 'chat', language: 'fr' })
       const metadata = {
         model: 'gpt-3.5-turbo',
         tokens_used: tokensUsed,
         temperature: 0.7,
         source: 'vercel-chat',
         origin: ALLOWED_ORIGIN,
+        prompt: promptMetadata,
       }
       if (clientIpHash) {
         metadata.clientIpHash = clientIpHash

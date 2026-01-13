@@ -1,4 +1,5 @@
 import { generateText, embedText } from './_lib/vertex.js'
+import { buildMessagesWithPrompt, getPromptMetadata } from './_lib/prompt-generator.js'
 
 /**
  * Consolidated Vertex AI API
@@ -53,17 +54,35 @@ export default async function handler(req, res) {
  * Handle chat generation
  */
 async function handleChat(req, res) {
-  const { messages, sessionId, temperature } = req.body || {}
+  const { messages, sessionId, temperature, promptType, promptLanguage } =
+    req.body || {}
 
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
     return res.status(400).json({ error: 'Messages are required' })
   }
 
-  const result = await generateText({ messages, temperature })
+  // Build messages with system prompt if needed
+  const messagesWithPrompt = buildMessagesWithPrompt(messages, {
+    type: promptType || 'workspace',
+    language: promptLanguage || 'en',
+  })
+
+  const result = await generateText({
+    messages: messagesWithPrompt,
+    temperature,
+  })
+
+  // Include prompt metadata in response for debugging/analytics
+  const promptMetadata = getPromptMetadata({
+    type: promptType || 'workspace',
+    language: promptLanguage || 'en',
+  })
+
   return res.status(200).json({
     message: result.message,
     usage: result.usage,
     sessionId,
+    prompt: promptMetadata,
   })
 }
 
