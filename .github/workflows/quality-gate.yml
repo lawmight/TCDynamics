@@ -99,7 +99,8 @@ jobs:
         if: ${{ (inputs.skip_tests != true && inputs.skip_tests != 'true') || (github.event.inputs.skip_tests != true && github.event.inputs.skip_tests != 'true') }}
         run: npm run test:coverage
 
-      - name: Assert health endpoint non-cacheable
+        id: test-run
+        if: ${{ (inputs.skip_tests != true && inputs.skip_tests != 'true') || (github.event.inputs.skip_tests != true && github.event.inputs.skip_tests != 'true') }}
         id: health-check
         if: always()
         run: |
