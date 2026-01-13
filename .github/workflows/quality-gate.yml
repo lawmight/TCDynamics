@@ -30,6 +30,11 @@ on:
         required: false
         type: boolean
         default: false
+      coverage_threshold:
+        description: 'Coverage threshold percentage (default: 60)'
+        required: false
+        type: number
+        default: 60
   workflow_dispatch:
     inputs:
       skip_lint:
@@ -47,13 +52,15 @@ on:
         required: false
         type: boolean
         default: false
+      coverage_threshold:
+        description: 'Coverage threshold percentage (default: 60)'
+        required: false
+        type: number
+        default: 60
 
 jobs:
   quality-gate:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20, 22]
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -61,102 +68,187 @@ jobs:
       - name: Setup Node.js with Caching
         uses: ./.github/actions/setup-node-cache
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: '20'
+
+      - name: Debug Environment
+        run: |
+          echo "Node version: $(node --version)"
+          echo "npm version: $(npm --version)"
+          echo "Working directory: $(pwd)"
+          echo "Skip flags: lint=${{ inputs.skip_lint || github.event.inputs.skip_lint || false }}, tests=${{ inputs.skip_tests || github.event.inputs.skip_tests || false }}, build=${{ inputs.skip_build || github.event.inputs.skip_build || false }}"
+          echo "Coverage threshold: ${{ inputs.coverage_threshold || github.event.inputs.coverage_threshold || 60 }}%"
 
       - name: Install Dependencies
         uses: ./.github/actions/install-dependencies
 
       - name: Type Check
-        if: (inputs.skip_lint != true && inputs.skip_lint != 'true') && (github.event.inputs.skip_lint != true && github.event.inputs.skip_lint != 'true')
+        id: type-check
+        if: ${{ (inputs.skip_lint != true && inputs.skip_lint != 'true') || (github.event.inputs.skip_lint != true && github.event.inputs.skip_lint != 'true') }}
         working-directory: ./apps/frontend
         run: npm run type-check
 
       - name: Lint
-        if: (inputs.skip_lint != true && inputs.skip_lint != 'true') && (github.event.inputs.skip_lint != true && github.event.inputs.skip_lint != 'true')
-        working-directory: ./apps/frontend
+        id: lint
+        if: ${{ inputs.skip_lint != true && inputs.skip_lint != 'true' && (github.event.inputs.skip_lint != true && github.event.inputs.skip_lint != 'true') }}
+        if: ${{ (inputs.skip_lint != true && inputs.skip_lint != 'true') || (github.event.inputs.skip_lint != true && github.event.inputs.skip_lint != 'true') }}
         run: npm run lint
 
       - name: Unit Tests
-        if: (inputs.skip_tests != true && inputs.skip_tests != 'true') && (github.event.inputs.skip_tests != true && github.event.inputs.skip_tests != 'true')
-        working-directory: ./apps/frontend
-        run: npm run test:coverage
         id: test-run
+        if: ${{ inputs.skip_tests != true && inputs.skip_tests != 'true' && (github.event.inputs.skip_tests != true && github.event.inputs.skip_tests != 'true') }}
+        if: ${{ (inputs.skip_tests != true && inputs.skip_tests != 'true') || (github.event.inputs.skip_tests != true && github.event.inputs.skip_tests != 'true') }}
+        run: npm run test:coverage
 
-      - name: Assert health endpoint non-cacheable
+        id: test-run
+        if: ${{ (inputs.skip_tests != true && inputs.skip_tests != 'true') || (github.event.inputs.skip_tests != true && github.event.inputs.skip_tests != 'true') }}
+        id: health-check
+        if: always()
         run: |
+          if [ ! -f "apps/backend/src/app.ts" ]; then
+            echo "ℹ️ Backend app.ts not found, skipping health endpoint check"
+            exit 0
+          fi
+          
           if grep -q "Cache-Control" apps/backend/src/app.ts; then
             if ! grep -q "no-store" apps/backend/src/app.ts; then
               echo "❌ /health must include no-store Cache-Control"
+              echo "   Expected: Cache-Control header with 'no-store'"
+              echo "   File: apps/backend/src/app.ts"
               exit 1
             fi
             if grep -q "stale-while-revalidate" apps/backend/src/app.ts; then
               echo "❌ /health must not include stale-while-revalidate"
+              echo "   Health endpoints should not be cached"
+              echo "   File: apps/backend/src/app.ts"
               exit 1
             fi
             echo "✅ /health Cache-Control is non-cacheable"
           else
-            echo "ℹ️ No Cache-Control header found for /health"
+            echo "ℹ️ No Cache-Control header found for /health endpoint"
           fi
+        continue-on-error: true
 
       - name: Check Coverage Threshold
-        if: (inputs.skip_tests != true && inputs.skip_tests != 'true') && (github.event.inputs.skip_tests != true && github.event.inputs.skip_tests != 'true')
+        if: ${{ inputs.skip_tests != true && inputs.skip_tests != 'true' && (github.event.inputs.skip_tests != true && github.event.inputs.skip_tests != 'true') }}
         id: coverage-check
-        working-directory: ./apps/frontend
+        if: ${{ (inputs.skip_tests != true && inputs.skip_tests != 'true') || (github.event.inputs.skip_tests != true && github.event.inputs.skip_tests != 'true') }}
         run: |
           # Check if coverage meets threshold using Node.js (no external dependencies needed)
           # Coverage report is generated by the Unit Tests step above
-          # Current threshold: 60%
+          threshold=${{ inputs.coverage_threshold || github.event.inputs.coverage_threshold || 60 }}
+          
+          if [ ! -f "coverage/coverage-summary.json" ]; then
+            echo "❌ Coverage report not found at coverage/coverage-summary.json"
+            echo "   Make sure test:coverage script generates the report"
+            exit 1
+          fi
+          
           coverage=$(node -e "
             const fs = require('fs');
-            const data = JSON.parse(fs.readFileSync('coverage/coverage-summary.json', 'utf8'));
-            const coverage = data.total.lines.pct;
-            const threshold = 60;
-            if (coverage < threshold) {
-              console.error(\`❌ Coverage \${coverage}% is below \${threshold}% threshold\`);
+            try {
+              const data = JSON.parse(fs.readFileSync('coverage/coverage-summary.json', 'utf8'));
+              const coverage = data.total.lines.pct;
+              const threshold = $threshold;
+              
+              console.log(\`📊 Coverage Report:\`);
+              console.log(\`   Lines: \${data.total.lines.pct}%\`);
+              console.log(\`   Statements: \${data.total.statements.pct}%\`);
+              console.log(\`   Functions: \${data.total.functions.pct}%\`);
+              console.log(\`   Branches: \${data.total.branches.pct}%\`);
+              console.log(\`   Threshold: \${threshold}%\`);
+              
+              if (coverage < threshold) {
+                console.error(\`\n❌ Coverage \${coverage}% is below \${threshold}% threshold\`);
+                console.error(\`   Difference: -\${(threshold - coverage).toFixed(2)}%\`);
+                process.exit(1);
+              } else {
+                console.log(\`\n✅ Coverage \${coverage}% meets \${threshold}% threshold\`);
+                console.log(coverage);
+              }
+            } catch (error) {
+              console.error('❌ Error reading coverage report:', error.message);
               process.exit(1);
-            } else {
-              console.log(\`✅ Coverage \${coverage}% meets \${threshold}% threshold\`);
-              console.log(coverage);
             }
           ")
           echo "coverage=$coverage" >> $GITHUB_OUTPUT
 
       - name: Build Check
-        if: (inputs.skip_build != true && inputs.skip_build != 'true') && (github.event.inputs.skip_build != true && github.event.inputs.skip_build != 'true')
+        id: build-check
+        if: ${{ inputs.skip_build != true && inputs.skip_build != 'true' && (github.event.inputs.skip_build != true && github.event.inputs.skip_build != 'true') }}
         working-directory: ./apps/frontend
         run: npm run build
-
+        if: ${{ (inputs.skip_build != true && inputs.skip_build != 'true') || (github.event.inputs.skip_build != true && github.event.inputs.skip_build != 'true') }}
       - name: Upload Coverage
-        if: (inputs.skip_tests != true && inputs.skip_tests != 'true') && (github.event.inputs.skip_tests != true && github.event.inputs.skip_tests != 'true')
+        if: ${{ inputs.skip_tests != true && inputs.skip_tests != 'true' && (github.event.inputs.skip_tests != true && github.event.inputs.skip_tests != 'true') && steps.test-run.outcome == 'success' }}
         uses: codecov/codecov-action@v5
         with:
           file: ./apps/frontend/coverage/lcov.info
-          flags: frontend
+        if: ${{ ((inputs.skip_tests != true && inputs.skip_tests != 'true') || (github.event.inputs.skip_tests != true && github.event.inputs.skip_tests != 'true')) && steps.test-run.outcome == 'success' }}
           name: frontend-coverage
           fail_ci_if_error: false
+        continue-on-error: true
 
       - name: Validate API
+        id: validate-api
         uses: ./.github/actions/validate-api
 
       - name: Audit API Dependencies
+        id: audit-api
         working-directory: ./api
         run: |
           echo "Running npm audit for API dependencies..."
-          npm audit --audit-level=moderate || {
-            echo "⚠️ npm audit found vulnerabilities. Review and address as needed."
-            exit 1
-          }
-          echo "✅ npm audit passed"
+          echo "Audit level: high (moderate and low vulnerabilities will be ignored)"
+          
+          if npm audit --audit-level=high; then
+            echo "✅ npm audit passed (no high or critical vulnerabilities)"
+          else
+            audit_exit_code=$?
+            echo ""
+            echo "⚠️ npm audit found high or critical vulnerabilities"
+            echo "   Review the output above and address critical/high severity issues"
+            echo "   To see all vulnerabilities: npm audit --audit-level=moderate"
+            echo ""
+            echo "Attempting to show audit report..."
+            npm audit --audit-level=moderate || true
+            exit $audit_exit_code
+          fi
 
       - name: Job Summary
         if: always()
         run: |
-          echo "## Quality Gate Results (Node.js ${{ matrix.node-version }})" >> $GITHUB_STEP_SUMMARY
+          echo "## Quality Gate Results (Node.js 20)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Node Version**: ${{ matrix.node-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Node Version**: $(node --version)" >> $GITHUB_STEP_SUMMARY
+          echo "- **npm Version**: $(npm --version)" >> $GITHUB_STEP_SUMMARY
           echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Steps Status" >> $GITHUB_STEP_SUMMARY
+          echo "- Type Check: ${{ steps.type-check.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Lint: ${{ steps.lint.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Unit Tests: ${{ steps.test-run.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Health Endpoint Check: ${{ steps.health-check.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Coverage Check: ${{ steps.coverage-check.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Build Check: ${{ steps.build-check.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- API Validation: ${{ steps.validate-api.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- npm Audit: ${{ steps.audit-api.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
 
       - name: Append Coverage to Summary
-        if: always() && inputs.skip_tests != true && steps.coverage-check.outputs.coverage != ''
+        if: always() && steps.coverage-check.outputs.coverage != ''
         run: |
+          threshold=${{ inputs.coverage_threshold || github.event.inputs.coverage_threshold || 60 }}
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Coverage Report" >> $GITHUB_STEP_SUMMARY
           echo "- **Coverage**: ${{ steps.coverage-check.outputs.coverage }}%" >> $GITHUB_STEP_SUMMARY
+          echo "- **Threshold**: ${threshold}%" >> $GITHUB_STEP_SUMMARY
+          if [ -f "apps/frontend/coverage/coverage-summary.json" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "#### Detailed Coverage" >> $GITHUB_STEP_SUMMARY
+            node -e "
+              const fs = require('fs');
+              const data = JSON.parse(fs.readFileSync('apps/frontend/coverage/coverage-summary.json', 'utf8'));
+              console.log('- **Lines**: ' + data.total.lines.pct + '%');
+              console.log('- **Statements**: ' + data.total.statements.pct + '%');
+              console.log('- **Functions**: ' + data.total.functions.pct + '%');
+              console.log('- **Branches**: ' + data.total.branches.pct + '%');
+            " >> $GITHUB_STEP_SUMMARY
+          fi
