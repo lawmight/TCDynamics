@@ -1,5 +1,8 @@
 import { GoogleAuth } from 'google-auth-library'
 
+import { logger } from './logger.js'
+import { transformMessagesToContents } from './vertex-message-transformer.js'
+
 const SCOPES = ['https://www.googleapis.com/auth/cloud-platform']
 let cachedClient = null
 let cachedClientPromise = null
@@ -10,7 +13,7 @@ const getCredentials = () => {
   try {
     return JSON.parse(raw)
   } catch (error) {
-    console.error('Failed to parse VERTEX_SERVICE_ACCOUNT_JSON', error)
+    logger.error('Failed to parse VERTEX_SERVICE_ACCOUNT_JSON', error)
     throw error
   }
 }
@@ -54,122 +57,65 @@ export const getProjectConfig = () => {
   return { projectId, location, model, embedModel }
 }
 
-export const generateText = async ({ messages, temperature = 0.4 }) => {
-  const client = await getAuthClient()
-  const { projectId, location, model } = getProjectConfig()
-
+/**
+ * Builds the Vertex AI API URL for generateContent
+ * @param {string} projectId - Google Cloud project ID
+ * @param {string} location - Vertex AI location/region
+ * @param {string} model - Model name
+ * @returns {string} Full API URL
+ */
+const buildGenerateContentUrl = (projectId, location, model) => {
   // For global region, use aiplatform.googleapis.com (no regional prefix)
   const host =
     location === 'global'
       ? 'aiplatform.googleapis.com'
       : `${location}-aiplatform.googleapis.com`
   const pathLocation = location === 'global' ? 'global' : location
-  const url = `https://${host}/v1/projects/${projectId}/locations/${pathLocation}/publishers/google/models/${model}:generateContent`
+  return `https://${host}/v1/projects/${projectId}/locations/${pathLocation}/publishers/google/models/${model}:generateContent`
+}
 
-  const toSafeText = value => {
-    if (value === undefined || value === null) return ''
-    if (typeof value === 'string') return value
-    if (typeof value === 'number' || typeof value === 'boolean')
-      return String(value)
-    try {
-      return JSON.stringify(value)
-    } catch {
-      return String(value)
-    }
+/**
+ * Extracts the message text from Vertex AI response
+ * @param {Object} responseData - Response data from Vertex AI API
+ * @returns {string} Extracted message text
+ */
+const extractMessageFromResponse = responseData => {
+  const candidates = responseData?.candidates || []
+  const textParts =
+    Array.isArray(candidates) && candidates.length > 0
+      ? candidates[0]?.content?.parts || []
+      : []
+  return textParts
+    .filter(part => typeof part?.text === 'string')
+    .map(part => part.text)
+    .join('')
+}
+
+/**
+ * Generates text using Vertex AI
+ * @param {Object} params - Generation parameters
+ * @param {Array} params.messages - Array of message objects with role and content
+ * @param {number} [params.temperature=0.4] - Temperature for generation
+ * @returns {Promise<Object>} Response with message and usage metadata
+ */
+export const generateText = async ({ messages, temperature = 0.4 }) => {
+  if (!messages || !Array.isArray(messages) || messages.length === 0) {
+    throw new Error('Messages array is required and must not be empty')
   }
 
-  const normalizeEntryToParts = (entry, parts) => {
-    if (entry === undefined || entry === null) return
+  const client = await getAuthClient()
+  const { projectId, location, model } = getProjectConfig()
 
-    // Strings, numbers, booleans -> text part
-    if (
-      typeof entry === 'string' ||
-      typeof entry === 'number' ||
-      typeof entry === 'boolean'
-    ) {
-      const text = toSafeText(entry)
-      if (text) parts.push({ text })
-      return
-    }
+  // Transform messages to Vertex AI format
+  const contents = transformMessagesToContents(messages)
 
-    // Arrays -> normalize each element
-    if (Array.isArray(entry)) {
-      entry.forEach(item => normalizeEntryToParts(item, parts))
-      return
-    }
-
-    if (typeof entry === 'object') {
-      // Inline/file data already in Vertex format
-      if (entry.inlineData?.mimeType && entry.inlineData?.data) {
-        parts.push({ inlineData: entry.inlineData })
-        return
-      }
-      if (entry.fileData?.fileUri) {
-        parts.push({ fileData: entry.fileData })
-        return
-      }
-
-      // Common OpenAI-style multimodal payloads
-      if (entry.type === 'image_url' && entry.image_url?.url) {
-        parts.push({ fileData: { fileUri: entry.image_url.url } })
-        return
-      }
-
-      // Nested parts array -> flatten safely
-      if (Array.isArray(entry.parts)) {
-        entry.parts.forEach(item => normalizeEntryToParts(item, parts))
-        return
-      }
-
-      // Objects with text content
-      if (typeof entry.text === 'string') {
-        const text = entry.text
-        if (text) parts.push({ text })
-        return
-      }
-
-      // Fallback: stringify object to text
-      const text = toSafeText(entry)
-      if (text) parts.push({ text })
-      return
-    }
-
-    // Fallback for any other type
-    const text = toSafeText(entry)
-    if (text) parts.push({ text })
+  if (contents.length === 0) {
+    throw new Error(
+      'No valid messages after transformation. All messages were filtered out.'
+    )
   }
 
-  const mapRole = role => {
-    if (role === 'assistant') return 'model'
-    if (role === 'system') return 'user' // Vertex generateContent does not use a dedicated system role; fold into user
-    return 'user'
-  }
-
-  const contents = messages
-    .map(msg => {
-      const parts = []
-      normalizeEntryToParts(msg?.content, parts)
-
-      // Drop empty text parts to avoid Vertex rejection
-      const filteredParts = parts
-        .map(part => {
-          if (typeof part?.text === 'string') {
-            const text = part.text.trim()
-            return text ? { text } : null
-          }
-          return part
-        })
-        .filter(Boolean)
-
-      // Skip messages with no usable content
-      if (filteredParts.length === 0) return null
-
-      return {
-        role: mapRole(msg?.role),
-        parts: filteredParts,
-      }
-    })
-    .filter(Boolean)
+  const url = buildGenerateContentUrl(projectId, location, model)
 
   const body = {
     contents,
@@ -178,24 +124,26 @@ export const generateText = async ({ messages, temperature = 0.4 }) => {
     },
   }
 
-  const response = await client.request({
-    url,
-    method: 'POST',
-    data: body,
-  })
+  try {
+    const response = await client.request({
+      url,
+      method: 'POST',
+      data: body,
+    })
 
-  const candidates = response.data?.candidates || []
-  const textParts =
-    Array.isArray(candidates) && candidates.length > 0
-      ? candidates[0]?.content?.parts || []
-      : []
-  const message = textParts
-    .filter(part => typeof part?.text === 'string')
-    .map(part => part.text)
-    .join('')
-  const usage = response.data?.usageMetadata || {}
+    const message = extractMessageFromResponse(response.data)
+    const usage = response.data?.usageMetadata || {}
 
-  return { message, usage }
+    return { message, usage }
+  } catch (error) {
+    logger.error('Vertex AI generateText request failed', {
+      error: error.message,
+      projectId,
+      location,
+      model,
+    })
+    throw error
+  }
 }
 
 export const embedText = async text => {

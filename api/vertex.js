@@ -1,4 +1,5 @@
 import { generateText, embedText } from './_lib/vertex.js'
+import { logger } from './_lib/logger.js'
 
 /**
  * Consolidated Vertex AI API
@@ -41,7 +42,7 @@ export default async function handler(req, res) {
       })
     }
   } catch (error) {
-    console.error('Vertex AI error:', error)
+    logger.error('Vertex AI endpoint error', error)
     return res.status(500).json({
       error: 'Failed to process Vertex AI request',
       message: error.message,
@@ -59,12 +60,22 @@ async function handleChat(req, res) {
     return res.status(400).json({ error: 'Messages are required' })
   }
 
-  const result = await generateText({ messages, temperature })
-  return res.status(200).json({
-    message: result.message,
-    usage: result.usage,
-    sessionId,
-  })
+  try {
+    const result = await generateText({ messages, temperature })
+    return res.status(200).json({
+      message: result.message,
+      usage: result.usage,
+      sessionId,
+    })
+  } catch (error) {
+    logger.error('Vertex AI chat generation failed', {
+      error: error.message,
+      sessionId,
+      messageCount: messages?.length,
+    })
+    // generateText already throws with descriptive errors, pass them through
+    throw error
+  }
 }
 
 /**
