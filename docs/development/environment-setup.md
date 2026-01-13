@@ -575,7 +575,7 @@ VITE_FEATURE_ENABLE_VERCEL_CHAT=true
 
 ## Related Documentation
 
-- [API Environment Variables](../../api/ENV_VARIABLES.md) - Detailed API variable documentation
+- This document contains all API environment variable documentation
 - [Onboarding Guide](./onboarding.md) - Complete development guide
 - [Deployment Guide](../deployment/ci-cd.md) - Production deployment setup
 - [Configuration Utility](../../apps/frontend/src/utils/config.ts) - Frontend config implementation
