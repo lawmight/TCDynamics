@@ -147,7 +147,7 @@ Frontend environment variables must be prefixed with `VITE_` to be exposed to th
 
 ### API Variables (Server-side)
 
-API environment variables are used by Vercel serverless functions in the `api/` directory. See `api/ENV_VARIABLES.md` for detailed documentation.
+API environment variables are used by Vercel serverless functions in the `api/` directory. See below for detailed documentation.
 
 #### Required API Variables
 
