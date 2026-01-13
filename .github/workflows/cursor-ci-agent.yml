@@ -31,13 +31,16 @@ jobs:
         run: |
           curl https://cursor.com/install -fsS | bash
           echo "$HOME/.cursor/bin" >> $GITHUB_PATH
+          # Verify installation
+          export PATH="$HOME/.cursor/bin:$PATH"
+          which agent || echo "Agent not found in PATH"
+          ls -la $HOME/.cursor/bin/ || echo "Cursor bin directory not found"
 
-      - name: Authenticate Cursor CLI
+      - name: Verify Cursor CLI installation
         run: |
-          export CURSOR_AUTH_TOKEN="${{ secrets.CURSOR_AUTH_TOKEN }}"
-          echo "Cursor CLI authenticated"
-        env:
-          CURSOR_AUTH_TOKEN: ${{ secrets.CURSOR_AUTH_TOKEN }}
+          export PATH="$HOME/.cursor/bin:$PATH"
+          agent --version || echo "Agent command not available"
+        continue-on-error: true
 
       - name: Check workflow status
         id: check_status
@@ -73,6 +76,7 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_SHA: ${{ github.sha }}
         run: |
+          set -euo pipefail  # Exit on error, but we'll handle failures gracefully
           # Get workflow failure details
           WORKFLOW_ID="${{ steps.check_status.outputs.workflow_id }}"
           if [ -z "$WORKFLOW_ID" ] || [ "$WORKFLOW_ID" == "" ]; then
@@ -106,7 +110,38 @@ Repository structure:
 - Root: Monorepo with workspaces
 EOF
 
-          agent -p --force "$(cat cursor-prompt.txt)" > cursor-analysis.txt 2>&1 || true
+          # Ensure agent is in PATH and authenticated
+          export PATH="$HOME/.cursor/bin:$PATH"
+          export CURSOR_AUTH_TOKEN="${{ secrets.CURSOR_AUTH_TOKEN }}"
+          
+          # Verify agent is available
+          if ! command -v agent &> /dev/null; then
+            echo "Error: agent command not found. PATH: $PATH"
+            echo "Cursor bin contents:"
+            ls -la $HOME/.cursor/bin/ || echo "Directory not found"
+            exit 1
+          fi
+          
+          # Run agent with authentication
+          echo "Running Cursor agent..."
+          set +e  # Don't exit on error for agent command
+          agent -p --force "$(cat cursor-prompt.txt)" > cursor-analysis.txt 2>&1
+          EXIT_CODE=$?
+          set -e  # Re-enable error exit
+          
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "Agent command exited with code: $EXIT_CODE"
+            echo "Analysis output:"
+            cat cursor-analysis.txt || echo "No analysis output"
+            # Don't fail the workflow, just mark as not fixed
+            echo "fixed=false" >> $GITHUB_OUTPUT
+            {
+              echo "analysis<<EOF"
+              echo "Cursor CLI encountered an error (exit code: $EXIT_CODE). Please check the workflow logs for details."
+              cat cursor-analysis.txt 2>/dev/null || true
+              echo "EOF"
+            } >> $GITHUB_OUTPUT
+          fi
           
           # Check if fixes were made
           if git diff --quiet; then
