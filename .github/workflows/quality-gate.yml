@@ -86,23 +86,21 @@ jobs:
         if: ${{ inputs.skip_lint != true && inputs.skip_lint != 'true' && (github.event.inputs.skip_lint != true && github.event.inputs.skip_lint != 'true') }}
         working-directory: ./apps/frontend
         run: npm run type-check
-        continue-on-error: false
 
       - name: Lint
         id: lint
         if: ${{ inputs.skip_lint != true && inputs.skip_lint != 'true' && (github.event.inputs.skip_lint != true && github.event.inputs.skip_lint != 'true') }}
         working-directory: ./apps/frontend
         run: npm run lint
-        continue-on-error: false
 
       - name: Unit Tests
+        id: test-run
         if: ${{ inputs.skip_tests != true && inputs.skip_tests != 'true' && (github.event.inputs.skip_tests != true && github.event.inputs.skip_tests != 'true') }}
         working-directory: ./apps/frontend
         run: npm run test:coverage
-        id: test-run
-        continue-on-error: false
 
       - name: Assert health endpoint non-cacheable
+        id: health-check
         if: always()
         run: |
           if [ ! -f "apps/backend/src/app.ts" ]; then
@@ -172,14 +170,12 @@ jobs:
             }
           ")
           echo "coverage=$coverage" >> $GITHUB_OUTPUT
-        continue-on-error: false
 
       - name: Build Check
         id: build-check
         if: ${{ inputs.skip_build != true && inputs.skip_build != 'true' && (github.event.inputs.skip_build != true && github.event.inputs.skip_build != 'true') }}
         working-directory: ./apps/frontend
         run: npm run build
-        continue-on-error: false
 
       - name: Upload Coverage
         if: ${{ inputs.skip_tests != true && inputs.skip_tests != 'true' && (github.event.inputs.skip_tests != true && github.event.inputs.skip_tests != 'true') && steps.test-run.outcome == 'success' }}
@@ -194,7 +190,6 @@ jobs:
       - name: Validate API
         id: validate-api
         uses: ./.github/actions/validate-api
-        continue-on-error: false
 
       - name: Audit API Dependencies
         id: audit-api
@@ -216,7 +211,6 @@ jobs:
             npm audit --audit-level=moderate || true
             exit $audit_exit_code
           fi
-        continue-on-error: false
 
       - name: Job Summary
         if: always()
@@ -231,6 +225,7 @@ jobs:
           echo "- Type Check: ${{ steps.type-check.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
           echo "- Lint: ${{ steps.lint.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
           echo "- Unit Tests: ${{ steps.test-run.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Health Endpoint Check: ${{ steps.health-check.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
           echo "- Coverage Check: ${{ steps.coverage-check.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
           echo "- Build Check: ${{ steps.build-check.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
           echo "- API Validation: ${{ steps.validate-api.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
