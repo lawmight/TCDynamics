@@ -75,7 +75,7 @@ jobs:
           echo "Node version: $(node --version)"
           echo "npm version: $(npm --version)"
           echo "Working directory: $(pwd)"
-          echo "Skip flags: lint=${{ inputs.skip_lint || github.event.inputs.skip_lint }}, tests=${{ inputs.skip_tests || github.event.inputs.skip_tests }}, build=${{ inputs.skip_build || github.event.inputs.skip_build }}"
+          echo "Skip flags: lint=${{ inputs.skip_lint || github.event.inputs.skip_lint || false }}, tests=${{ inputs.skip_tests || github.event.inputs.skip_tests || false }}, build=${{ inputs.skip_build || github.event.inputs.skip_build || false }}"
           echo "Coverage threshold: ${{ inputs.coverage_threshold || github.event.inputs.coverage_threshold || 60 }}%"
 
       - name: Install Dependencies
