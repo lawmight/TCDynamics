@@ -1,5 +1,10 @@
 # AGENTS.md - TCDynamics Project Guide
 
+**Last Updated**: 2026-01-13
+**Status**: Active
+
+Quick reference guide for build/test/lint commands, architecture overview, and code style guidelines.
+
 ## Build/Test/Lint Commands
 
 ```bash

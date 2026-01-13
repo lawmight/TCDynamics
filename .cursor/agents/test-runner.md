@@ -2,7 +2,7 @@
 name: test-runner
 description: Test execution and analysis specialist. Use for running tests, analyzing failures, and improving test coverage. SAFE TO RUN IN PARALLEL - Can execute frontend/backend tests independently with coordination.
 tools: Read, Grep, Glob, Bash
-model: inherit
+model: default
 ---
 
 # Test Runner Subagent

@@ -2,7 +2,7 @@
 name: code-reviewer
 description: Expert code review specialist for security, quality, and maintainability. Use PROACTIVELY for code reviews, security audits, and quality checks. SAFE TO RUN IN PARALLEL - Read-only operations only.
 tools: Read, Grep, Glob, Bash
-model: inherit
+model: default
 readonly: true
 ---
 

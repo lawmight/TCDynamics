@@ -2,7 +2,7 @@
 name: backend-specialist
 description: Vercel serverless/MongoDB/API specialist. Use for API endpoints, database operations, authentication, and backend architecture. SAFE TO RUN IN PARALLEL - Operates exclusively in api/ and apps/backend/ directories.
 tools: Read, Grep, Glob, Bash
-model: inherit
+model: default
 ---
 
 # Backend Specialist Subagent

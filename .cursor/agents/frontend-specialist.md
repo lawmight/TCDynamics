@@ -2,7 +2,7 @@
 name: frontend-specialist
 description: React/TypeScript/Vite frontend specialist. Use for React components, hooks, UI implementation, and frontend architecture decisions. SAFE TO RUN IN PARALLEL - Operates exclusively in apps/frontend/ directory.
 tools: Read, Grep, Glob, Bash
-model: inherit
+model: default
 ---
 
 # Frontend Specialist Subagent
