@@ -347,7 +347,7 @@ logger.warn('Rate limit warning', { ip })
 
 **Tracked Automatically**:
 - **LCP** (Largest Contentful Paint) - Load performance
-- **FID** (First Input Delay) - Interactivity
+- **INP** (Interaction to Next Paint) - Interactivity
 - **CLS** (Cumulative Layout Shift) - Visual stability
 
 **Dashboard**: Vercel Analytics → Web Vitals tab
