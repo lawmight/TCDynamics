@@ -124,7 +124,7 @@ When adding or updating documentation:
 ## Related Documentation
 
 - Root [README.md](../README.md) - Project overview and quick start
-- [API Environment Variables](../api/ENV_VARIABLES.md) - Environment variable documentation
+- [Environment Setup](development/environment-setup.md) - Environment variables and service configuration
 - [DOCS_ANALYSIS.md](DOCS_ANALYSIS.md) - Comprehensive documentation analysis report
 
 ---
