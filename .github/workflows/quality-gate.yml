@@ -83,7 +83,7 @@ jobs:
 
       - name: Type Check
         id: type-check
-        if: ${{ inputs.skip_lint != true && inputs.skip_lint != 'true' && (github.event.inputs.skip_lint != true && github.event.inputs.skip_lint != 'true') }}
+        if: ${{ (inputs.skip_lint != true && inputs.skip_lint != 'true') || (github.event.inputs.skip_lint != true && github.event.inputs.skip_lint != 'true') }}
         working-directory: ./apps/frontend
         run: npm run type-check
 
