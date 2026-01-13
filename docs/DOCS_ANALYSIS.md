@@ -34,7 +34,7 @@ The `/docs` folder contains **17 documentation files** covering architecture, de
 | `CLERK_CUSTOMIZATION.md` | Integration Guide | ✅ Active | 2026-01-06 | Clerk authentication theming and customization |
 | `coep-header-fix.md` | Technical Fix | ✅ Active | Recent | COEP header rationale (`credentialless` vs `require-corp`) |
 | `DEPLOYMENT.md` | Deployment Guide | ✅ Active | 2026-01 | GitHub Actions workflows, Vercel deployment, CI/CD |
-| `engineer.md` | Onboarding Guide | ✅ Active | Recent | Comprehensive React SPA patterns and development guide |
+| `development/onboarding.md` | Onboarding Guide | ✅ Active | Recent | Comprehensive React SPA patterns and development guide |
 | `GIT_STATUS.md` | Git Reference | ⚠️ Static | Recent | Git remotes and branch management status |
 | `MCP_DIFFERENTIATION_STRATEGY.md` | Strategic Planning | ✅ Active | 2026-01-09 | MCP layer differentiation strategy |
 | `SECURITY_HEADERS.md` | Security Guide | ✅ Active | Recent | CSP hardening, COEP configuration, security headers |
