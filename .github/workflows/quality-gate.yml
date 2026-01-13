@@ -51,9 +51,6 @@ on:
 jobs:
   quality-gate:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20, 22]
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -61,7 +58,7 @@ jobs:
       - name: Setup Node.js with Caching
         uses: ./.github/actions/setup-node-cache
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: '20'
 
       - name: Install Dependencies
         uses: ./.github/actions/install-dependencies
@@ -151,9 +148,9 @@ jobs:
       - name: Job Summary
         if: always()
         run: |
-          echo "## Quality Gate Results (Node.js ${{ matrix.node-version }})" >> $GITHUB_STEP_SUMMARY
+          echo "## Quality Gate Results (Node.js 20)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Node Version**: ${{ matrix.node-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Node Version**: 20" >> $GITHUB_STEP_SUMMARY
           echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
 
       - name: Append Coverage to Summary
