@@ -46,7 +46,7 @@
     "deploy:vercel": "powershell -ExecutionPolicy Bypass -File ./scripts/deploy-vercel.ps1",
     "deploy:vercel:frontend": "powershell -ExecutionPolicy Bypass -File ./scripts/deploy-vercel-frontend-only.ps1",
     "ship": "powershell -ExecutionPolicy Bypass -File ./scripts/ship.ps1",
-    "preview": "powershell -ExecutionPolicy Bypass -File ./scripts/ship.ps1 -Message \"chore: preview deployment\""
+    "preview": "powershell -ExecutionPolicy Bypass -File ./scripts/ship.ps1 -Message \"chore: preview deployment\"",
     "worktree:cleanup": "powershell -ExecutionPolicy Bypass -File ./scripts/cleanup-worktrees.ps1"
   },
   "dependencies": {
