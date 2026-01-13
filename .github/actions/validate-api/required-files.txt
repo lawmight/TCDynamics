@@ -3,13 +3,12 @@
 # Empty lines and lines starting with # are ignored
 
 # Core API endpoints
-health.js
 chat.js
-contactform.js
-
-# Payment endpoints
-create-payment-intent.js
-create-subscription.js
+forms.js
+analytics.js
+files.js
+vertex.js
+vision.js
 
 # Polar integration
 polar/webhook.js
