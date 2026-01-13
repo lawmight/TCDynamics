@@ -1,0 +1,164 @@
+name: Cursor CI Agent
+
+on:
+  push:
+    branches: ['**']
+  workflow_run:
+    workflows: ['CI', 'Test', 'Build', 'Lint']
+    types: [completed]
+    branches: ['**']
+
+jobs:
+  wait-and-analyze:
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'failure' ||
+      github.event_name == 'push'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Cursor CLI
+        run: |
+          curl https://cursor.com/install -fsS | bash
+          echo "$HOME/.cursor/bin" >> $GITHUB_PATH
+
+      - name: Authenticate Cursor CLI
+        run: |
+          export CURSOR_AUTH_TOKEN="${{ secrets.CURSOR_AUTH_TOKEN }}"
+          echo "Cursor CLI authenticated"
+        env:
+          CURSOR_AUTH_TOKEN: ${{ secrets.CURSOR_AUTH_TOKEN }}
+
+      - name: Check workflow status
+        id: check_status
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_run" ]; then
+            echo "Previous workflow failed, analyzing..."
+            echo "failed=true" >> $GITHUB_OUTPUT
+            echo "workflow_id=${{ github.event.workflow_run.id }}" >> $GITHUB_OUTPUT
+          else
+            # Check if there are any failed workflows for this push
+            node .github/scripts/check-workflow-status.js
+            # Read the output to check if we should continue
+            if [ -f "$GITHUB_OUTPUT" ]; then
+              FAILED=$(grep "^failed=" "$GITHUB_OUTPUT" | cut -d'=' -f2 || echo "false")
+              if [ "$FAILED" != "true" ]; then
+                echo "No failed workflows found, exiting"
+                exit 0
+              fi
+            fi
+          fi
+
+      - name: Analyze and fix failures
+        if: steps.check_status.outputs.failed == 'true'
+        id: fix_attempt
+        continue-on-error: true
+        env:
+          CURSOR_AUTH_TOKEN: ${{ secrets.CURSOR_AUTH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          # Get workflow failure details
+          WORKFLOW_ID="${{ steps.check_status.outputs.workflow_id }}"
+          if [ -z "$WORKFLOW_ID" ] || [ "$WORKFLOW_ID" == "" ]; then
+            WORKFLOW_ID=$(node .github/scripts/get-latest-failed-workflow.js)
+          fi
+          
+          # Get failure logs and context
+          FAILURE_CONTEXT=$(node .github/scripts/get-failure-context.js "$WORKFLOW_ID" || echo "Workflow $WORKFLOW_ID failed")
+          
+          # Use Cursor CLI to analyze and fix
+          echo "Analyzing failures with Cursor CLI..."
+          echo "Failure context: $FAILURE_CONTEXT"
+          
+          # Create a prompt file for better handling
+          cat > cursor-prompt.txt << EOF
+Analyze the following CI/CD failure and fix the issues in the TCDynamics repository.
+
+Context:
+$FAILURE_CONTEXT
+
+Requirements:
+1. Focus on the entire repository (monorepo with apps/frontend and apps/backend)
+2. Make direct fixes to files that are causing the failures
+3. If you cannot fix an issue, explain why in detail
+4. Preserve existing code style and patterns
+5. Ensure fixes are minimal and targeted
+
+Repository structure:
+- apps/frontend: React 18 + Vite + TypeScript
+- apps/backend: Node.js + Express
+- Root: Monorepo with workspaces
+EOF
+
+          agent -p --force "$(cat cursor-prompt.txt)" > cursor-analysis.txt 2>&1 || true
+          
+          # Check if fixes were made
+          if git diff --quiet; then
+            echo "fixed=false" >> $GITHUB_OUTPUT
+            ANALYSIS=$(cat cursor-analysis.txt 2>/dev/null | head -c 65536 || echo "No automatic fixes were applied. Cursor CLI analysis completed but no file changes were made.")
+            {
+              echo "analysis<<EOF"
+              echo "$ANALYSIS"
+              echo "EOF"
+            } >> $GITHUB_OUTPUT
+            echo "No automatic fixes were applied"
+          else
+            echo "fixed=true" >> $GITHUB_OUTPUT
+            ANALYSIS=$(cat cursor-analysis.txt 2>/dev/null | head -c 65536 || echo "Fixes were applied successfully")
+            {
+              echo "analysis<<EOF"
+              echo "$ANALYSIS"
+              echo "EOF"
+            } >> $GITHUB_OUTPUT
+            echo "Fixes were applied"
+            git diff --stat
+          fi
+
+      - name: Commit fixes
+        if: steps.fix_attempt.outputs.fixed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          git add -A
+          git commit -m "fix: auto-fix CI failures [cursor-ci-agent]" || exit 0
+          git push || echo "Push failed or no changes to commit"
+
+      - name: Comment on PR if fix failed
+        if: |
+          steps.fix_attempt.outputs.fixed == 'false' &&
+          (github.event_name == 'pull_request' || github.event_name == 'push' || github.event_name == 'workflow_run')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+        run: |
+          ANALYSIS="${{ steps.fix_attempt.outputs.analysis }}"
+          node .github/scripts/comment-on-pr.js "$ANALYSIS"
+
+      - name: Add annotations
+        if: steps.check_status.outputs.failed == 'true'
+        run: |
+          if [ -f cursor-analysis.txt ]; then
+            ANALYSIS=$(cat cursor-analysis.txt)
+            echo "::error::CI failures detected and analyzed by Cursor CI Agent"
+            echo "::notice::$ANALYSIS"
+          fi
