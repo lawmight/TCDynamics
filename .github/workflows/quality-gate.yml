@@ -176,7 +176,7 @@ jobs:
         if: ${{ inputs.skip_build != true && inputs.skip_build != 'true' && (github.event.inputs.skip_build != true && github.event.inputs.skip_build != 'true') }}
         working-directory: ./apps/frontend
         run: npm run build
-
+        if: ${{ (inputs.skip_build != true && inputs.skip_build != 'true') || (github.event.inputs.skip_build != true && github.event.inputs.skip_build != 'true') }}
       - name: Upload Coverage
         if: ${{ inputs.skip_tests != true && inputs.skip_tests != 'true' && (github.event.inputs.skip_tests != true && github.event.inputs.skip_tests != 'true') && steps.test-run.outcome == 'success' }}
         uses: codecov/codecov-action@v5
