@@ -90,25 +90,25 @@ jobs:
           echo "Analyzing failures with Cursor CLI..."
           echo "Failure context: $FAILURE_CONTEXT"
           
-          # Create a prompt file for better handling
-          cat > cursor-prompt.txt << EOF
-Analyze the following CI/CD failure and fix the issues in the TCDynamics repository.
-
-Context:
-$FAILURE_CONTEXT
-
-Requirements:
-1. Focus on the entire repository (monorepo with apps/frontend and apps/backend)
-2. Make direct fixes to files that are causing the failures
-3. If you cannot fix an issue, explain why in detail
-4. Preserve existing code style and patterns
-5. Ensure fixes are minimal and targeted
-
-Repository structure:
-- apps/frontend: React 18 + Vite + TypeScript
-- apps/backend: Node.js + Express
-- Root: Monorepo with workspaces
-EOF
+          # Create a prompt file for better handling (using echo to avoid YAML heredoc issues)
+          {
+            echo "Analyze the following CI/CD failure and fix the issues in the TCDynamics repository."
+            echo ""
+            echo "Context:"
+            echo "$FAILURE_CONTEXT"
+            echo ""
+            echo "Requirements:"
+            echo "1. Focus on the entire repository (monorepo with apps/frontend and apps/backend)"
+            echo "2. Make direct fixes to files that are causing the failures"
+            echo "3. If you cannot fix an issue, explain why in detail"
+            echo "4. Preserve existing code style and patterns"
+            echo "5. Ensure fixes are minimal and targeted"
+            echo ""
+            echo "Repository structure:"
+            echo "- apps/frontend: React 18 + Vite + TypeScript"
+            echo "- apps/backend: Node.js + Express"
+            echo "- Root: Monorepo with workspaces"
+          } > cursor-prompt.txt
 
           # Ensure agent is in PATH and authenticated
           export PATH="$HOME/.cursor/bin:$PATH"
