@@ -192,6 +192,7 @@ const SocialProof = () => {
                   "{testimonial.quote}"
                 </blockquote>
                 <div className="flex flex-wrap items-center gap-3">
+                  {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
                   <img
                     src={testimonial.image}
                     alt={`${testimonial.author}, ${testimonial.position} chez ${testimonial.company}`}
