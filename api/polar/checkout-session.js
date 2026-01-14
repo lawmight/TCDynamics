@@ -7,10 +7,27 @@
 import { Polar } from '@polar-sh/sdk'
 import { verifySupabaseAuth } from '../_lib/auth.js'
 
+/**
+ * Determine Polar server based on environment
+ * Priority: 1. Explicit POLAR_SERVER env var, 2. VERCEL_ENV preview → sandbox, 3. Default production
+ */
+function getPolarServer() {
+  // Explicit override takes highest priority
+  if (process.env.POLAR_SERVER) {
+    return process.env.POLAR_SERVER
+  }
+  // Auto-detect preview environment for sandbox mode
+  if (process.env.VERCEL_ENV === 'preview') {
+    return 'sandbox'
+  }
+  // Default to production
+  return 'production'
+}
+
 const polar = process.env.POLAR_ACCESS_TOKEN
   ? new Polar({
       accessToken: process.env.POLAR_ACCESS_TOKEN,
-      server: process.env.POLAR_SERVER || 'production',
+      server: getPolarServer(),
     })
   : null
 
