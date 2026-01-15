@@ -95,6 +95,7 @@ jobs:
       - name: Unit Tests
         id: test-run
         if: ${{ (inputs.skip_tests != true && inputs.skip_tests != 'true') || (github.event.inputs.skip_tests != true && github.event.inputs.skip_tests != 'true') }}
+        working-directory: ./apps/frontend
         run: npm run test:coverage
 
       - name: Health Endpoint Check
