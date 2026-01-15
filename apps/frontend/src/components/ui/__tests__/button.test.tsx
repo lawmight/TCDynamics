@@ -27,7 +27,7 @@ describe('Button Component', () => {
 
   it('should render with different sizes', () => {
     const { rerender } = render(<Button size="sm">Small</Button>)
-    expect(screen.getByRole('button')).toHaveClass('h-9')
+    expect(screen.getByRole('button')).toHaveClass('h-8')
 
     rerender(<Button size="lg">Large</Button>)
     expect(screen.getByRole('button')).toHaveClass('h-11')
