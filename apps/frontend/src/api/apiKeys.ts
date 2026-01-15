@@ -68,7 +68,7 @@ export const listApiKeys = async (
           Authorization: `Bearer ${token}`,
         },
       })
-    } catch (networkError) {
+    } catch {
       // Handle network errors (server not running, connection refused, etc.)
       const isDevelopment = import.meta.env.DEV
       if (isDevelopment) {

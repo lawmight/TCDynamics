@@ -258,12 +258,14 @@ const AIChatbot = () => {
 
       {/* Chatbot Window */}
       {isOpen && (
+        /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
         <div
           id={chatbotId}
           className="fixed bottom-24 right-6 z-40 h-[500px] w-96 shadow-2xl"
           role="dialog"
           aria-labelledby="chatbot-title"
           aria-describedby="chatbot-description"
+          tabIndex={-1}
           onKeyDown={handleFocusTrap}
         >
           <Card className="flex h-full flex-col border-primary/20 bg-card/95 backdrop-blur-sm">
