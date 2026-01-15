@@ -8,7 +8,7 @@ on:
       - 'api/**'
       - '.github/workflows/quality-gate.yml'
   push:
-    branches: [main]
+    branches: [main, 'cursor/github-actions-status-50be']
     paths:
       - 'apps/frontend/**'
       - 'api/**'
