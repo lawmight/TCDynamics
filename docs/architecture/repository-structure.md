@@ -58,8 +58,8 @@ flowchart TB
     Frontend --> Config[Config Files]
     Frontend --> Public[public/]
 
-    Src --> Pages[pages/<br/>30 route components]
-    Src --> Components[components/<br/>102 TSX components]
+    Src --> Pages[pages/<br/>31 route components]
+    Src --> Components[components/<br/>64 TSX components]
     Src --> Hooks[hooks/<br/>Custom React hooks]
     Src --> API[api/<br/>API clients]
     Src --> Utils[utils/<br/>Utilities]
@@ -281,11 +281,11 @@ flowchart LR
     subgraph FrontendDeps["Frontend"]
         FE1[React 18.3.1]
         FE2[React Router 6.30.3]
-        FE3[TanStack Query 5.90.2]
+        FE3[TanStack Query 5.90.17]
         FE4[Clerk React 5.59.3]
-        FE5[Tailwind CSS 3.4.17]
+        FE5[Tailwind CSS 3.4.19]
         FE6[Vitest 3.2.4]
-        FE7[Vite 7.1.7]
+        FE7[Vite 7.3.0]
     end
 
     subgraph APIDeps["API"]
@@ -298,7 +298,7 @@ flowchart LR
     end
 
     subgraph BackendDeps["Backend"]
-        BE1[Express 4.21.2]
+        BE1[Express 4.22.1]
         BE2[Joi 17.13.3]
         BE3[Pino 8.19.0]
         BE4[Helmet 8.1.0]
@@ -407,6 +407,6 @@ mindmap
 
 ---
 
-**Last Updated**: 2026-01-06
+**Last Updated**: 2026-01-09
 **Repository**: lawmight/TCDynamics
 **Documentation Generated**: Using Nia MCP + Local Filesystem Analysis

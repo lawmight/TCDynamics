@@ -1,5 +1,8 @@
 # Recommended CLI Tools for TCDynamics
 
+**Last Updated**: 2026-01-09
+**Status**: Active
+
 This document lists CLI tools that can streamline your development workflow.
 
 ## Essential Tools
@@ -477,4 +480,4 @@ Since you're using zsh, consider these plugins:
 
 ---
 
-**Last Updated**: 2026-01-06
+**Last Updated**: 2026-01-09
