@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import ApiKeyManager from '../ApiKeyManager'
@@ -59,8 +60,16 @@ describe('ApiKeyManager', () => {
     vi.clearAllMocks()
   })
 
+  // Helper function to render with Router context
+  const renderApiKeyManager = () =>
+    render(
+      <MemoryRouter>
+        <ApiKeyManager />
+      </MemoryRouter>
+    )
+
   it('renders key list with correct data', () => {
-    render(<ApiKeyManager />)
+    renderApiKeyManager()
 
     // Check for named key
     expect(screen.getByText('Production Server')).toBeInTheDocument()
@@ -72,7 +81,7 @@ describe('ApiKeyManager', () => {
   })
 
   it('shows create button when keys exist', () => {
-    render(<ApiKeyManager />)
+    renderApiKeyManager()
 
     const createButton = screen.getByRole('button', { name: /create key/i })
     expect(createButton).toBeInTheDocument()
@@ -80,7 +89,7 @@ describe('ApiKeyManager', () => {
 
   it('opens revoke confirmation dialog when revoke button is clicked', async () => {
     const user = userEvent.setup()
-    render(<ApiKeyManager />)
+    renderApiKeyManager()
 
     // Find and click first revoke button
     const revokeButtons = screen.getAllByRole('button', { name: /revoke key/i })
@@ -95,7 +104,7 @@ describe('ApiKeyManager', () => {
 
   it('displays key context in revocation dialog', async () => {
     const user = userEvent.setup()
-    render(<ApiKeyManager />)
+    renderApiKeyManager()
 
     // Click revoke on first key
     const revokeButtons = screen.getAllByRole('button', { name: /revoke key/i })
