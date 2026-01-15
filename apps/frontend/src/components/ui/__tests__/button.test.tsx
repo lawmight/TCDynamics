@@ -33,7 +33,7 @@ describe('Button Component', () => {
     expect(screen.getByRole('button')).toHaveClass('h-10')
 
     rerender(<Button size="icon">Icon</Button>)
-    expect(screen.getByRole('button')).toHaveClass('h-10', 'w-10')
+    expect(screen.getByRole('button')).toHaveClass('h-9', 'w-9')
   })
 
   it('should handle click events', () => {
