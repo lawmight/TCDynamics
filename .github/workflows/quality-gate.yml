@@ -96,12 +96,8 @@ jobs:
 
       - name: Lint
         id: lint
-<<<<<<< Updated upstream
         if: ${{ (inputs.skip_lint != true && inputs.skip_lint != 'true') || (github.event.inputs.skip_lint != true && github.event.inputs.skip_lint != 'true') }}
         working-directory: ./apps/frontend
-=======
-        if: ${{ (inputs.skip_lint != true && inputs.skip_lint != 'true') && (github.event.inputs.skip_lint != true && github.event.inputs.skip_lint != 'true') }}
->>>>>>> Stashed changes
         run: npm run lint
 
       - name: Unit Tests

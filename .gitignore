@@ -40,6 +40,9 @@ cursor/*
 *.swo
 *~
 
+# Pulse framework
+.pulse/
+
 # OS
 .DS_Store
 Thumbs.db
