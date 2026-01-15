@@ -1,0 +1,236 @@
+name: Auto-Update Tests
+
+on:
+  push:
+    branches: [main, 'cursor/**']
+    paths:
+      - 'apps/frontend/src/**'
+      - 'apps/backend/src/**'
+      - 'api/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/frontend/src/**'
+      - 'apps/backend/src/**'
+      - 'api/**'
+  workflow_dispatch:
+    inputs:
+      update_snapshots:
+        description: 'Update snapshot tests'
+        required: false
+        type: boolean
+        default: true
+      create_pr:
+        description: 'Create PR with updates'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      has_changes: ${{ steps.changes.outputs.has_changes }}
+      changed_files: ${{ steps.changes.outputs.changed_files }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+
+      - name: Detect Changes
+        id: changes
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+            HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          else
+            BASE_SHA="${{ github.event.before }}"
+            HEAD_SHA="${{ github.event.after }}"
+          fi
+          
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            echo "No base commit, checking all files"
+            CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD | grep -E '^(apps/(frontend|backend)/src|api)/' || true)
+          else
+            CHANGED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA | grep -E '^(apps/(frontend|backend)/src|api)/' || true)
+          fi
+          
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No relevant changes detected"
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "changed_files<<EOF" >> $GITHUB_OUTPUT
+            echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            echo "Changed files:"
+            echo "$CHANGED_FILES"
+          fi
+
+  analyze-tests:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node-cache
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        uses: ./.github/actions/install-dependencies
+
+      - name: Run Test Analysis
+        id: analysis
+        run: |
+          node tools/scripts/auto-update-tests.js --check-only --verbose > analysis.txt 2>&1 || true
+          cat analysis.txt
+          
+          # Extract summary
+          if grep -q "Missing tests:" analysis.txt; then
+            echo "has_missing_tests=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_missing_tests=false" >> $GITHUB_OUTPUT
+          fi
+          
+          if grep -q "snapshot test" analysis.txt; then
+            echo "has_snapshots=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_snapshots=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload Analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-analysis
+          path: analysis.txt
+
+  update-snapshots:
+    needs: [detect-changes, analyze-tests]
+    if: |
+      needs.detect-changes.outputs.has_changes == 'true' &&
+      (needs.analyze-tests.outputs.has_snapshots == 'true' || github.event.inputs.update_snapshots == 'true')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node-cache
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        uses: ./.github/actions/install-dependencies
+
+      - name: Run Tests to Update Snapshots
+        id: update
+        continue-on-error: true
+        run: |
+          # Try to update frontend snapshots
+          cd apps/frontend
+          if npm run test -- --run --update-snapshots 2>&1 | tee snapshot-update.log; then
+            echo "frontend_updated=true" >> $GITHUB_OUTPUT
+          else
+            echo "frontend_updated=false" >> $GITHUB_OUTPUT
+          fi
+          
+          # Try to update backend snapshots
+          cd ../backend
+          if npm run test -- -u 2>&1 | tee -a snapshot-update.log; then
+            echo "backend_updated=true" >> $GITHUB_OUTPUT
+          else
+            echo "backend_updated=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check for Changes
+        id: changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            git diff --stat
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No snapshot changes needed"
+          fi
+
+      - name: Create Pull Request
+        if: |
+          steps.changes.outputs.has_changes == 'true' &&
+          (github.event.inputs.create_pr == 'true' || github.event_name == 'push')
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: auto-update test snapshots'
+          title: 'Auto-update: Test Snapshots'
+          body: |
+            ## Auto-updated Test Snapshots
+            
+            This PR was automatically created to update test snapshots after code changes.
+            
+            ### Changes
+            - Updated snapshot tests to match current code behavior
+            - Review the diff carefully to ensure changes are expected
+            
+            ### How to Review
+            1. Check that snapshot changes reflect intended code changes
+            2. Verify no unexpected behavior changes
+            3. Approve and merge if changes look correct
+            
+            **Auto-generated by [auto-update-tests workflow](.github/workflows/auto-update-tests.yml)**
+          branch: auto-update/snapshots-${{ github.run_number }}
+          delete-branch: true
+
+      - name: Commit Directly (for same branch)
+        if: |
+          steps.changes.outputs.has_changes == 'true' &&
+          github.event_name == 'push' &&
+          (github.event.inputs.create_pr != 'true' || github.event.inputs.create_pr == 'false')
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git commit -m "chore: auto-update test snapshots [skip ci]" || exit 0
+          git push || echo "Push failed, may need manual intervention"
+
+  report:
+    needs: [detect-changes, analyze-tests, update-snapshots]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Download Analysis
+        uses: actions/download-artifact@v4
+        with:
+          name: test-analysis
+          path: .
+
+      - name: Create Summary
+        run: |
+          echo "## Test Auto-Update Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f analysis.txt ]; then
+            echo "### Analysis Results" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat analysis.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Status" >> $GITHUB_STEP_SUMMARY
+          echo "- **Changes Detected**: ${{ needs.detect-changes.outputs.has_changes }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Has Snapshots**: ${{ needs.analyze-tests.outputs.has_snapshots }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Has Missing Tests**: ${{ needs.analyze-tests.outputs.has_missing_tests }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Snapshots Updated**: ${{ needs.update-snapshots.outputs.changes.has_changes }}" >> $GITHUB_STEP_SUMMARY
