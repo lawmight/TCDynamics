@@ -86,7 +86,7 @@ const LocalAdvantages = () => {
       </div>
 
       {/* Network Pattern */}
-      <div className="absolute inset-0 opacity-3">
+      <div className="absolute inset-0 opacity-5">
         <svg
           className="absolute inset-0 h-full w-full"
           xmlns="http://www.w3.org/2000/svg"
