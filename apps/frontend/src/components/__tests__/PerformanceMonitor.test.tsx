@@ -126,7 +126,16 @@ describe('PerformanceMonitor Component', () => {
 
   it('should handle missing memory information gracefully', () => {
     // Remove memory from performance mock
-    delete (mockPerformance as any).memory
+    interface MockPerformance {
+      getEntriesByType: ReturnType<typeof vi.fn>
+      memory?: {
+        usedJSHeapSize: number
+        totalJSHeapSize: number
+        jsHeapSizeLimit: number
+      }
+    }
+    const perfMock = mockPerformance as MockPerformance
+    delete perfMock.memory
 
     render(<PerformanceMonitor />)
 

@@ -16,6 +16,8 @@ import {
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import type { ApiKey } from '@/api/apiKeys'
+import { useApiKeys } from '@/hooks/useApiKeys'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
   AlertDialog,
@@ -35,8 +37,6 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 
-import type { ApiKey } from '@/api/apiKeys'
-import { useApiKeys } from '@/hooks/useApiKeys'
 import { ApiKeyCreateDialog } from './ApiKeyCreateDialog'
 
 function formatDate(dateString: string | null): string {
@@ -220,12 +220,14 @@ export default function ApiKeyManager() {
         <AlertTriangle className="h-4 w-4" />
         <AlertTitle>Error loading API keys</AlertTitle>
         <AlertDescription className="space-y-3">
-          <p>{error.message || 'An unexpected error occurred. Please try again.'}</p>
+          <p>
+            {error.message || 'An unexpected error occurred. Please try again.'}
+          </p>
           {import.meta.env.DEV && isAuthError && (
             <p className="text-xs text-muted-foreground italic">
-              Tip: In development mode, Clerk sessions may expire quickly. Make sure
-              your Vercel dev server is running and both frontend and API are using
-              the same Clerk instance.
+              Tip: In development mode, Clerk sessions may expire quickly. Make
+              sure your Vercel dev server is running and both frontend and API
+              are using the same Clerk instance.
             </p>
           )}
           {isAuthError ? (
