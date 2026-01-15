@@ -96,6 +96,8 @@ jobs:
         id: test-run
         if: ${{ (inputs.skip_tests != true && inputs.skip_tests != 'true') || (github.event.inputs.skip_tests != true && github.event.inputs.skip_tests != 'true') }}
         working-directory: ./apps/frontend
+        env:
+          VITE_AZURE_FUNCTIONS_URL: 'https://test-functions.azurewebsites.net'
         run: npm run test:coverage
 
       - name: Health Endpoint Check
