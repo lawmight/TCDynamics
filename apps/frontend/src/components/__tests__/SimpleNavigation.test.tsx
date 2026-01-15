@@ -1,10 +1,34 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import SimpleNavigation from '../SimpleNavigation'
 
 import { ThemeProvider } from '@/components/ThemeProvider'
+import { renderWithClerk } from '@/test/utils'
+
+// Mock Clerk hooks
+vi.mock('@clerk/clerk-react', async () => {
+  const actual = await vi.importActual('@clerk/clerk-react')
+  return {
+    ...actual,
+    useAuth: vi.fn(() => ({
+      isSignedIn: false,
+      isLoaded: true,
+      user: null,
+      userId: null,
+      getToken: vi.fn(() => Promise.resolve(null)),
+      signOut: vi.fn(() => Promise.resolve()),
+    })),
+    useUser: vi.fn(() => ({
+      isSignedIn: false,
+      isLoaded: true,
+      user: null,
+    })),
+    ClerkProvider: ({ children }: { children: React.ReactNode }) => (
+      <>{children}</>
+    ),
+  }
+})
 
 // Mock the icons
 vi.mock('lucide-react', () => ({
@@ -31,12 +55,10 @@ describe('SimpleNavigation Component', () => {
   })
 
   const renderSimpleNavigation = () =>
-    render(
-      <MemoryRouter initialEntries={['/']}>
-        <ThemeProvider defaultTheme="light" storageKey="theme">
-          <SimpleNavigation />
-        </ThemeProvider>
-      </MemoryRouter>
+    renderWithClerk(
+      <ThemeProvider defaultTheme="light" storageKey="theme">
+        <SimpleNavigation />
+      </ThemeProvider>
     )
 
   it('should render logo and navigation items', () => {

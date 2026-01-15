@@ -19,6 +19,7 @@ const MOCK_CLERK_PUBLISHABLE_KEY = 'pk_test_mock_key'
 /**
  * Render component with ClerkProvider wrapper
  * Use for components that use Clerk authentication hooks
+ * Note: Clerk must be mocked in the test file using vi.mock('@clerk/clerk-react')
  */
 export function renderWithClerk(
   ui: ReactElement,
