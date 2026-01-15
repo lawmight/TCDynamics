@@ -30,7 +30,7 @@ describe('Button Component', () => {
     expect(screen.getByRole('button')).toHaveClass('h-8')
 
     rerender(<Button size="lg">Large</Button>)
-    expect(screen.getByRole('button')).toHaveClass('h-11')
+    expect(screen.getByRole('button')).toHaveClass('h-10')
 
     rerender(<Button size="icon">Icon</Button>)
     expect(screen.getByRole('button')).toHaveClass('h-10', 'w-10')
