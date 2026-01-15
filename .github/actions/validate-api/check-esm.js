@@ -54,6 +54,11 @@ function findJSFiles(
       }
       files.push(...findJSFiles(fullPath, baseDir, excludeDirs))
     } else if (entry.endsWith('.js')) {
+      // Skip config files that may legitimately use CommonJS
+      // (e.g., jest.config.js, webpack.config.js, etc.)
+      if (entry.match(/\.config\.js$/) || entry.match(/^\./)) {
+        continue
+      }
       files.push(fullPath)
     }
   }
