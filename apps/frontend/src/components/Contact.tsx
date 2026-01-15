@@ -464,7 +464,6 @@ const Contact = () => {
               </div>
               <div className="space-y-3">
                 {contactInfo.slice(0, 2).map((info, index) => {
-                  const IconComponent = info.icon
                   return (
                     <div key={index} className="space-y-0.5">
                       <h5 className="text-xs font-semibold text-foreground">
@@ -498,7 +497,6 @@ const Contact = () => {
               </div>
               <div className="space-y-3">
                 {contactInfo.slice(2).map((info, index) => {
-                  const IconComponent = info.icon
                   return (
                     <div key={index} className="space-y-0.5">
                       <h5 className="text-xs font-semibold text-foreground">

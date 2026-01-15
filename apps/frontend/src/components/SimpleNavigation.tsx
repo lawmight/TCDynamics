@@ -1,4 +1,4 @@
-import { ArrowUp, Menu, Settings, X } from 'lucide-react'
+import { ArrowUp, Menu, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 

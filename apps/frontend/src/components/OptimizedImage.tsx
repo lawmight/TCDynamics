@@ -64,6 +64,7 @@ export const OptimizedImage = ({
         />
       )}
       {inView && (
+        /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
         <img
           src={src}
           alt={alt}
