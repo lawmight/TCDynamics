@@ -90,7 +90,7 @@ jobs:
       - name: Lint
         id: lint
         if: ${{ (inputs.skip_lint != true && inputs.skip_lint != 'true') || (github.event.inputs.skip_lint != true && github.event.inputs.skip_lint != 'true') }}
-        run: npm run lint
+        run: npm run lint:frontend
 
       - name: Unit Tests
         id: test-run
