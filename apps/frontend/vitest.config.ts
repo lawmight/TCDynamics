@@ -16,7 +16,6 @@ export default defineConfig({
       '**/dist/**',
       '**/backend/**', // Exclude backend tests (uses Jest)
       '**/TCDynamics/**', // Exclude Azure Functions tests
-      '**/api/**', // Exclude API tests (uses Node.js test runner)
       '**/.{idea,git,cache,output,temp}/**',
       '**/pages/__tests__/NotFound.test.tsx', // Skip tests with location mocking issues
     ],
@@ -32,6 +31,7 @@ export default defineConfig({
         '**/*.d.ts',
         '**/dist/**',
         'coverage/**',
+        'src/api/**', // Exclude API files from coverage (tested separately or via integration tests)
       ],
       thresholds: {
         branches: 60,
