@@ -174,6 +174,7 @@ export default [
     },
     rules: {
       '@typescript-eslint/no-explicit-any': 'warn', // Allow 'as any' in tests for mocking
+      'no-undef': 'off', // TypeScript handles this - prevents false positives with types
     },
   },
   {
