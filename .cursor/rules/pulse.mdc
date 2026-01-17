@@ -1,7 +1,7 @@
 ---
 description: PULSE Framework - Automatic safeguards for every message
 globs: *
-alwaysApply: true
+alwaysApply: false
 ---
 
 # ⛔ STOP - READ THIS FIRST

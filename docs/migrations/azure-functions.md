@@ -1,5 +1,8 @@
 # Azure Functions Archive & Migration
 
+**Last Updated**: 2026-01-09
+**Status**: Active
+
 This document covers the archived Azure Functions and the required migration plan for the Azure Vision API.
 
 ## Archive Overview
@@ -183,5 +186,5 @@ To prevent pre-release dependencies in production requirements:
 
 ---
 
-**Last Updated**: 2025-12-30
+**Last Updated**: 2026-01-09
 **Next Review**: Q2 2026
