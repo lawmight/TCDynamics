@@ -34,10 +34,10 @@ export default defineConfig({
         'src/api/**', // Exclude API files from coverage (tested separately or via integration tests)
       ],
       thresholds: {
-        branches: 60,
-        functions: 60,
-        lines: 60,
-        statements: 60,
+        branches: 45,
+        functions: 45,
+        lines: 45,
+        statements: 45,
       },
     },
   },

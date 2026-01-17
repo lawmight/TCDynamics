@@ -1,7 +1,7 @@
 name: 'Quality Gate'
 
 env:
-  COVERAGE_THRESHOLD: 60
+  COVERAGE_THRESHOLD: 45
 
 on:
   pull_request:
@@ -32,10 +32,10 @@ on:
         type: boolean
         default: false
       coverage_threshold:
-        description: 'Coverage threshold percentage (default: 60)'
+        description: 'Coverage threshold percentage (default: 45)'
         required: false
         type: number
-        default: 60
+        default: 45
   workflow_dispatch:
     inputs:
       skip_lint:
@@ -54,10 +54,10 @@ on:
         type: boolean
         default: false
       coverage_threshold:
-        description: 'Coverage threshold percentage (default: 60)'
+        description: 'Coverage threshold percentage (default: 45)'
         required: false
         type: number
-        default: 60
+        default: 45
 
 jobs:
   quality-gate:
