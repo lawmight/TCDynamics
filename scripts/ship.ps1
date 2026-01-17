@@ -1,8 +1,10 @@
-# Ship - Commit, push, and deploy to Vercel production
+# Ship - Commit, push, and deploy to Vercel
 # This script automates the full deployment workflow
+# By default, deploys to preview (use --prod flag for production)
 
 param(
-    [string]$Message = ""
+    [string]$Message = "",
+    [switch]$Prod = $false
 )
 
 Write-Host "🚀 Starting ship workflow..." -ForegroundColor Cyan
@@ -49,12 +51,18 @@ if ([string]::IsNullOrWhiteSpace($gitStatus)) {
     Write-Host "Changes committed and pushed successfully!" -ForegroundColor Green
 }
 
-# Step 2: Deploy to Vercel production
-Write-Host "Deploying to Vercel production..." -ForegroundColor Yellow
-& "$ScriptDir\deploy-vercel.ps1"
+# Step 2: Deploy to Vercel
+if ($Prod) {
+    Write-Host "Deploying to Vercel production..." -ForegroundColor Yellow
+    & "$ScriptDir\deploy-vercel.ps1"
+} else {
+    Write-Host "Deploying to Vercel preview..." -ForegroundColor Yellow
+    & "$ScriptDir\deploy-vercel-preview.ps1"
+}
 
 if ($LASTEXITCODE -eq 0) {
-    Write-Host "✅ Ship completed successfully!" -ForegroundColor Green
+    $deployType = if ($Prod) { "production" } else { "preview" }
+    Write-Host "✅ Ship to $deployType completed successfully!" -ForegroundColor Green
 } else {
     Write-Host "❌ Ship failed during deployment" -ForegroundColor Red
     exit $LASTEXITCODE
