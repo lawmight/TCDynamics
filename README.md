@@ -44,6 +44,25 @@ npm run lint          # frontend + backend
 npm run type-check
 ```
 
+### Automated Test Updates
+
+The project includes an automated test and script update system that keeps tests synchronized with code changes:
+
+```bash
+npm run test:update:check  # Check what needs updating
+npm run test:update:dry     # See what would be updated (dry run)
+npm run test:update         # Update tests automatically
+```
+
+**Features**:
+- Automatically detects changed files and maps them to tests
+- Updates snapshot tests when code changes
+- Identifies missing tests
+- Detects scripts that reference changed code
+- Runs automatically on push via GitHub Actions
+
+See [Auto-Update Guide](docs/testing/auto-update-guide.md) for detailed documentation.
+
 ## Deployment
 
 - **Frontend + serverless API**: Vercel
