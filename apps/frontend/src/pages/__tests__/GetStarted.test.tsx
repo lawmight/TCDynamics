@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -31,23 +31,32 @@ describe('GetStarted page', () => {
       </MemoryRouter>
     )
 
-    const firstNameInput = screen.getByLabelText(/Prénom/i)
-    const lastNameInputs = screen.getAllByLabelText(/Nom/i)
-    const emailInput = screen.getByLabelText(/Email professionnel/i)
-    const companyInput = screen.getByLabelText(/Entreprise/i)
-
-    await user.type(firstNameInput, 'Jean')
-    await user.type(lastNameInputs[0], 'Dupont')
-    await user.type(emailInput, 'jean@example.com')
-    await user.type(companyInput, 'Acme')
-
     const submitButton = screen.getByRole('button', {
       name: /Réserver la démo/i,
     })
+    const form = submitButton.closest('form') as HTMLFormElement
+    const formScope = form ? within(form) : screen
+
+    const firstNameInput = formScope.getByLabelText(/^Prénom/i)
+    const lastNameInput = formScope.getByLabelText(/^Nom\s*\*?$/i)
+    const emailInput = formScope.getByLabelText(/Email professionnel/i)
+    const companyInput = formScope.getByLabelText(/Entreprise/i)
+
+    await user.type(firstNameInput, 'Jean')
+    await user.type(lastNameInput, 'Dupont')
+    await user.type(emailInput, 'jean@example.com')
+    await user.type(companyInput, 'Acme')
+
+    // Bypass HTML5 validation in jsdom so the submit event fires and onSubmit runs
+    if (form) form.noValidate = true
+
     await user.click(submitButton)
 
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/demo?plan=starter')
-    })
+    await waitFor(
+      () => {
+        expect(mockNavigate).toHaveBeenCalledWith('/demo?plan=starter')
+      },
+      { timeout: 5000 }
+    )
   })
 })

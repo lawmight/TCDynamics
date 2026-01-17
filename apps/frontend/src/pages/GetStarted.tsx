@@ -1,14 +1,14 @@
 import {
-  ArrowRight,
-  CheckCircle,
-  Clock,
-  Gift,
-  Lock,
-  Mail,
-  Rocket,
-  Shield,
-  Sparkles,
-  Zap,
+    ArrowRight,
+    CheckCircle,
+    Clock,
+    Gift,
+    Lock,
+    Mail,
+    Rocket,
+    Shield,
+    Sparkles,
+    Zap,
 } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'

@@ -1,14 +1,14 @@
 import {
-  ArrowRight,
-  Calendar,
-  CheckCircle,
-  Clock,
-  FileText,
-  MessageSquare,
-  Play,
-  Users,
-  Video,
-  Zap,
+    ArrowRight,
+    Calendar,
+    CheckCircle,
+    Clock,
+    FileText,
+    MessageSquare,
+    Play,
+    Users,
+    Video,
+    Zap,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
@@ -211,7 +211,6 @@ const Demo = () => {
                           companySize: formData.get('employees') as string,
                           businessNeeds: formData.get('needs') as string,
                         }
-
                         const result = await demoForm.submitForm(data)
                         if (result.success) {
                           form.reset()
