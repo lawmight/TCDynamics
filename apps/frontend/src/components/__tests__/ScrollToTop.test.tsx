@@ -7,7 +7,7 @@ import ScrollToTop from '../ScrollToTop'
 describe('ScrollToTop component', () => {
   it('scrolls to top when no hash is present', () => {
     Object.defineProperty(window, 'requestAnimationFrame', {
-      value: (cb: FrameRequestCallback) => {
+      value: (cb: (time: number) => void) => {
         cb(0)
         return 0
       },
