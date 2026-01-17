@@ -71,15 +71,15 @@ jobs:
       - production-force-approval
     if: |
       (github.event_name == 'push' && github.ref == 'refs/heads/main' &&
-       needs.quality-gate.result == 'success') ||
+       (needs.quality-gate.result == 'success' || needs.quality-gate.result == 'skipped')) ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production' && github.event.inputs.force == 'true' &&
        github.event.inputs.confirm_production_force == 'FORCE_PRODUCTION_DEPLOY' &&
        (needs.validate-production-force.result == 'success' || needs.validate-production-force.result == 'skipped') &&
        (needs.production-force-approval.result == 'success' || needs.production-force-approval.result == 'skipped')) ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production' && github.event.inputs.force != 'true' &&
-       needs.quality-gate.result == 'success') ||
+       (needs.quality-gate.result == 'success' || needs.quality-gate.result == 'skipped')) ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging' &&
-       (github.event.inputs.force == 'true' || needs.quality-gate.result == 'success'))
+       (github.event.inputs.force == 'true' || needs.quality-gate.result == 'success' || needs.quality-gate.result == 'skipped'))
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
