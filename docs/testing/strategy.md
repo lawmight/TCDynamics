@@ -279,8 +279,10 @@ npm run test:e2e:ui                # UI mode
 npm run test:e2e:debug             # Debug mode
 
 # All tests
-npm run test                       # Run all tests
-npm run test:coverage              # All tests with coverage
+npm run test                       # Run all tests (sequential)
+npm run test:parallel              # Run all tests in parallel (faster)
+npm run test:coverage              # All tests with coverage (sequential)
+npm run test:coverage:parallel     # All tests with coverage in parallel (faster)
 ```
 
 ### Running Tests in CI/CD
