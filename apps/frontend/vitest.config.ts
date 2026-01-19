@@ -21,7 +21,7 @@ export default defineConfig({
     ],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html', 'lcov'],
+      reporter: ['text', 'json-summary', 'html', 'lcov'],
       exclude: [
         'node_modules/',
         'src/test/',
