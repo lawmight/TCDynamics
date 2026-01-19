@@ -175,19 +175,19 @@ jobs:
               const coverage = data.total.lines.pct;
               const threshold = $threshold;
 
-              console.log(\`📊 Coverage Report:\`);
-              console.log(\`   Lines: \${data.total.lines.pct}%\`);
-              console.log(\`   Statements: \${data.total.statements.pct}%\`);
-              console.log(\`   Functions: \${data.total.functions.pct}%\`);
-              console.log(\`   Branches: \${data.total.branches.pct}%\`);
-              console.log(\`   Threshold: \${threshold}%\`);
+              console.error(\`📊 Coverage Report:\`);
+              console.error(\`   Lines: \${data.total.lines.pct}%\`);
+              console.error(\`   Statements: \${data.total.statements.pct}%\`);
+              console.error(\`   Functions: \${data.total.functions.pct}%\`);
+              console.error(\`   Branches: \${data.total.branches.pct}%\`);
+              console.error(\`   Threshold: \${threshold}%\`);
 
               if (coverage < threshold) {
                 console.error(\`\n❌ Coverage \${coverage}% is below \${threshold}% threshold\`);
                 console.error(\`   Difference: -\${(threshold - coverage).toFixed(2)}%\`);
                 process.exit(1);
               } else {
-                console.log(\`\n✅ Coverage \${coverage}% meets \${threshold}% threshold\`);
+                console.error(\`\n✅ Coverage \${coverage}% meets \${threshold}% threshold\`);
                 console.log(coverage);
               }
             } catch (error) {
