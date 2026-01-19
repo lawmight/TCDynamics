@@ -30,7 +30,7 @@ runs:
         # NOTE: This only validates Vercel serverless functions in ./api
         # Backend routes in apps/backend/src/routes/ use CommonJS and are excluded
         # Uses AST-based detection to avoid false positives from comments/strings
-        SCRIPT_PATH="../../.github/actions/validate-api/check-esm.js"
+        SCRIPT_PATH="../.github/actions/validate-api/check-esm.js"
         if [ ! -f "$SCRIPT_PATH" ]; then
           echo "❌ Error: ESM validation script not found at expected path: $SCRIPT_PATH"
           echo "   Please ensure the check-esm.js file exists in .github/actions/validate-api/"
@@ -52,7 +52,7 @@ runs:
           if [ -n "$trimmed" ] && [ "${trimmed#\#}" = "$trimmed" ]; then
             required_files+=("$trimmed")
           fi
-        done < ../../.github/actions/validate-api/required-files.txt
+        done < ../.github/actions/validate-api/required-files.txt
 
         missing_files=()
         for file in "${required_files[@]}"; do
