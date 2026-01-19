@@ -4,7 +4,7 @@
  * Checks for require() calls and module.exports assignments in JavaScript files
  */
 
-import acorn from 'acorn'
+import * as acorn from 'acorn'
 import { readFileSync, readdirSync, statSync } from 'fs'
 import { join, relative } from 'path'
 
