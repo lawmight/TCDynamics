@@ -127,11 +127,11 @@ describe('Monitoring Routes', () => {
       expect(response.text).toContain('# TYPE tcdynamics_uptime_seconds gauge')
       expect(response.text).toContain('# HELP tcdynamics_requests_total')
       expect(response.text).toContain(
-        '# TYPE tcdynamics_requests_total counter'
+        '# TYPE tcdynamics_requests_total counter',
       )
       expect(response.text).toContain('# HELP tcdynamics_memory_usage_rss')
       expect(response.text).toContain(
-        '# TYPE tcdynamics_memory_usage_rss gauge'
+        '# TYPE tcdynamics_memory_usage_rss gauge',
       )
     })
 
@@ -148,10 +148,10 @@ describe('Monitoring Routes', () => {
         .expect(200)
 
       expect(response.text).toContain(
-        'tcdynamics_requests_by_method_total{method="GET"} 5'
+        'tcdynamics_requests_by_method_total{method="GET"} 5',
       )
       expect(response.text).toContain(
-        'tcdynamics_requests_by_method_total{method="POST"} 3'
+        'tcdynamics_requests_by_method_total{method="POST"} 3',
       )
     })
 
@@ -169,13 +169,13 @@ describe('Monitoring Routes', () => {
         .expect(200)
 
       expect(response.text).toContain(
-        'tcdynamics_requests_by_status_total{status="200"} 10'
+        'tcdynamics_requests_by_status_total{status="200"} 10',
       )
       expect(response.text).toContain(
-        'tcdynamics_requests_by_status_total{status="404"} 2'
+        'tcdynamics_requests_by_status_total{status="404"} 2',
       )
       expect(response.text).toContain(
-        'tcdynamics_requests_by_status_total{status="500"} 1'
+        'tcdynamics_requests_by_status_total{status="500"} 1',
       )
     })
   })
@@ -280,7 +280,7 @@ describe('Monitoring Routes', () => {
     })
 
     it('should apply admin authentication middleware', async () => {
-      const response = await request(app).post('/monitoring/metrics/reset')
+      await request(app).post('/monitoring/metrics/reset')
 
       // Should have called the auth middleware
       const { apiKeyAuth } = require('../../middleware/auth')
@@ -316,7 +316,7 @@ describe('Monitoring Routes', () => {
       await request(testApp).get('/test').expect(200)
 
       expect(
-        monitoringModule.metrics.performance.averageResponseTime
+        monitoringModule.metrics.performance.averageResponseTime,
       ).toBeGreaterThan(0)
     })
 
@@ -331,16 +331,16 @@ describe('Monitoring Routes', () => {
       await request(testApp).get('/test').expect(200)
 
       expect(
-        monitoringModule.metrics.performance.slowestEndpoints
+        monitoringModule.metrics.performance.slowestEndpoints,
       ).toHaveLength(1)
       expect(
-        monitoringModule.metrics.performance.slowestEndpoints[0]
+        monitoringModule.metrics.performance.slowestEndpoints[0],
       ).toHaveProperty('endpoint', 'GET /test')
       expect(
-        monitoringModule.metrics.performance.slowestEndpoints[0]
+        monitoringModule.metrics.performance.slowestEndpoints[0],
       ).toHaveProperty('duration')
       expect(
-        monitoringModule.metrics.performance.slowestEndpoints[0]
+        monitoringModule.metrics.performance.slowestEndpoints[0],
       ).toHaveProperty('timestamp')
     })
 
@@ -418,7 +418,7 @@ describe('Monitoring Routes', () => {
 
       expect(monitoringModule.metrics.errors.recent).toHaveLength(50)
       expect(monitoringModule.metrics.errors.recent[0].message).toBe(
-        'Test error 54'
+        'Test error 54',
       )
     })
   })
@@ -431,12 +431,12 @@ describe('Monitoring Routes', () => {
       testApp.use('/monitoring', monitoringRouter)
 
       // Add a route that throws an error
-      testApp.get('/error', (req, res) => {
+      testApp.get('/error', (_req, _res) => {
         throw new Error('Test error')
       })
 
       // Mock error handler middleware
-      testApp.use((error, req, res, next) => {
+      testApp.use((error, req, res, _next) => {
         collectErrorMetrics(error, req)
         res.status(500).json({ error: 'Internal server error' })
       })

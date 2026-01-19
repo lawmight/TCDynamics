@@ -58,4 +58,3 @@ export interface ResponseWithCsrf extends Response {
     [key: string]: unknown
   }
 }
-

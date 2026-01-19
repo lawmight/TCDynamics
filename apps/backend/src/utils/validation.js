@@ -24,25 +24,23 @@ const demoSchema = Joi.object({
 })
 
 // Fonction de validation générique
-const validateData = schema => {
-  return (req, res, next) => {
-    const { error, value } = schema.validate(req.body, {
-      abortEarly: false,
-      stripUnknown: true,
+const validateData = schema => (req, res, next) => {
+  const { error, value } = schema.validate(req.body, {
+    abortEarly: false,
+    stripUnknown: true,
+  })
+
+  if (error) {
+    const errorMessages = error.details.map(detail => detail.message)
+    return res.status(400).json({
+      success: false,
+      message: 'Données invalides',
+      errors: errorMessages,
     })
-
-    if (error) {
-      const errorMessages = error.details.map(detail => detail.message)
-      return res.status(400).json({
-        success: false,
-        message: 'Données invalides',
-        errors: errorMessages,
-      })
-    }
-
-    req.body = value // Utiliser les données nettoyées
-    next()
   }
+
+  req.body = value // Utiliser les données nettoyées
+  next()
 }
 
 module.exports = {

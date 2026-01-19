@@ -1,8 +1,8 @@
 import { useAuth as useClerkAuth, useUser } from '@clerk/clerk-react'
+import type { User } from '@clerk/clerk-react'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import type { User } from '@clerk/clerk-react'
 
 // Adapter type to maintain compatibility with existing code
 type AuthContextType = {

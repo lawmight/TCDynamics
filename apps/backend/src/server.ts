@@ -4,6 +4,12 @@
  */
 
 // Add error handlers at the very top before any imports
+import dotenv from 'dotenv'
+
+import { createApp } from './app'
+import { loadEnvironment } from './config/environment'
+import { logger } from './utils/logger'
+
 process.on('uncaughtException', (error: Error) => {
   console.error('❌ Uncaught Exception:', error)
   console.error('Stack:', error.stack)
@@ -17,13 +23,8 @@ process.on('unhandledRejection', (reason: unknown, promise: Promise<unknown>) =>
 
 // Load environment variables
 console.log('🔧 Loading environment variables...')
-import dotenv from 'dotenv'
 dotenv.config()
 console.log('✅ Environment variables loaded')
-
-import { createApp } from './app'
-import { loadEnvironment } from './config/environment'
-import { logger } from './utils/logger'
 
 /**
  * Start the server
@@ -72,7 +73,7 @@ function startServer(): void {
       console.error('❌ Server failed to start:', error)
       if (error.code === 'EADDRINUSE') {
         console.error(
-          `❌ Port ${PORT} is already in use. Please use a different port or kill the process using this port.`
+          `❌ Port ${PORT} is already in use. Please use a different port or kill the process using this port.`,
         )
       }
       process.exit(1)

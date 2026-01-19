@@ -71,7 +71,7 @@ describe('Integration Tests', () => {
       // Mock a validation failure
       vi.spyOn(configInstance, 'getSafeClientConfig').mockReturnValue({
         VITE_AZURE_FUNCTIONS_URL: 'invalid-url',
-        VITE_NODE_ENV: 'development' as any,
+        VITE_NODE_ENV: 'development' as 'development' | 'production' | 'test',
         VITE_APP_VERSION: '1.0.0',
         VITE_FEATURE_ENABLE_ANALYTICS: true,
         VITE_FEATURE_ENABLE_DEBUG_LOGGING: false,
@@ -211,7 +211,7 @@ describe('Integration Tests', () => {
       expect(isDevelopment()).toBe(true) // Vitest sets import.meta.env.DEV = true in test environment
 
       // Mock Node.js environment
-      delete (global as any).window
+      delete (global as { window?: unknown }).window
       Object.defineProperty(global, 'process', {
         value: { env: { NODE_ENV: 'test' } },
         writable: true,
@@ -275,7 +275,7 @@ describe('Integration Tests', () => {
   describe('End-to-End Integration', () => {
     it('should work together without conflicts', async () => {
       // Initialize config
-      const configInstance = new (config.constructor as any)()
+      const configInstance = new (config.constructor as new () => ConfigManager)()
       await configInstance.initialize()
 
       // Test cache with config

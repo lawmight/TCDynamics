@@ -124,16 +124,14 @@ const createEmailRouteHandler = config => {
  * const mapper = createDataMapper(['name', 'email', 'phone', 'message'])
  * // Extracts only specified fields from request body
  */
-const createDataMapper = fields => {
-  return body => {
-    const mapped = {}
-    fields.forEach(field => {
-      if (body[field] !== undefined) {
-        mapped[field] = body[field]
-      }
-    })
-    return mapped
-  }
+const createDataMapper = fields => body => {
+  const mapped = {}
+  fields.forEach(field => {
+    if (body[field] !== undefined) {
+      mapped[field] = body[field]
+    }
+  })
+  return mapped
 }
 
 module.exports = {

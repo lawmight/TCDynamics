@@ -18,7 +18,7 @@ router.post(
       'Votre demande de démonstration a été enregistrée. Notre équipe vous contactera dans les 2 heures.',
     errorMessage:
       "Une erreur est survenue lors de l'enregistrement de votre demande. Veuillez réessayer plus tard.",
-  })
+  }),
 )
 
 module.exports = router

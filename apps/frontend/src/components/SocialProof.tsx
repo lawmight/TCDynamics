@@ -84,7 +84,7 @@ const SocialProof = () => {
     >
       {/* Network Background */}
       <div className="absolute inset-0 opacity-5" aria-hidden="true">
-        <div className="absolute inset-0 network-background-gradient">
+        <div className="network-background-gradient absolute inset-0">
           <svg
             className="absolute inset-0 h-full w-full"
             xmlns="http://www.w3.org/2000/svg"

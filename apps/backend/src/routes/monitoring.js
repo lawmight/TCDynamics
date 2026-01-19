@@ -36,22 +36,19 @@ const collectMetrics = (req, res, next) => {
 
     // Update metrics
     metrics.requests.total++
-    metrics.requests.byMethod[req.method] =
-      (metrics.requests.byMethod[req.method] || 0) + 1
-    metrics.requests.byStatus[res.statusCode] =
-      (metrics.requests.byStatus[res.statusCode] || 0) + 1
+    metrics.requests.byMethod[req.method] = (metrics.requests.byMethod[req.method] || 0) + 1
+    metrics.requests.byStatus[res.statusCode] = (metrics.requests.byStatus[res.statusCode] || 0) + 1
 
     const endpoint = `${req.method} ${req.route?.path || req.path}`
-    metrics.requests.byEndpoint[endpoint] =
-      (metrics.requests.byEndpoint[endpoint] || 0) + 1
+    metrics.requests.byEndpoint[endpoint] = (metrics.requests.byEndpoint[endpoint] || 0) + 1
 
     // Update performance metrics
     const currentAvg = metrics.performance.averageResponseTime
     const totalRequests = metrics.requests.total
-    metrics.performance.averageResponseTime =
-      (currentAvg * (totalRequests - 1) + duration) / totalRequests
+    metrics.performance.averageResponseTime = (currentAvg * (totalRequests - 1) + duration) / totalRequests
 
     // Track slowest endpoints
+    // eslint-disable-next-line no-use-before-define
     updateSlowestEndpoints(endpoint, duration)
 
     originalSend.call(this, body)
@@ -147,7 +144,7 @@ router.get(
         pid: process.pid,
       },
     })
-  })
+  }),
 )
 
 /**
@@ -223,7 +220,7 @@ tcdynamics_requests_by_status_total{status="${status}"} ${count}
 
     res.setHeader('Content-Type', 'text/plain; charset=utf-8')
     res.send(prometheusMetrics)
-  })
+  }),
 )
 
 /**
@@ -259,7 +256,7 @@ router.get(
         totalRequests: metrics.requests.total,
         totalErrors: metrics.errors.total,
         averageResponseTime: Math.round(
-          metrics.performance.averageResponseTime
+          metrics.performance.averageResponseTime,
         ),
         memoryUsage: metrics.performance.memoryUsage,
       },
@@ -286,17 +283,16 @@ router.get(
     }
 
     // Check memory usage
-    const memUsagePercent =
-      (metrics.performance.memoryUsage.heapUsed /
-        metrics.performance.memoryUsage.heapTotal) *
-      100
+    const memUsagePercent = (metrics.performance.memoryUsage.heapUsed
+        / metrics.performance.memoryUsage.heapTotal)
+      * 100
     if (memUsagePercent > 90) {
       health.status = 'warning'
       health.memoryWarning = `High memory usage: ${memUsagePercent.toFixed(1)}%`
     }
 
     res.json(health)
-  })
+  }),
 )
 
 /**
@@ -347,7 +343,7 @@ router.post(
       message: 'Metrics reset successfully',
       timestamp: new Date().toISOString(),
     })
-  })
+  }),
 )
 
 module.exports = {

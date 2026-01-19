@@ -7,7 +7,7 @@ jest.mock('../../config/email', () => ({
 }))
 
 jest.mock('../../utils/validation', () => ({
-  validateData: jest.fn(schema => (req, res, next) => {
+  validateData: jest.fn(_schema => (req, res, next) => {
     // Simple validation for testing
     const { name, email, message } = req.body
     if (!name || !email || !message) {
@@ -49,9 +49,6 @@ const { logger } = require('../../utils/logger')
 
 // Import the actual router (which now uses the factory)
 const contactRouter = require('../contact')
-
-// Create a test router
-const router = express.Router()
 
 describe('Contact Route', () => {
   let app
@@ -133,14 +130,14 @@ describe('Contact Route', () => {
       // Verify logging (updated for factory pattern)
       expect(logger.info).toHaveBeenCalledWith(
         'Email server ready for contact',
-        expect.any(Object)
+        expect.any(Object),
       )
       expect(logger.info).toHaveBeenCalledWith(
         'Email sent successfully for contact',
         expect.objectContaining({
           messageId: 'test-message-id-123',
           sender: 'john@example.com',
-        })
+        }),
       )
     })
 
@@ -163,7 +160,7 @@ describe('Contact Route', () => {
         expect.objectContaining({
           error: 'Email verification failed',
           route: 'contact',
-        })
+        }),
       )
     })
 
@@ -187,7 +184,7 @@ describe('Contact Route', () => {
         expect.objectContaining({
           error: 'Email sending failed',
           route: 'contact',
-        })
+        }),
       )
     })
 
@@ -246,7 +243,7 @@ describe('Contact Route', () => {
       expect(emailTemplates.contact).toHaveBeenCalledWith(
         expect.objectContaining({
           message: longMessage,
-        })
+        }),
       )
     })
 
@@ -270,7 +267,7 @@ describe('Contact Route', () => {
       expect(emailTemplates.contact).toHaveBeenCalledWith(
         expect.objectContaining({
           company: 'Test & Co. "Special" GmbH',
-        })
+        }),
       )
     })
 
@@ -294,7 +291,7 @@ describe('Contact Route', () => {
       expect(emailTemplates.contact).toHaveBeenCalledWith(
         expect.objectContaining({
           phone: '+44 20 7946 0958',
-        })
+        }),
       )
     })
 

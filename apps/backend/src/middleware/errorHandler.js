@@ -53,8 +53,6 @@ class RateLimitError extends Error {
 
 // Error response formatter
 const formatErrorResponse = (error, req) => {
-  const isDevelopment = process.env.NODE_ENV === 'development'
-
   const baseResponse = {
     success: false,
     message: error.message || 'Une erreur est survenue',
@@ -81,7 +79,7 @@ const formatErrorResponse = (error, req) => {
 }
 
 // Global error handler middleware
-const errorHandler = (error, req, res, next) => {
+const errorHandler = (error, req, res, _next) => {
   // Log the error with context
   logError(error, {
     url: req.url,
@@ -120,7 +118,7 @@ const notFoundHandler = (req, res, next) => {
 const handleValidationError = error => {
   if (error.isJoi) {
     const field = error.details[0].path.join('.')
-    const message = error.details[0].message
+    const { message } = error.details[0]
     return new ValidationError(message, field)
   }
   return error

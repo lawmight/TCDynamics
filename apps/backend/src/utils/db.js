@@ -1,16 +1,14 @@
 const { Pool } = require('pg')
 
-const DEFAULT_DATABASE_URL =
-  process.env.DATABASE_URL ||
-  'postgresql://tcdynamics:changeme@postgres:5432/tcdynamics'
+const DEFAULT_DATABASE_URL = process.env.DATABASE_URL
+  || 'postgresql://tcdynamics:changeme@postgres:5432/tcdynamics'
 
 const pool = new Pool({
   connectionString: DEFAULT_DATABASE_URL,
-  max: parseInt(process.env.PG_POOL_MAX || '10', 10),
-  idleTimeoutMillis: parseInt(process.env.PG_IDLE_TIMEOUT_MS || '30000', 10),
+  max: parseInt(process.env.PG_POOL_MAX || '10'),
+  idleTimeoutMillis: parseInt(process.env.PG_IDLE_TIMEOUT_MS || '30000'),
   connectionTimeoutMillis: parseInt(
     process.env.PG_CONNECTION_TIMEOUT_MS || '10000',
-    10
   ),
   ssl: process.env.PG_SSL === 'true' ? { rejectUnauthorized: false } : false,
 })

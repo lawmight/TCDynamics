@@ -65,7 +65,7 @@ const validateIP = (req, res, next) => {
       ip: clientIP,
       userAgent: req.headers['user-agent'],
       path: req.path,
-      method: req.method
+      method: req.method,
     })
   }
 

@@ -30,7 +30,6 @@ const express = require('express')
 // Import after mocks are set up
 const { createTransporter, emailTemplates } = require('../../config/email')
 const { validateData } = require('../../utils/validation')
-const { formRateLimit } = require('../../middleware/security')
 const { logger } = require('../../utils/logger')
 
 // Create a test router instead of importing the real one
@@ -39,8 +38,9 @@ const router = express.Router()
 // Add the route handler manually for testing - avec validation basique
 router.post('/demo', async (req, res) => {
   try {
-    const { firstName, lastName, email, phone, company, employees, needs } =
-      req.body
+    const {
+      firstName, lastName, email, phone, company, employees, needs,
+    } = req.body
 
     // Validation basique des champs requis
     if (!firstName || !lastName || !email || !company || !employees || !needs) {
@@ -218,14 +218,14 @@ describe('Demo Route', () => {
         'Serveur email Zoho prêt pour la démo',
         {
           emailService: 'contact@workflowai.fr',
-        }
+        },
       )
       expect(logger.info).toHaveBeenCalledWith(
         'Email de démo envoyé avec succès',
         {
           messageId: 'demo-message-id-123',
           recipient: 'john.doe@example.com',
-        }
+        },
       )
     })
 
@@ -248,7 +248,7 @@ describe('Demo Route', () => {
         {
           error: 'Email verification failed',
           submitterEmail: 'john.doe@example.com',
-        }
+        },
       )
     })
 
@@ -272,7 +272,7 @@ describe('Demo Route', () => {
         {
           error: 'Email sending failed',
           submitterEmail: 'john.doe@example.com',
-        }
+        },
       )
     })
 
@@ -357,7 +357,7 @@ describe('Demo Route', () => {
       expect(emailTemplates.demo).toHaveBeenCalledWith(
         expect.objectContaining({
           needs: longNeeds,
-        })
+        }),
       )
     })
 
@@ -381,7 +381,7 @@ describe('Demo Route', () => {
       expect(emailTemplates.demo).toHaveBeenCalledWith(
         expect.objectContaining({
           company: 'Test & Co. "Special" GmbH & Partners',
-        })
+        }),
       )
     })
 
@@ -405,7 +405,7 @@ describe('Demo Route', () => {
       expect(emailTemplates.demo).toHaveBeenCalledWith(
         expect.objectContaining({
           phone: '+1 (555) 123-4567',
-        })
+        }),
       )
     })
 

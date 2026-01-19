@@ -1,11 +1,11 @@
-import { ShieldCheck } from 'lucide-react'
-import { useEffect } from 'react'
 import {
   SignedIn,
   SignedOut,
   SignInButton,
   useAuth,
 } from '@clerk/clerk-react'
+import { ShieldCheck } from 'lucide-react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { Card } from '@/components/ui/card'

@@ -1,8 +1,8 @@
-import { render, RenderOptions } from '@testing-library/react'
 import { ClerkProvider } from '@clerk/clerk-react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { MemoryRouter } from 'react-router-dom'
+import { render, RenderOptions } from '@testing-library/react'
 import { ReactElement } from 'react'
+import { MemoryRouter } from 'react-router-dom'
 
 // Reusable QueryClient for tests (no retries, fast failures)
 const createTestQueryClient = () =>

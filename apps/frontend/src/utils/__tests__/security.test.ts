@@ -96,7 +96,10 @@ describe('Security Utilities', () => {
       vi.useFakeTimers()
 
       // Clear rate limiter state between tests
-      const limiter = rateLimiters.contact as any
+      const limiter = rateLimiters.contact as {
+        limits?: Map<string, unknown>
+        isRateLimited: (key: string) => boolean
+      }
       if (limiter && limiter.limits) {
         limiter.limits.clear()
       }

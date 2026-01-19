@@ -11,7 +11,7 @@ const router = express.Router()
 router.use((req, res, next) => {
   res.setHeader(
     'Access-Control-Allow-Origin',
-    process.env.RUM_ALLOWED_ORIGINS || '*'
+    process.env.RUM_ALLOWED_ORIGINS || '*',
   )
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Write-Key')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
@@ -36,7 +36,8 @@ const eventSchema = Joi.object({
   url: Joi.string().uri({ allowRelative: true }).allow('').optional(),
   path: Joi.string().max(2048).required(),
   referrer: Joi.string().allow('', null).optional(),
-  country: Joi.string().uppercase().length(2).allow(null).optional(),
+  country: Joi.string().uppercase().length(2).allow(null)
+    .optional(),
   device: Joi.string()
     .valid('desktop', 'mobile', 'tablet')
     .allow(null)
@@ -52,7 +53,8 @@ const eventSchema = Joi.object({
 
 const collectSchema = Joi.object({
   projectId: Joi.string().max(64).optional(),
-  events: Joi.array().items(eventSchema).min(1).max(100).required(),
+  events: Joi.array().items(eventSchema).min(1).max(100)
+    .required(),
 })
 
 const hashIp = ip => {
@@ -67,7 +69,7 @@ const hashIp = ip => {
 const resolveProjectByKey = async writeKey => {
   const res = await query(
     'SELECT id, public_write_key FROM projects WHERE public_write_key = $1 LIMIT 1',
-    [writeKey]
+    [writeKey],
   )
   return res.rows[0] || null
 }
@@ -77,13 +79,12 @@ router.post(
   '/rum/collect',
   ingestLimiter,
   asyncHandler(async (req, res) => {
-    const writeKey =
-      req.header('x-write-key') ||
-      req.header('X-Write-Key') ||
-      req.query.key ||
-      req.query.k ||
-      req.body?.key ||
-      req.body?.writeKey
+    const writeKey = req.header('x-write-key')
+      || req.header('X-Write-Key')
+      || req.query.key
+      || req.query.k
+      || req.body?.key
+      || req.body?.writeKey
     if (!writeKey) {
       throw new ValidationError('Missing X-Write-Key header')
     }
@@ -127,9 +128,15 @@ router.post(
     let paramIndex = 1
     for (const e of value.events) {
       const ts = e.ts ? new Date(e.ts) : serverNow
-      values.push(
-        `($${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++})`
-      )
+      // Build parameter placeholders for SQL query
+      const currentIndex = paramIndex
+      // eslint-disable-next-line no-loop-func
+      const placeholders = Array.from(
+        { length: 13 },
+        (_, i) => `$${currentIndex + i}`,
+      ).join(', ')
+      values.push(`(${placeholders})`)
+      paramIndex += 13
       params.push(
         project.id,
         ts,
@@ -143,25 +150,25 @@ router.post(
         e.metric,
         e.value,
         e.metadata || {},
-        ipHash
+        ipHash,
       )
     }
 
     const sql = `INSERT INTO rum_events (${columns.join(',')}) VALUES ${values.join(
-      ','
+      ',',
     )}`
     await query(sql, params)
 
     res.status(202).json({ success: true, accepted: value.events.length })
-  })
+  }),
 )
 
 // GET /api/metrics/overview?projectId=...&days=7
 router.get(
   '/metrics/overview',
   asyncHandler(async (req, res) => {
-    const projectId = req.query.projectId
-    const days = Math.min(parseInt(req.query.days || '7', 10), 30)
+    const { projectId } = req.query
+    const days = Math.min(parseInt(req.query.days || '7'), 30)
     if (!projectId) {
       throw new ValidationError('Missing projectId')
     }
@@ -180,17 +187,19 @@ router.get(
       results[m] = rows[0]
     }
 
-    res.json({ success: true, projectId, windowDays: days, results })
-  })
+    res.json({
+      success: true, projectId, windowDays: days, results,
+    })
+  }),
 )
 
 // GET /api/metrics/pages?projectId=...&days=7&limit=50
 router.get(
   '/metrics/pages',
   asyncHandler(async (req, res) => {
-    const projectId = req.query.projectId
-    const days = Math.min(parseInt(req.query.days || '7', 10), 30)
-    const limit = Math.min(parseInt(req.query.limit || '50', 10), 200)
+    const { projectId } = req.query
+    const days = Math.min(parseInt(req.query.days || '7'), 30)
+    const limit = Math.min(parseInt(req.query.limit || '50'), 200)
     if (!projectId) {
       throw new ValidationError('Missing projectId')
     }
@@ -230,7 +239,7 @@ router.get(
         byPath[r.path][key] = Number(r.p75)
         byPath[r.path].samples = Math.max(
           byPath[r.path].samples,
-          Number(r.samples)
+          Number(r.samples),
         )
       }
     }
@@ -244,7 +253,7 @@ router.get(
       windowDays: days,
       pages: Object.values(byPath),
     })
-  })
+  }),
 )
 
 module.exports = router

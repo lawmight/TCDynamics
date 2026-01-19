@@ -11,7 +11,7 @@ import { redirectToCheckout, type PlanType } from '@/utils/polar'
 const Checkout = () => {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  const { getToken, loading: authLoading } = useAuth()
+  const { getToken, loading: _authLoading } = useAuth()
   const planParam = searchParams.get('plan') || 'starter'
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

@@ -2,8 +2,7 @@ const { doubleCsrf } = require('csrf-csrf')
 
 // Configure CSRF protection
 const doubleCsrfOptions = {
-  getSecret: () =>
-    process.env.SESSION_SECRET || 'default-secret-change-in-production',
+  getSecret: () => process.env.SESSION_SECRET || 'default-secret-change-in-production',
   cookieName: '__Host-psifi.x-csrf-token',
   cookieOptions: {
     httpOnly: true,
@@ -13,13 +12,10 @@ const doubleCsrfOptions = {
   },
   size: 64,
   ignoredMethods: ['GET', 'HEAD', 'OPTIONS'],
-  getTokenFromRequest: req => {
-    return req.headers['x-csrf-token'] || req.body._csrf
-  },
+  getTokenFromRequest: req => req.headers['x-csrf-token'] || req.body._csrf,
 }
 
-const { generateToken, validateRequest, doubleCsrfProtection } =
-  doubleCsrf(doubleCsrfOptions)
+const { generateToken, validateRequest, doubleCsrfProtection } = doubleCsrf(doubleCsrfOptions)
 
 // Middleware to generate and send CSRF token
 const csrfToken = (req, res, next) => {

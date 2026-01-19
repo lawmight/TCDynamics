@@ -5,10 +5,9 @@ const { logger } = require('../utils/logger')
  * Validates API key from Authorization header or X-API-Key header
  */
 const apiKeyAuth = (req, res, next) => {
-  const apiKey =
-    req.headers['x-api-key'] ||
-    req.headers['authorization']?.replace('Bearer ', '') ||
-    req.query.apiKey
+  const apiKey = req.headers['x-api-key']
+    || req.headers.authorization?.replace('Bearer ', '')
+    || req.query.apiKey
 
   const validApiKey = process.env.API_KEY || process.env.ADMIN_KEY
 
@@ -62,10 +61,9 @@ const apiKeyAuth = (req, res, next) => {
  * Validates API key if provided, but doesn't require it
  */
 const optionalApiKeyAuth = (req, res, next) => {
-  const apiKey =
-    req.headers['x-api-key'] ||
-    req.headers['authorization']?.replace('Bearer ', '') ||
-    req.query.apiKey
+  const apiKey = req.headers['x-api-key']
+    || req.headers.authorization?.replace('Bearer ', '')
+    || req.query.apiKey
 
   const validApiKey = process.env.API_KEY || process.env.ADMIN_KEY
 

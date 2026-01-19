@@ -6,8 +6,7 @@ const Joi = require('joi')
 const MESSAGES_FR = {
   required: field => `${field} est requis`,
   email: 'Veuillez fournir une adresse email valide',
-  minLength: (field, min) =>
-    `${field} doit contenir au moins ${min} caractères`,
+  minLength: (field, min) => `${field} doit contenir au moins ${min} caractères`,
   maxLength: (field, max) => `${field} ne peut pas dépasser ${max} caractères`,
   pattern: field => `${field} contient des caractères invalides`,
   phonePattern: 'Le numéro de téléphone contient des caractères invalides',
@@ -17,7 +16,7 @@ const MESSAGES_FR = {
  * Common validation patterns
  */
 const PATTERNS = {
-  phone: /^[0-9\s\+\-\(\)]+$/,
+  phone: /^[0-9\s+\-()]+$/,
 }
 
 /**
@@ -37,7 +36,9 @@ const PATTERNS = {
  * })
  */
 const createNameField = (options = {}) => {
-  const { min = 2, max = 100, required = true, label = 'Le nom' } = options
+  const {
+    min = 2, max = 100, required = true, label = 'Le nom',
+  } = options
 
   let field = Joi.string().min(min).max(max)
 
@@ -129,7 +130,9 @@ const createPhoneField = (options = {}) => {
  * })
  */
 const createTextField = (options = {}) => {
-  const { min, max = 500, required = false, label = 'Le champ' } = options
+  const {
+    min, max = 500, required = false, label = 'Le champ',
+  } = options
 
   let field = Joi.string()
 
@@ -206,32 +209,29 @@ const commonFields = {
   phone: () => createPhoneField(),
 
   // Company fields
-  company: (required = false) =>
-    createTextField({
-      max: 200,
-      required,
-      label: "Le nom de l'entreprise",
-    }),
+  company: (required = false) => createTextField({
+    max: 200,
+    required,
+    label: "Le nom de l'entreprise",
+  }),
 
   // Message fields
-  message: (options = {}) =>
-    createTextField({
-      min: 10,
-      max: 2000,
-      required: true,
-      label: 'Le message',
-      ...options,
-    }),
+  message: (options = {}) => createTextField({
+    min: 10,
+    max: 2000,
+    required: true,
+    label: 'Le message',
+    ...options,
+  }),
 
   // Select fields
   employees: () => createSelectField({ label: "Le nombre d'employés" }),
 
   // Description/notes fields
-  notes: (max = 1000) =>
-    createTextField({
-      max,
-      label: 'La description',
-    }),
+  notes: (max = 1000) => createTextField({
+    max,
+    label: 'La description',
+  }),
 }
 
 module.exports = {

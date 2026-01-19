@@ -38,7 +38,7 @@ export function initializeDatabase(config: EnvironmentConfig['database']): Pool 
  */
 export async function query(
   text: string,
-  params?: unknown[]
+  params?: unknown[],
 ): Promise<{ rows: unknown[]; rowCount: number | null }> {
   if (!pool) {
     throw new Error('Database pool not initialized. Call initializeDatabase first.')
@@ -82,4 +82,3 @@ export async function closePool(): Promise<void> {
 export function getPool(): Pool | null {
   return pool
 }
-

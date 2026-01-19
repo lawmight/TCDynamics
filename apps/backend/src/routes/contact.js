@@ -18,7 +18,7 @@ router.post(
       'Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.',
     errorMessage:
       "Une erreur est survenue lors de l'envoi de votre message. Veuillez réessayer plus tard.",
-  })
+  }),
 )
 
 module.exports = router

@@ -32,7 +32,9 @@ const customFormat = winston.format.combine(
   winston.format.errors({ stack: true }),
   winston.format.json(),
   winston.format.printf(info => {
-    const { timestamp, level, message, ...meta } = info
+    const {
+      timestamp, level, message, ...meta
+    } = info
 
     // Structure du log
     const logEntry = {
@@ -50,7 +52,7 @@ const customFormat = winston.format.combine(
     }
 
     return JSON.stringify(logEntry)
-  })
+  }),
 )
 
 // Configuration des transports
@@ -63,20 +65,22 @@ transports.push(
     format:
       process.env.NODE_ENV === 'production'
         ? winston.format.combine(
-            winston.format.timestamp(),
-            winston.format.json()
-          )
+          winston.format.timestamp(),
+          winston.format.json(),
+        )
         : winston.format.combine(
-            winston.format.colorize(),
-            winston.format.simple(),
-            winston.format.printf(({ level, message, timestamp, ...meta }) => {
-              const metaStr = Object.keys(meta).length
-                ? `\n${JSON.stringify(meta, null, 2)}`
-                : ''
-              return `${timestamp} [${level}]: ${message}${metaStr}`
-            })
-          ),
-  })
+          winston.format.colorize(),
+          winston.format.simple(),
+          winston.format.printf(({
+            level, message, timestamp, ...meta
+          }) => {
+            const metaStr = Object.keys(meta).length
+              ? `\n${JSON.stringify(meta, null, 2)}`
+              : ''
+            return `${timestamp} [${level}]: ${message}${metaStr}`
+          }),
+        ),
+  }),
 )
 
 // Transport fichier pour les erreurs (tous environnements)
@@ -87,7 +91,7 @@ transports.push(
     format: customFormat,
     maxsize: 5242880, // 5MB
     maxFiles: 5,
-  })
+  }),
 )
 
 // Transport fichier pour tous les logs en production
@@ -99,7 +103,7 @@ if (process.env.NODE_ENV === 'production') {
       format: customFormat,
       maxsize: 10485760, // 10MB
       maxFiles: 10,
-    })
+    }),
   )
 }
 
@@ -111,7 +115,7 @@ transports.push(
     format: customFormat,
     maxsize: 2097152, // 2MB
     maxFiles: 3,
-  })
+  }),
 )
 
 // Créer l'instance du logger
@@ -128,7 +132,7 @@ logger.exceptions.handle(
   new winston.transports.File({
     filename: path.join(__dirname, '../logs/exceptions.log'),
     format: customFormat,
-  })
+  }),
 )
 
 // Gestionnaire de rejets de promesses non gérés
@@ -136,7 +140,7 @@ logger.rejections.handle(
   new winston.transports.File({
     filename: path.join(__dirname, '../logs/rejections.log'),
     format: customFormat,
-  })
+  }),
 )
 
 // Fonctions utilitaires pour le logging
@@ -205,9 +209,8 @@ const logError = (error, context = {}) => {
 
 // Middleware pour ajouter un ID de requête
 const addRequestId = (req, res, next) => {
-  req.headers['x-request-id'] =
-    req.headers['x-request-id'] ||
-    `req-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
+  req.headers['x-request-id'] = req.headers['x-request-id']
+    || `req-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
   res.setHeader('X-Request-ID', req.headers['x-request-id'])
   next()
 }

@@ -21,7 +21,8 @@ const { createTransporter } = require('../../config/email')
 const { logger } = require('../logger')
 
 describe('routeFactory', () => {
-  let req, res, mockTransporter
+  let req; let res; let
+    mockTransporter
 
   beforeEach(() => {
     // Reset all mocks
@@ -113,7 +114,7 @@ describe('routeFactory', () => {
           replyTo: 'john@example.com',
           subject: 'Test Subject',
           html: '<p>Test HTML</p>',
-        })
+        }),
       )
 
       // Verify success response
@@ -128,14 +129,14 @@ describe('routeFactory', () => {
       expect(logger.info).toHaveBeenCalledTimes(2)
       expect(logger.info).toHaveBeenCalledWith(
         'Email server ready for contact',
-        expect.any(Object)
+        expect.any(Object),
       )
       expect(logger.info).toHaveBeenCalledWith(
         'Email sent successfully for contact',
         expect.objectContaining({
           messageId: 'test-message-id-123',
           sender: 'john@example.com',
-        })
+        }),
       )
     })
 
@@ -154,7 +155,7 @@ describe('routeFactory', () => {
         expect.objectContaining({
           from: expect.stringContaining('TCDynamics Demo'),
           subject: 'Test Demo Subject',
-        })
+        }),
       )
       expect(res.status).toHaveBeenCalledWith(200)
       expect(res.json).toHaveBeenCalledWith({
@@ -188,7 +189,7 @@ describe('routeFactory', () => {
         expect.objectContaining({
           error: 'Connection failed',
           route: 'contact',
-        })
+        }),
       )
     })
 
@@ -255,7 +256,7 @@ describe('routeFactory', () => {
         'Email sent successfully for contact',
         expect.objectContaining({
           sender: undefined,
-        })
+        }),
       )
     })
 
@@ -272,7 +273,7 @@ describe('routeFactory', () => {
       expect(mockTransporter.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           from: expect.stringContaining('TCDynamics Support'),
-        })
+        }),
       )
     })
   })

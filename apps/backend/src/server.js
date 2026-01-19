@@ -12,20 +12,26 @@ process.on('unhandledRejection', (reason, promise) => {
 
 console.log('🔧 Loading environment variables...')
 require('dotenv').config()
+
 console.log('✅ Environment variables loaded')
 
 console.log('🔧 Loading Express and core modules...')
 const express = require('express')
+
 console.log('✅ Express loaded')
 const cors = require('cors')
+
 console.log('✅ CORS loaded')
 const compression = require('compression')
+
 console.log('✅ Compression loaded')
 const morgan = require('morgan')
+
 console.log('✅ Morgan loaded')
 
 console.log('🔧 Loading security middleware...')
-let helmetConfig, validateIP, sanitizeInput
+let helmetConfig; let validateIP; let
+  sanitizeInput
 try {
   const securityModule = require('./middleware/security')
   helmetConfig = securityModule.helmetConfig
@@ -40,11 +46,11 @@ try {
 
 // Import des routes
 console.log('🔧 Loading route modules...')
-let contactRoutes,
-  demoRoutes,
-  monitoringRoutes,
-  rumRoutes,
-  feedbackRoutes
+let contactRoutes
+let demoRoutes
+let monitoringRoutes
+let rumRoutes
+let feedbackRoutes
 
 try {
   contactRoutes = require('./routes/contact')
@@ -94,7 +100,8 @@ try {
 
 // Import de la documentation Swagger
 console.log('🔧 Loading Swagger documentation...')
-let swaggerUi, swaggerSpec, swaggerUiOptions
+let swaggerUi; let swaggerSpec; let
+  swaggerUiOptions
 try {
   const swaggerModule = require('./swagger')
   swaggerUi = swaggerModule.swaggerUi
@@ -109,14 +116,11 @@ try {
 
 // Import du système de logging
 console.log('🔧 Loading logging system...')
-let logger, logRequest, logSecurityEvent, logPerformance, logError, addRequestId
+let logger; let
+  addRequestId
 try {
   const loggerModule = require('./utils/logger')
   logger = loggerModule.logger
-  logRequest = loggerModule.logRequest
-  logSecurityEvent = loggerModule.logSecurityEvent
-  logPerformance = loggerModule.logPerformance
-  logError = loggerModule.logError
   addRequestId = loggerModule.addRequestId
   console.log('✅ Logging system loaded')
 } catch (error) {
@@ -127,7 +131,8 @@ try {
 
 // Import des middlewares d'erreur
 console.log('🔧 Loading error handlers...')
-let errorHandler, notFoundHandler
+let errorHandler; let
+  notFoundHandler
 try {
   const errorModule = require('./middleware/errorHandler')
   errorHandler = errorModule.errorHandler
@@ -141,11 +146,10 @@ try {
 
 // Import des middlewares de monitoring
 console.log('🔧 Loading metrics...')
-let collectMetrics, collectErrorMetrics
+let collectMetrics
 try {
   const metricsModule = require('./routes/monitoring')
   collectMetrics = metricsModule.collectMetrics
-  collectErrorMetrics = metricsModule.collectErrorMetrics
   console.log('✅ Metrics loaded')
 } catch (error) {
   console.error('❌ Failed to load metrics:', error.message)
@@ -155,7 +159,8 @@ try {
 
 // Import du middleware CSRF
 console.log('🔧 Loading CSRF middleware...')
-let csrfToken, csrfProtection
+let csrfToken; let
+  csrfProtection
 try {
   const csrfModule = require('./middleware/csrf')
   csrfToken = csrfModule.csrfToken
@@ -183,7 +188,7 @@ app.use(
       }
       return compression.filter(req, res)
     },
-  })
+  }),
 )
 // CORS Whitelist Configuration
 const corsOptions = {
@@ -192,10 +197,10 @@ const corsOptions = {
     const allowedOrigins = process.env.ALLOWED_ORIGINS
       ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
       : [
-          'https://tcdynamics.fr',
-          'https://www.tcdynamics.fr',
-          process.env.FRONTEND_URL || 'http://localhost:8080',
-        ].filter(Boolean)
+        'https://tcdynamics.fr',
+        'https://www.tcdynamics.fr',
+        process.env.FRONTEND_URL || 'http://localhost:8080',
+      ].filter(Boolean)
 
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true)
@@ -218,7 +223,7 @@ app.use(
       // Store raw body for webhook verification if needed
       req.rawBody = buf
     },
-  })
+  }),
 )
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 app.use(collectMetrics)
@@ -312,7 +317,7 @@ app.get('/api/test', (req, res) => {
 app.use(
   '/api-docs',
   swaggerUi.serve,
-  swaggerUi.setup(swaggerSpec, swaggerUiOptions)
+  swaggerUi.setup(swaggerSpec, swaggerUiOptions),
 )
 app.get('/api-docs.json', (req, res) => {
   res.setHeader('Content-Type', 'application/json')
@@ -334,7 +339,7 @@ const server = app.listen(PORT, () => {
   console.log(`Port: ${PORT}`)
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`)
   console.log(
-    `Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:8080'}`
+    `Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:8080'}`,
   )
   console.log(`Email Configured: ${!!process.env.EMAIL_USER}`)
   console.log('')
@@ -342,7 +347,7 @@ const server = app.listen(PORT, () => {
   console.log(`  Health Check: http://localhost:${PORT}/health`)
   console.log(`  API Test: http://localhost:${PORT}/api/test`)
   console.log(`  API Docs: http://localhost:${PORT}/api-docs`)
-  console.log(``)
+  console.log('')
   console.log('')
   console.log('✅ Server is ready to accept requests')
   console.log('='.repeat(60))
@@ -365,7 +370,7 @@ server.on('error', error => {
   console.error('❌ Server failed to start:', error)
   if (error.code === 'EADDRINUSE') {
     console.error(
-      `❌ Port ${PORT} is already in use. Please use a different port or kill the process using this port.`
+      `❌ Port ${PORT} is already in use. Please use a different port or kill the process using this port.`,
     )
   }
   process.exit(1)

@@ -82,11 +82,11 @@ const LocalAdvantages = () => {
     <section className="relative overflow-hidden bg-gradient-to-b from-background to-background/50 py-24">
       {/* French Flag Colors Background */}
       <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0 french-flag-gradient" />
+        <div className="french-flag-gradient absolute inset-0" />
       </div>
 
       {/* Network Pattern */}
-      <div className="absolute inset-0 opacity-3">
+      <div className="opacity-3 absolute inset-0">
         <svg
           className="absolute inset-0 h-full w-full"
           xmlns="http://www.w3.org/2000/svg"

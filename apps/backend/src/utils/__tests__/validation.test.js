@@ -31,8 +31,6 @@ jest.mock('joi', () => {
   }
 })
 
-const Joi = require('joi')
-
 describe('Validation Utils', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -46,7 +44,7 @@ describe('Validation Utils', () => {
           .mockReturnValue({ error: null, value: { name: 'John' } }),
       }
 
-      const validateData = require('../validation').validateData
+      const { validateData } = require('../validation')
 
       const req = { body: { name: 'John' } }
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() }
@@ -71,7 +69,7 @@ describe('Validation Utils', () => {
         validate: jest.fn().mockReturnValue({ error: validationError }),
       }
 
-      const validateData = require('../validation').validateData
+      const { validateData } = require('../validation')
 
       const req = { body: {} }
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() }
@@ -100,7 +98,7 @@ describe('Validation Utils', () => {
         validate: jest.fn().mockReturnValue({ error: validationError }),
       }
 
-      const validateData = require('../validation').validateData
+      const { validateData } = require('../validation')
 
       const req = { body: {} }
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() }
@@ -120,7 +118,7 @@ describe('Validation Utils', () => {
         validate: jest.fn().mockReturnValue({ error: null }),
       }
 
-      const validateData = require('../validation').validateData
+      const { validateData } = require('../validation')
 
       const req = { body: { name: 'John' } }
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() }

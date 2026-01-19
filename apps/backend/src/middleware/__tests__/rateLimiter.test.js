@@ -2,39 +2,37 @@ const request = require('supertest')
 const express = require('express')
 
 // Mock express-rate-limit avec logique améliorée
-jest.mock('express-rate-limit', () => {
-  return jest.fn(() => (req, res, next) => {
-    // Utiliser un store attaché à l'app pour maintenir l'état entre requêtes
-    if (!req.app.rateLimitStore) {
-      req.app.rateLimitStore = {}
-    }
+jest.mock('express-rate-limit', () => jest.fn(() => (req, res, next) => {
+  // Utiliser un store attaché à l'app pour maintenir l'état entre requêtes
+  if (!req.app.rateLimitStore) {
+    req.app.rateLimitStore = {}
+  }
 
-    const key = req.ip || 'default'
+  const key = req.ip || 'default'
 
-    // Vérifier si la limite est dépassée
-    if (req.app.rateLimitStore[key] > 5) {
-      res.status(429).json({
-        success: false,
-        error: 'Too Many Requests',
-        message: 'Rate limit exceeded. Try again later.',
-        retryAfter: 60,
-      })
-      return
-    }
+  // Vérifier si la limite est dépassée
+  if (req.app.rateLimitStore[key] > 5) {
+    res.status(429).json({
+      success: false,
+      error: 'Too Many Requests',
+      message: 'Rate limit exceeded. Try again later.',
+      retryAfter: 60,
+    })
+    return
+  }
 
-    // Incrémenter le compteur
-    req.app.rateLimitStore[key] = (req.app.rateLimitStore[key] || 0) + 1
+  // Incrémenter le compteur
+  req.app.rateLimitStore[key] = (req.app.rateLimitStore[key] || 0) + 1
 
-    // Headers de rate limiting
-    res.set('X-RateLimit-Limit', '5')
-    res.set(
-      'X-RateLimit-Remaining',
-      Math.max(0, 5 - req.app.rateLimitStore[key]).toString()
-    )
+  // Headers de rate limiting
+  res.set('X-RateLimit-Limit', '5')
+  res.set(
+    'X-RateLimit-Remaining',
+    Math.max(0, 5 - req.app.rateLimitStore[key]).toString(),
+  )
 
-    next()
-  })
-})
+  next()
+}))
 
 const rateLimit = require('express-rate-limit')
 
@@ -83,7 +81,7 @@ describe('Rate Limiter Middleware', () => {
   })
 
   it('should track different endpoints separately', async () => {
-    let testApp = express()
+    const testApp = express()
     testApp.use(rateLimit())
     testApp.get('/test', (req, res) => res.json({ success: true }))
     testApp.post('/test2', (req, res) => res.json({ success: true }))

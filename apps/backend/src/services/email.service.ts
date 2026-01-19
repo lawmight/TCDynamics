@@ -12,7 +12,7 @@ let transporter: Transporter | null = null
  * Initialize email transporter
  */
 export function initializeEmailService(
-  config: EnvironmentConfig['email']
+  config: EnvironmentConfig['email'],
 ): Transporter {
   if (transporter) {
     return transporter
@@ -116,7 +116,7 @@ export const emailTemplates = {
 export async function sendEmail(
   to: string,
   template: EmailTemplate,
-  from?: string
+  from?: string,
 ): Promise<void> {
   if (!transporter) {
     throw new Error('Email service not initialized. Call initializeEmailService first.')
@@ -135,7 +135,7 @@ export async function sendEmail(
  */
 export async function sendContactEmail(
   data: ContactEmailData,
-  recipientEmail: string = process.env.EMAIL_USER || 'contact@tcdynamics.fr'
+  recipientEmail: string = process.env.EMAIL_USER || 'contact@tcdynamics.fr',
 ): Promise<void> {
   const template = emailTemplates.contact(data)
   await sendEmail(recipientEmail, template)
@@ -146,9 +146,8 @@ export async function sendContactEmail(
  */
 export async function sendDemoEmail(
   data: DemoEmailData,
-  recipientEmail: string = process.env.EMAIL_USER || 'contact@tcdynamics.fr'
+  recipientEmail: string = process.env.EMAIL_USER || 'contact@tcdynamics.fr',
 ): Promise<void> {
   const template = emailTemplates.demo(data)
   await sendEmail(recipientEmail, template)
 }
-

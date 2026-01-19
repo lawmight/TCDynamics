@@ -16,8 +16,9 @@ import {
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import { ApiKeyCreateDialog } from './ApiKeyCreateDialog'
+
 import type { ApiKey } from '@/api/apiKeys'
-import { useApiKeys } from '@/hooks/useApiKeys'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
   AlertDialog,
@@ -36,8 +37,8 @@ import {
   CardDescription,
   CardTitle,
 } from '@/components/ui/card'
+import { useApiKeys } from '@/hooks/useApiKeys'
 
-import { ApiKeyCreateDialog } from './ApiKeyCreateDialog'
 
 function formatDate(dateString: string | null): string {
   if (!dateString) return 'Never'
@@ -76,18 +77,18 @@ function ApiKeyCard({
     <Card>
       <CardContent className="pt-6">
         <div className="flex items-start justify-between gap-4">
-          <div className="space-y-2 min-w-0 flex-1">
+          <div className="min-w-0 flex-1 space-y-2">
             <div className="flex items-center gap-2">
-              <Key className="h-4 w-4 text-muted-foreground shrink-0" />
+              <Key className="h-4 w-4 shrink-0 text-muted-foreground" />
               {apiKey.name ? (
-                <span className="font-medium truncate">{apiKey.name}</span>
+                <span className="truncate font-medium">{apiKey.name}</span>
               ) : (
-                <span className="text-muted-foreground italic">
+                <span className="italic text-muted-foreground">
                   Unnamed key
                 </span>
               )}
             </div>
-            <code className="text-xs font-mono bg-muted px-2 py-1 rounded block truncate">
+            <code className="block truncate rounded bg-muted px-2 py-1 font-mono text-xs">
               {apiKey.key_prefix}
             </code>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
@@ -106,7 +107,7 @@ function ApiKeyCard({
             size="sm"
             onClick={onRevoke}
             disabled={isRevoking}
-            className="text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0"
+            className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
           >
             {isRevoking ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -125,9 +126,9 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
   return (
     <Card className="border-dashed">
       <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-        <Key className="h-12 w-12 text-muted-foreground mb-4" />
-        <h3 className="font-semibold text-lg mb-2">No API keys</h3>
-        <p className="text-muted-foreground text-sm mb-6 max-w-sm">
+        <Key className="mb-4 h-12 w-12 text-muted-foreground" />
+        <h3 className="mb-2 text-lg font-semibold">No API keys</h3>
+        <p className="mb-6 max-w-sm text-sm text-muted-foreground">
           Create an API key to access the API programmatically from your
           applications, scripts, or integrations.
         </p>
@@ -148,13 +149,13 @@ function LoadingSkeleton() {
           <CardContent className="pt-6">
             <div className="animate-pulse space-y-3">
               <div className="flex items-center gap-2">
-                <div className="h-4 w-4 bg-muted rounded" />
-                <div className="h-4 w-32 bg-muted rounded" />
+                <div className="h-4 w-4 rounded bg-muted" />
+                <div className="h-4 w-32 rounded bg-muted" />
               </div>
-              <div className="h-6 w-48 bg-muted rounded" />
+              <div className="h-6 w-48 rounded bg-muted" />
               <div className="flex gap-4">
-                <div className="h-3 w-28 bg-muted rounded" />
-                <div className="h-3 w-24 bg-muted rounded" />
+                <div className="h-3 w-28 rounded bg-muted" />
+                <div className="h-3 w-24 rounded bg-muted" />
               </div>
             </div>
           </CardContent>
@@ -224,7 +225,7 @@ export default function ApiKeyManager() {
             {error.message || 'An unexpected error occurred. Please try again.'}
           </p>
           {import.meta.env.DEV && isAuthError && (
-            <p className="text-xs text-muted-foreground italic">
+            <p className="text-xs italic text-muted-foreground">
               Tip: In development mode, Clerk sessions may expire quickly. Make
               sure your Vercel dev server is running and both frontend and API
               are using the same Clerk instance.
@@ -236,7 +237,7 @@ export default function ApiKeyManager() {
                 size="sm"
                 variant="outline"
                 onClick={() => navigate('/login')}
-                className="text-destructive border-destructive hover:bg-destructive/10"
+                className="border-destructive text-destructive hover:bg-destructive/10"
               >
                 Sign In Again
               </Button>
@@ -244,7 +245,7 @@ export default function ApiKeyManager() {
                 size="sm"
                 variant="outline"
                 onClick={() => refetch()}
-                className="text-destructive border-destructive hover:bg-destructive/10"
+                className="border-destructive text-destructive hover:bg-destructive/10"
               >
                 <RefreshCw className="mr-2 h-3 w-3" />
                 Retry
@@ -329,7 +330,7 @@ export default function ApiKeyManager() {
           {/* Context and warnings outside Description (block elements) */}
           <div className="space-y-3 pt-2">
             {/* Key Context Card */}
-            <div className="rounded-md border bg-muted/50 p-3 space-y-2">
+            <div className="space-y-2 rounded-md border bg-muted/50 p-3">
               {keyToRevoke?.name && (
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Name:</span>
@@ -338,7 +339,7 @@ export default function ApiKeyManager() {
               )}
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Key Prefix:</span>
-                <code className="text-xs font-mono bg-background px-2 py-1 rounded">
+                <code className="rounded bg-background px-2 py-1 font-mono text-xs">
                   {keyToRevoke?.key_prefix}
                 </code>
               </div>

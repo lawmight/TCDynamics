@@ -10,10 +10,9 @@ import { Label } from '@/components/ui/label'
 
 // Minimum amount in dollars (from MIN_CHECKOUT_AMOUNT env var, default: 2160$)
 const MIN_AMOUNT_EUROS = 2160
-const MIN_AMOUNT_CENTS = MIN_AMOUNT_EUROS * 100
 
 const CheckoutEnterprise = () => {
-  const navigate = useNavigate()
+  const _navigate = useNavigate()
   const [amount, setAmount] = useState<string>('')
   const [isSubscription, setIsSubscription] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -76,7 +75,7 @@ const CheckoutEnterprise = () => {
         setError('URL de paiement non reçue')
         setIsLoading(false)
       }
-    } catch (err) {
+    } catch {
       setError(
         'Une erreur est survenue. Veuillez réessayer ou contacter notre support.'
       )
@@ -142,7 +141,7 @@ const CheckoutEnterprise = () => {
                         )
                       </Label>
                       <div className="relative">
-                        <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 flex items-center">
+                        <div className="pointer-events-none absolute left-3 top-1/2 flex -translate-y-1/2 items-center">
                           <span className="text-muted-foreground">$</span>
                         </div>
                         <Input
