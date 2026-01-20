@@ -37,9 +37,7 @@ const ChatConversationSchema = new mongoose.Schema(
 )
 
 // Pre-save middleware to keep denormalized fields in sync
-// Indexes for chat retrieval
-ChatConversationSchema.index({ clerkId: 1, conversationStatus: 1 })
-ChatConversationSchema.index({ lastMessageAt: -1 })
+ChatConversationSchema.pre('save', function (next) {
   if (Array.isArray(this.messages)) {
     this.messageCount = this.messages.length
 
