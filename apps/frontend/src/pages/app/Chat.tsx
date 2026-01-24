@@ -1,5 +1,3 @@
-import Loader2 from '~icons/lucide/loader-2'
-import Send from '~icons/lucide/send'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { recordEvent } from '@/api/analytics'
@@ -8,6 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/hooks/useAuth'
+import Loader2 from '~icons/lucide/loader-2'
+import Send from '~icons/lucide/send'
 
 const Chat = () => {
   const { user } = useAuth()

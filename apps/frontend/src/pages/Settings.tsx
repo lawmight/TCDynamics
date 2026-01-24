@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import ApiKeyManager from '@/components/app/ApiKeyManager'
-import { getWithMigration, LS } from '@/utils/storageMigration'
 import { Separator } from '@/components/ui/separator'
 import { useRequireAuth } from '@/hooks/useAuth'
+import { getWithMigration, LS } from '@/utils/storageMigration'
 
 const Settings = () => {
   // Require authentication for this page

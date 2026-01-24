@@ -1,9 +1,9 @@
 import { track } from '@vercel/analytics'
-import X from '~icons/lucide/x'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import X from '~icons/lucide/x'
 
 interface PostSubmissionFeedbackProps {
   onClose: () => void

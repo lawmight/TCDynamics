@@ -1,11 +1,4 @@
 import { UserButton, useUser } from '@clerk/clerk-react'
-import BarChart3 from '~icons/lucide/bar-chart-3'
-import Folder from '~icons/lucide/folder'
-import LogOut from '~icons/lucide/log-out'
-import MessageSquare from '~icons/lucide/message-square'
-import Moon from '~icons/lucide/moon'
-import Settings from '~icons/lucide/settings'
-import Sun from '~icons/lucide/sun'
 import { useMemo } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 
@@ -14,6 +7,14 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { getClerkAppearance } from '@/config/clerkTheme'
 import { useAuth } from '@/hooks/useAuth'
+import BarChart3 from '~icons/lucide/bar-chart-3'
+import Folder from '~icons/lucide/folder'
+import LogOut from '~icons/lucide/log-out'
+import MessageSquare from '~icons/lucide/message-square'
+import Moon from '~icons/lucide/moon'
+import Settings from '~icons/lucide/settings'
+import Sun from '~icons/lucide/sun'
+
 
 const navItems = [
   { to: '/app/chat', label: 'Chat', icon: MessageSquare },

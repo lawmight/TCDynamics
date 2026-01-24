@@ -1,8 +1,8 @@
-import WifiOff from '~icons/lucide/wifi-off'
-import Wifi from '~icons/lucide/wifi'
 import { useState, useEffect } from 'react'
 
 import { Badge } from '@/components/ui/badge'
+import Wifi from '~icons/lucide/wifi'
+import WifiOff from '~icons/lucide/wifi-off'
 
 const OfflineIndicator = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine)

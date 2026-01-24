@@ -1,6 +1,3 @@
-import CloudUpload from '~icons/lucide/cloud-upload'
-import FileText from '~icons/lucide/file-text'
-import RefreshCcw from '~icons/lucide/refresh-ccw'
 import { useEffect, useState } from 'react'
 
 import { recordEvent } from '@/api/analytics'
@@ -11,6 +8,9 @@ import {
 } from '@/api/files'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import CloudUpload from '~icons/lucide/cloud-upload'
+import FileText from '~icons/lucide/file-text'
+import RefreshCcw from '~icons/lucide/refresh-ccw'
 
 const Files = () => {
   const [files, setFiles] = useState<KnowledgeFile[]>([])

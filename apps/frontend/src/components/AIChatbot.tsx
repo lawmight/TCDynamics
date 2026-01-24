@@ -1,8 +1,3 @@
-import Bot from '~icons/lucide/bot'
-import Loader2 from '~icons/lucide/loader-2'
-import Send from '~icons/lucide/send'
-import User from '~icons/lucide/user'
-import X from '~icons/lucide/x'
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 
 import { chatAPI } from '@/api/azureServices'
@@ -13,6 +8,11 @@ import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useToggle } from '@/hooks/useToggle'
 import { logger } from '@/utils/logger'
+import Bot from '~icons/lucide/bot'
+import Loader2 from '~icons/lucide/loader-2'
+import Send from '~icons/lucide/send'
+import User from '~icons/lucide/user'
+import X from '~icons/lucide/x'
 
 interface Message {
   id: string

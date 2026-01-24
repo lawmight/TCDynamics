@@ -1,9 +1,9 @@
-import ArrowLeft from '~icons/lucide/arrow-left'
-import CheckCircle2 from '~icons/lucide/check-circle-2'
 import { Link } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import ArrowLeft from '~icons/lucide/arrow-left'
+import CheckCircle2 from '~icons/lucide/check-circle-2'
 
 const WaitlistSuccess = () => {
   return (

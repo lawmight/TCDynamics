@@ -1,12 +1,12 @@
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 import ArrowRight from '~icons/lucide/arrow-right'
 import MapPin from '~icons/lucide/map-pin'
 import Shield from '~icons/lucide/shield'
 import Star from '~icons/lucide/star'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 
 const SocialProof = () => {
   const { ref: sectionRef, isIntersecting } = useIntersectionObserver({

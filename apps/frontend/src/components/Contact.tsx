@@ -1,11 +1,4 @@
 import { track } from '@vercel/analytics'
-import Building from '~icons/lucide/building'
-import Calendar from '~icons/lucide/calendar'
-import Car from '~icons/lucide/car'
-import CheckCircle from '~icons/lucide/check-circle'
-import Mail from '~icons/lucide/mail'
-import MapPin from '~icons/lucide/map-pin'
-import Phone from '~icons/lucide/phone'
 import { useEffect, useRef, useState } from 'react'
 
 import Captcha, { type CaptchaHandle } from '@/components/Captcha'
@@ -17,6 +10,13 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useContactForm } from '@/hooks/useContactForm'
 import { useDemoForm } from '@/hooks/useDemoForm'
+import Building from '~icons/lucide/building'
+import Calendar from '~icons/lucide/calendar'
+import Car from '~icons/lucide/car'
+import CheckCircle from '~icons/lucide/check-circle'
+import Mail from '~icons/lucide/mail'
+import MapPin from '~icons/lucide/map-pin'
+import Phone from '~icons/lucide/phone'
 
 const Contact = () => {
   const demoForm = useDemoForm()

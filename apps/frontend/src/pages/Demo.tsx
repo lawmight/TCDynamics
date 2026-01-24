@@ -1,3 +1,11 @@
+import { Link } from 'react-router-dom'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { useDemoForm } from '@/hooks/useDemoForm'
 import ArrowRight from '~icons/lucide/arrow-right'
 import Calendar from '~icons/lucide/calendar'
 import CheckCircle from '~icons/lucide/check-circle'
@@ -8,14 +16,7 @@ import Play from '~icons/lucide/play'
 import Users from '~icons/lucide/users'
 import Video from '~icons/lucide/video'
 import Zap from '~icons/lucide/zap'
-import { Link } from 'react-router-dom'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { useDemoForm } from '@/hooks/useDemoForm'
 
 const Demo = () => {
   const demoForm = useDemoForm()

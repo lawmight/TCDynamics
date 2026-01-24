@@ -1,7 +1,3 @@
-import ArrowLeft from '~icons/lucide/arrow-left'
-import CreditCard from '~icons/lucide/credit-card'
-import Lock from '~icons/lucide/lock'
-import Shield from '~icons/lucide/shield'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -10,6 +6,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import ArrowLeft from '~icons/lucide/arrow-left'
+import CreditCard from '~icons/lucide/credit-card'
+import Lock from '~icons/lucide/lock'
+import Shield from '~icons/lucide/shield'
 
 // Minimum amount in dollars (from MIN_CHECKOUT_AMOUNT env var, default: 2160$)
 const MIN_AMOUNT_EUROS = 2160

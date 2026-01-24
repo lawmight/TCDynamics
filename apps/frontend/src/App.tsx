@@ -14,8 +14,8 @@ import {
 import ErrorBoundary from './components/ErrorBoundary'
 // import MobileNavigation from './components/MobileNavigation' // DISABLED: Causes black page
 // import StickyHeader from './components/StickyHeader' // DISABLED: Causes black page
-import LazyAIChatbot from './components/LazyAIChatbot'
 import Footer from './components/Footer'
+import LazyAIChatbot from './components/LazyAIChatbot'
 import OfflineIndicator from './components/OfflineIndicator'
 import PerformanceMonitor from './components/PerformanceMonitor'
 import ScrollToTop from './components/ScrollToTop'

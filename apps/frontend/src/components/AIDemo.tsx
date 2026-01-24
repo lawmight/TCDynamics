@@ -1,8 +1,3 @@
-import ArrowRight from '~icons/lucide/arrow-right'
-import Brain from '~icons/lucide/brain'
-import FileText from '~icons/lucide/file-text'
-import MessageSquare from '~icons/lucide/message-square'
-import Zap from '~icons/lucide/zap'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -12,6 +7,11 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import ArrowRight from '~icons/lucide/arrow-right'
+import Brain from '~icons/lucide/brain'
+import FileText from '~icons/lucide/file-text'
+import MessageSquare from '~icons/lucide/message-square'
+import Zap from '~icons/lucide/zap'
 
 const AIDemo = () => {
   const navigate = useNavigate()
