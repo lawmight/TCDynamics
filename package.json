@@ -26,6 +26,7 @@
     "test:ui": "cd apps/frontend && npm run test:ui",
     "fix": "node tools/scripts/fix-current.js",
     "quick-check": "node tools/scripts/quick-check.js",
+    "audit": "npm audit",
     "lint": "npm run lint:frontend && npm run lint:backend",
     "lint:frontend": "cd apps/frontend && npm run lint",
     "lint:backend": "cd apps/backend && npm run lint",
@@ -79,7 +80,7 @@
     "yaml": "^2.8.1"
   },
   "engines": {
-    "node": ">=18.0.0",
+    "node": "20.x",
     "npm": ">=9.0.0"
   },
   "overrides": {

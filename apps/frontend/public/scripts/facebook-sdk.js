@@ -23,9 +23,7 @@ window.fbAsyncInit = function () {
   js = d.createElement(s)
   js.id = id
   js.src = 'https://connect.facebook.net/en_US/sdk.js'
-  js.src = 'https://connect.facebook.net/en_US/sdk.js'
   js.async = true
-  js.crossOrigin = 'anonymous'
   js.crossOrigin = 'anonymous'
   if (fjs && fjs.parentNode) {
     fjs.parentNode.insertBefore(js, fjs)
