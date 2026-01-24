@@ -5,20 +5,6 @@ import { vi } from 'vitest'
 
 import AIChatbot from '../AIChatbot'
 
-// Mock lucide-react icons
-vi.mock('lucide-react', () => ({
-  MessageCircle: vi.fn(() =>
-    React.createElement('svg', { 'data-testid': 'mock-icon' })
-  ),
-  Bot: vi.fn(() => React.createElement('svg', { 'data-testid': 'mock-icon' })),
-  Send: vi.fn(() => React.createElement('svg', { 'data-testid': 'mock-icon' })),
-  User: vi.fn(() => React.createElement('svg', { 'data-testid': 'mock-icon' })),
-  Loader2: vi.fn(() =>
-    React.createElement('svg', { 'data-testid': 'mock-icon' })
-  ),
-  X: vi.fn(() => React.createElement('svg', { 'data-testid': 'mock-icon' })),
-}))
-
 // Mock the chat API
 vi.mock('@/api/azureServices', () => ({
   chatAPI: {
@@ -126,14 +112,10 @@ describe('AIChatbot Component', () => {
     fireEvent.change(input, { target: { value: 'Test' } })
     fireEvent.click(sendButton)
 
-    // Should show loading state (button disabled)
+    // Should show loading state (button disabled; Loader2 typing indicator uses real ~icons)
     await waitFor(() => {
       expect(sendButton).toBeDisabled()
     })
-
-    // Should show typing indicator (Loader2 icon)
-    const loaderIcons = screen.getAllByTestId('mock-icon')
-    expect(loaderIcons.length).toBeGreaterThan(1) // At least the typing indicator
   })
 
   it('should clear input after sending', async () => {

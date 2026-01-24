@@ -41,20 +41,6 @@ vi.mock('@/hooks/useApiKeys', () => ({
   }),
 }))
 
-// Mock lucide-react icons
-vi.mock('lucide-react', () => ({
-  Key: () => <span data-testid="key-icon" />,
-  Plus: () => <span data-testid="plus-icon" />,
-  Trash2: () => <span data-testid="trash-icon" />,
-  AlertTriangle: () => <span data-testid="alert-icon" />,
-  Loader2: () => <span data-testid="loader-icon" />,
-  Calendar: () => <span data-testid="calendar-icon" />,
-  Clock: () => <span data-testid="clock-icon" />,
-  CheckCircle2: () => <span data-testid="check-icon" />,
-  Copy: () => <span data-testid="copy-icon" />,
-  X: () => <span data-testid="x-icon" />,
-}))
-
 describe('ApiKeyManager', () => {
   beforeEach(() => {
     vi.clearAllMocks()

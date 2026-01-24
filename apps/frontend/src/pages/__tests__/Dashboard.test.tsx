@@ -15,7 +15,7 @@ vi.mock('@/api/metrics', () => ({
 
 describe('Dashboard page', () => {
   it('shows guidance when no project is configured', () => {
-    localStorage.removeItem('rum.projectId')
+    localStorage.removeItem('rum.projectId:v1')
     mockUseQuery.mockReturnValue({
       data: null,
       isLoading: false,
@@ -30,7 +30,7 @@ describe('Dashboard page', () => {
   })
 
   it('renders metrics cards when data is available', () => {
-    localStorage.setItem('rum.projectId', 'project-123')
+    localStorage.setItem('rum.projectId:v1', 'project-123')
     mockUseQuery.mockReturnValue({
       data: {
         results: {

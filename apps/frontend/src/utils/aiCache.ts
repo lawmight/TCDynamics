@@ -3,6 +3,8 @@
 
 import crypto from 'crypto'
 
+import { getWithMigration, LS } from './storageMigration'
+
 interface CacheEntry {
   response: string
   timestamp: number
@@ -143,7 +145,7 @@ class AIResponseCache {
     if (typeof window !== 'undefined' && window.localStorage) {
       // Browser environment
       const cacheData = Array.from(this.cache.entries())
-      localStorage.setItem('ai_response_cache', JSON.stringify(cacheData))
+      localStorage.setItem(LS.AI_RESPONSE_CACHE, JSON.stringify(cacheData))
     }
     // Node.js file system caching handled separately if needed
   }
@@ -153,7 +155,10 @@ class AIResponseCache {
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
         // Browser environment
-        const stored = localStorage.getItem('ai_response_cache')
+        const stored = getWithMigration(
+          LS.AI_RESPONSE_CACHE,
+          'ai_response_cache'
+        )
         if (stored) {
           const cacheData = JSON.parse(stored)
           this.cache = new Map(cacheData)
@@ -257,7 +262,7 @@ export function getFreeTierStatus(): {
 
   // Get current month's token usage (you'll need to track this separately)
   const currentMonthTokens = parseInt(
-    localStorage.getItem('current_month_tokens') || '0'
+    getWithMigration(LS.CURRENT_MONTH_TOKENS, 'current_month_tokens') || '0'
   )
 
   const now = new Date()

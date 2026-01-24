@@ -177,7 +177,7 @@ describe('PerformanceMonitor Component', () => {
 
     await waitFor(() => {
       expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-        'showPerfMonitor',
+        'showPerfMonitor:v1',
         'false'
       )
     })
@@ -215,7 +215,7 @@ describe('PerformanceMonitor Component', () => {
     fireEvent.click(closeButton)
 
     expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-      'showPerfMonitor',
+      'showPerfMonitor:v1',
       'false'
     )
   })

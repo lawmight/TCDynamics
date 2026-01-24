@@ -1,4 +1,5 @@
-import { WifiOff, Wifi } from 'lucide-react'
+import WifiOff from '~icons/lucide/wifi-off'
+import Wifi from '~icons/lucide/wifi'
 import { useState, useEffect } from 'react'
 
 import { Badge } from '@/components/ui/badge'

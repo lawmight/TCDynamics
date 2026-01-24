@@ -1,5 +1,8 @@
 import confetti from 'canvas-confetti'
-import { ArrowRight, CheckCircle, Download, Mail } from 'lucide-react'
+import ArrowRight from '~icons/lucide/arrow-right'
+import CheckCircle from '~icons/lucide/check-circle'
+import Download from '~icons/lucide/download'
+import Mail from '~icons/lucide/mail'
 import { useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 

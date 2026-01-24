@@ -43,8 +43,8 @@ describe('Settings page', () => {
     await user.type(screen.getByLabelText(/Public Write Key/i), 'pk_123')
     await user.click(screen.getByRole('button', { name: /Save/i }))
 
-    expect(localStorage.getItem('rum.projectId')).toBe('project-1')
-    expect(localStorage.getItem('rum.writeKey')).toBe('pk_123')
+    expect(localStorage.getItem('rum.projectId:v1')).toBe('project-1')
+    expect(localStorage.getItem('rum.writeKey:v1')).toBe('pk_123')
     expect(mockSuccess).toHaveBeenCalled()
   })
 })

@@ -3,6 +3,7 @@
  * Following patterns from utils/polar.ts
  */
 
+import { config } from '@/utils/config'
 import { logger } from '@/utils/logger'
 
 export interface ApiKey {
@@ -46,6 +47,11 @@ export interface RestoreApiKeyResponse {
   error?: string
 }
 
+const getApiKeysUrl = (path = '') => {
+  const apiBaseUrl = config.apiBaseUrl.replace(/\/$/, '')
+  return `${apiBaseUrl}/app/api-keys${path}`
+}
+
 /**
  * List all active API keys for the authenticated user
  */
@@ -61,8 +67,9 @@ export const listApiKeys = async (
   try {
     let response: Response
     try {
-      response = await fetch('/api/app/api-keys', {
+      response = await fetch(getApiKeysUrl(), {
         method: 'GET',
+        credentials: 'omit',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -73,7 +80,7 @@ export const listApiKeys = async (
       const isDevelopment = import.meta.env.DEV
       if (isDevelopment) {
         throw new Error(
-          'Cannot connect to API server. Please start the Vercel dev server in a separate terminal: `vercel dev --listen 3001`'
+          'Cannot connect to API server. Make sure you started the development server with `npm run dev` (not just `npm run dev:frontend`)'
         )
       }
       throw new Error(
@@ -86,10 +93,25 @@ export const listApiKeys = async (
       const isDevelopment = import.meta.env.DEV
       if (isDevelopment) {
         throw new Error(
-          'API endpoint not found. Please ensure the Vercel dev server is running: `vercel dev --listen 3001`'
+          'API endpoint not found. Make sure the Vercel dev server is running (use `npm run dev` to start both frontend and API)'
         )
       }
       throw new Error('API endpoint not found. Please check your configuration.')
+    }
+
+    // Handle 431 - Request headers too large (usually large auth tokens)
+    if (response.status === 431) {
+      const isDevelopment = import.meta.env.DEV
+      if (isDevelopment) {
+        throw new Error(
+          'Request headers too large. This is usually caused by large authentication tokens. ' +
+            'Make sure you started the development server with `npm run dev` (which includes the header size fix). ' +
+            'If the error persists, try signing out and back in to refresh your session.'
+        )
+      }
+      throw new Error(
+        'Authentication data too large. Please try signing out and back in to refresh your session.'
+      )
     }
 
     // Check if response has content before parsing
@@ -158,8 +180,9 @@ export const createApiKey = async (
   }
 
   try {
-    const response = await fetch('/api/app/api-keys', {
+    const response = await fetch(getApiKeysUrl(), {
       method: 'POST',
+      credentials: 'omit',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
@@ -200,8 +223,9 @@ export const revokeApiKey = async (
   }
 
   try {
-    const response = await fetch('/api/app/api-keys', {
+    const response = await fetch(getApiKeysUrl(), {
       method: 'DELETE',
+      credentials: 'omit',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
@@ -242,8 +266,9 @@ export const restoreApiKey = async (
   }
 
   try {
-    const response = await fetch(`/api/app/api-keys/${keyId}/restore`, {
+    const response = await fetch(getApiKeysUrl(`/${keyId}/restore`), {
       method: 'POST',
+      credentials: 'omit',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,

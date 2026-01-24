@@ -264,5 +264,8 @@
     "@pages": "${workspaceFolder}/apps/frontend/src/pages",
     "@api": "${workspaceFolder}/apps/frontend/src/api",
     "@lib": "${workspaceFolder}/apps/frontend/src/lib"
-  }
+  },
+  "cSpell.words": [
+    "WCAG"
+  ]
 }

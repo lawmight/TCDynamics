@@ -1,4 +1,7 @@
-import { ArrowRight, MapPin, Shield, Star } from 'lucide-react'
+import ArrowRight from '~icons/lucide/arrow-right'
+import MapPin from '~icons/lucide/map-pin'
+import Shield from '~icons/lucide/shield'
+import Star from '~icons/lucide/star'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'

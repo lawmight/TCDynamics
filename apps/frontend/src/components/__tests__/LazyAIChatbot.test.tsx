@@ -9,15 +9,6 @@ vi.mock('../AIChatbot', () => ({
   default: () => <div data-testid="ai-chatbot">AI Chatbot Loaded</div>,
 }))
 
-// Mock the lucide-react icon
-vi.mock('lucide-react', () => ({
-  Loader2: (props: { className?: string }) => (
-    <div data-testid="loader-icon" className={props.className}>
-      Loader
-    </div>
-  ),
-}))
-
 describe('LazyAIChatbot Component', () => {
   beforeEach(() => {
     vi.clearAllMocks()

@@ -1,5 +1,5 @@
 import { track } from '@vercel/analytics'
-import { X } from 'lucide-react'
+import X from '~icons/lucide/x'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'

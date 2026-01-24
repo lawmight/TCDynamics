@@ -1,12 +1,18 @@
-import type { LucideIcon } from 'lucide-react'
-import { BarChart3, FileText, MessageSquare, Shield } from 'lucide-react'
+import type { ComponentType } from 'react'
+
+import BarChart3 from '~icons/lucide/bar-chart-3'
+import FileText from '~icons/lucide/file-text'
+import MessageSquare from '~icons/lucide/message-square'
+import Shield from '~icons/lucide/shield'
 
 type FeatureColor = 'primary' | 'primary-glow'
 type FeatureDelay = '0s' | '0.1s' | '0.2s' | '0.3s'
 
+type IconComponent = ComponentType<{ className?: string; size?: number }>
+
 export type FeatureModule = {
   slug: string
-  icon: LucideIcon
+  icon: IconComponent
   title: string
   subtitle: string
   description: string

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import ApiKeyManager from '@/components/app/ApiKeyManager'
+import { getWithMigration, LS } from '@/utils/storageMigration'
 import { Separator } from '@/components/ui/separator'
 import { useRequireAuth } from '@/hooks/useAuth'
 
@@ -14,8 +15,8 @@ const Settings = () => {
 
   useEffect(() => {
     try {
-      setProjectId(localStorage.getItem('rum.projectId') || '')
-      setWriteKey(localStorage.getItem('rum.writeKey') || '')
+      setProjectId(getWithMigration(LS.RUM_PROJECT_ID, 'rum.projectId') || '')
+      setWriteKey(getWithMigration(LS.RUM_WRITE_KEY, 'rum.writeKey') || '')
     } catch {
       /* noop */
     }
@@ -23,8 +24,8 @@ const Settings = () => {
 
   const handleSave = () => {
     try {
-      localStorage.setItem('rum.projectId', projectId)
-      localStorage.setItem('rum.writeKey', writeKey)
+      localStorage.setItem(LS.RUM_PROJECT_ID, projectId)
+      localStorage.setItem(LS.RUM_WRITE_KEY, writeKey)
       toast.success('Configuration saved!', {
         description: 'Your settings have been saved successfully',
       })

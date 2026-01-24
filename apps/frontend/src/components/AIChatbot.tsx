@@ -1,4 +1,8 @@
-import { Bot, Loader2, Send, User, X } from 'lucide-react'
+import Bot from '~icons/lucide/bot'
+import Loader2 from '~icons/lucide/loader-2'
+import Send from '~icons/lucide/send'
+import User from '~icons/lucide/user'
+import X from '~icons/lucide/x'
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 
 import { chatAPI } from '@/api/azureServices'

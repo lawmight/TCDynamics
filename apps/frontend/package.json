@@ -6,7 +6,7 @@
   "license": "Proprietary",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "cross-env NODE_OPTIONS=\"--max-http-header-size=65536\" vite",
     "dev:vercel": "vercel dev --listen 3001",
     "build": "vite build",
     "analyze": "vite build --mode analyze",
@@ -66,7 +66,6 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "isomorphic-dompurify": "^2.35.0",
-    "lucide-react": "^0.562.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.30.3",
@@ -79,6 +78,8 @@
     "@commitlint/config-conventional": "^20.3.1",
     "@eslint/js": "^9.39.2",
     "@sentry/vite-plugin": "^2.0.0",
+    "@svgr/core": "^8.1.0",
+    "@svgr/plugin-jsx": "^8.1.0",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
@@ -113,6 +114,8 @@
     "terser": "^5.46.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.53.1",
+    "unplugin-icons": "^23.0.1",
+    "@iconify-json/lucide": "^1.2.43",
     "vite": "^7.3.0",
     "vitest": "^3.2.4"
   }

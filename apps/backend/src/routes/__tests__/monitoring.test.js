@@ -30,39 +30,34 @@ const { logger } = require('../../utils/logger')
 
 describe('Monitoring Routes', () => {
   let app
-  let originalMetrics
 
   beforeEach(() => {
     jest.clearAllMocks()
 
-    // Store original metrics to restore later
-    originalMetrics = require('../monitoring').metrics
-
-    // Reset metrics to clean state
+    // Reset metrics in place (module exports a getter; we mutate the same object the routes use)
     const monitoringModule = require('../monitoring')
-    monitoringModule.metrics = {
-      startTime: Date.now(),
-      requests: {
-        total: 0,
-        byMethod: {},
-        byStatus: {},
-        byEndpoint: {},
-      },
-      errors: {
-        total: 0,
-        byType: {},
-        recent: [],
-      },
-      performance: {
-        averageResponseTime: 0,
-        slowestEndpoints: [],
-        memoryUsage: {
-          rss: 100,
-          heapTotal: 200,
-          heapUsed: 150,
-          external: 50,
-          timestamp: new Date().toISOString(),
-        },
+    const m = monitoringModule.metrics
+    m.startTime = Date.now()
+    m.requests = {
+      total: 0,
+      byMethod: {},
+      byStatus: {},
+      byEndpoint: {},
+    }
+    m.errors = {
+      total: 0,
+      byType: {},
+      recent: [],
+    }
+    m.performance = {
+      averageResponseTime: 0,
+      slowestEndpoints: [],
+      memoryUsage: {
+        rss: 100,
+        heapTotal: 200,
+        heapUsed: 150,
+        external: 50,
+        timestamp: new Date().toISOString(),
       },
     }
 
@@ -73,12 +68,6 @@ describe('Monitoring Routes', () => {
 
     // Mock environment variables
     process.env.npm_package_version = '1.0.0-test'
-  })
-
-  afterEach(() => {
-    // Restore original metrics
-    const monitoringModule = require('../monitoring')
-    monitoringModule.metrics = originalMetrics
   })
 
   describe('GET /metrics', () => {
@@ -219,22 +208,25 @@ describe('Monitoring Routes', () => {
     })
 
     it('should detect warning status with high memory usage', async () => {
-      // Set high memory usage
-      const monitoringModule = require('../monitoring')
-      monitoringModule.metrics.performance.memoryUsage = {
-        heapUsed: 180,
-        heapTotal: 200,
-        rss: 100,
-        external: 50,
-        timestamp: new Date().toISOString(),
+      // Mock process.memoryUsage so updateMemoryUsage() sees >90% heap (182/200)
+      const mockMem = {
+        rss: 100 * 1024 * 1024,
+        heapTotal: 200 * 1024 * 1024,
+        heapUsed: 182 * 1024 * 1024,
+        external: 50 * 1024 * 1024,
       }
+      const spy = jest.spyOn(process, 'memoryUsage').mockReturnValue(mockMem)
 
-      const response = await request(app)
-        .get('/monitoring/health/detailed')
-        .expect(200)
+      try {
+        const response = await request(app)
+          .get('/monitoring/health/detailed')
+          .expect(200)
 
-      expect(response.body.status).toBe('warning')
-      expect(response.body).toHaveProperty('memoryWarning')
+        expect(response.body.status).toBe('warning')
+        expect(response.body).toHaveProperty('memoryWarning')
+      } finally {
+        spy.mockRestore()
+      }
     })
 
     it('should ignore old errors in health check', async () => {
@@ -264,6 +256,8 @@ describe('Monitoring Routes', () => {
     it('should reset metrics with admin authentication', async () => {
       const response = await request(app)
         .post('/monitoring/metrics/reset')
+        .set('x-request-id', 'test-request-id')
+        .set('User-Agent', 'Jest/supertest')
         .expect(200)
 
       expect(response.body).toEqual({
@@ -274,8 +268,8 @@ describe('Monitoring Routes', () => {
 
       expect(logger.info).toHaveBeenCalledWith('Metrics reset requested', {
         ip: expect.any(String),
-        userAgent: expect.any(String),
-        requestId: expect.any(String),
+        userAgent: 'Jest/supertest',
+        requestId: 'test-request-id',
       })
     })
 
@@ -308,10 +302,12 @@ describe('Monitoring Routes', () => {
     it('should calculate average response time', async () => {
       const monitoringModule = require('../monitoring')
 
-      // Create a simple app with the middleware
+      // Create a simple app with the middleware; small delay ensures measurable duration
       const testApp = express()
       testApp.use(collectMetrics)
-      testApp.get('/test', (req, res) => res.send('OK'))
+      testApp.get('/test', (_req, res) => {
+        setTimeout(() => res.send('OK'), 5)
+      })
 
       await request(testApp).get('/test').expect(200)
 

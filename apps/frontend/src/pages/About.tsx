@@ -1,12 +1,10 @@
-import {
-  Building2,
-  CheckCircle2,
-  Globe,
-  MapPin,
-  Server,
-  ShieldCheck,
-  Users,
-} from 'lucide-react'
+import Building2 from '~icons/lucide/building-2'
+import CheckCircle2 from '~icons/lucide/check-circle-2'
+import Globe from '~icons/lucide/globe'
+import MapPin from '~icons/lucide/map-pin'
+import Server from '~icons/lucide/server'
+import ShieldCheck from '~icons/lucide/shield-check'
+import Users from '~icons/lucide/users'
 import { Link } from 'react-router-dom'
 
 import { AnimatedCounter } from '@/components/ui/animated-counter'

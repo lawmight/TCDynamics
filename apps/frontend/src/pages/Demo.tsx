@@ -1,15 +1,13 @@
-import {
-    ArrowRight,
-    Calendar,
-    CheckCircle,
-    Clock,
-    FileText,
-    MessageSquare,
-    Play,
-    Users,
-    Video,
-    Zap,
-} from 'lucide-react'
+import ArrowRight from '~icons/lucide/arrow-right'
+import Calendar from '~icons/lucide/calendar'
+import CheckCircle from '~icons/lucide/check-circle'
+import Clock from '~icons/lucide/clock'
+import FileText from '~icons/lucide/file-text'
+import MessageSquare from '~icons/lucide/message-square'
+import Play from '~icons/lucide/play'
+import Users from '~icons/lucide/users'
+import Video from '~icons/lucide/video'
+import Zap from '~icons/lucide/zap'
 import { Link } from 'react-router-dom'
 
 import { Badge } from '@/components/ui/badge'

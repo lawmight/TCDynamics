@@ -73,16 +73,7 @@ const contacts = await Contact.find({ clerkId }).sort({ createdAt: -1 })
 
 ## Available Models
 
-Located in `api/_lib/models/`:
-
-| Model | Purpose | Key Fields |
-|-------|---------|------------|
-| User | Synced from Clerk | `clerkId`, `email` |
-| Contact | Form submissions | `clerkId`, `email`, `name` |
-| ApiKey | API authentication | `clerkId`, `key`, `name` |
-| ChatConversation | AI chat history | `clerkId`, `messages` |
-| UsageLog | API usage tracking | `clerkId`, `endpoint` |
-| AnalyticsEvent | User analytics | `clerkId`, `event` |
+See `api/_lib/models/` for the current list. Always index `clerkId` for multi-tenant queries.
 
 ## Indexing Best Practices
 

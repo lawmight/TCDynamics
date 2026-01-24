@@ -286,7 +286,7 @@ router.get(
     const memUsagePercent = (metrics.performance.memoryUsage.heapUsed
         / metrics.performance.memoryUsage.heapTotal)
       * 100
-    if (memUsagePercent > 90) {
+    if (memUsagePercent > 90 && Number.isFinite(memUsagePercent)) {
       health.status = 'warning'
       health.memoryWarning = `High memory usage: ${memUsagePercent.toFixed(1)}%`
     }
@@ -334,8 +334,8 @@ router.post(
 
     logger.info('Metrics reset requested', {
       ip: req.ip,
-      userAgent: req.get('User-Agent'),
-      requestId: req.headers['x-request-id'],
+      userAgent: req.get('User-Agent') || '',
+      requestId: req.headers['x-request-id'] || '',
     })
 
     res.json({
@@ -350,4 +350,7 @@ module.exports = {
   router,
   collectMetrics,
   collectErrorMetrics,
+  get metrics() {
+    return metrics
+  },
 }

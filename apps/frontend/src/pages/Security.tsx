@@ -1,4 +1,7 @@
-import { Shield, Lock, Cloud, Phone } from 'lucide-react'
+import Shield from '~icons/lucide/shield'
+import Lock from '~icons/lucide/lock'
+import Cloud from '~icons/lucide/cloud'
+import Phone from '~icons/lucide/phone'
 import { Link } from 'react-router-dom'
 
 import { Badge } from '@/components/ui/badge'

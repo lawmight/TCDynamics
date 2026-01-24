@@ -27,7 +27,14 @@ export function renderWithClerk(
 ) {
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <ClerkProvider publishableKey={MOCK_CLERK_PUBLISHABLE_KEY}>
-      <MemoryRouter>{children}</MemoryRouter>
+      <MemoryRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
+        {children}
+      </MemoryRouter>
     </ClerkProvider>
   )
 
@@ -46,7 +53,14 @@ export function renderWithQueryClient(
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter>{children}</MemoryRouter>
+      <MemoryRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
+        {children}
+      </MemoryRouter>
     </QueryClientProvider>
   )
 
@@ -66,7 +80,14 @@ export function renderWithProviders(
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <ClerkProvider publishableKey={MOCK_CLERK_PUBLISHABLE_KEY}>
       <QueryClientProvider client={queryClient}>
-        <MemoryRouter>{children}</MemoryRouter>
+        <MemoryRouter
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+          }}
+        >
+          {children}
+        </MemoryRouter>
       </QueryClientProvider>
     </ClerkProvider>
   )

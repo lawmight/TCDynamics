@@ -3,12 +3,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import Files from '../Files'
 
-vi.mock('lucide-react', () => ({
-  CloudUpload: () => null,
-  FileText: () => null,
-  RefreshCcw: () => null,
-}))
-
 vi.mock('@/api/files', () => ({
   listKnowledgeFiles: vi.fn().mockResolvedValue([
     {

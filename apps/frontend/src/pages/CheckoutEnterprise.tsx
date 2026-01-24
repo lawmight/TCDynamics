@@ -1,4 +1,7 @@
-import { ArrowLeft, CreditCard, Lock, Shield } from 'lucide-react'
+import ArrowLeft from '~icons/lucide/arrow-left'
+import CreditCard from '~icons/lucide/credit-card'
+import Lock from '~icons/lucide/lock'
+import Shield from '~icons/lucide/shield'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 

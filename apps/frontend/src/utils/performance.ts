@@ -200,7 +200,7 @@ class PerformanceMonitor {
         avgTime: stats.totalTime / stats.count,
         count: stats.count,
       }))
-      .sort((a, b) => b.avgTime - a.avgTime)
+      .toSorted((a, b) => b.avgTime - a.avgTime)
       .slice(0, 5)
 
     return {

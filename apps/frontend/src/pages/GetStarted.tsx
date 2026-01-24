@@ -1,15 +1,13 @@
-import {
-    ArrowRight,
-    CheckCircle,
-    Clock,
-    Gift,
-    Lock,
-    Mail,
-    Rocket,
-    Shield,
-    Sparkles,
-    Zap,
-} from 'lucide-react'
+import ArrowRight from '~icons/lucide/arrow-right'
+import CheckCircle from '~icons/lucide/check-circle'
+import Clock from '~icons/lucide/clock'
+import Gift from '~icons/lucide/gift'
+import Lock from '~icons/lucide/lock'
+import Mail from '~icons/lucide/mail'
+import Rocket from '~icons/lucide/rocket'
+import Shield from '~icons/lucide/shield'
+import Sparkles from '~icons/lucide/sparkles'
+import Zap from '~icons/lucide/zap'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 

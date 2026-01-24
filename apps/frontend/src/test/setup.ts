@@ -12,11 +12,6 @@ import './mocks/styles.css'
 // Extend Vitest's expect with jest-dom matchers
 expect.extend(matchers)
 
-// Mock lucide-react before any component imports
-vi.mock('lucide-react', async () => {
-  return import('./mocks/lucide-react')
-})
-
 // Make window.location.assign spy-able in jsdom/Vitest
 if (typeof window !== 'undefined') {
   const originalLocation = window.location

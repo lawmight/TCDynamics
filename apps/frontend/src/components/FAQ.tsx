@@ -1,13 +1,11 @@
-import {
-  CheckCircle,
-  Clock,
-  Gift,
-  HeadphonesIcon,
-  Phone,
-  Shield,
-  Users,
-  Wrench,
-} from 'lucide-react'
+import CheckCircle from '~icons/lucide/check-circle'
+import Clock from '~icons/lucide/clock'
+import Gift from '~icons/lucide/gift'
+import HeadphonesIcon from '~icons/lucide/headphones'
+import Phone from '~icons/lucide/phone'
+import Shield from '~icons/lucide/shield'
+import Users from '~icons/lucide/users'
+import Wrench from '~icons/lucide/wrench'
 import React, { createContext, useContext, useId, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'

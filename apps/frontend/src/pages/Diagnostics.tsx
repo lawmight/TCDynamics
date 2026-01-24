@@ -33,7 +33,7 @@ const Diagnostics = () => {
   }, [])
 
   const topTasks = useMemo(
-    () => longTasks.sort((a, b) => b.duration - a.duration).slice(0, 50),
+    () => longTasks.toSorted((a, b) => b.duration - a.duration).slice(0, 50),
     [longTasks]
   )
 

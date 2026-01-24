@@ -1,5 +1,7 @@
-import { ArrowUp, Menu, X } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import ArrowUp from '~icons/lucide/arrow-up'
+import Menu from '~icons/lucide/menu'
+import X from '~icons/lucide/x'
+import { startTransition, useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import { useTheme } from '@/components/ThemeProvider'
@@ -49,11 +51,13 @@ const SimpleNavigation = () => {
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY
-      setIsScrolled(scrollTop > 50)
-      setShowBackToTop(scrollTop > 300)
+      startTransition(() => {
+        setIsScrolled(scrollTop > 50)
+        setShowBackToTop(scrollTop > 300)
+      })
     }
 
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 

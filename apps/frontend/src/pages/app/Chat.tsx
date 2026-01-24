@@ -1,4 +1,5 @@
-import { Loader2, Send } from 'lucide-react'
+import Loader2 from '~icons/lucide/loader-2'
+import Send from '~icons/lucide/send'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { recordEvent } from '@/api/analytics'
@@ -119,7 +120,9 @@ const Chat = () => {
             disabled={isSending}
             aria-label="Chat message input"
           />
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error ? (
+              <p className="text-sm text-destructive">{error}</p>
+            ) : null}
           <div className="flex items-center justify-between gap-3">
             <div className="text-xs text-muted-foreground">
               Uses Vertex AI (Gemini) with safe defaults. Data is not stored

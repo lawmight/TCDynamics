@@ -1,10 +1,8 @@
-import {
-  Upload,
-  FileText,
-  Loader2,
-  CheckCircle,
-  AlertCircle,
-} from 'lucide-react'
+import Upload from '~icons/lucide/upload'
+import FileText from '~icons/lucide/file-text'
+import Loader2 from '~icons/lucide/loader-2'
+import CheckCircle from '~icons/lucide/check-circle'
+import AlertCircle from '~icons/lucide/alert-circle'
 import { useState, useRef } from 'react'
 
 import { visionAPI } from '@/api/azureServices'

@@ -2,10 +2,11 @@ import { useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 
 import { fetchMetricsOverview } from '@/api/metrics'
+import { getWithMigration, LS } from '@/utils/storageMigration'
 
 const getStoredProjectId = (): string => {
   try {
-    return localStorage.getItem('rum.projectId') || ''
+    return getWithMigration(LS.RUM_PROJECT_ID, 'rum.projectId') || ''
   } catch {
     return ''
   }

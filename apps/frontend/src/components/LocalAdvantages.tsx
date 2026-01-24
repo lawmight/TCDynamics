@@ -1,4 +1,9 @@
-import { Flag, GraduationCap, MapPin, Phone, Shield, Users } from 'lucide-react'
+import Flag from '~icons/lucide/flag'
+import GraduationCap from '~icons/lucide/graduation-cap'
+import MapPin from '~icons/lucide/map-pin'
+import Phone from '~icons/lucide/phone'
+import Shield from '~icons/lucide/shield'
+import Users from '~icons/lucide/users'
 
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'

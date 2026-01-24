@@ -24,7 +24,7 @@ describe('aiCache utilities', () => {
   })
 
   it('reports free tier usage from localStorage', () => {
-    localStorage.setItem('current_month_tokens', '1000')
+    localStorage.setItem('current_month_tokens:v1', '1000')
 
     const status = getFreeTierStatus()
 

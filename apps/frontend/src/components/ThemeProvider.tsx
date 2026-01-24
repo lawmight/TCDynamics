@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 
+import { getWithMigration, LS } from '@/utils/storageMigration'
+
 type Theme = 'light' | 'dark' | 'system'
 
 interface ThemeContextType {
@@ -34,7 +36,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // Initialize theme from localStorage or default to 'system'
   const [theme, setTheme] = useState<Theme>(() => {
     try {
-      const stored = localStorage.getItem('theme') as Theme
+      const stored = getWithMigration(LS.THEME, 'theme') as Theme
       return stored || 'system'
     } catch {
       return 'system'
@@ -70,7 +72,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     // Persist to localStorage
     try {
-      localStorage.setItem('theme', theme)
+      localStorage.setItem(LS.THEME, theme)
     } catch (error) {
       console.error('Failed to save theme preference:', error)
     }

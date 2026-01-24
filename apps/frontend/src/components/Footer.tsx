@@ -1,4 +1,8 @@
-import { CheckCircle, Clock, Train, Twitter, Users } from 'lucide-react'
+import CheckCircle from '~icons/lucide/check-circle'
+import Clock from '~icons/lucide/clock'
+import Train from '~icons/lucide/train'
+import Twitter from '~icons/lucide/twitter'
+import Users from '~icons/lucide/users'
 import { Link } from 'react-router-dom'
 
 const Footer = () => {

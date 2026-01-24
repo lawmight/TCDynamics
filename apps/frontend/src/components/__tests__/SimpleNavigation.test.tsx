@@ -30,13 +30,6 @@ vi.mock('@clerk/clerk-react', async () => {
   }
 })
 
-// Mock the icons
-vi.mock('lucide-react', () => ({
-  Menu: () => <div data-testid="menu-icon">Menu</div>,
-  X: () => <div data-testid="close-icon">Close</div>,
-  ArrowUp: () => <div data-testid="arrow-up-icon">ArrowUp</div>,
-}))
-
 describe('SimpleNavigation Component', () => {
   let scrollSpy: ReturnType<typeof vi.spyOn> | null = null
 
@@ -76,9 +69,8 @@ describe('SimpleNavigation Component', () => {
   it('should render mobile menu button', () => {
     renderSimpleNavigation()
 
-    const mobileMenuButton = screen.getByLabelText('Toggle menu')
+    const mobileMenuButton = screen.getByRole('button', { name: /Toggle menu/i })
     expect(mobileMenuButton).toBeInTheDocument()
-    expect(screen.getByTestId('menu-icon')).toBeInTheDocument()
   })
 
   it('should handle logo click to scroll to hero section', () => {
@@ -115,15 +107,15 @@ describe('SimpleNavigation Component', () => {
   it('should toggle mobile menu on button click', () => {
     renderSimpleNavigation()
 
-    const mobileMenuButton = screen.getByLabelText('Toggle menu')
+    const mobileMenuButton = screen.getByRole('button', { name: /Toggle menu/i })
 
-    // Initially closed
-    expect(screen.queryByTestId('close-icon')).not.toBeInTheDocument()
+    // Initially closed: one "Accéder à l'app" (desktop only)
+    expect(screen.getAllByText(/Accéder à l'app/i)).toHaveLength(1)
 
-    // Open mobile menu
+    // Open mobile menu: mobile panel adds a second "Accéder à l'app"
     fireEvent.click(mobileMenuButton)
 
-    expect(screen.getByTestId('close-icon')).toBeInTheDocument()
+    expect(screen.getAllByText(/Accéder à l'app/i)).toHaveLength(2)
   })
 
   it('should render mobile menu when open', () => {
@@ -142,7 +134,7 @@ describe('SimpleNavigation Component', () => {
   it('should close mobile menu when navigation item is clicked', () => {
     renderSimpleNavigation()
 
-    const mobileMenuButton = screen.getByLabelText('Toggle menu')
+    const mobileMenuButton = screen.getByRole('button', { name: /Toggle menu/i })
 
     // Open mobile menu
     fireEvent.click(mobileMenuButton)
@@ -151,9 +143,8 @@ describe('SimpleNavigation Component', () => {
     const featuresButton = screen.getByText('Fonctionnalités')
     fireEvent.click(featuresButton)
 
-    // Menu should close
-    expect(screen.getByTestId('menu-icon')).toBeInTheDocument()
-    expect(screen.queryByTestId('close-icon')).not.toBeInTheDocument()
+    // Menu should close: back to one "Accéder à l'app" (desktop only)
+    expect(screen.getAllByText(/Accéder à l'app/i)).toHaveLength(1)
   })
 
   it('should update scrolled state on scroll', async () => {
@@ -181,7 +172,7 @@ describe('SimpleNavigation Component', () => {
     renderSimpleNavigation()
 
     // Initially no back to top button
-    expect(screen.queryByTestId('arrow-up-icon')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Back to top/i })).not.toBeInTheDocument()
 
     // Simulate scroll past 300px
     Object.defineProperty(window, 'scrollY', {
@@ -192,7 +183,7 @@ describe('SimpleNavigation Component', () => {
     fireEvent.scroll(window)
 
     await waitFor(() => {
-      expect(screen.getByTestId('arrow-up-icon')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Back to top/i })).toBeInTheDocument()
     })
   })
 
@@ -220,7 +211,11 @@ describe('SimpleNavigation Component', () => {
   it('should add scroll event listener on mount', () => {
     renderSimpleNavigation()
 
-    expect(scrollSpy).toHaveBeenCalledWith('scroll', expect.any(Function))
+    expect(scrollSpy).toHaveBeenCalledWith(
+      'scroll',
+      expect.any(Function),
+      { passive: true }
+    )
   })
 
   it('should cleanup scroll event listener on unmount', () => {

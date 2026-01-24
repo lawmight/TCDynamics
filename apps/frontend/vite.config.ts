@@ -2,6 +2,7 @@ import { sentryVitePlugin } from '@sentry/vite-plugin'
 import react from '@vitejs/plugin-react-swc'
 import path from 'path'
 import { visualizer } from 'rollup-plugin-visualizer'
+import Icons from 'unplugin-icons/vite'
 import { fileURLToPath } from 'url'
 import { defineConfig } from 'vite'
 
@@ -33,6 +34,7 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
+    Icons({ compiler: 'jsx' }),
     // Sentry source maps plugin (production only)
     mode === 'production' &&
       process.env.SENTRY_AUTH_TOKEN &&
@@ -95,8 +97,6 @@ export default defineConfig(({ mode }) => ({
           ],
           // React Query for data fetching
           query: ['@tanstack/react-query'],
-          // Icon library
-          icons: ['lucide-react'],
           // Utility libraries
           utils: ['clsx', 'tailwind-merge', 'class-variance-authority'],
         },
@@ -133,7 +133,6 @@ export default defineConfig(({ mode }) => ({
     include: [
       'react',
       'react-dom',
-      'lucide-react',
       '@tanstack/react-query',
       '@radix-ui/react-dialog',
       '@radix-ui/react-label',

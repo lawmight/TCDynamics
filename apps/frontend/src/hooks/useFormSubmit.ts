@@ -1,7 +1,7 @@
 import { track } from '@vercel/analytics'
 import { useState } from 'react'
 
-import type { ApiResponse } from '@/utils/apiConfig'
+import { type ApiResponse, apiRequest } from '@/utils/apiConfig'
 import { logger } from '@/utils/logger'
 
 /**
@@ -112,9 +112,6 @@ export const useFormSubmit = <T = Record<string, unknown>>(
 
     setIsSubmitting(true)
     setResponse(null)
-
-    // Resolve the (possibly mocked) apiRequest at call time to avoid stale references in tests
-    const { apiRequest } = await import('@/utils/apiConfig')
 
     const performRequest = async () => {
       try {

@@ -4,11 +4,6 @@ import { describe, expect, it, vi } from 'vitest'
 
 import Login from '../Login'
 
-vi.mock('lucide-react', () => ({
-  LogIn: () => null,
-  ShieldCheck: () => null,
-}))
-
 // Mock Clerk hooks directly since component uses @clerk/clerk-react
 vi.mock('@clerk/clerk-react', async () => {
   const actual = await vi.importActual('@clerk/clerk-react')

@@ -1,10 +1,8 @@
-import {
-  CheckCircle2,
-  PlugZap,
-  ShieldCheck,
-  Sparkles,
-  Workflow,
-} from 'lucide-react'
+import CheckCircle2 from '~icons/lucide/check-circle-2'
+import PlugZap from '~icons/lucide/plug-zap'
+import ShieldCheck from '~icons/lucide/shield-check'
+import Sparkles from '~icons/lucide/sparkles'
+import Workflow from '~icons/lucide/workflow'
 import { Link } from 'react-router-dom'
 
 import { Badge } from '@/components/ui/badge'

@@ -483,8 +483,12 @@ class ConfigManager {
     }
 
     const isTestEnv =
-      process.env.VITEST === 'true' ||
-      process.env.NODE_ENV === 'test' ||
+      (typeof process !== 'undefined' &&
+        (process.env.VITEST === 'true' || process.env.NODE_ENV === 'test')) ||
+      (typeof import.meta !== 'undefined' &&
+        import.meta.env &&
+        (import.meta.env.VITEST === 'true' ||
+          import.meta.env.NODE_ENV === 'test')) ||
       clientConfig.VITE_NODE_ENV === 'test'
 
     // Check server-side required configs (only if we're on server and not in test)

@@ -1,9 +1,10 @@
 import react from '@vitejs/plugin-react-swc'
 import path from 'path'
+import Icons from 'unplugin-icons/vite'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), Icons({ compiler: 'jsx' })],
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],

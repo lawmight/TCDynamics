@@ -1,4 +1,9 @@
-import { Check, MapPin, Phone, Play, Shield, X } from 'lucide-react'
+import Check from '~icons/lucide/check'
+import MapPin from '~icons/lucide/map-pin'
+import Phone from '~icons/lucide/phone'
+import Play from '~icons/lucide/play'
+import Shield from '~icons/lucide/shield'
+import X from '~icons/lucide/x'
 import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'

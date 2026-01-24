@@ -12,15 +12,6 @@ const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {
   return <div>No error</div>
 }
 
-vi.mock('lucide-react', () => ({
-  AlertTriangle: ({ className }: { className?: string }) => (
-    <div className={className} data-testid="alert-triangle" />
-  ),
-  RefreshCw: ({ className }: { className?: string }) => (
-    <div className={className} data-testid="refresh-cw" />
-  ),
-}))
-
 describe('ErrorBoundary', () => {
   beforeEach(() => {
     // Reset console.error mock before each test

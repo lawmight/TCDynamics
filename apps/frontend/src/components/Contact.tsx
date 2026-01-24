@@ -1,13 +1,11 @@
 import { track } from '@vercel/analytics'
-import {
-  Building,
-  Calendar,
-  Car,
-  CheckCircle,
-  Mail,
-  MapPin,
-  Phone,
-} from 'lucide-react'
+import Building from '~icons/lucide/building'
+import Calendar from '~icons/lucide/calendar'
+import Car from '~icons/lucide/car'
+import CheckCircle from '~icons/lucide/check-circle'
+import Mail from '~icons/lucide/mail'
+import MapPin from '~icons/lucide/map-pin'
+import Phone from '~icons/lucide/phone'
 import { useEffect, useRef, useState } from 'react'
 
 import Captcha, { type CaptchaHandle } from '@/components/Captcha'

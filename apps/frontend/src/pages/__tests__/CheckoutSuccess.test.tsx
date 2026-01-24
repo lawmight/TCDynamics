@@ -18,33 +18,17 @@ vi.mock('canvas-confetti', () => ({
   default: vi.fn(),
 }))
 
-vi.mock('lucide-react', () => {
-  // @ts-expect-error - Mock component, types not needed
-  const MockIcon = (props) => (
-    <div className={props.className} data-testid={props['data-testid']} />
-  )
-  return {
-    // @ts-expect-error - Mock component, types not needed
-    CheckCircle: (props) => (
-      <MockIcon className={props.className} data-testid="check-circle" />
-    ),
-    // @ts-expect-error - Mock component, types not needed
-    Mail: (props) => (
-      <MockIcon className={props.className} data-testid="mail" />
-    ),
-    // @ts-expect-error - Mock component, types not needed
-    Download: (props) => (
-      <MockIcon className={props.className} data-testid="download" />
-    ),
-    // @ts-expect-error - Mock component, types not needed
-    ArrowRight: (props) => (
-      <MockIcon className={props.className} data-testid="arrow-right" />
-    ),
-  }
-})
-
 const renderWithRouter = (component: React.ReactElement) => {
-  return render(<BrowserRouter>{component}</BrowserRouter>)
+  return render(
+    <BrowserRouter
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
+      {component}
+    </BrowserRouter>
+  )
 }
 
 describe('CheckoutSuccess', () => {

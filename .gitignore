@@ -36,11 +36,16 @@ AzureFunctionsTools/
 cursor/*
 !.cursor/rules/
 .cursor/skills/
+.cursor/plans/
 .gemini/
 .claude/
 *.swp
 *.swo
 *~
+
+# Workspace and agent artifacts
+Projects.code-workspace
+.agents/
 
 # Pulse framework
 .pulse/
@@ -90,4 +95,6 @@ out/
 
 # Local documentation (keep local, don't push to GitHub)
 md/
+.env*.local
+
 .env*.local

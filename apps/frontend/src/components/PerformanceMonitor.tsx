@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 
+import { getWithMigration, LS } from '@/utils/storageMigration'
+
 interface PerformanceMetrics {
   loadTime: number
   renderTime: number
@@ -10,7 +12,9 @@ interface PerformanceMetrics {
 const PerformanceMonitor = () => {
   const isBrowser = typeof window !== 'undefined'
   const getStoredPreference = () =>
-    isBrowser ? localStorage.getItem('showPerfMonitor') : null
+    isBrowser
+      ? getWithMigration(LS.SHOW_PERF_MONITOR, 'showPerfMonitor')
+      : null
 
   type MetaEnv = { MODE?: string; VITEST?: string }
   const metaEnv: MetaEnv | undefined =
@@ -51,7 +55,7 @@ const PerformanceMonitor = () => {
     if (
       !isTestEnv &&
       envMode !== 'development' &&
-      !localStorage.getItem('showPerfMonitor')
+      !getWithMigration(LS.SHOW_PERF_MONITOR, 'showPerfMonitor')
     ) {
       return
     }
@@ -110,7 +114,7 @@ const PerformanceMonitor = () => {
       if (e.ctrlKey && e.shiftKey && e.key === 'P') {
         setIsVisible(prev => {
           const nextValue = !prev
-          localStorage.setItem('showPerfMonitor', nextValue.toString())
+          localStorage.setItem(LS.SHOW_PERF_MONITOR, nextValue.toString())
           return nextValue
         })
       }
@@ -131,7 +135,7 @@ const PerformanceMonitor = () => {
           onClick={() => {
             setIsVisible(false)
             if (isBrowser) {
-              localStorage.setItem('showPerfMonitor', 'false')
+              localStorage.setItem(LS.SHOW_PERF_MONITOR, 'false')
             }
           }}
           className="text-gray-400 hover:text-white"
@@ -143,7 +147,9 @@ const PerformanceMonitor = () => {
       <div className="space-y-1">
         <div>Load: {metrics.loadTime}ms</div>
         <div>Render: {metrics.renderTime}ms</div>
-        {metrics.memoryUsage && <div>Memory: {metrics.memoryUsage}MB</div>}
+        {typeof metrics.memoryUsage === 'number' ? (
+          <div>Memory: {metrics.memoryUsage}MB</div>
+        ) : null}
       </div>
       <div className="mt-2 text-xs text-gray-400">
         Press Ctrl+Shift+P to toggle

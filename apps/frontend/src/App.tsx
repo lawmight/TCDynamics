@@ -1,7 +1,6 @@
 // FIXED: Using simple navigation to prevent black page
 import { ClerkProvider } from '@clerk/clerk-react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { Analytics } from '@vercel/analytics/react'
 import { Suspense, lazy, useEffect } from 'react'
 import {
   BrowserRouter,
@@ -15,7 +14,7 @@ import {
 import ErrorBoundary from './components/ErrorBoundary'
 // import MobileNavigation from './components/MobileNavigation' // DISABLED: Causes black page
 // import StickyHeader from './components/StickyHeader' // DISABLED: Causes black page
-// import LazyAIChatbot from './components/LazyAIChatbot' // Temporarily disabled - Week 5-6 customer validation
+import LazyAIChatbot from './components/LazyAIChatbot'
 import Footer from './components/Footer'
 import OfflineIndicator from './components/OfflineIndicator'
 import PerformanceMonitor from './components/PerformanceMonitor'
@@ -51,6 +50,11 @@ const ChatApp = lazy(() => import('./pages/app/Chat'))
 const FilesApp = lazy(() => import('./pages/app/Files'))
 const AnalyticsApp = lazy(() => import('./pages/app/Analytics'))
 const Security = lazy(() => import('./pages/Security'))
+
+// Defer analytics until after initial paint (bundle-defer-third-party)
+const Analytics = lazy(() =>
+  import('@vercel/analytics/react').then((m) => ({ default: m.Analytics }))
+)
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -206,6 +210,7 @@ const AppRouter = () => {
         </Routes>
       </Suspense>
       {!hideMarketingChrome && <Footer />}
+      <LazyAIChatbot />
     </>
   )
 }
@@ -220,10 +225,21 @@ const ThemedClerkProvider = ({
   children: React.ReactNode
 }) => {
   const { resolvedTheme } = useTheme()
-  const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+  
+  // Use preview/test key for localhost and Vercel preview deployments
+  // Use production key for production deployment only
+  const isPreview = 
+    import.meta.env.MODE === 'development' || 
+    (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app'))
+  
+  const PUBLISHABLE_KEY = isPreview
+    ? import.meta.env.VITE_CLERK_PREVIEW_PUBLISHABLE_KEY
+    : import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
   if (!PUBLISHABLE_KEY) {
-    throw new Error('Missing Clerk Publishable Key')
+    throw new Error(
+      `Missing Clerk Publishable Key for ${isPreview ? 'preview' : 'production'} environment`
+    )
   }
 
   return (
@@ -248,8 +264,15 @@ const App = () => (
             <Sonner />
             <OfflineIndicator />
             <PerformanceMonitor />
-            <Analytics />
-            <BrowserRouter>
+            <Suspense fallback={null}>
+              <Analytics />
+            </Suspense>
+            <BrowserRouter
+              future={{
+                v7_startTransition: true,
+                v7_relativeSplatPath: true,
+              }}
+            >
               <AppRouter />
             </BrowserRouter>
           </TooltipProvider>

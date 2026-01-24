@@ -17,11 +17,15 @@ Hybrid system: Vercel serverless API + React frontend. Express backend exists fo
 
 ```bash
 npm install           # installs root + workspaces
-npm run dev           # runs frontend + backend (local)
+npm run dev           # runs frontend + Vercel dev (API functions) with optimized settings
 # or per app
-npm run dev:frontend
-npm run dev:backend   # local Express only
+npm run dev:frontend  # frontend only (Vite dev server)
+npm run dev:vercel    # Vercel dev server (API functions) - includes 32KB header size limit
+npm run dev:backend   # local Express only (optional)
+npm run dev:all       # all three together
 ```
+
+**Note**: The `npm run dev` command automatically configures Node.js to accept larger HTTP headers (32KB) to accommodate Clerk authentication tokens. If you encounter `431 Request Header Fields Too Large` errors, ensure you're using `npm run dev` and not just `npm run dev:frontend`.
 
 ### Environment Variables
 

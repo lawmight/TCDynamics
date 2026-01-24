@@ -51,8 +51,15 @@ Use `getAllBy*` for elements appearing multiple times:
 expect(screen.getAllByText(/Email/i).length).toBeGreaterThan(0)
 ```
 
+## Test runner
+
+- **Backend** (`apps/backend`): Jest — use `jest.mock` and `require` in mocks.
+- **Frontend** (`apps/frontend`): Vitest — use `vi.mock` and `import`; mocks must be hoisted (top-level) or use `vi.hoisted`.
+
 ## Mocking Dependencies
 Mock before imports:
+
+**Jest (backend):**
 
 ```javascript
 jest.mock('../../config/email', () => ({
@@ -62,4 +69,11 @@ jest.mock('../../config/email', () => ({
 
 // Import AFTER mocks
 const { createTransporter } = require('../../config/email')
+```
+
+**Vitest (frontend):**
+
+```typescript
+vi.mock('@/utils/logger', () => ({ logger: { error: vi.fn(), warn: vi.fn() } }))
+import { useFormSubmit } from '../useFormSubmit'
 ```

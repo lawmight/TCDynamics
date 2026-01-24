@@ -7,10 +7,11 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:vercel\"",
+    "dev:all": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\" \"npm run dev:vercel\"",
     "dev:frontend": "cd apps/frontend && npm run dev",
     "dev:backend": "cd apps/backend && npm run dev",
-    "dev:vercel": "cd apps/frontend && vercel dev --listen 3001 --yes",
+    "dev:vercel": "cross-env NODE_OPTIONS=\"--max-http-header-size=65536\" vercel dev --listen 3001 --yes",
     "dev:functions": "echo \"Azure Functions archived - see apps/functions-archive/\"",
     "build": "npm run build:frontend && npm run build:backend",
     "build:frontend": "cd apps/frontend && npm run build",
@@ -62,6 +63,7 @@
     "autoprefixer": "^10.4.23",
     "caniuse-lite": "^1.0.30001765",
     "concurrently": "^8.2.2",
+    "cross-env": "^10.1.0",
     "css-tree": "^2.3.1",
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-react-hooks": "^5.2.0",

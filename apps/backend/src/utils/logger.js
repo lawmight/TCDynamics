@@ -161,16 +161,20 @@ const logRequest = (req, res, next) => {
   res.send = function (body) {
     const duration = Date.now() - start
 
+    let size
+    if (Buffer.isBuffer(body)) {
+      size = body.length
+    } else if (typeof body === 'string') {
+      size = Buffer.byteLength(body, 'utf8')
+    } else {
+      size = 0
+    }
     logger.http('Réponse envoyée', {
       method: req.method,
       url: req.url,
       statusCode: res.statusCode,
       duration: `${duration}ms`,
-      size: Buffer.isBuffer(body)
-        ? body.length
-        : typeof body === 'string'
-          ? Buffer.byteLength(body, 'utf8')
-          : 0,
+      size,
       requestId: req.headers['x-request-id'] || 'unknown',
     })
 

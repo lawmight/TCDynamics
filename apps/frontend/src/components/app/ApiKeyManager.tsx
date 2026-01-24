@@ -3,16 +3,14 @@
  * Main component for listing, creating, and revoking API keys
  */
 
-import {
-  AlertTriangle,
-  Calendar,
-  Clock,
-  Key,
-  Loader2,
-  Plus,
-  RefreshCw,
-  Trash2,
-} from 'lucide-react'
+import AlertTriangle from '~icons/lucide/alert-triangle'
+import Calendar from '~icons/lucide/calendar'
+import Clock from '~icons/lucide/clock'
+import Key from '~icons/lucide/key'
+import Loader2 from '~icons/lucide/loader-2'
+import Plus from '~icons/lucide/plus'
+import RefreshCw from '~icons/lucide/refresh-cw'
+import Trash2 from '~icons/lucide/trash-2'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 

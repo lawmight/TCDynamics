@@ -1,4 +1,7 @@
-import { ArrowRight, Link, Settings, TrendingUp } from 'lucide-react'
+import ArrowRight from '~icons/lucide/arrow-right'
+import Link from '~icons/lucide/link'
+import Settings from '~icons/lucide/settings'
+import TrendingUp from '~icons/lucide/trending-up'
 
 import { Card, CardContent } from '@/components/ui/card'
 

@@ -1,15 +1,13 @@
-import {
-  AlertCircle,
-  ArrowRight,
-  CheckCircle,
-  Cpu,
-  Database,
-  Network,
-  Pause,
-  Play,
-  RefreshCw,
-  Shield,
-} from 'lucide-react'
+import AlertCircle from '~icons/lucide/alert-circle'
+import ArrowRight from '~icons/lucide/arrow-right'
+import CheckCircle from '~icons/lucide/check-circle'
+import Cpu from '~icons/lucide/cpu'
+import Database from '~icons/lucide/database'
+import Network from '~icons/lucide/network'
+import Pause from '~icons/lucide/pause'
+import Play from '~icons/lucide/play'
+import RefreshCw from '~icons/lucide/refresh-cw'
+import Shield from '~icons/lucide/shield'
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 

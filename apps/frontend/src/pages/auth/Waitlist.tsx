@@ -1,5 +1,5 @@
 import { Waitlist as ClerkWaitlist } from '@clerk/clerk-react'
-import { Sparkles } from 'lucide-react'
+import Sparkles from '~icons/lucide/sparkles'
 
 import { Card } from '@/components/ui/card'
 

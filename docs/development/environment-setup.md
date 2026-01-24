@@ -45,14 +45,21 @@ Add required environment variables (see sections below).
 ### 5. Start Development Servers
 
 ```bash
-# Terminal 1: Vercel dev server (API functions)
-vercel dev --listen 3001
-
-# Terminal 2: Frontend dev server
-npm run dev:frontend
-# or run both together
+# Run both frontend and Vercel dev server together (recommended)
 npm run dev
+
+# Or run individually:
+# Terminal 1: Frontend dev server
+npm run dev:frontend
+
+# Terminal 2: Vercel dev server (API functions)
+npm run dev:vercel
+
+# Or run all three (frontend + API + Express backend):
+npm run dev:all
 ```
+
+**Note**: The main `npm run dev` command now automatically starts both the frontend (Vite) and the Vercel dev server (API functions) together. This ensures API endpoints are available when developing locally.
 
 ---
 
@@ -550,6 +557,42 @@ VITE_FEATURE_ENABLE_VERCEL_CHAT=true
 - Verify `CLERK_WEBHOOK_SIGNING_SECRET` matches Clerk dashboard
 - Check webhook endpoint URL is correct
 - Verify webhook events are subscribed
+
+---
+
+### 431 Request Header Fields Too Large
+
+**Error**: `431 Request Header Fields Too Large` when accessing API endpoints
+
+**Cause**: This error occurs when request headers (primarily the Clerk JWT token in the Authorization header) exceed Node.js's default 16KB limit.
+
+**Solution**:
+1. Ensure you're running the development server with the correct command:
+   ```bash
+   npm run dev  # This includes the header size fix
+   ```
+   
+2. If running Vercel dev manually, use the increased header size:
+   ```bash
+   NODE_OPTIONS="--max-http-header-size=32768" vercel dev --listen 3001
+   ```
+
+3. Try refreshing your Clerk session:
+   - Sign out of the application
+   - Sign back in
+   - This generates a new, potentially smaller token
+
+**Prevention**:
+- Keep Clerk user metadata lean (avoid storing large objects)
+- Use database references instead of embedding data in tokens
+- Consider using Clerk sessions with shorter expiration times
+- Avoid storing large arrays or objects in public/private metadata
+
+**Production Deployment**:
+The fix is automatically applied in production via Vercel's serverless functions configuration. If deploying elsewhere, ensure Node.js is started with:
+```bash
+NODE_OPTIONS="--max-http-header-size=32768" node server.js
+```
 
 ---
 

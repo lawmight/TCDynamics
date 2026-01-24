@@ -1,4 +1,6 @@
-import { CloudUpload, FileText, RefreshCcw } from 'lucide-react'
+import CloudUpload from '~icons/lucide/cloud-upload'
+import FileText from '~icons/lucide/file-text'
+import RefreshCcw from '~icons/lucide/refresh-ccw'
 import { useEffect, useState } from 'react'
 
 import { recordEvent } from '@/api/analytics'
@@ -119,7 +121,9 @@ const Files = () => {
             </Button>
           </div>
         </div>
-        {message && <p className="text-sm text-muted-foreground">{message}</p>}
+        {message ? (
+            <p className="text-sm text-muted-foreground">{message}</p>
+          ) : null}
       </Card>
 
       <Card className="border-border bg-card/70 p-4 shadow-sm">

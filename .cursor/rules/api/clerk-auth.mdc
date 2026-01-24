@@ -9,17 +9,26 @@ globs: ['api/**/*.js', 'apps/frontend/src/**/*.{ts,tsx}']
 
 ### ClerkProvider
 
-Wrap your app with ClerkProvider in `main.tsx`:
+Wrap your app with ClerkProvider in `App.tsx` via a `ThemedClerkProvider` (inside `ThemeProvider`) so appearance follows theme. Use `getClerkAppearance(resolvedTheme)` from `@/config/clerkTheme`. Use `VITE_CLERK_PREVIEW_PUBLISHABLE_KEY` for dev/preview and `VITE_CLERK_PUBLISHABLE_KEY` for production.
 
 ```tsx
 import { ClerkProvider } from '@clerk/clerk-react'
-import { clerkTheme } from './lib/clerkTheme'
-;<ClerkProvider
-  publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
-  appearance={clerkTheme}
->
-  <App />
-</ClerkProvider>
+import { useTheme } from '@/components/ThemeProvider'
+import { getClerkAppearance } from '@/config/clerkTheme'
+
+const ThemedClerkProvider = ({ children }: { children: React.ReactNode }) => {
+  const { resolvedTheme } = useTheme()
+  const key =
+    import.meta.env.MODE === 'development' /* or Vercel preview */
+      ? import.meta.env.VITE_CLERK_PREVIEW_PUBLISHABLE_KEY
+      : import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+  return (
+    <ClerkProvider publishableKey={key} appearance={getClerkAppearance(resolvedTheme)}>
+      {children}
+    </ClerkProvider>
+  )
+}
+// In App: <ThemeProvider><ThemedClerkProvider>...</ThemedClerkProvider></ThemeProvider>
 ```
 
 ### useAuth Hook
