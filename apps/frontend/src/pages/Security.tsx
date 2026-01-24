@@ -1,11 +1,11 @@
-import Shield from '~icons/lucide/shield'
-import Lock from '~icons/lucide/lock'
-import Cloud from '~icons/lucide/cloud'
-import Phone from '~icons/lucide/phone'
 import { Link } from 'react-router-dom'
 
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import Cloud from '~icons/lucide/cloud'
+import Lock from '~icons/lucide/lock'
+import Phone from '~icons/lucide/phone'
+import Shield from '~icons/lucide/shield'
 
 const Security = () => {
   const guarantees = [

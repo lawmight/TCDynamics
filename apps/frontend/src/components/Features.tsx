@@ -1,11 +1,12 @@
-import ArrowRight from '~icons/lucide/arrow-right'
-import Brain from '~icons/lucide/brain'
-import Lock from '~icons/lucide/lock'
-import Zap from '~icons/lucide/zap'
 import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
 import { featureModules } from '@/data/productHighlights'
+import ArrowRight from '~icons/lucide/arrow-right'
+import Brain from '~icons/lucide/brain'
+import Lock from '~icons/lucide/lock'
+import Zap from '~icons/lucide/zap'
+
 
 const Features = () => {
   const navigate = useNavigate()

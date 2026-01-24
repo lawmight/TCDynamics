@@ -1,3 +1,10 @@
+import { useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+
+import heroAutomationVideo from '@/assets/hero-automation-video.mp4'
+import heroAutomationPoster from '@/assets/hero-automation.jpg'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
 import AlertCircle from '~icons/lucide/alert-circle'
 import ArrowRight from '~icons/lucide/arrow-right'
 import CheckCircle from '~icons/lucide/check-circle'
@@ -8,13 +15,7 @@ import Pause from '~icons/lucide/pause'
 import Play from '~icons/lucide/play'
 import RefreshCw from '~icons/lucide/refresh-cw'
 import Shield from '~icons/lucide/shield'
-import { useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 
-import heroAutomationVideo from '@/assets/hero-automation-video.mp4'
-import heroAutomationPoster from '@/assets/hero-automation.jpg'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
 
 const Hero = () => {
   const navigate = useNavigate()

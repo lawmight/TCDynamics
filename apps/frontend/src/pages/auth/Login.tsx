@@ -4,11 +4,11 @@ import {
   SignInButton,
   useAuth,
 } from '@clerk/clerk-react'
-import ShieldCheck from '~icons/lucide/shield-check'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { Card } from '@/components/ui/card'
+import ShieldCheck from '~icons/lucide/shield-check'
 
 const Login = () => {
   const { isSignedIn, isLoaded } = useAuth()

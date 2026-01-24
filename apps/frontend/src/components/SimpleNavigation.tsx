@@ -1,11 +1,11 @@
-import ArrowUp from '~icons/lucide/arrow-up'
-import Menu from '~icons/lucide/menu'
-import X from '~icons/lucide/x'
 import { startTransition, useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import { useTheme } from '@/components/ThemeProvider'
 import { useAuth } from '@/hooks/useAuth'
+import ArrowUp from '~icons/lucide/arrow-up'
+import Menu from '~icons/lucide/menu'
+import X from '~icons/lucide/x'
 
 type NavigationItem =
   | { label: string; scrollId: string; path?: never }

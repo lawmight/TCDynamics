@@ -3,12 +3,6 @@
  * Displays newly created API key with copy functionality and security warnings
  */
 
-import AlertTriangle from '~icons/lucide/alert-triangle'
-import CheckCircle2 from '~icons/lucide/check-circle-2'
-import Copy from '~icons/lucide/copy'
-import Key from '~icons/lucide/key'
-import Loader2 from '~icons/lucide/loader-2'
-import X from '~icons/lucide/x'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -25,6 +19,12 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import AlertTriangle from '~icons/lucide/alert-triangle'
+import CheckCircle2 from '~icons/lucide/check-circle-2'
+import Copy from '~icons/lucide/copy'
+import Key from '~icons/lucide/key'
+import Loader2 from '~icons/lucide/loader-2'
+import X from '~icons/lucide/x'
 
 interface ApiKeyCreateDialogProps {
   open: boolean

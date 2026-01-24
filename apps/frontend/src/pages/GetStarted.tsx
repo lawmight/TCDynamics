@@ -1,3 +1,11 @@
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import ArrowRight from '~icons/lucide/arrow-right'
 import CheckCircle from '~icons/lucide/check-circle'
 import Clock from '~icons/lucide/clock'
@@ -8,14 +16,7 @@ import Rocket from '~icons/lucide/rocket'
 import Shield from '~icons/lucide/shield'
 import Sparkles from '~icons/lucide/sparkles'
 import Zap from '~icons/lucide/zap'
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 const GetStarted = () => {
   const navigate = useNavigate()

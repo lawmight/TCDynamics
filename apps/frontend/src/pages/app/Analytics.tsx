@@ -1,12 +1,13 @@
-import Activity from '~icons/lucide/activity'
-import BarChart2 from '~icons/lucide/bar-chart-2'
-import Gauge from '~icons/lucide/gauge'
-import Loader2 from '~icons/lucide/loader-2'
 import { useEffect, useState } from 'react'
 
 import { fetchAnalytics, type AnalyticsSummary } from '@/api/analytics'
 import { AnimatedCounter } from '@/components/ui/animated-counter'
 import { Card } from '@/components/ui/card'
+import Activity from '~icons/lucide/activity'
+import BarChart2 from '~icons/lucide/bar-chart-2'
+import Gauge from '~icons/lucide/gauge'
+import Loader2 from '~icons/lucide/loader-2'
+
 
 const Analytics = () => {
   const [data, setData] = useState<AnalyticsSummary | null>(null)

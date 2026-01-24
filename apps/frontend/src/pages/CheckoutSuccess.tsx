@@ -1,14 +1,14 @@
 import confetti from 'canvas-confetti'
-import ArrowRight from '~icons/lucide/arrow-right'
-import CheckCircle from '~icons/lucide/check-circle'
-import Download from '~icons/lucide/download'
-import Mail from '~icons/lucide/mail'
 import { useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import ArrowRight from '~icons/lucide/arrow-right'
+import CheckCircle from '~icons/lucide/check-circle'
+import Download from '~icons/lucide/download'
+import Mail from '~icons/lucide/mail'
 
 const CheckoutSuccess = () => {
   const [searchParams] = useSearchParams()

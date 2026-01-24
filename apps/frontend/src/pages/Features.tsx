@@ -1,13 +1,14 @@
-import CheckCircle2 from '~icons/lucide/check-circle-2'
-import PlugZap from '~icons/lucide/plug-zap'
-import ShieldCheck from '~icons/lucide/shield-check'
-import Sparkles from '~icons/lucide/sparkles'
-import Workflow from '~icons/lucide/workflow'
 import { Link } from 'react-router-dom'
 
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { featureModules } from '@/data/productHighlights'
+import CheckCircle2 from '~icons/lucide/check-circle-2'
+import PlugZap from '~icons/lucide/plug-zap'
+import ShieldCheck from '~icons/lucide/shield-check'
+import Sparkles from '~icons/lucide/sparkles'
+import Workflow from '~icons/lucide/workflow'
+
 
 const integrationHighlights = [
   {

@@ -3,14 +3,6 @@
  * Main component for listing, creating, and revoking API keys
  */
 
-import AlertTriangle from '~icons/lucide/alert-triangle'
-import Calendar from '~icons/lucide/calendar'
-import Clock from '~icons/lucide/clock'
-import Key from '~icons/lucide/key'
-import Loader2 from '~icons/lucide/loader-2'
-import Plus from '~icons/lucide/plus'
-import RefreshCw from '~icons/lucide/refresh-cw'
-import Trash2 from '~icons/lucide/trash-2'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -36,6 +28,14 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { useApiKeys } from '@/hooks/useApiKeys'
+import AlertTriangle from '~icons/lucide/alert-triangle'
+import Calendar from '~icons/lucide/calendar'
+import Clock from '~icons/lucide/clock'
+import Key from '~icons/lucide/key'
+import Loader2 from '~icons/lucide/loader-2'
+import Plus from '~icons/lucide/plus'
+import RefreshCw from '~icons/lucide/refresh-cw'
+import Trash2 from '~icons/lucide/trash-2'
 
 
 function formatDate(dateString: string | null): string {

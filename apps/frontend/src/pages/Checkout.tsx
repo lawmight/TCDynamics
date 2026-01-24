@@ -1,8 +1,3 @@
-import ArrowLeft from '~icons/lucide/arrow-left'
-import CheckCircle from '~icons/lucide/check-circle'
-import CreditCard from '~icons/lucide/credit-card'
-import Lock from '~icons/lucide/lock'
-import Shield from '~icons/lucide/shield'
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 
@@ -11,6 +6,11 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/hooks/useAuth'
 import { redirectToCheckout, type PlanType } from '@/utils/polar'
+import ArrowLeft from '~icons/lucide/arrow-left'
+import CheckCircle from '~icons/lucide/check-circle'
+import CreditCard from '~icons/lucide/credit-card'
+import Lock from '~icons/lucide/lock'
+import Shield from '~icons/lucide/shield'
 
 const Checkout = () => {
   const [searchParams] = useSearchParams()

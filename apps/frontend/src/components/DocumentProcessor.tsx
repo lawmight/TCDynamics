@@ -1,8 +1,3 @@
-import Upload from '~icons/lucide/upload'
-import FileText from '~icons/lucide/file-text'
-import Loader2 from '~icons/lucide/loader-2'
-import CheckCircle from '~icons/lucide/check-circle'
-import AlertCircle from '~icons/lucide/alert-circle'
 import { useState, useRef } from 'react'
 
 import { visionAPI } from '@/api/azureServices'
@@ -11,6 +6,11 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { logger } from '@/utils/logger'
+import AlertCircle from '~icons/lucide/alert-circle'
+import CheckCircle from '~icons/lucide/check-circle'
+import FileText from '~icons/lucide/file-text'
+import Loader2 from '~icons/lucide/loader-2'
+import Upload from '~icons/lucide/upload'
 
 // Types pour l'API Vision
 interface VisionWord {

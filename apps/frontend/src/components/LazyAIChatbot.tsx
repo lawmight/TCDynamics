@@ -1,5 +1,6 @@
-import Loader2 from '~icons/lucide/loader-2'
 import { Suspense, lazy } from 'react'
+
+import Loader2 from '~icons/lucide/loader-2'
 
 // Lazy load the AIChatbot component
 const AIChatbot = lazy(() => import('./AIChatbot'))
