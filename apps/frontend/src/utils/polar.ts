@@ -62,7 +62,7 @@ export const createCheckoutSession = async (
   }
 
   try {
-    const response = await fetch('/api/polar/create-checkout-session', {
+    const response = await fetch('/api/polar/checkout', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -144,7 +144,7 @@ export const getCheckoutSession = async (
 
   try {
     const response = await fetch(
-      `/api/polar/checkout-session?checkoutId=${checkoutId}`,
+      `/api/polar/checkout?checkoutId=${checkoutId}`,
       {
         method: 'GET',
         headers: {
@@ -205,7 +205,7 @@ export const createOnDemandCheckout = async (
   }
 
   try {
-    const response = await fetch('/api/polar/create-checkout-session', {
+    const response = await fetch('/api/polar/checkout', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

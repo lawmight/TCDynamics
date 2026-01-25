@@ -45,7 +45,7 @@ const CheckoutEnterprise = () => {
 
       // Call public checkout API
       const response = await fetch(
-        '/api/polar/create-checkout-session?public=true',
+        '/api/polar/checkout?public=true',
         {
           method: 'POST',
           headers: {
