@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr-FR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -44,18 +44,23 @@
     <meta name="apple-mobile-web-app-title" content="WorkFlowAI" />
     <meta name="msapplication-TileColor" content="#667eea" />
 
-    <!-- Preconnects & critical fonts -->
+    <!-- Preconnects & critical fonts (use onload-preload pattern to avoid double downloads) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="preload"
       as="style"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      />
+    </noscript>
+    <!-- Ensure sensible referrer policy for cross-origin requests -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     <link rel="preconnect" href="https://api.tcdynamics.fr" crossorigin />
     <link rel="preconnect" href="https://connect.facebook.net" crossorigin />
     <link rel="canonical" href="https://tcdynamics.fr/" />
@@ -83,6 +88,8 @@
     </script>
   </head>
   <body>
+    <!-- Fallback styles for users with JavaScript disabled -->
+    <noscript><style>html{color-scheme: light;} </style></noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <!-- Facebook SDK initialization - moved to external file for CSP compliance -->
