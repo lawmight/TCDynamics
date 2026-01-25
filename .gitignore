@@ -37,6 +37,7 @@ cursor/*
 !.cursor/rules/
 .cursor/skills/
 .cursor/plans/
+.cursor/hooks/logs/
 .gemini/
 .claude/
 *.swp

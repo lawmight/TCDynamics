@@ -1,3 +1,7 @@
+> **Status: Superseded (2026-01-25).** One-off agent prompt; quality gate fixes have been applied. See `.github/workflows/quality-gate.yml`.
+>
+> ---
+
 # Prompt for Background Agent: Fix Quality Gate Workflow Failures
 
 ## Context
@@ -21,7 +25,7 @@ The workflow runs these checks:
 ### 1. **Coverage Threshold (60%)**
 - **Location**: Step "Check Coverage Threshold"
 - **Issue**: May be too strict or coverage report not generating correctly
-- **Check**: 
+- **Check**:
   - Verify `coverage/coverage-summary.json` is created after tests
   - Check if threshold should be lowered or made configurable
   - Ensure test:coverage script is working correctly

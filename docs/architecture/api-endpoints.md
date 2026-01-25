@@ -109,6 +109,32 @@ Record an analytics event.
 
 ---
 
+### Awaiting Summary (Internal)
+
+#### `GET /api/awaiting-summary`
+
+Counts of new contacts, pending demo requests, and recent Polar events. Used by Cursor `sessionStart` hook to inject “awaiting” context into the agent.
+
+**Authentication**: Required — `x-internal-token: <INTERNAL_HOOK_TOKEN>` or `Authorization: Bearer <INTERNAL_HOOK_TOKEN>`
+
+**Response**:
+```json
+{
+  "contacts": { "new": 3, "last24h": 5 },
+  "demoRequests": { "pending": 2, "last7d": 2 },
+  "polar": { "last24h": 1, "last7d": 3, "byType": { "order.paid": 1, "checkout.updated": 0 } }
+}
+```
+
+**Error Responses**:
+- `401 Unauthorized` - Missing or invalid `INTERNAL_HOOK_TOKEN`
+- `503 Service Unavailable` - Database unavailable
+- `500 Internal Server Error` - Query failed
+
+**Note**: Set `INTERNAL_HOOK_TOKEN` in Vercel (and in local env when using `.cursor/hooks/status-inject.js`). See `.cursor/hooks/README.md`.
+
+---
+
 ### Chat
 
 #### `POST /api/chat`

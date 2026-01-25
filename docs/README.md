@@ -2,6 +2,7 @@
 
 **Last Updated**: 2026-01-09
 **Status**: Active
+**Pulse**: Workflow verified 2026-01-25
 
 Welcome to the TCDynamics WorkFlowAI documentation. This index provides navigation to all project documentation organized by category.
 
@@ -125,7 +126,7 @@ When adding or updating documentation:
 
 - Root [README.md](../README.md) - Project overview and quick start
 - [Environment Setup](development/environment-setup.md) - Environment variables and service configuration
-- [DOCS_ANALYSIS.md](DOCS_ANALYSIS.md) - Comprehensive documentation analysis report
+- [DOCS_ANALYSIS (archived)](archive/DOCS_ANALYSIS.md) - Documentation analysis report (historical; structure since implemented)
 
 ---
 

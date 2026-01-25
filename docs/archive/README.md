@@ -1,6 +1,6 @@
 # Archive Directory
 
-**Last Updated**: 2026-01-09
+**Last Updated**: 2026-01-25
 **Status**: Historical Reference
 
 This directory contains historical documentation and configuration files that are no longer actively used but are preserved for reference.
@@ -29,6 +29,30 @@ Backup of a previous `vercel.json` configuration file. The current `vercel.json`
 
 ---
 
+### `DOCS_ANALYSIS.md`
+
+**Status**: Superseded (2026-01-25). Recommended structure implemented; see [docs/README.md](../README.md) for the current index.
+
+**Purpose**: Reference for the 2026-01-09 documentation analysis and earlier proposed structure.
+
+---
+
+### `fix-quality-gate-prompt.md`
+
+**Status**: Superseded (2026-01-25). Quality gate fixes applied.
+
+**Purpose**: One-off agent prompt used to guide quality-gate workflow fixes.
+
+---
+
+### `github-actions-logs-summary.md`
+
+**Status**: Superseded (2026-01-25). Workflow syntax and lockfile issues described in the doc have been resolved.
+
+**Purpose**: Reference for GitHub Actions failure analysis (2026-01-14) and troubleshooting.
+
+---
+
 ## Notes
 
 - **These files are NOT actively used** - They are kept for historical reference only
@@ -37,4 +61,4 @@ Backup of a previous `vercel.json` configuration file. The current `vercel.json`
 
 ---
 
-**Last Updated**: 2026-01-09
+**Last Updated**: 2026-01-25

@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      { "command": "node ./.cursor/hooks/status-inject.js" }
+    ],
+    "afterFileEdit": [
+      { "command": "node ./.cursor/hooks/format.js" }
+    ],
+    "afterShellExecution": [
+      { "command": "node ./.cursor/hooks/deploy-notify.js" }
+    ],
+    "beforeShellExecution": [
+      { "command": "node ./.cursor/hooks/audit.js" }
+    ],
+    "beforeSubmitPrompt": [
+      { "command": "node ./.cursor/hooks/audit.js" }
+    ],
+    "stop": [
+      { "command": "node ./.cursor/hooks/audit.js" },
+      { "command": "node ./.cursor/hooks/stop-status.js" }
+    ]
+  }
+}

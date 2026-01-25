@@ -2,6 +2,8 @@
 
 Generated: 2026-01-14
 
+> **Status: Superseded (2026-01-25).** The workflow syntax and lockfile issues described here have been resolved. See `.github/workflows/quality-gate.yml`.
+
 ## Overview
 
 This document contains information about recent GitHub Actions workflow runs, including logs and failure analysis.

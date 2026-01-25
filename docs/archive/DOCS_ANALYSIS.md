@@ -6,10 +6,11 @@
 **Mode**: Concept Analysis (No Code Changes)
 **Scope**: Complete analysis of `/docs` folder structure, content, gaps, and outdated information
 
+> **Status: Superseded (2026-01-25).** The recommended structure has been implemented; paths and file names have changed. See [docs/README.md](../README.md) for the current documentation index.
+
 ---
 
 ## Executive Summary
-
 The `/docs` folder contains **17 documentation files** covering architecture, deployment, migrations, security, testing, and strategic research. The documentation is comprehensive but shows signs of **temporal evolution** with some outdated references and potential gaps.
 
 **Key Findings**:

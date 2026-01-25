@@ -223,6 +223,10 @@ API environment variables are used by Vercel serverless functions in the `api/` 
 - `MAX_MESSAGE_LENGTH` (default: `2000`) - Maximum chat message length
 - `MAX_TOKENS` (default: `512`) - Maximum tokens for AI responses
 
+**Cursor hooks (awaiting-summary)**:
+
+- `INTERNAL_HOOK_TOKEN` (optional) - Shared secret for `GET /api/awaiting-summary` (used by Cursor `sessionStart` to inject contact/demo/Polar counts). Generate: `openssl rand -hex 32`. Set in Vercel and in local env when using `status-inject.js`.
+
 **Monitoring**:
 
 - `SENTRY_DSN` - Sentry DSN for error tracking (server-side)
@@ -571,7 +575,7 @@ VITE_FEATURE_ENABLE_VERCEL_CHAT=true
    ```bash
    npm run dev  # This includes the header size fix
    ```
-   
+
 2. If running Vercel dev manually, use the increased header size:
    ```bash
    NODE_OPTIONS="--max-http-header-size=32768" vercel dev --listen 3001
