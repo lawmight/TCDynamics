@@ -16,7 +16,6 @@ import Play from '~icons/lucide/play'
 import RefreshCw from '~icons/lucide/refresh-cw'
 import Shield from '~icons/lucide/shield'
 
-
 const Hero = () => {
   const navigate = useNavigate()
   const demoLink = import.meta.env.VITE_DEMO_URL || '/demo'
@@ -61,17 +60,17 @@ const Hero = () => {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-background">
+    <div className="bg-background relative min-h-screen overflow-hidden">
       {/* Background Network Patterns */}
       <div className="absolute inset-0">
-        <div className="absolute left-1/4 top-1/4 h-2 w-2 animate-pulse rounded-full bg-primary opacity-60"></div>
-        <div className="absolute right-1/3 top-1/3 h-1 w-1 rounded-full bg-primary-glow opacity-40"></div>
-        <div className="fade-delay-10 absolute bottom-1/4 left-1/3 h-1.5 w-1.5 animate-pulse rounded-full bg-primary opacity-50"></div>
-        <div className="absolute right-1/4 top-1/2 h-1 w-1 rounded-full bg-primary-glow opacity-30"></div>
+        <div className="bg-primary absolute left-1/4 top-1/4 size-2 animate-pulse rounded-full opacity-60"></div>
+        <div className="bg-primary-glow absolute right-1/3 top-1/3 size-1 rounded-full opacity-40"></div>
+        <div className="fade-delay-10 bg-primary absolute bottom-1/4 left-1/3 size-1.5 animate-pulse rounded-full opacity-50"></div>
+        <div className="bg-primary-glow absolute right-1/4 top-1/2 size-1 rounded-full opacity-30"></div>
 
         {/* Connection Lines */}
         <svg
-          className="absolute inset-0 h-full w-full opacity-10"
+          className="absolute inset-0 size-full opacity-10"
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
@@ -119,37 +118,42 @@ const Hero = () => {
           {/* Left Column - Content */}
           <div className="space-y-8">
             {/* Overline */}
-            <div className="fade-in-up inline-flex items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-2 font-mono text-xs text-muted-foreground backdrop-blur-sm">
+            <div className="fade-in-up border-border bg-card/50 text-muted-foreground inline-flex items-center gap-2 rounded-lg border px-3 py-2 font-mono text-xs backdrop-blur-sm">
               <Network size={14} aria-hidden="true" />
-              WORKFLOW INTELLECT
+              <span>WORKFLOW INTELLECT</span>
+              <span className="text-border">·</span>
+              <abbr
+                title="MCP (Model Context Protocol) : protocole ouvert pour connecter l'IA à vos outils, données et APIs."
+                className="cursor-help no-underline"
+              >
+                MCP
+              </abbr>
             </div>
 
             {/* Main Headline */}
             <div className="fade-in-up space-y-4">
-              <h1 className="text-5xl font-bold leading-[0.9] tracking-tight text-foreground lg:text-7xl">
+              <h1 className="text-foreground text-5xl font-bold leading-[0.9] tracking-tight lg:text-7xl">
                 Automatisez Votre{' '}
                 <span className="text-gradient">Entreprise avec l'IA</span>
               </h1>
             </div>
 
             {/* Subheading */}
-            <p className="fade-in-up-delay max-w-lg text-xl leading-relaxed text-muted-foreground lg:text-2xl">
-              Gagnez{' '}
-              <strong className="text-foreground">10h par semaine</strong> avec
-              notre intelligence artificielle.{' '}
-              <span className="text-primary-glow">
-                Spécialement conçu pour les entreprises françaises.
-              </span>
+            <p className="fade-in-up-delay text-muted-foreground max-w-lg text-xl leading-relaxed lg:text-2xl">
+              Finies les heures perdues en process manuels. Gagnez{' '}
+              <span className="text-gradient font-bold">10h</span> par semaine
+              avec l'IA — spécialement conçu pour les entreprises françaises.
             </p>
 
             {/* Value Proposition Box */}
-            <div className="fade-in-up-delay rounded-lg border border-border bg-card/30 p-6 backdrop-blur-sm">
+            <div className="fade-in-up-delay border-border bg-card/30 rounded-lg border p-6 backdrop-blur-sm">
               <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/20">
+                <div className="bg-primary/20 flex size-8 items-center justify-center rounded-md">
                   <Cpu size={16} className="text-primary" aria-hidden="true" />
                 </div>
-                <span className="text-lg font-medium text-foreground">
-                  Transformez vos processus métier en 3 clics
+                <span className="text-foreground text-lg font-medium">
+                  Transformez vos processus métier en{' '}
+                  <span className="text-gradient">3 clics</span>
                 </span>
               </div>
             </div>
@@ -185,7 +189,7 @@ const Hero = () => {
             </div>
 
             {/* Trust Indicators */}
-            <div className="fade-in-up-delay-2 flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
+            <div className="fade-in-up-delay-2 text-muted-foreground flex flex-wrap items-center gap-6 text-sm">
               <div className="flex items-center gap-2">
                 <Database size={14} aria-hidden="true" />
                 <span className="font-mono">Données hébergées en France</span>
@@ -204,7 +208,7 @@ const Hero = () => {
               </div>
               <button
                 onClick={() => goTo(securityLink)}
-                className="font-mono text-xs uppercase tracking-wide text-primary underline-offset-4 hover:underline"
+                className="text-primary font-mono text-xs uppercase tracking-wide underline-offset-4 hover:underline"
               >
                 Security & Availability
               </button>
@@ -213,11 +217,11 @@ const Hero = () => {
 
           {/* Right Column - Hero Visualization */}
           <div className="fade-in-up-delay-2 relative">
-            <div className="relative z-10 overflow-hidden rounded-xl border border-border bg-card/60 shadow-xl shadow-primary/10 backdrop-blur">
-              <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
+            <div className="border-border bg-card/60 shadow-primary/10 relative z-10 overflow-hidden rounded-xl border shadow-xl backdrop-blur">
+              <div className="border-border/60 flex items-center justify-between border-b px-4 py-3">
                 <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 animate-pulse rounded-full bg-primary"></span>
-                  <p className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
+                  <span className="bg-primary size-2 animate-pulse rounded-full"></span>
+                  <p className="text-muted-foreground font-mono text-xs uppercase tracking-wide">
                     Démonstration en direct
                   </p>
                 </div>
@@ -239,9 +243,9 @@ const Hero = () => {
                   <div className="flex min-h-[400px] items-center justify-center p-8">
                     <Alert
                       variant="destructive"
-                      className="w-full max-w-md border-destructive/50 bg-destructive/10"
+                      className="border-destructive/50 bg-destructive/10 w-full max-w-md"
                     >
-                      <AlertCircle className="h-5 w-5 text-destructive" />
+                      <AlertCircle className="text-destructive size-5" />
                       <AlertTitle className="font-mono text-base font-semibold">
                         Erreur de chargement
                       </AlertTitle>
@@ -250,11 +254,11 @@ const Hero = () => {
                           La vidéo de démonstration n'a pas pu être chargée.
                         </p>
                         {errorMessage && (
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-muted-foreground text-xs">
                             {errorMessage}
                           </p>
                         )}
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-muted-foreground text-xs">
                           Veuillez vérifier votre connexion ou réessayer plus
                           tard.
                         </p>
@@ -301,7 +305,7 @@ const Hero = () => {
                     >
                       Votre navigateur ne supporte pas la lecture de vidéos.
                     </video>
-                    <div className="absolute inset-0 bg-gradient-to-tr from-background/40 via-transparent to-background/10"></div>
+                    <div className="from-background/40 to-background/10 absolute inset-0 bg-gradient-to-tr via-transparent"></div>
                     {/* Accessible Pause/Play Control Overlay */}
                     <div className="absolute right-4 top-4 z-20">
                       <Button
@@ -320,7 +324,7 @@ const Hero = () => {
                             ? 'Mettre en pause la vidéo de démonstration'
                             : 'Reprendre la lecture de la vidéo de démonstration'
                         }
-                        className="flex items-center gap-2 bg-background/90 shadow-lg backdrop-blur-sm hover:bg-background/95 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                        className="bg-background/90 hover:bg-background/95 focus-visible:ring-primary flex items-center gap-2 shadow-lg backdrop-blur-sm focus-visible:ring-2 focus-visible:ring-offset-2"
                       >
                         {isPlaying ? (
                           <>
@@ -336,18 +340,18 @@ const Hero = () => {
                       </Button>
                     </div>
                     <div
-                      className={`absolute bottom-4 left-4 rounded-lg border border-border/60 bg-background/70 px-4 py-3 shadow-lg backdrop-blur transition-opacity duration-200 ${
+                      className={`border-border/60 bg-background/70 absolute bottom-4 left-4 rounded-lg border px-4 py-3 shadow-lg backdrop-blur transition-opacity duration-200 ${
                         isVideoHovered || !isPlaying || isVideoEnded
                           ? 'pointer-events-none opacity-0'
                           : 'opacity-100'
                       }`}
                     >
-                      <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
+                      <div className="text-muted-foreground flex items-center gap-2 font-mono text-xs">
                         <Network size={14} />
-                        Workflow en direct
+                        De manuel à automatisé — en direct
                       </div>
-                      <p className="text-sm font-semibold text-foreground">
-                        Extraction + réponses IA orchestrées
+                      <p className="text-foreground text-sm font-semibold">
+                        La transformation en 3 clics
                       </p>
                     </div>
                   </>
@@ -362,7 +366,7 @@ const Hero = () => {
       </div>
 
       {/* Bottom Fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent"></div>
+      <div className="from-background absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t to-transparent"></div>
     </div>
   )
 }

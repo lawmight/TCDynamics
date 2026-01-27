@@ -1,11 +1,18 @@
 import { Card, CardContent } from '@/components/ui/card'
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 import ArrowRight from '~icons/lucide/arrow-right'
 import Link from '~icons/lucide/link'
 import Settings from '~icons/lucide/settings'
 import TrendingUp from '~icons/lucide/trending-up'
 
-
 const HowItWorks = () => {
+  const { ref: sectionRef, hasIntersected } = useIntersectionObserver({
+    threshold: 0.15,
+    rootMargin: '0px 0px -50px 0px',
+  })
+
+  // Hidden state before scroll reveal
+  const hiddenClass = 'opacity-0 translate-y-6'
   const steps = [
     {
       number: '01',
@@ -49,12 +56,15 @@ const HowItWorks = () => {
   ]
 
   return (
-    <section className="relative overflow-hidden bg-background py-24">
+    <section
+      ref={sectionRef}
+      className="bg-background relative overflow-hidden py-24"
+    >
       {/* Network Background */}
       <div className="absolute inset-0 opacity-5">
         <div className="network-background-gradient absolute inset-0">
           <svg
-            className="absolute inset-0 h-full w-full"
+            className="absolute inset-0 size-full"
             xmlns="http://www.w3.org/2000/svg"
           >
             <defs>
@@ -85,11 +95,13 @@ const HowItWorks = () => {
       </div>
 
       <div className="container relative z-10 mx-auto px-4">
-        <div className="fade-in-up mb-16 text-center">
+        <div
+          className={`mb-16 text-center ${hasIntersected ? 'fade-in-up' : hiddenClass}`}
+        >
           <h2 className="text-gradient mb-6 text-4xl font-bold md:text-5xl">
             Comment ça marche
           </h2>
-          <p className="mx-auto max-w-3xl font-mono text-xl text-muted-foreground">
+          <p className="text-muted-foreground mx-auto max-w-3xl font-mono text-xl">
             Trois étapes simples pour transformer votre entreprise avec l'IA
           </p>
         </div>
@@ -100,35 +112,37 @@ const HowItWorks = () => {
             return (
               <div
                 key={index}
-                className={`fade-in-up relative ${
-                  index === 0
-                    ? 'fade-delay-00'
-                    : index === 1
-                      ? 'fade-delay-02'
-                      : index === 2
-                        ? 'fade-delay-04'
-                        : ''
+                className={`relative ${
+                  hasIntersected
+                    ? `fade-in-up ${
+                        index === 0
+                          ? 'fade-delay-00'
+                          : index === 1
+                            ? 'fade-delay-02'
+                            : 'fade-delay-04'
+                      }`
+                    : hiddenClass
                 }`}
               >
-                <Card className="group h-full border-primary/20 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-primary/40">
+                <Card className="border-primary/20 bg-card/50 hover:border-primary/40 group h-full backdrop-blur-sm transition-all duration-300 hover:scale-105">
                   <CardContent className="p-8">
                     {/* Step Number */}
                     <div className="mb-6 flex items-center justify-between">
-                      <span className="font-mono text-6xl font-bold text-primary/20 transition-colors group-hover:text-primary/40">
+                      <span className="text-primary/20 group-hover:text-primary/40 font-mono text-6xl font-bold transition-colors">
                         {step.number}
                       </span>
-                      <div className="rounded-full bg-primary/10 p-4 transition-colors group-hover:bg-primary/20">
-                        <IconComponent className="h-8 w-8 text-primary" />
+                      <div className="bg-primary/10 group-hover:bg-primary/20 rounded-full p-4 transition-colors">
+                        <IconComponent className="text-primary size-8" />
                       </div>
                     </div>
 
                     {/* Title */}
-                    <h3 className="mb-4 text-2xl font-bold transition-colors group-hover:text-primary">
+                    <h3 className="group-hover:text-primary mb-4 text-2xl font-bold transition-colors">
                       {step.title}
                     </h3>
 
                     {/* Description */}
-                    <p className="mb-6 leading-relaxed text-muted-foreground">
+                    <p className="text-muted-foreground mb-6 leading-relaxed">
                       {step.description}
                     </p>
 
@@ -139,7 +153,7 @@ const HowItWorks = () => {
                           key={detailIndex}
                           className="flex items-center font-mono text-sm"
                         >
-                          <div className="mr-3 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" />
+                          <div className="bg-primary mr-3 size-1.5 shrink-0 rounded-full" />
                           <span className="text-muted-foreground">
                             {detail}
                           </span>
@@ -151,9 +165,9 @@ const HowItWorks = () => {
 
                 {/* Arrow between steps */}
                 {index < steps.length - 1 && (
-                  <div className="absolute -right-4 top-1/2 z-10 hidden -translate-y-1/2 transform lg:block">
-                    <div className="rounded-full border border-primary/20 bg-background p-2">
-                      <ArrowRight className="h-4 w-4 text-primary" />
+                  <div className="absolute -right-4 top-1/2 z-10 hidden -translate-y-1/2 lg:block">
+                    <div className="border-primary/20 bg-background rounded-full border p-2">
+                      <ArrowRight className="text-primary size-4" />
                     </div>
                   </div>
                 )}
@@ -163,12 +177,14 @@ const HowItWorks = () => {
         </div>
 
         {/* Bottom CTA */}
-        <div className="fade-in-up fade-delay-06 mt-16 text-center">
-          <p className="mb-6 font-mono text-lg text-muted-foreground">
+        <div
+          className={`mt-16 text-center ${hasIntersected ? 'fade-in-up fade-delay-06' : hiddenClass}`}
+        >
+          <p className="text-muted-foreground mb-6 font-mono text-lg">
             Prêt à automatiser votre entreprise ?
           </p>
-          <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-6 py-3">
-            <span className="font-mono font-medium text-primary">
+          <div className="border-primary/20 bg-primary/10 inline-flex items-center rounded-full border px-6 py-3">
+            <span className="text-primary font-mono font-medium">
               Démarrez en moins de 5 minutes
             </span>
           </div>

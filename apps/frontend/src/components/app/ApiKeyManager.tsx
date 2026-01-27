@@ -37,7 +37,6 @@ import Plus from '~icons/lucide/plus'
 import RefreshCw from '~icons/lucide/refresh-cw'
 import Trash2 from '~icons/lucide/trash-2'
 
-
 function formatDate(dateString: string | null): string {
   if (!dateString) return 'Never'
   const date = new Date(dateString)
@@ -77,25 +76,25 @@ function ApiKeyCard({
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1 space-y-2">
             <div className="flex items-center gap-2">
-              <Key className="h-4 w-4 shrink-0 text-muted-foreground" />
+              <Key className="text-muted-foreground size-4 shrink-0" />
               {apiKey.name ? (
                 <span className="truncate font-medium">{apiKey.name}</span>
               ) : (
-                <span className="italic text-muted-foreground">
+                <span className="text-muted-foreground italic">
                   Unnamed key
                 </span>
               )}
             </div>
-            <code className="block truncate rounded bg-muted px-2 py-1 font-mono text-xs">
+            <code className="bg-muted block truncate rounded px-2 py-1 font-mono text-xs">
               {apiKey.key_prefix}
             </code>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+            <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
               <span className="flex items-center gap-1">
-                <Calendar className="h-3 w-3" />
+                <Calendar className="size-3" />
                 Created {formatDate(apiKey.created_at)}
               </span>
               <span className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
+                <Clock className="size-3" />
                 {formatRelativeDate(apiKey.last_used_at)}
               </span>
             </div>
@@ -105,12 +104,12 @@ function ApiKeyCard({
             size="sm"
             onClick={onRevoke}
             disabled={isRevoking}
-            className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
+            className="text-destructive hover:bg-destructive/10 hover:text-destructive shrink-0"
           >
             {isRevoking ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="size-4 animate-spin" />
             ) : (
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="size-4" />
             )}
             <span className="sr-only">Revoke key</span>
           </Button>
@@ -124,14 +123,14 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
   return (
     <Card className="border-dashed">
       <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-        <Key className="mb-4 h-12 w-12 text-muted-foreground" />
+        <Key className="text-muted-foreground mb-4 size-12" />
         <h3 className="mb-2 text-lg font-semibold">No API keys</h3>
-        <p className="mb-6 max-w-sm text-sm text-muted-foreground">
+        <p className="text-muted-foreground mb-6 max-w-sm text-sm">
           Create an API key to access the API programmatically from your
           applications, scripts, or integrations.
         </p>
         <Button onClick={onCreate}>
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus className="mr-2 size-4" />
           Create your first API key
         </Button>
       </CardContent>
@@ -147,13 +146,13 @@ function LoadingSkeleton() {
           <CardContent className="pt-6">
             <div className="animate-pulse space-y-3">
               <div className="flex items-center gap-2">
-                <div className="h-4 w-4 rounded bg-muted" />
-                <div className="h-4 w-32 rounded bg-muted" />
+                <div className="bg-muted size-4 rounded" />
+                <div className="bg-muted h-4 w-32 rounded" />
               </div>
-              <div className="h-6 w-48 rounded bg-muted" />
+              <div className="bg-muted h-6 w-48 rounded" />
               <div className="flex gap-4">
-                <div className="h-3 w-28 rounded bg-muted" />
-                <div className="h-3 w-24 rounded bg-muted" />
+                <div className="bg-muted h-3 w-28 rounded" />
+                <div className="bg-muted h-3 w-24 rounded" />
               </div>
             </div>
           </CardContent>
@@ -216,14 +215,14 @@ export default function ApiKeyManager() {
 
     return (
       <Alert variant="destructive">
-        <AlertTriangle className="h-4 w-4" />
+        <AlertTriangle className="size-4" />
         <AlertTitle>Error loading API keys</AlertTitle>
         <AlertDescription className="space-y-3">
           <p>
             {error.message || 'An unexpected error occurred. Please try again.'}
           </p>
           {import.meta.env.DEV && isAuthError && (
-            <p className="text-xs italic text-muted-foreground">
+            <p className="text-muted-foreground text-xs italic">
               Tip: In development mode, Clerk sessions may expire quickly. Make
               sure your Vercel dev server is running and both frontend and API
               are using the same Clerk instance.
@@ -245,7 +244,7 @@ export default function ApiKeyManager() {
                 onClick={() => refetch()}
                 className="border-destructive text-destructive hover:bg-destructive/10"
               >
-                <RefreshCw className="mr-2 h-3 w-3" />
+                <RefreshCw className="mr-2 size-3" />
                 Retry
               </Button>
             </div>
@@ -256,7 +255,7 @@ export default function ApiKeyManager() {
               onClick={() => refetch()}
               className="mt-2"
             >
-              <RefreshCw className="mr-2 h-3 w-3" />
+              <RefreshCw className="mr-2 size-3" />
               Retry
             </Button>
           )}
@@ -277,7 +276,7 @@ export default function ApiKeyManager() {
         </div>
         {keys.length > 0 && (
           <Button size="sm" onClick={handleOpenCreateDialog}>
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="mr-2 size-4" />
             Create key
           </Button>
         )}
@@ -316,7 +315,7 @@ export default function ApiKeyManager() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <div className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-destructive" />
+              <AlertTriangle className="text-destructive size-5" />
               <AlertDialogTitle>Revoke API Key?</AlertDialogTitle>
             </div>
             <AlertDialogDescription>
@@ -328,7 +327,7 @@ export default function ApiKeyManager() {
           {/* Context and warnings outside Description (block elements) */}
           <div className="space-y-3 pt-2">
             {/* Key Context Card */}
-            <div className="space-y-2 rounded-md border bg-muted/50 p-3">
+            <div className="bg-muted/50 space-y-2 rounded-md border p-3">
               {keyToRevoke?.name && (
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Name:</span>
@@ -337,16 +336,16 @@ export default function ApiKeyManager() {
               )}
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Key Prefix:</span>
-                <code className="rounded bg-background px-2 py-1 font-mono text-xs">
+                <code className="bg-background rounded px-2 py-1 font-mono text-xs">
                   {keyToRevoke?.key_prefix}
                 </code>
               </div>
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <div className="text-muted-foreground flex items-center justify-between text-xs">
                 <span>Created:</span>
                 <span>{formatDate(keyToRevoke?.created_at ?? null)}</span>
               </div>
               {keyToRevoke?.last_used_at && (
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <div className="text-muted-foreground flex items-center justify-between text-xs">
                   <span>Last Used:</span>
                   <span>{formatDate(keyToRevoke.last_used_at)}</span>
                 </div>
@@ -355,7 +354,7 @@ export default function ApiKeyManager() {
 
             {/* Warning Alert */}
             <Alert variant="destructive" className="mt-3">
-              <AlertTriangle className="h-4 w-4" />
+              <AlertTriangle className="size-4" />
               <AlertTitle>Immediate Impact</AlertTitle>
               <AlertDescription>
                 This key will stop working immediately. Any applications or
@@ -379,7 +378,7 @@ export default function ApiKeyManager() {
             >
               {isRevoking ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 size-4 animate-spin" />
                   Revoking...
                 </>
               ) : (

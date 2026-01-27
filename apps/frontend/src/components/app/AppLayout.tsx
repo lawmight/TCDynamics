@@ -15,7 +15,6 @@ import Moon from '~icons/lucide/moon'
 import Settings from '~icons/lucide/settings'
 import Sun from '~icons/lucide/sun'
 
-
 const navItems = [
   { to: '/app/chat', label: 'Chat', icon: MessageSquare },
   { to: '/app/files', label: 'Files / KB', icon: Folder },
@@ -43,16 +42,16 @@ export const AppLayout = () => {
     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="bg-background text-foreground min-h-screen">
       <div className="flex min-h-screen">
-        <aside className="hidden w-72 flex-shrink-0 border-r border-border bg-sidebar md:flex md:flex-col">
-          <div className="flex items-center gap-3 px-6 py-6">
+        <aside className="border-border bg-sidebar hidden w-72 shrink-0 border-r md:flex md:flex-col">
+          <div className="flex items-center gap-3 p-6">
             {/* eslint-disable-next-line tailwindcss/classnames-order */}
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl ring-1 ring-primary/30 bg-primary/10 text-primary font-semibold">
+            <div className="flex size-10 items-center justify-center rounded-xl ring-1 ring-primary/30 bg-primary/10 text-primary font-semibold">
               TC
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">TCDynamics</p>
+              <p className="text-muted-foreground text-sm">TCDynamics</p>
               <p className="text-base font-semibold">Workspace</p>
             </div>
           </div>
@@ -72,18 +71,18 @@ export const AppLayout = () => {
                     }`
                   }
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="size-4" />
                   {item.label}
                 </NavLink>
               )
             })}
           </nav>
 
-          <div className="space-y-3 border-t border-border px-6 py-4">
+          <div className="border-border space-y-3 border-t px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {/* eslint-disable-next-line tailwindcss/classnames-order */}
-                <div className="flex h-10 w-10 items-center justify-center rounded-full ring-1 ring-primary/30 bg-primary/10 text-primary font-semibold">
+                <div className="flex size-10 items-center justify-center rounded-full ring-1 ring-primary/30 bg-primary/10 text-primary font-semibold">
                   {initials}
                 </div>
                 <div className="text-sm">
@@ -105,11 +104,11 @@ export const AppLayout = () => {
               >
                 {resolvedTheme === 'dark' ? (
                   <div className="flex w-full items-center justify-center gap-2">
-                    <Sun className="h-4 w-4" /> Light
+                    <Sun className="size-4" /> Light
                   </div>
                 ) : (
                   <div className="flex w-full items-center justify-center gap-2">
-                    <Moon className="h-4 w-4" /> Dark
+                    <Moon className="size-4" /> Dark
                   </div>
                 )}
               </Button>
@@ -124,23 +123,23 @@ export const AppLayout = () => {
         </aside>
 
         <main className="flex min-h-screen flex-1 flex-col">
-          <header className="flex items-center justify-between border-b border-border px-4 py-4 md:hidden">
+          <header className="border-border flex items-center justify-between border-b p-4 md:hidden">
             <Link to="/app/chat" className="flex items-center gap-2">
               {/* eslint-disable-next-line tailwindcss/classnames-order */}
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl ring-1 ring-primary/30 bg-primary/10 text-primary font-semibold">
+              <div className="flex size-9 items-center justify-center rounded-xl ring-1 ring-primary/30 bg-primary/10 text-primary font-semibold">
                 TC
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">TCDynamics</p>
+                <p className="text-muted-foreground text-xs">TCDynamics</p>
                 <p className="text-sm font-semibold">Workspace</p>
               </div>
             </Link>
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="icon" onClick={toggleTheme}>
                 {theme === 'dark' ? (
-                  <Sun className="h-4 w-4" />
+                  <Sun className="size-4" />
                 ) : (
-                  <Moon className="h-4 w-4" />
+                  <Moon className="size-4" />
                 )}
               </Button>
               <Button
@@ -148,18 +147,18 @@ export const AppLayout = () => {
                 size="sm"
                 onClick={() => void signOut()}
               >
-                <LogOut className="mr-2 h-4 w-4" />
+                <LogOut className="mr-2 size-4" />
                 Logout
               </Button>
             </div>
           </header>
 
-          <div className="flex flex-1 flex-col gap-6 bg-gradient-to-b from-background via-muted/40 to-background px-4 py-6 md:px-8">
+          <div className="from-background via-muted/40 to-background flex flex-1 flex-col gap-6 bg-gradient-to-b px-4 py-6 md:px-8">
             <div className="grid grid-cols-1 gap-4 md:hidden">
               <Card className="p-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       Signed in as
                     </p>
                     <p className="text-sm font-semibold">
@@ -181,7 +180,7 @@ export const AppLayout = () => {
                           }`
                         }
                       >
-                        <item.icon className="h-4 w-4" />
+                        <item.icon className="size-4" />
                       </NavLink>
                     ))}
                   </div>

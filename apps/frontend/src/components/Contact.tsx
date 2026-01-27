@@ -99,7 +99,7 @@ const Contact = () => {
       icon: Building,
       title: 'Siège social',
       details: [
-        'WorkFlowAI France',
+        'TCDynamics France',
         '12 Avenue des Prés',
         '78180 Montigny-le-Bretonneux',
         'Île-de-France',
@@ -119,9 +119,9 @@ const Contact = () => {
       icon: Mail,
       title: 'Email',
       details: [
-        'contact@workflowai.fr',
-        'demo@workflowai.fr',
-        'support@workflowai.fr',
+        'contact@tcdynamics.fr',
+        'demo@tcdynamics.fr',
+        'support@tcdynamics.fr',
         'Réponse sous 2h',
       ],
     },
@@ -145,11 +145,11 @@ const Contact = () => {
   ]
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-background to-background/50 py-24">
+    <section className="from-background to-background/50 relative overflow-hidden bg-gradient-to-b py-24">
       {/* Network Background */}
       <div className="absolute inset-0 opacity-5">
         <svg
-          className="absolute inset-0 h-full w-full"
+          className="absolute inset-0 size-full"
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
@@ -183,15 +183,15 @@ const Contact = () => {
         <div className="fade-in-up mb-16 text-center">
           <Badge
             variant="outline"
-            className="mb-6 border-primary/40 font-mono text-primary"
+            className="border-primary/40 text-primary mb-6 font-mono"
           >
             Contactez-nous
           </Badge>
           <h2 className="text-gradient mb-6 text-4xl font-bold md:text-5xl">
             Prêt à automatiser ?
           </h2>
-          <p className="mx-auto max-w-3xl font-mono text-xl text-muted-foreground">
-            Découvrez comment WorkFlowAI peut transformer votre entreprise
+          <p className="text-muted-foreground mx-auto max-w-3xl font-mono text-xl">
+            Découvrez comment TCDynamics peut transformer votre entreprise
           </p>
         </div>
 
@@ -199,16 +199,16 @@ const Contact = () => {
         <div className="mx-auto max-w-6xl">
           <div className="grid items-start gap-6 md:grid-cols-3 lg:grid-cols-3">
             {/* Hero Card - Demo Request Form (Full Width) */}
-            <div className="fade-in-up fade-delay-02 relative overflow-hidden rounded-lg border-2 border-primary/40 bg-gradient-to-br from-primary/10 via-primary/5 to-background p-8 shadow-lg shadow-primary/20 backdrop-blur-sm transition-all duration-300 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/30 md:col-span-3 lg:col-span-3">
+            <div className="fade-in-up fade-delay-02 border-primary/40 from-primary/10 via-primary/5 to-background shadow-primary/20 hover:border-primary/60 hover:shadow-primary/30 relative overflow-hidden rounded-lg border-2 bg-gradient-to-br p-8 shadow-lg backdrop-blur-sm transition-all duration-300 hover:shadow-xl md:col-span-3 lg:col-span-3">
               <div className="mb-6 flex items-center gap-3">
-                <div className="rounded-full bg-primary/20 p-2">
-                  <Calendar className="h-6 w-6 text-primary" />
+                <div className="bg-primary/20 rounded-full p-2">
+                  <Calendar className="text-primary size-6" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-primary lg:text-3xl">
+                  <h3 className="text-primary text-2xl font-bold lg:text-3xl">
                     Réserver une démo
                   </h3>
-                  <p className="font-mono text-sm text-muted-foreground">
+                  <p className="text-muted-foreground font-mono text-sm">
                     Démonstration personnalisée avec vos données
                   </p>
                 </div>
@@ -216,9 +216,9 @@ const Contact = () => {
 
               <div className="grid gap-6 md:grid-cols-2">
                 {/* Benefits Section */}
-                <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
-                  <h4 className="mb-3 flex items-center gap-2 font-semibold text-primary">
-                    <CheckCircle className="h-4 w-4 text-primary" />
+                <div className="border-primary/20 bg-primary/5 rounded-lg border p-4">
+                  <h4 className="text-primary mb-3 flex items-center gap-2 font-semibold">
+                    <CheckCircle className="text-primary size-4" />
                     Inclus dans votre démonstration :
                   </h4>
                   <ul className="space-y-2">
@@ -227,7 +227,7 @@ const Contact = () => {
                         key={index}
                         className="flex items-center font-mono text-sm"
                       >
-                        <div className="mr-3 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" />
+                        <div className="bg-primary mr-3 size-1.5 shrink-0 rounded-full" />
                         <span className="text-muted-foreground">{benefit}</span>
                       </li>
                     ))}
@@ -379,7 +379,7 @@ const Contact = () => {
                       className="mb-2 block text-sm font-medium"
                     >
                       Besoins spécifiques *{' '}
-                      <span className="text-xs font-normal text-muted-foreground">
+                      <span className="text-muted-foreground text-xs font-normal">
                         (minimum 10 caractères)
                       </span>
                     </label>
@@ -387,7 +387,7 @@ const Contact = () => {
                       id="needs"
                       name="needs"
                       placeholder="Décrivez brièvement vos processus à automatiser (minimum 10 caractères)..."
-                      className="min-h-[100px] bg-background/50"
+                      className="bg-background/50 min-h-[100px]"
                       required
                       minLength={10}
                       maxLength={5000}
@@ -417,7 +417,7 @@ const Contact = () => {
                       'Envoi en cours...'
                     ) : (
                       <>
-                        <Calendar className="mr-2 h-4 w-4" />
+                        <Calendar className="mr-2 size-4" />
                         Réserver ma démo gratuite
                       </>
                     )}
@@ -430,8 +430,8 @@ const Contact = () => {
                   role="alert"
                   className={`mt-4 rounded-lg p-4 ${
                     demoForm.response.success
-                      ? 'border border-primary/20 bg-primary/10 text-primary'
-                      : 'border border-destructive/20 bg-destructive/10 text-destructive'
+                      ? 'border-primary/20 bg-primary/10 text-primary border'
+                      : 'border-destructive/20 bg-destructive/10 text-destructive border'
                   }`}
                 >
                   {demoForm.response.message}
@@ -445,18 +445,18 @@ const Contact = () => {
                 </div>
               )}
 
-              <p className="mt-4 text-center font-mono text-xs text-muted-foreground">
+              <p className="text-muted-foreground mt-4 text-center font-mono text-xs">
                 Démonstration de 45min • Sans engagement • Réponse sous 2h
               </p>
             </div>
 
             {/* Supporting Card 1 - Contact Info (Combined) */}
-            <div className="fade-in-up fade-delay-04 relative overflow-hidden rounded-lg border border-border/50 bg-card/30 p-4 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-card/50 md:col-span-1 lg:col-span-1">
+            <div className="fade-in-up fade-delay-04 border-border/50 bg-card/30 hover:border-primary/30 hover:bg-card/50 relative overflow-hidden rounded-lg border p-4 backdrop-blur-sm transition-all duration-300 md:col-span-1 lg:col-span-1">
               <div className="mb-3 flex items-center gap-2">
-                <div className="rounded-full bg-primary/10 p-1.5">
-                  <Building className="h-4 w-4 text-primary" />
+                <div className="bg-primary/10 rounded-full p-1.5">
+                  <Building className="text-primary size-4" />
                 </div>
-                <h4 className="font-mono text-base font-bold text-foreground">
+                <h4 className="text-foreground font-mono text-base font-bold">
                   Contact
                 </h4>
               </div>
@@ -464,14 +464,14 @@ const Contact = () => {
                 {contactInfo.slice(0, 2).map((info, index) => {
                   return (
                     <div key={index} className="space-y-0.5">
-                      <h5 className="text-xs font-semibold text-foreground">
+                      <h5 className="text-foreground text-xs font-semibold">
                         {info.title}
                       </h5>
                       <div className="space-y-0.5">
                         {info.details.map((detail, detailIndex) => (
                           <p
                             key={detailIndex}
-                            className="font-mono text-xs leading-tight text-muted-foreground"
+                            className="text-muted-foreground font-mono text-xs leading-tight"
                           >
                             {detail}
                           </p>
@@ -484,12 +484,12 @@ const Contact = () => {
             </div>
 
             {/* Supporting Card 2 - More Contact Info */}
-            <div className="fade-in-up fade-delay-06 relative overflow-hidden rounded-lg border border-border/50 bg-card/30 p-4 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-card/50 md:col-span-1 lg:col-span-1">
+            <div className="fade-in-up fade-delay-06 border-border/50 bg-card/30 hover:border-primary/30 hover:bg-card/50 relative overflow-hidden rounded-lg border p-4 backdrop-blur-sm transition-all duration-300 md:col-span-1 lg:col-span-1">
               <div className="mb-3 flex items-center gap-2">
-                <div className="rounded-full bg-primary/10 p-1.5">
-                  <Mail className="h-4 w-4 text-primary" />
+                <div className="bg-primary/10 rounded-full p-1.5">
+                  <Mail className="text-primary size-4" />
                 </div>
-                <h4 className="font-mono text-base font-bold text-foreground">
+                <h4 className="text-foreground font-mono text-base font-bold">
                   Accès & Email
                 </h4>
               </div>
@@ -497,14 +497,14 @@ const Contact = () => {
                 {contactInfo.slice(2).map((info, index) => {
                   return (
                     <div key={index} className="space-y-0.5">
-                      <h5 className="text-xs font-semibold text-foreground">
+                      <h5 className="text-foreground text-xs font-semibold">
                         {info.title}
                       </h5>
                       <div className="space-y-0.5">
                         {info.details.map((detail, detailIndex) => (
                           <p
                             key={detailIndex}
-                            className="font-mono text-xs leading-tight text-muted-foreground"
+                            className="text-muted-foreground font-mono text-xs leading-tight"
                           >
                             {detail}
                           </p>
@@ -517,39 +517,39 @@ const Contact = () => {
             </div>
 
             {/* Supporting Card 3 - Local Office Highlight */}
-            <div className="fade-in-up fade-delay-08 relative overflow-hidden rounded-lg border border-primary/20 bg-gradient-to-br from-primary/10 to-primary/5 p-4 backdrop-blur-sm transition-all duration-300 hover:border-primary/40 hover:bg-gradient-to-br hover:from-primary/15 hover:to-primary/10 md:col-span-1 lg:col-span-1">
+            <div className="fade-in-up fade-delay-08 border-primary/20 from-primary/10 to-primary/5 hover:border-primary/40 hover:from-primary/15 hover:to-primary/10 relative overflow-hidden rounded-lg border bg-gradient-to-br p-4 backdrop-blur-sm transition-all duration-300 hover:bg-gradient-to-br md:col-span-1 lg:col-span-1">
               <div className="mb-3 flex items-center gap-2">
-                <div className="rounded-full bg-primary/20 p-1.5">
-                  <MapPin className="h-4 w-4 text-primary" />
+                <div className="bg-primary/20 rounded-full p-1.5">
+                  <MapPin className="text-primary size-4" />
                 </div>
-                <h4 className="font-mono text-base font-bold text-primary">
+                <h4 className="text-primary font-mono text-base font-bold">
                   Bureau local
                 </h4>
               </div>
               <div>
-                <h5 className="mb-1.5 text-sm font-bold text-foreground">
+                <h5 className="text-foreground mb-1.5 text-sm font-bold">
                   Île-de-France
                 </h5>
-                <p className="mb-3 font-mono text-xs leading-tight text-muted-foreground">
+                <p className="text-muted-foreground mb-3 font-mono text-xs leading-tight">
                   Équipe française basée à Montigny-le-Bretonneux, proche de
                   Guyancourt
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   <Badge
                     variant="secondary"
-                    className="bg-primary/10 font-mono text-xs text-primary"
+                    className="bg-primary/10 text-primary font-mono text-xs"
                   >
                     Intervention sur site
                   </Badge>
                   <Badge
                     variant="secondary"
-                    className="bg-primary/10 font-mono text-xs text-primary"
+                    className="bg-primary/10 text-primary font-mono text-xs"
                   >
                     Support local
                   </Badge>
                   <Badge
                     variant="secondary"
-                    className="bg-primary/10 font-mono text-xs text-primary"
+                    className="bg-primary/10 text-primary font-mono text-xs"
                   >
                     Formation en français
                   </Badge>
@@ -563,12 +563,12 @@ const Contact = () => {
             <Card className="fade-in-up fade-delay-10 border-primary/20 bg-card/60 backdrop-blur-sm">
               <CardHeader>
                 <div className="mb-2 flex items-center gap-3">
-                  <div className="rounded-full bg-primary/10 p-2">
-                    <Mail className="h-5 w-5 text-primary" />
+                  <div className="bg-primary/10 rounded-full p-2">
+                    <Mail className="text-primary size-5" />
                   </div>
                   <CardTitle>Nous contacter</CardTitle>
                 </div>
-                <p className="font-mono text-sm text-muted-foreground">
+                <p className="text-muted-foreground font-mono text-sm">
                   Une question ? Notre équipe vous répond rapidement
                 </p>
               </CardHeader>
@@ -694,7 +694,7 @@ const Contact = () => {
                       className="mb-2 block text-sm font-medium"
                     >
                       Message *{' '}
-                      <span className="text-xs font-normal text-muted-foreground">
+                      <span className="text-muted-foreground text-xs font-normal">
                         (minimum 10 caractères)
                       </span>
                     </label>
@@ -702,7 +702,7 @@ const Contact = () => {
                       id="contact-message"
                       name="message"
                       placeholder="Décrivez votre demande (minimum 10 caractères)..."
-                      className="min-h-[120px] bg-background/50"
+                      className="bg-background/50 min-h-[120px]"
                       required
                       minLength={10}
                       maxLength={5000}
@@ -726,7 +726,7 @@ const Contact = () => {
                       'Envoi en cours...'
                     ) : (
                       <>
-                        <Mail className="mr-2 h-4 w-4" />
+                        <Mail className="mr-2 size-4" />
                         Envoyer le message
                       </>
                     )}
@@ -737,8 +737,8 @@ const Contact = () => {
                   <div
                     className={`mt-4 rounded-lg p-4 ${
                       contactForm.response.success
-                        ? 'border border-primary/20 bg-primary/10 text-primary'
-                        : 'border border-destructive/20 bg-destructive/10 text-destructive'
+                        ? 'border-primary/20 bg-primary/10 text-primary border'
+                        : 'border-destructive/20 bg-destructive/10 text-destructive border'
                     }`}
                   >
                     {contactForm.response.message}

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useId, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 import CheckCircle from '~icons/lucide/check-circle'
 import Clock from '~icons/lucide/clock'
 import Gift from '~icons/lucide/gift'
@@ -10,7 +11,6 @@ import Phone from '~icons/lucide/phone'
 import Shield from '~icons/lucide/shield'
 import Users from '~icons/lucide/users'
 import Wrench from '~icons/lucide/wrench'
-
 
 // Accordion Context for state management
 interface AccordionContextType {
@@ -122,7 +122,7 @@ const AccordionTrigger = ({
   return (
     <button
       id={triggerId}
-      className={`${className} flex w-full items-center justify-between rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2`}
+      className={`${className} focus:ring-primary flex w-full items-center justify-between rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-offset-2`}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       aria-expanded={isOpen}
@@ -131,7 +131,7 @@ const AccordionTrigger = ({
     >
       {children}
       <svg
-        className={`h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+        className={`size-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -176,6 +176,14 @@ const AccordionContent = ({
 }
 
 const FAQ = () => {
+  const { ref: sectionRef, hasIntersected } = useIntersectionObserver({
+    threshold: 0.15,
+    rootMargin: '0px 0px -50px 0px',
+  })
+
+  // Hidden state before scroll reveal
+  const hiddenClass = 'opacity-0 translate-y-6'
+
   const faqs = [
     {
       id: 'security',
@@ -198,7 +206,7 @@ const FAQ = () => {
       question: 'Comment intégrer avec nos outils existants ?',
       badge: 'Intégration',
       answer: [
-        "WorkFlowAI s'intègre facilement avec vos outils actuels :",
+        "TCDynamics s'intègre facilement avec vos outils actuels :",
         '• **Connecteurs natifs** : Office 365, Google Workspace, Salesforce, HubSpot',
         '• **APIs REST** : Plus de 200 intégrations disponibles via notre marketplace',
         '• **Import de données** : Migration assistée depuis vos fichiers Excel, CSV, PDF',
@@ -230,7 +238,7 @@ const FAQ = () => {
       question: 'Puis-je essayer gratuitement ?',
       badge: 'Essai gratuit',
       answer: [
-        'Bien sûr ! Nous proposons plusieurs options pour découvrir WorkFlowAI :',
+        'Bien sûr ! Nous proposons plusieurs options pour découvrir TCDynamics :',
         '• **Essai gratuit 30 jours** : Accès complet sans engagement ni carte bancaire',
         '• **Démonstration personnalisée** : Présentation adaptée à vos besoins (1h)',
         '• **Environnement de test** : Testez avec vos propres données en toute sécurité',
@@ -264,7 +272,7 @@ const FAQ = () => {
       question: "Combien d'utilisateurs peuvent utiliser la plateforme ?",
       badge: 'Utilisateurs',
       answer: [
-        "WorkFlowAI s'adapte à la taille de votre équipe :",
+        "TCDynamics s'adapte à la taille de votre équipe :",
         "• **Gestion flexible** : Ajout/suppression d'utilisateurs en quelques clics",
         '• **Rôles personnalisés** : Administrateur, utilisateur, invité, consultant',
         '• **Droits granulaires** : Contrôle précis des accès par département/projet',
@@ -278,11 +286,14 @@ const FAQ = () => {
   const allFaqs = [...faqs, ...additionalFaqs]
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-background/50 to-background py-24">
+    <section
+      ref={sectionRef}
+      className="from-background/50 to-background relative overflow-hidden bg-gradient-to-b py-24"
+    >
       {/* Network Background */}
       <div className="absolute inset-0 opacity-5">
         <svg
-          className="absolute inset-0 h-full w-full"
+          className="absolute inset-0 size-full"
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
@@ -313,24 +324,28 @@ const FAQ = () => {
 
       <div className="container relative z-10 mx-auto px-4">
         {/* Header */}
-        <div className="fade-in-up mb-16 text-center">
+        <div
+          className={`mb-16 text-center ${hasIntersected ? 'fade-in-up' : hiddenClass}`}
+        >
           <Badge
             variant="outline"
-            className="mb-6 border-primary/40 font-mono text-primary"
+            className="border-primary/40 text-primary mb-6 font-mono"
           >
             Questions fréquentes
           </Badge>
           <h2 className="text-gradient mb-6 text-4xl font-bold md:text-5xl">
             Vos questions, nos réponses
           </h2>
-          <p className="mx-auto max-w-3xl font-mono text-xl text-muted-foreground">
-            Tout ce que vous devez savoir sur WorkFlowAI avant de commencer
+          <p className="text-muted-foreground mx-auto max-w-3xl font-mono text-xl">
+            Tout ce que vous devez savoir sur TCDynamics avant de commencer
           </p>
         </div>
 
         {/* FAQ Accordion */}
         <div className="mx-auto max-w-4xl">
-          <Card className="fade-in-up fade-delay-02 border-primary/20 bg-card/60 p-8 backdrop-blur-sm">
+          <Card
+            className={`border-primary/20 bg-card/60 p-8 backdrop-blur-sm ${hasIntersected ? 'fade-in-up fade-delay-02' : hiddenClass}`}
+          >
             <Accordion type="single" collapsible className="space-y-4">
               {allFaqs.map(faq => {
                 const IconComponent = faq.icon
@@ -338,24 +353,24 @@ const FAQ = () => {
                   <AccordionItem
                     key={faq.id}
                     value={faq.id}
-                    className="rounded-lg border border-primary/10 px-6 py-2 transition-colors hover:border-primary/30"
+                    className="border-primary/10 hover:border-primary/30 rounded-lg border px-6 py-2 transition-colors"
                   >
                     <AccordionTrigger
                       value={faq.id}
                       className="group py-6 text-left hover:no-underline"
                     >
                       <div className="flex flex-1 items-center gap-4">
-                        <div className="flex-shrink-0 rounded-full bg-primary/10 p-2 transition-colors group-hover:bg-primary/20">
-                          <IconComponent className="h-5 w-5 text-primary" />
+                        <div className="bg-primary/10 group-hover:bg-primary/20 shrink-0 rounded-full p-2 transition-colors">
+                          <IconComponent className="text-primary size-5" />
                         </div>
                         <div className="flex-1">
                           <div className="mb-1 flex items-center gap-3">
-                            <h3 className="text-lg font-semibold transition-colors group-hover:text-primary">
+                            <h3 className="group-hover:text-primary text-lg font-semibold transition-colors">
                               {faq.question}
                             </h3>
                             <Badge
                               variant="secondary"
-                              className="border-primary/20 bg-primary/10 font-mono text-xs text-primary"
+                              className="border-primary/20 bg-primary/10 text-primary font-mono text-xs"
                             >
                               {faq.badge}
                             </Badge>
@@ -372,13 +387,13 @@ const FAQ = () => {
                             return (
                               <p
                                 key={lineIndex}
-                                className="leading-relaxed text-muted-foreground"
+                                className="text-muted-foreground leading-relaxed"
                               >
                                 {parts.map((part, partIndex) =>
                                   partIndex % 2 === 1 ? (
                                     <strong
                                       key={partIndex}
-                                      className="font-semibold text-foreground"
+                                      className="text-foreground font-semibold"
                                     >
                                       {part}
                                     </strong>
@@ -392,7 +407,7 @@ const FAQ = () => {
                           return (
                             <p
                               key={lineIndex}
-                              className="leading-relaxed text-muted-foreground"
+                              className="text-muted-foreground leading-relaxed"
                             >
                               {line}
                             </p>
@@ -408,26 +423,28 @@ const FAQ = () => {
         </div>
 
         {/* Contact CTA */}
-        <div className="fade-in-up fade-delay-04 mt-12 text-center">
-          <div className="mx-auto max-w-2xl rounded-2xl border border-primary/20 bg-card/30 p-8 backdrop-blur-sm">
+        <div
+          className={`mt-12 text-center ${hasIntersected ? 'fade-in-up fade-delay-04' : hiddenClass}`}
+        >
+          <div className="border-primary/20 bg-card/30 mx-auto max-w-2xl rounded-2xl border p-8 backdrop-blur-sm">
             <div className="mb-4 flex items-center justify-center gap-3">
-              <Phone className="h-6 w-6 text-primary" />
+              <Phone className="text-primary size-6" />
               <h3 className="text-xl font-bold">Une autre question ?</h3>
             </div>
-            <p className="mb-6 font-mono text-muted-foreground">
+            <p className="text-muted-foreground mb-6 font-mono">
               Notre équipe française est là pour vous répondre
             </p>
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
-              <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2">
-                <CheckCircle className="h-4 w-4 text-primary" />
-                <span className="font-mono text-sm text-primary">
+              <div className="border-primary/20 bg-primary/10 flex items-center gap-2 rounded-full border px-4 py-2">
+                <CheckCircle className="text-primary size-4" />
+                <span className="text-primary font-mono text-sm">
                   📞 01 39 44 75 00
                 </span>
               </div>
-              <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2">
-                <CheckCircle className="h-4 w-4 text-primary" />
-                <span className="font-mono text-sm text-primary">
-                  ✉️ contact@workflowai.fr
+              <div className="border-primary/20 bg-primary/10 flex items-center gap-2 rounded-full border px-4 py-2">
+                <CheckCircle className="text-primary size-4" />
+                <span className="text-primary font-mono text-sm">
+                  ✉️ contact@tcdynamics.fr
                 </span>
               </div>
             </div>

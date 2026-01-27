@@ -8,10 +8,10 @@ const AIChatbot = lazy(() => import('./AIChatbot'))
 // Loading fallback component
 const ChatbotLoadingFallback = () => (
   <div className="fixed bottom-6 right-6 z-50" data-testid="loader-container">
-    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/50 shadow-lg">
+    <div className="bg-primary/50 flex size-16 items-center justify-center rounded-full shadow-lg">
       <Loader2
         data-testid="loader-icon"
-        className="h-6 w-6 animate-spin text-primary-foreground"
+        className="text-primary-foreground size-6 animate-spin"
       />
     </div>
   </div>

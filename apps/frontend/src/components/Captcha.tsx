@@ -73,7 +73,9 @@ export const Captcha = forwardRef<CaptchaHandle, CaptchaProps>(
       script.crossOrigin = 'anonymous' // CSP compliance: ensure CORS is handled properly
       script.onload = () => setScriptLoaded(true)
       script.onerror = () => {
-        const error = new Error('Failed to load Turnstile script from Cloudflare CDN')
+        const error = new Error(
+          'Failed to load Turnstile script from Cloudflare CDN'
+        )
         if (onError) {
           onError(error)
         } else {
@@ -102,9 +104,10 @@ export const Captcha = forwardRef<CaptchaHandle, CaptchaProps>(
         })
         widgetIdRef.current = renderedId ?? null
       } catch (error) {
-        const renderError = error instanceof Error
-          ? error
-          : new Error('Turnstile widget render failed with unknown error')
+        const renderError =
+          error instanceof Error
+            ? error
+            : new Error('Turnstile widget render failed with unknown error')
         if (onError) {
           onError(renderError)
         } else {

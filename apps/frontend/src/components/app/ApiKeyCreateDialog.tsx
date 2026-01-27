@@ -177,7 +177,7 @@ export function ApiKeyCreateDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Key className="h-5 w-5" />
+            <Key className="size-5" />
             {createdKey ? 'Your API Key' : 'Create API Key'}
           </DialogTitle>
           <DialogDescription>
@@ -203,11 +203,11 @@ export function ApiKeyCreateDialog({
                 aria-describedby={nameError ? 'key-name-error' : undefined}
               />
               {nameError ? (
-                <p className="text-xs text-destructive" id="key-name-error">
+                <p className="text-destructive text-xs" id="key-name-error">
                   {nameError}
                 </p>
               ) : (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   Give your key a name to identify it later (max 100 characters,
                   alphanumeric, spaces, hyphens, and underscores only).
                 </p>
@@ -234,16 +234,16 @@ export function ApiKeyCreateDialog({
                   className="shrink-0"
                 >
                   {copied ? (
-                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    <CheckCircle2 className="size-4 text-green-500" />
                   ) : (
-                    <Copy className="h-4 w-4" />
+                    <Copy className="size-4" />
                   )}
                 </Button>
               </div>
             </div>
 
             <Alert variant="destructive">
-              <AlertTriangle className="h-4 w-4" />
+              <AlertTriangle className="size-4" />
               <AlertTitle>Store this key securely</AlertTitle>
               <AlertDescription>
                 This is the only time you&apos;ll see this key. Store it in a
@@ -252,7 +252,7 @@ export function ApiKeyCreateDialog({
               </AlertDescription>
             </Alert>
 
-            <p className="text-center text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-center text-xs">
               This dialog will auto-close in {autoCloseCountdown} seconds
             </p>
           </div>
@@ -271,7 +271,7 @@ export function ApiKeyCreateDialog({
               <Button onClick={handleCreate} disabled={isCreating}>
                 {isCreating ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 size-4 animate-spin" />
                     Creating...
                   </>
                 ) : (
@@ -281,7 +281,7 @@ export function ApiKeyCreateDialog({
             </>
           ) : (
             <Button onClick={handleClose} className="w-full">
-              <X className="mr-2 h-4 w-4" />
+              <X className="mr-2 size-4" />
               {copied ? 'Close' : "I've copied the key"}
             </Button>
           )}

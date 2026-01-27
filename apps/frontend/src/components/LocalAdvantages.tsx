@@ -7,7 +7,6 @@ import Phone from '~icons/lucide/phone'
 import Shield from '~icons/lucide/shield'
 import Users from '~icons/lucide/users'
 
-
 const LocalAdvantages = () => {
   const advantages = [
     {
@@ -84,7 +83,7 @@ const LocalAdvantages = () => {
   ]
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-background to-background/50 py-24">
+    <section className="from-background to-background/50 relative overflow-hidden bg-gradient-to-b py-24">
       {/* French Flag Colors Background */}
       <div className="absolute inset-0 opacity-5">
         <div className="french-flag-gradient absolute inset-0" />
@@ -93,7 +92,7 @@ const LocalAdvantages = () => {
       {/* Network Pattern */}
       <div className="opacity-3 absolute inset-0">
         <svg
-          className="absolute inset-0 h-full w-full"
+          className="absolute inset-0 size-full"
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
@@ -128,12 +127,12 @@ const LocalAdvantages = () => {
           <div className="mb-6 inline-flex items-center gap-3">
             <div className="flex items-center gap-1">
               <div className="h-6 w-4 rounded-sm bg-blue-600"></div>
-              <div className="h-6 w-4 rounded-sm border border-border bg-white"></div>
+              <div className="border-border h-6 w-4 rounded-sm border bg-white"></div>
               <div className="h-6 w-4 rounded-sm bg-red-600"></div>
             </div>
             <Badge
               variant="outline"
-              className="border-primary/40 font-mono text-primary"
+              className="border-primary/40 text-primary font-mono"
             >
               100% Français
             </Badge>
@@ -141,8 +140,8 @@ const LocalAdvantages = () => {
           <h2 className="text-gradient mb-6 text-4xl font-bold leading-tight md:text-5xl md:leading-[1.1]">
             Vos avantages locaux
           </h2>
-          <p className="mx-auto max-w-3xl font-mono text-xl text-muted-foreground">
-            WorkFlowAI, la solution d'IA française pour les entreprises
+          <p className="text-muted-foreground mx-auto max-w-3xl font-mono text-xl">
+            TCDynamics, la solution d'IA française pour les entreprises
             françaises
           </p>
         </div>
@@ -170,28 +169,28 @@ const LocalAdvantages = () => {
                               : ''
                 }`}
               >
-                <Card className="h-full border-primary/20 bg-card/60 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10">
+                <Card className="border-primary/20 bg-card/60 hover:border-primary/40 hover:shadow-primary/10 h-full backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:shadow-lg">
                   <CardContent className="p-6">
                     {/* Icon and Badge */}
                     <div className="mb-4 flex items-start justify-between">
-                      <div className="rounded-full bg-primary/10 p-3 transition-colors group-hover:bg-primary/20">
-                        <IconComponent className="h-6 w-6 text-primary" />
+                      <div className="bg-primary/10 group-hover:bg-primary/20 rounded-full p-3 transition-colors">
+                        <IconComponent className="text-primary size-6" />
                       </div>
                       <Badge
                         variant="secondary"
-                        className="border-primary/20 bg-primary/10 font-mono text-xs text-primary"
+                        className="border-primary/20 bg-primary/10 text-primary font-mono text-xs"
                       >
                         {advantage.badge}
                       </Badge>
                     </div>
 
                     {/* Title */}
-                    <h3 className="mb-3 text-xl font-bold transition-colors group-hover:text-primary">
+                    <h3 className="group-hover:text-primary mb-3 text-xl font-bold transition-colors">
                       {advantage.title}
                     </h3>
 
                     {/* Description */}
-                    <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
+                    <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
                       {advantage.description}
                     </p>
 
@@ -202,7 +201,7 @@ const LocalAdvantages = () => {
                           key={detailIndex}
                           className="flex items-center font-mono text-xs"
                         >
-                          <div className="mr-2 h-1 w-1 flex-shrink-0 rounded-full bg-primary" />
+                          <div className="bg-primary mr-2 size-1 shrink-0 rounded-full" />
                           <span className="text-muted-foreground">
                             {detail}
                           </span>
@@ -218,12 +217,12 @@ const LocalAdvantages = () => {
 
         {/* Trust Indicators */}
         <div className="fade-in-up fade-delay-08">
-          <div className="rounded-2xl border border-primary/20 bg-card/30 p-8 backdrop-blur-sm">
+          <div className="border-primary/20 bg-card/30 rounded-2xl border p-8 backdrop-blur-sm">
             <div className="mb-8 text-center">
               <h3 className="text-gradient mb-4 text-2xl font-bold">
                 Nos certifications et partenaires
               </h3>
-              <p className="font-mono text-muted-foreground">
+              <p className="text-muted-foreground font-mono">
                 La confiance de nos clients repose sur nos engagements
               </p>
             </div>
@@ -231,39 +230,39 @@ const LocalAdvantages = () => {
             <div className="grid grid-cols-2 items-center gap-8 md:grid-cols-4">
               {/* Certification Badges */}
               <div className="text-center">
-                <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                  <Shield className="h-8 w-8 text-primary" />
+                <div className="bg-primary/10 mx-auto mb-3 flex size-16 items-center justify-center rounded-full">
+                  <Shield className="text-primary size-8" />
                 </div>
-                <p className="font-mono text-sm text-muted-foreground">RGPD</p>
-                <p className="font-mono text-xs text-primary">Certifié</p>
+                <p className="text-muted-foreground font-mono text-sm">RGPD</p>
+                <p className="text-primary font-mono text-xs">Certifié</p>
               </div>
 
               <div className="text-center">
-                <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                  <Flag className="h-8 w-8 text-primary" />
+                <div className="bg-primary/10 mx-auto mb-3 flex size-16 items-center justify-center rounded-full">
+                  <Flag className="text-primary size-8" />
                 </div>
-                <p className="font-mono text-sm text-muted-foreground">
+                <p className="text-muted-foreground font-mono text-sm">
                   ISO 27001
                 </p>
-                <p className="font-mono text-xs text-primary">Sécurité</p>
+                <p className="text-primary font-mono text-xs">Sécurité</p>
               </div>
 
               <div className="text-center">
-                <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                  <MapPin className="h-8 w-8 text-primary" />
+                <div className="bg-primary/10 mx-auto mb-3 flex size-16 items-center justify-center rounded-full">
+                  <MapPin className="text-primary size-8" />
                 </div>
-                <p className="font-mono text-sm text-muted-foreground">
+                <p className="text-muted-foreground font-mono text-sm">
                   French Tech
                 </p>
-                <p className="font-mono text-xs text-primary">Membre</p>
+                <p className="text-primary font-mono text-xs">Membre</p>
               </div>
 
               <div className="text-center">
-                <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                  <Users className="h-8 w-8 text-primary" />
+                <div className="bg-primary/10 mx-auto mb-3 flex size-16 items-center justify-center rounded-full">
+                  <Users className="text-primary size-8" />
                 </div>
-                <p className="font-mono text-sm text-muted-foreground">PME</p>
-                <p className="font-mono text-xs text-primary">Française</p>
+                <p className="text-muted-foreground font-mono text-sm">PME</p>
+                <p className="text-primary font-mono text-xs">Française</p>
               </div>
             </div>
           </div>
@@ -271,9 +270,9 @@ const LocalAdvantages = () => {
 
         {/* Local Contact */}
         <div className="fade-in-up fade-delay-10 mt-12 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-6 py-3">
-            <MapPin className="h-4 w-4 text-primary" />
-            <span className="font-mono text-sm text-primary">
+          <div className="border-primary/20 bg-primary/10 inline-flex items-center gap-2 rounded-full border px-6 py-3">
+            <MapPin className="text-primary size-4" />
+            <span className="text-primary font-mono text-sm">
               📍 Siège social : 78180 Montigny-le-Bretonneux
             </span>
           </div>

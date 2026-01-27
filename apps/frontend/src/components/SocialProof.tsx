@@ -7,11 +7,14 @@ import MapPin from '~icons/lucide/map-pin'
 import Shield from '~icons/lucide/shield'
 import Star from '~icons/lucide/star'
 
-
 const SocialProof = () => {
-  const { ref: sectionRef, isIntersecting } = useIntersectionObserver({
-    threshold: 0.2,
+  const { ref: sectionRef, hasIntersected } = useIntersectionObserver({
+    threshold: 0.15,
+    rootMargin: '0px 0px -50px 0px',
   })
+
+  // Hidden state before scroll reveal
+  const hiddenClass = 'opacity-0 translate-y-6'
   const demoLink = import.meta.env.VITE_DEMO_URL || '/demo'
 
   const logos = [
@@ -36,7 +39,7 @@ const SocialProof = () => {
   const testimonials = [
     {
       quote:
-        'WorkFlowAI structure nos dossiers et répond aux questions clés en quelques secondes. On déploie le pilote sur d’autres équipes.',
+        'TCDynamics structure nos dossiers et répond aux questions clés en quelques secondes. On déploie le pilote sur d’autres équipes.',
       author: 'Pilote Finance',
       position: 'Responsable Ops',
       company: 'PME Île-de-France',
@@ -82,14 +85,14 @@ const SocialProof = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden bg-gradient-to-b from-background/50 to-background py-24"
+      className="from-background/50 to-background relative overflow-hidden bg-gradient-to-b py-24"
       aria-labelledby="social-proof-title"
     >
       {/* Network Background */}
       <div className="absolute inset-0 opacity-5" aria-hidden="true">
         <div className="network-background-gradient absolute inset-0">
           <svg
-            className="absolute inset-0 h-full w-full"
+            className="absolute inset-0 size-full"
             xmlns="http://www.w3.org/2000/svg"
           >
             <defs>
@@ -122,11 +125,11 @@ const SocialProof = () => {
       <div className="container relative z-10 mx-auto px-4">
         {/* Header */}
         <div
-          className={`mb-16 text-center ${isIntersecting ? 'fade-in-up' : 'opacity-0'}`}
+          className={`mb-16 text-center ${hasIntersected ? 'fade-in-up' : hiddenClass}`}
         >
           <Badge
             variant="outline"
-            className="mb-6 border-primary/40 font-mono text-primary"
+            className="border-primary/40 text-primary mb-6 font-mono"
           >
             Témoignages clients
           </Badge>
@@ -136,18 +139,16 @@ const SocialProof = () => {
           >
             Ils nous font confiance
           </h2>
-          <p className="mx-auto max-w-3xl font-mono text-xl text-muted-foreground">
+          <p className="text-muted-foreground mx-auto max-w-3xl font-mono text-xl">
             Déploiements pilotes en cours (processus finance, support et
             documentation). Logos et cas clients vérifiés arrivent.
           </p>
         </div>
 
         {/* Logo Strip */}
-        <div
-          className={`fade-in-up mb-16 ${isIntersecting ? '' : 'opacity-0'}`}
-        >
+        <div className={`mb-16 ${hasIntersected ? 'fade-in-up' : hiddenClass}`}>
           {import.meta.env.DEV && (
-            <div className="mb-4 text-center font-mono text-sm text-muted-foreground">
+            <div className="text-muted-foreground mb-4 text-center font-mono text-sm">
               Remplacez par vos logos clients validés
             </div>
           )}
@@ -155,12 +156,12 @@ const SocialProof = () => {
             {logos.map(logo => (
               <div
                 key={logo.name}
-                className="rounded-lg border border-primary/10 bg-card/40 p-4 text-center backdrop-blur-sm transition-all duration-300 hover:border-primary/30"
+                className="border-primary/10 bg-card/40 hover:border-primary/30 rounded-lg border p-4 text-center backdrop-blur-sm transition-all duration-300"
               >
-                <div className="text-sm font-semibold text-foreground">
+                <div className="text-foreground text-sm font-semibold">
                   {logo.name}
                 </div>
-                <p className="mt-1 font-mono text-xs text-muted-foreground">
+                <p className="text-muted-foreground mt-1 font-mono text-xs">
                   {logo.tagline}
                 </p>
               </div>
@@ -170,12 +171,12 @@ const SocialProof = () => {
 
         {/* Testimonials */}
         <div
-          className={`stagger-fade mb-16 grid gap-8 lg:grid-cols-3 ${isIntersecting ? '' : 'opacity-0'}`}
+          className={`mb-16 grid gap-8 lg:grid-cols-3 ${hasIntersected ? 'stagger-fade' : '[&>*]:translate-y-4 [&>*]:opacity-0'}`}
         >
           {testimonials.map((testimonial, index) => (
             <Card
               key={index}
-              className="card-hover group border-primary/20 bg-card/60 backdrop-blur-sm transition-all duration-500 hover:border-primary/40"
+              className="card-hover border-primary/20 bg-card/60 hover:border-primary/40 group backdrop-blur-sm transition-all duration-500"
               role="article"
               aria-labelledby={`testimonial-${index}-author`}
             >
@@ -187,19 +188,19 @@ const SocialProof = () => {
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star
                       key={i}
-                      className="h-4 w-4 fill-yellow-400 text-yellow-400"
+                      className="size-4 fill-yellow-400 text-yellow-400"
                     />
                   ))}
                 </div>
-                <blockquote className="mb-6 italic leading-relaxed text-muted-foreground">
+                <blockquote className="text-muted-foreground mb-6 italic leading-relaxed">
                   "{testimonial.quote}"
                 </blockquote>
                 <div className="flex flex-wrap items-center gap-3">
-                  {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
+                  {}
                   <img
                     src={testimonial.image}
                     alt={`${testimonial.author}, ${testimonial.position} chez ${testimonial.company}`}
-                    className="h-10 w-10 flex-shrink-0 rounded-full object-cover"
+                    className="size-10 shrink-0 rounded-full object-cover"
                     onError={e => {
                       if (e.currentTarget.dataset.fallbackApplied === 'true') {
                         return
@@ -211,14 +212,14 @@ const SocialProof = () => {
                   <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
                     <cite
                       id={`testimonial-${index}-author`}
-                      className="font-semibold not-italic text-foreground transition-colors group-hover:text-primary"
+                      className="text-foreground group-hover:text-primary font-semibold not-italic transition-colors"
                     >
                       {testimonial.author}
                     </cite>
-                    <p className="font-mono text-sm text-muted-foreground">
+                    <p className="text-muted-foreground font-mono text-sm">
                       {testimonial.position}
                     </p>
-                    <p className="font-mono text-sm text-primary">
+                    <p className="text-primary font-mono text-sm">
                       {testimonial.company}
                     </p>
                   </div>
@@ -230,25 +231,25 @@ const SocialProof = () => {
 
         {/* Trust Indicators */}
         <div
-          className={`stagger-fade grid gap-8 md:grid-cols-2 ${isIntersecting ? '' : 'opacity-0'}`}
+          className={`grid gap-8 md:grid-cols-2 ${hasIntersected ? 'stagger-fade' : '[&>*]:translate-y-4 [&>*]:opacity-0'}`}
         >
           {trustIndicators.map((indicator, index) => {
             const IconComponent = indicator.icon
             return (
               <Card
                 key={index}
-                className="group border-primary/20 bg-gradient-to-r from-primary/10 to-primary/5 transition-all duration-300 hover:from-primary/15 hover:to-primary/10"
+                className="border-primary/20 from-primary/10 to-primary/5 hover:from-primary/15 hover:to-primary/10 group bg-gradient-to-r transition-all duration-300"
               >
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">
-                    <div className="rounded-full bg-primary/20 p-3 transition-colors group-hover:bg-primary/30">
-                      <IconComponent className="h-6 w-6 text-primary" />
+                    <div className="bg-primary/20 group-hover:bg-primary/30 rounded-full p-3 transition-colors">
+                      <IconComponent className="text-primary size-6" />
                     </div>
                     <div>
-                      <h4 className="mb-1 text-lg font-bold transition-colors group-hover:text-primary">
+                      <h4 className="group-hover:text-primary mb-1 text-lg font-bold transition-colors">
                         {indicator.title}
                       </h4>
-                      <p className="font-mono text-sm text-muted-foreground">
+                      <p className="text-muted-foreground font-mono text-sm">
                         {indicator.description}
                       </p>
                     </div>
@@ -261,7 +262,7 @@ const SocialProof = () => {
 
         {/* CTA */}
         <div
-          className={`fade-in-up mt-16 text-center ${isIntersecting ? '' : 'opacity-0'}`}
+          className={`mt-16 text-center ${hasIntersected ? 'fade-in-up' : hiddenClass}`}
         >
           <Button
             variant="hero"
@@ -276,9 +277,9 @@ const SocialProof = () => {
             }}
           >
             Voir la démo personnalisée
-            <ArrowRight className="h-4 w-4" />
+            <ArrowRight className="size-4" />
           </Button>
-          <p className="mt-3 font-mono text-sm text-muted-foreground">
+          <p className="text-muted-foreground mt-3 font-mono text-sm">
             Programmes pilotes ouverts — sécurité et conformité revues pendant
             le parcours démo.
           </p>

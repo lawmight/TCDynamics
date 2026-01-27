@@ -8,24 +8,24 @@ import Users from '~icons/lucide/users'
 
 const Footer = () => {
   return (
-    <footer className="border-t border-border/40 bg-background py-12">
+    <footer className="border-border/40 bg-background border-t py-12">
       <div className="container mx-auto px-4">
         {/* Top Row: Trust Signals */}
-        <div className="mb-12 flex flex-wrap justify-center gap-6 border-b border-border/40 pb-12 font-mono text-sm text-muted-foreground">
+        <div className="border-border/40 text-muted-foreground mb-12 flex flex-wrap justify-center gap-6 border-b pb-12 font-mono text-sm">
           <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-primary" />
+            <Clock className="text-primary size-4" />
             <span>Réponse sous 2h</span>
           </div>
           <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-primary" />
+            <Users className="text-primary size-4" />
             <span>Équipe française</span>
           </div>
           <div className="flex items-center gap-2">
-            <CheckCircle className="h-4 w-4 text-primary" />
+            <CheckCircle className="text-primary size-4" />
             <span>RGPD conforme</span>
           </div>
           <div className="flex items-center gap-2">
-            <Train className="h-4 w-4 text-primary" />
+            <Train className="text-primary size-4" />
             <span>Accès RER C</span>
           </div>
         </div>
@@ -34,12 +34,12 @@ const Footer = () => {
         <div className="grid grid-cols-1 gap-8 text-center md:grid-cols-4 md:text-left">
           {/* Column 1: Company */}
           <div className="space-y-4">
-            <h3 className="text-lg font-bold text-foreground">Company</h3>
+            <h3 className="text-foreground text-lg font-bold">Company</h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   to="/about"
-                  className="text-slate-400 transition-colors hover:text-primary"
+                  className="hover:text-primary text-slate-400 transition-colors"
                 >
                   About
                 </Link>
@@ -47,7 +47,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/#contact"
-                  className="text-slate-400 transition-colors hover:text-primary"
+                  className="hover:text-primary text-slate-400 transition-colors"
                 >
                   Contact
                 </Link>
@@ -57,12 +57,12 @@ const Footer = () => {
 
           {/* Column 2: Product */}
           <div className="space-y-4">
-            <h3 className="text-lg font-bold text-foreground">Product</h3>
+            <h3 className="text-foreground text-lg font-bold">Product</h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   to="/#features"
-                  className="text-slate-400 transition-colors hover:text-primary"
+                  className="hover:text-primary text-slate-400 transition-colors"
                 >
                   Features
                 </Link>
@@ -70,7 +70,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/#pricing"
-                  className="text-slate-400 transition-colors hover:text-primary"
+                  className="hover:text-primary text-slate-400 transition-colors"
                 >
                   Pricing
                 </Link>
@@ -80,16 +80,16 @@ const Footer = () => {
 
           {/* Column 3: Social */}
           <div className="space-y-4">
-            <h3 className="text-lg font-bold text-foreground">Social</h3>
+            <h3 className="text-foreground text-lg font-bold">Social</h3>
             <ul className="space-y-2">
               <li>
                 <a
                   href="https://x.com/tomcoustols"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 text-slate-400 transition-colors hover:text-primary md:justify-start"
+                  className="hover:text-primary flex items-center justify-center gap-2 text-slate-400 transition-colors md:justify-start"
                 >
-                  <Twitter className="h-4 w-4" />
+                  <Twitter className="size-4" />
                   <span>Twitter/X</span>
                 </a>
               </li>
@@ -98,14 +98,14 @@ const Footer = () => {
 
           {/* Column 4: Legal */}
           <div className="space-y-4">
-            <h3 className="text-lg font-bold text-foreground">Legal</h3>
+            <h3 className="text-foreground text-lg font-bold">Legal</h3>
             <ul className="space-y-2">
               <li>
                 <a
                   href="https://www.termsfeed.com/live/fa645ea2-fa78-4258-9064-630eeef14d62"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-slate-400 transition-colors hover:text-primary"
+                  className="hover:text-primary text-slate-400 transition-colors"
                 >
                   Privacy Policy
                 </a>
@@ -115,7 +115,7 @@ const Footer = () => {
                   href="https://www.termsfeed.com/live/0d2ed5d6-3b2e-4040-b09d-1ff7cb705693"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-slate-400 transition-colors hover:text-primary"
+                  className="hover:text-primary text-slate-400 transition-colors"
                 >
                   Terms & Conditions
                 </a>
@@ -125,7 +125,7 @@ const Footer = () => {
                   href="https://app.termsfeed.com/download/5a5ab972-5165-4b73-97d1-ed0a6524d7ac"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-slate-400 transition-colors hover:text-primary"
+                  className="hover:text-primary text-slate-400 transition-colors"
                 >
                   EULA
                 </a>
@@ -135,9 +135,9 @@ const Footer = () => {
         </div>
 
         {/* Copyright */}
-        <div className="mt-12 border-t border-border/40 pt-8 text-center text-sm text-slate-500">
+        <div className="border-border/40 mt-12 border-t pt-8 text-center text-sm text-slate-500">
           <p>
-            &copy; {new Date().getFullYear()} WorkFlowAI. All rights reserved.
+            &copy; {new Date().getFullYear()} TCDynamics. All rights reserved.
           </p>
         </div>
       </div>

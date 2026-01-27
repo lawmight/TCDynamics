@@ -9,7 +9,6 @@ import Play from '~icons/lucide/play'
 import Shield from '~icons/lucide/shield'
 import X from '~icons/lucide/x'
 
-
 const pricingPlans = [
   {
     name: 'Starter',
@@ -125,14 +124,14 @@ const Pricing = () => {
   }
 
   return (
-    <section className="relative overflow-hidden bg-background py-24">
+    <section className="bg-background relative overflow-hidden py-24">
       {/* Background Network Pattern */}
       <div className="absolute inset-0 opacity-20">
-        <div className="absolute left-1/4 top-0 h-32 w-px bg-gradient-to-b from-primary/40 to-transparent"></div>
-        <div className="absolute right-1/3 top-16 h-24 w-px bg-gradient-to-b from-accent/30 to-transparent"></div>
-        <div className="absolute bottom-0 left-1/2 h-40 w-px bg-gradient-to-t from-primary/30 to-transparent"></div>
-        <div className="absolute left-0 top-1/2 h-px w-32 bg-gradient-to-r from-primary/30 to-transparent"></div>
-        <div className="absolute right-0 top-1/3 h-px w-24 bg-gradient-to-l from-accent/20 to-transparent"></div>
+        <div className="from-primary/40 absolute left-1/4 top-0 h-32 w-px bg-gradient-to-b to-transparent"></div>
+        <div className="from-accent/30 absolute right-1/3 top-16 h-24 w-px bg-gradient-to-b to-transparent"></div>
+        <div className="from-primary/30 absolute bottom-0 left-1/2 h-40 w-px bg-gradient-to-t to-transparent"></div>
+        <div className="from-primary/30 absolute left-0 top-1/2 h-px w-32 bg-gradient-to-r to-transparent"></div>
+        <div className="from-accent/20 absolute right-0 top-1/3 h-px w-24 bg-gradient-to-l to-transparent"></div>
       </div>
 
       <div className="container relative z-10 mx-auto px-4">
@@ -140,7 +139,7 @@ const Pricing = () => {
         <div className="mb-16 text-center">
           <div className="mb-16 text-center">
             {/* Above-fold social proof */}
-            <div className="mb-12 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
+            <div className="text-muted-foreground mb-12 flex flex-wrap items-center justify-center gap-6 text-sm">
               <div className="flex items-center gap-2">
                 <Shield size={14} aria-hidden="true" />
                 <span className="font-mono">
@@ -156,14 +155,14 @@ const Pricing = () => {
                 <span className="font-mono">Parcours démo guidé</span>
               </div>
             </div>
-            <div className="mx-auto mb-4 inline-flex items-center justify-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-6 py-2 font-mono text-sm font-semibold text-primary">
+            <div className="border-primary/20 bg-primary/10 text-primary mx-auto mb-4 inline-flex items-center justify-center gap-2 rounded-full border px-6 py-2 font-mono text-sm font-semibold">
               Automatisation IA Française • Validation en démo
             </div>
           </div>
-          <h2 className="mb-4 font-mono text-4xl font-bold text-foreground">
+          <h2 className="text-foreground mb-4 font-mono text-4xl font-bold">
             Plans IA, activation après démo guidée
           </h2>
-          <p className="mx-auto max-w-2xl font-mono text-lg text-muted-foreground">
+          <p className="text-muted-foreground mx-auto max-w-2xl font-mono text-lg">
             14 jours d'essai gratuit. Aucune carte bancaire requise. Annulez à
             tout moment.
           </p>
@@ -175,22 +174,22 @@ const Pricing = () => {
             {/* Bento Grid Container */}
             <div className="grid gap-6 md:grid-cols-3 md:grid-rows-2 lg:grid-cols-3 lg:grid-rows-2">
               {/* Old Way - Smaller, Muted Card */}
-              <div className="relative overflow-hidden rounded-lg border border-destructive/20 bg-destructive/5 p-6 backdrop-blur-sm md:col-span-1 lg:col-span-1">
+              <div className="border-destructive/20 bg-destructive/5 relative overflow-hidden rounded-lg border p-6 backdrop-blur-sm md:col-span-1 lg:col-span-1">
                 {/* Subtle diagonal strikethrough overlay */}
                 <div className="absolute inset-0 opacity-10">
-                  <div className="absolute left-0 top-0 h-full w-full">
-                    <div className="absolute left-0 top-1/2 h-px w-full origin-left -rotate-12 bg-destructive"></div>
+                  <div className="absolute left-0 top-0 size-full">
+                    <div className="bg-destructive absolute left-0 top-1/2 h-px w-full origin-left -rotate-12"></div>
                   </div>
                 </div>
                 <div className="relative z-10">
-                  <div className="mb-4 inline-flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-1.5 font-mono text-xs text-destructive">
+                  <div className="border-destructive/20 bg-destructive/10 text-destructive mb-4 inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 font-mono text-xs">
                     <X size={14} />
                     L'ANCIENNE MÉTHODE
                   </div>
-                  <h3 className="mb-3 text-xl font-bold text-muted-foreground lg:text-2xl">
+                  <h3 className="text-muted-foreground mb-3 text-xl font-bold lg:text-2xl">
                     Saisie manuelle interminable
                   </h3>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
+                  <ul className="text-muted-foreground space-y-2 text-sm">
                     <li>• 10h/semaine perdues sur factures</li>
                     <li>• Erreurs humaines (2-5%)</li>
                     <li>• Support client réactif 9-17h</li>
@@ -200,66 +199,66 @@ const Pricing = () => {
               </div>
 
               {/* New Way - Prominent, Larger Card */}
-              <div className="relative overflow-hidden rounded-lg border-2 border-primary/40 bg-gradient-to-br from-primary/10 via-primary/5 to-background p-8 shadow-lg shadow-primary/20 backdrop-blur-sm transition-all duration-300 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/30 md:col-span-2 lg:col-span-2">
-                <div className="mb-6 inline-flex items-center gap-2 rounded-lg border border-primary/50 bg-primary/20 px-4 py-2 font-mono text-sm font-semibold text-primary">
+              <div className="border-primary/40 from-primary/10 via-primary/5 to-background shadow-primary/20 hover:border-primary/60 hover:shadow-primary/30 relative overflow-hidden rounded-lg border-2 bg-gradient-to-br p-8 shadow-lg backdrop-blur-sm transition-all duration-300 hover:shadow-xl md:col-span-2 lg:col-span-2">
+                <div className="border-primary/50 bg-primary/20 text-primary mb-6 inline-flex items-center gap-2 rounded-lg border px-4 py-2 font-mono text-sm font-semibold">
                   <Check size={16} className="text-primary" />
-                  AVEC WORKFLOWAI
+                  AVEC TCDYNAMICS
                 </div>
-                <h3 className="mb-4 text-3xl font-bold text-primary lg:text-4xl">
+                <h3 className="text-primary mb-4 text-3xl font-bold lg:text-4xl">
                   Automatisation IA en 3 clics
                 </h3>
-                <ul className="space-y-3 text-base text-foreground">
+                <ul className="text-foreground space-y-3 text-base">
                   <li className="flex items-start gap-2">
-                    <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
+                    <Check className="text-primary mt-0.5 size-5 shrink-0" />
                     <span>99.7% précision extraction</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
+                    <Check className="text-primary mt-0.5 size-5 shrink-0" />
                     <span>Chatbot 24/7 résout 80%</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
+                    <Check className="text-primary mt-0.5 size-5 shrink-0" />
                     <span>Dashboards temps réel</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
+                    <Check className="text-primary mt-0.5 size-5 shrink-0" />
                     <span>Économisez 10h/semaine</span>
                   </li>
                 </ul>
               </div>
 
               {/* Step 1 - Onboard */}
-              <div className="relative overflow-hidden rounded-lg border border-border/50 bg-card/30 p-6 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-card/50 md:col-span-1 lg:col-span-1">
+              <div className="border-border/50 bg-card/30 hover:border-primary/30 hover:bg-card/50 relative overflow-hidden rounded-lg border p-6 backdrop-blur-sm transition-all duration-300 md:col-span-1 lg:col-span-1">
                 <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-primary/10 font-mono text-sm font-bold text-primary">
+                  <div className="border-primary bg-primary/10 text-primary flex size-8 items-center justify-center rounded-full border-2 font-mono text-sm font-bold">
                     1
                   </div>
-                  <div className="inline-flex items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-1 font-mono text-xs text-muted-foreground">
+                  <div className="border-border bg-card/50 text-muted-foreground inline-flex items-center gap-2 rounded-lg border px-3 py-1 font-mono text-xs">
                     <Play size={12} aria-hidden="true" />
                     COMMENT ÇA MARCHE
                   </div>
                 </div>
-                <h4 className="mb-3 font-mono text-xl font-bold text-foreground">
+                <h4 className="text-foreground mb-3 font-mono text-xl font-bold">
                   Onboard en 3 minutes
                 </h4>
-                <p className="text-sm leading-relaxed text-muted-foreground">
+                <p className="text-muted-foreground text-sm leading-relaxed">
                   Uploadez vos documents, activez le chatbot. Pas de migration,
                   pas de downtime.
                 </p>
               </div>
 
               {/* Step 2 - Super-powers */}
-              <div className="relative overflow-hidden rounded-lg border border-border/50 bg-card/30 p-6 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-card/50 md:col-span-1 lg:col-span-1">
+              <div className="border-border/50 bg-card/30 hover:border-primary/30 hover:bg-card/50 relative overflow-hidden rounded-lg border p-6 backdrop-blur-sm transition-all duration-300 md:col-span-1 lg:col-span-1">
                 <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-primary/10 font-mono text-sm font-bold text-primary">
+                  <div className="border-primary bg-primary/10 text-primary flex size-8 items-center justify-center rounded-full border-2 font-mono text-sm font-bold">
                     2
                   </div>
-                  <div className="h-px flex-1 bg-gradient-to-r from-primary/20 to-transparent"></div>
+                  <div className="from-primary/20 h-px flex-1 bg-gradient-to-r to-transparent"></div>
                 </div>
-                <h4 className="mb-3 font-mono text-xl font-bold text-primary">
+                <h4 className="text-primary mb-3 font-mono text-xl font-bold">
                   Débloquez vos super-pouvoirs
                 </h4>
-                <ul className="space-y-2 text-sm text-muted-foreground">
+                <ul className="text-muted-foreground space-y-2 text-sm">
                   <li>• Traitez 500+ docs/mois automatiquement</li>
                   <li>• Répondez 80% des clients sans humain</li>
                   <li>• Analysez KPIs en temps réel</li>
@@ -267,17 +266,17 @@ const Pricing = () => {
               </div>
 
               {/* Step 3 - Goals */}
-              <div className="relative overflow-hidden rounded-lg border border-border/50 bg-card/30 p-6 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-card/50 md:col-span-1 lg:col-span-1">
+              <div className="border-border/50 bg-card/30 hover:border-primary/30 hover:bg-card/50 relative overflow-hidden rounded-lg border p-6 backdrop-blur-sm transition-all duration-300 md:col-span-1 lg:col-span-1">
                 <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-primary/10 font-mono text-sm font-bold text-primary">
+                  <div className="border-primary bg-primary/10 text-primary flex size-8 items-center justify-center rounded-full border-2 font-mono text-sm font-bold">
                     3
                   </div>
-                  <div className="h-px flex-1 bg-gradient-to-r from-primary/20 to-transparent"></div>
+                  <div className="from-primary/20 h-px flex-1 bg-gradient-to-r to-transparent"></div>
                 </div>
-                <h4 className="mb-3 font-mono text-xl font-bold text-primary">
+                <h4 className="text-primary mb-3 font-mono text-xl font-bold">
                   Atteignez vos objectifs business
                 </h4>
-                <ul className="space-y-2 text-sm text-muted-foreground">
+                <ul className="text-muted-foreground space-y-2 text-sm">
                   <li>• Économisez 10h/semaine dès jour 1</li>
                   <li>• ROI 300% en 12 mois</li>
                   <li>• Support local Île-de-France</li>
@@ -296,9 +295,9 @@ const Pricing = () => {
           {pricingPlans.map((plan, index) => (
             <Card
               key={index}
-              className={`fade-in-up relative flex h-full flex-col border-primary/20 bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-primary/40 ${
+              className={`fade-in-up border-primary/20 bg-card/30 hover:border-primary/40 relative flex h-full flex-col backdrop-blur-sm transition-all duration-300 ${
                 plan.popular
-                  ? 'relative z-10 border-2 border-primary shadow-2xl'
+                  ? 'border-primary relative z-10 border-2 shadow-2xl'
                   : ''
               } ${
                 index === 0
@@ -311,34 +310,34 @@ const Pricing = () => {
               }`}
             >
               {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 transform">
-                  <div className="rounded-full bg-primary px-4 py-1 font-mono text-sm font-bold text-primary-foreground">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                  <div className="bg-primary text-primary-foreground rounded-full px-4 py-1 font-mono text-sm font-bold">
                     Plus populaire
                   </div>
                 </div>
               )}
 
               <CardHeader className="pb-6 text-center">
-                <CardTitle className="mb-2 font-mono text-2xl text-foreground">
+                <CardTitle className="text-foreground mb-2 font-mono text-2xl">
                   {plan.name}
                 </CardTitle>
                 <div className="mb-4">
-                  <span className="font-mono text-4xl font-bold text-foreground drop-shadow-sm transition-colors duration-200 group-hover:text-primary">
+                  <span className="text-foreground group-hover:text-primary font-mono text-4xl font-bold drop-shadow-sm transition-colors duration-200">
                     {plan.price}
                   </span>
-                  <span className="font-mono text-muted-foreground">
+                  <span className="text-muted-foreground font-mono">
                     {plan.period}
                   </span>
                 </div>
-                <p className="font-mono text-sm leading-relaxed text-muted-foreground">
+                <p className="text-muted-foreground font-mono text-sm leading-relaxed">
                   {plan.description}
                 </p>
                 {plan.testimonial && (
-                  <div className="mt-4 flex min-h-[140px] flex-col justify-center rounded-lg border border-border/50 bg-muted/50 p-3">
-                    <blockquote className="mb-2 text-sm italic text-muted-foreground">
+                  <div className="border-border/50 bg-muted/50 mt-4 flex min-h-[140px] flex-col justify-center rounded-lg border p-3">
+                    <blockquote className="text-muted-foreground mb-2 text-sm italic">
                       "{plan.testimonial.quote}"
                     </blockquote>
-                    <cite className="text-xs font-semibold not-italic text-foreground">
+                    <cite className="text-foreground text-xs font-semibold not-italic">
                       – {plan.testimonial.author}
                     </cite>
                   </div>
@@ -354,9 +353,9 @@ const Pricing = () => {
                       className="flex items-center space-x-3"
                     >
                       {feature.included ? (
-                        <Check className="h-4 w-4 flex-shrink-0 text-primary" />
+                        <Check className="text-primary size-4 shrink-0" />
                       ) : (
-                        <X className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                        <X className="text-muted-foreground size-4 shrink-0" />
                       )}
                       <span
                         className={`font-mono text-sm ${
@@ -387,7 +386,7 @@ const Pricing = () => {
 
         {/* Support Information */}
         <div className="mb-12 text-center">
-          <h3 className="mb-8 font-mono text-2xl font-bold text-foreground">
+          <h3 className="text-foreground mb-8 font-mono text-2xl font-bold">
             Support <span className="text-primary">Local</span>
           </h3>
 
@@ -395,19 +394,19 @@ const Pricing = () => {
             {supportInfo.map((info, index) => (
               <Card
                 key={index}
-                className="border-primary/20 bg-card/20 backdrop-blur-sm transition-all duration-300 hover:border-primary/40"
+                className="border-primary/20 bg-card/20 hover:border-primary/40 backdrop-blur-sm transition-all duration-300"
               >
                 <CardContent className="p-6 text-center">
-                  <div className="mx-auto mb-4 w-fit rounded-lg bg-primary/10 p-3">
+                  <div className="bg-primary/10 mx-auto mb-4 w-fit rounded-lg p-3">
                     <info.icon
-                      className="h-6 w-6 text-primary"
+                      className="text-primary size-6"
                       aria-hidden="true"
                     />
                   </div>
-                  <h4 className="mb-2 font-mono font-bold text-foreground">
+                  <h4 className="text-foreground mb-2 font-mono font-bold">
                     {info.title}
                   </h4>
-                  <p className="font-mono text-sm text-muted-foreground">
+                  <p className="text-muted-foreground font-mono text-sm">
                     {info.description}
                   </p>
                 </CardContent>
@@ -418,12 +417,12 @@ const Pricing = () => {
 
         {/* FAQ Notice */}
         <div className="text-center">
-          <Card className="mx-auto max-w-2xl border-primary/20 bg-card/20 backdrop-blur-sm">
+          <Card className="border-primary/20 bg-card/20 mx-auto max-w-2xl backdrop-blur-sm">
             <CardContent className="p-8">
-              <h4 className="mb-4 font-mono font-bold text-foreground">
+              <h4 className="text-foreground mb-4 font-mono font-bold">
                 Des questions sur nos tarifs ?
               </h4>
-              <p className="mb-6 font-mono text-sm text-muted-foreground">
+              <p className="text-muted-foreground mb-6 font-mono text-sm">
                 Contactez notre équipe pour une démo personnalisée et un devis
                 adapté à vos besoins spécifiques.
               </p>

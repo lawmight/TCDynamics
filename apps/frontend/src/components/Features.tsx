@@ -2,14 +2,21 @@ import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
 import { featureModules } from '@/data/productHighlights'
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 import ArrowRight from '~icons/lucide/arrow-right'
 import Brain from '~icons/lucide/brain'
 import Lock from '~icons/lucide/lock'
 import Zap from '~icons/lucide/zap'
 
-
 const Features = () => {
   const navigate = useNavigate()
+  const { ref: sectionRef, hasIntersected } = useIntersectionObserver({
+    threshold: 0.15,
+    rootMargin: '0px 0px -50px 0px',
+  })
+
+  // Hidden state before scroll reveal
+  const hiddenClass = 'opacity-0 translate-y-6'
 
   const scrollToContact = () => {
     const contactSection = document.getElementById('contact')
@@ -45,16 +52,19 @@ const Features = () => {
   } as const
 
   return (
-    <section className="relative overflow-hidden bg-background py-20 lg:py-32">
+    <section
+      ref={sectionRef}
+      className="bg-background relative overflow-hidden py-20 lg:py-32"
+    >
       {/* Background Network Patterns */}
       <div className="absolute inset-0 opacity-40">
-        <div className="top-1/6 left-1/5 absolute h-1 w-1 animate-pulse rounded-full bg-primary"></div>
-        <div className="fade-delay-20 absolute right-1/4 top-2/3 h-1.5 w-1.5 animate-pulse rounded-full bg-primary-glow"></div>
-        <div className="fade-delay-10 absolute bottom-1/3 left-1/2 h-1 w-1 animate-pulse rounded-full bg-primary"></div>
+        <div className="top-1/6 left-1/5 bg-primary absolute size-1 animate-pulse rounded-full"></div>
+        <div className="fade-delay-20 bg-primary-glow absolute right-1/4 top-2/3 size-1.5 animate-pulse rounded-full"></div>
+        <div className="fade-delay-10 bg-primary absolute bottom-1/3 left-1/2 size-1 animate-pulse rounded-full"></div>
 
         {/* Subtle connection lines */}
         <svg
-          className="absolute inset-0 h-full w-full opacity-5"
+          className="absolute inset-0 size-full opacity-5"
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
@@ -91,17 +101,23 @@ const Features = () => {
       <div className="container relative z-10 mx-auto px-6">
         {/* Section Header */}
         <div className="mb-16 space-y-6 text-center">
-          <div className="fade-in-up inline-flex items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-2 font-mono text-xs text-muted-foreground backdrop-blur-sm">
+          <div
+            className={`border-border bg-card/50 text-muted-foreground inline-flex items-center gap-2 rounded-lg border px-3 py-2 font-mono text-xs backdrop-blur-sm ${hasIntersected ? 'fade-in-up' : hiddenClass}`}
+          >
             <Brain size={14} aria-hidden="true" />
             INTELLIGENCE MODULES
           </div>
 
-          <h2 className="fade-in-up-delay text-4xl font-bold leading-tight tracking-tight text-foreground lg:text-6xl">
+          <h2
+            className={`text-foreground text-4xl font-bold leading-tight tracking-tight lg:text-6xl ${hasIntersected ? 'fade-in-up fade-delay-01' : hiddenClass}`}
+          >
             Modules IA pour{' '}
             <span className="text-gradient">Entreprises Françaises</span>
           </h2>
 
-          <p className="fade-in-up-delay-2 mx-auto max-w-3xl text-xl text-muted-foreground">
+          <p
+            className={`text-muted-foreground mx-auto max-w-3xl text-xl ${hasIntersected ? 'fade-in-up fade-delay-02' : hiddenClass}`}
+          >
             Solutions d'automatisation conçues spécifiquement pour les TPE/PME
             françaises.
             <span className="text-primary-glow">
@@ -122,12 +138,12 @@ const Features = () => {
             return (
               <div
                 key={index}
-                className={`fade-in-up group relative rounded-lg border border-border bg-card/30 p-8 backdrop-blur-sm transition-all duration-500 hover:border-primary/30 hover:bg-card/50 ${delayClass}`}
+                className={`border-border bg-card/30 hover:border-primary/30 hover:bg-card/50 group relative rounded-lg border p-8 backdrop-blur-sm transition-all duration-500 ${hasIntersected ? `fade-in-up ${delayClass}` : hiddenClass}`}
               >
                 {/* Icon Header */}
                 <div className="mb-6 flex items-center gap-4">
                   <div
-                    className={`h-12 w-12 ${colors.bg} flex items-center justify-center rounded-lg ${colors.bgHover} transition-colors`}
+                    className={`size-12 ${colors.bg} flex items-center justify-center rounded-lg ${colors.bgHover} transition-colors`}
                   >
                     <feature.icon
                       size={24}
@@ -136,17 +152,17 @@ const Features = () => {
                     />
                   </div>
                   <div>
-                    <div className="font-mono text-xs text-muted-foreground">
+                    <div className="text-muted-foreground font-mono text-xs">
                       {feature.subtitle}
                     </div>
-                    <h3 className="text-xl font-bold text-foreground">
+                    <h3 className="text-foreground text-xl font-bold">
                       {feature.title}
                     </h3>
                   </div>
                 </div>
 
                 {/* Description */}
-                <p className="mb-6 leading-relaxed text-muted-foreground">
+                <p className="text-muted-foreground mb-6 leading-relaxed">
                   {feature.description}
                 </p>
 
@@ -156,9 +172,9 @@ const Features = () => {
                     <div key={i} className="flex items-center gap-3">
                       <div
                         aria-hidden="true"
-                        className={`h-1.5 w-1.5 ${colors.bullet} rounded-full`}
+                        className={`size-1.5 ${colors.bullet} rounded-full`}
                       ></div>
-                      <span className="font-mono text-sm text-foreground">
+                      <span className="text-foreground font-mono text-sm">
                         {benefit}
                       </span>
                     </div>
@@ -166,7 +182,7 @@ const Features = () => {
                 </div>
 
                 {/* Hover indicator */}
-                <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground transition-colors group-hover:text-primary">
+                <div className="text-muted-foreground group-hover:text-primary flex items-center gap-2 font-mono text-xs transition-colors">
                   <Zap size={12} aria-hidden="true" />
                   <span>ACTIVER MODULE</span>
                   <ArrowRight
@@ -186,15 +202,17 @@ const Features = () => {
         </div>
 
         {/* Bottom CTA Section */}
-        <div className="fade-in-up-delay-2 rounded-lg border border-border bg-card/20 p-8 text-center backdrop-blur-sm">
+        <div
+          className={`border-border bg-card/20 rounded-lg border p-8 text-center backdrop-blur-sm ${hasIntersected ? 'fade-in-up fade-delay-04' : hiddenClass}`}
+        >
           <div className="mb-4 flex items-center justify-center gap-2">
             <Lock size={16} className="text-primary-glow" aria-hidden="true" />
-            <span className="font-mono text-sm text-muted-foreground">
+            <span className="text-muted-foreground font-mono text-sm">
               DONNÉES SÉCURISÉES EN FRANCE
             </span>
           </div>
 
-          <h3 className="mb-4 text-2xl font-bold text-foreground">
+          <h3 className="text-foreground mb-4 text-2xl font-bold">
             Prêt à transformer votre entreprise ?
           </h3>
 

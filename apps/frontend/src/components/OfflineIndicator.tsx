@@ -39,12 +39,12 @@ const OfflineIndicator = () => {
       >
         {isOnline ? (
           <>
-            <Wifi className="h-4 w-4" />
+            <Wifi className="size-4" />
             <span className="font-mono text-sm">Connexion rétablie</span>
           </>
         ) : (
           <>
-            <WifiOff className="h-4 w-4" />
+            <WifiOff className="size-4" />
             <span className="font-mono text-sm">Mode hors ligne</span>
           </>
         )}

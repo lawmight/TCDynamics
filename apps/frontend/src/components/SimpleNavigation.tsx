@@ -1,8 +1,10 @@
 import { startTransition, useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 
+import ScrollProgressBar from '@/components/ScrollProgressBar'
 import { useTheme } from '@/components/ThemeProvider'
 import { useAuth } from '@/hooks/useAuth'
+import { useScrollProgress } from '@/hooks/useScrollProgress'
 import ArrowUp from '~icons/lucide/arrow-up'
 import Menu from '~icons/lucide/menu'
 import X from '~icons/lucide/x'
@@ -38,6 +40,7 @@ const SimpleNavigation = () => {
   const navigate = useNavigate()
   const { resolvedTheme, setTheme } = useTheme()
   const { isSignedIn } = useAuth()
+  const { progress } = useScrollProgress()
   const appUrl = import.meta.env.VITE_APP_URL || '/app'
   const isExternalApp = appUrl.startsWith('http')
   const goToApp = () => {
@@ -105,22 +108,25 @@ const SimpleNavigation = () => {
 
   return (
     <>
+      {/* Scroll Progress Bar - Homepage only */}
+      {location.pathname === '/' && <ScrollProgressBar progress={progress} />}
+
       {/* Simple Header */}
       <header
-        className={`fixed left-0 right-0 top-0 z-40 transition-all duration-300 ${
+        className={`fixed inset-x-0 top-0 z-40 transition-all duration-300 ${
           isScrolled
-            ? 'border-b border-border bg-background/95 backdrop-blur-sm'
+            ? 'border-border bg-background/95 border-b backdrop-blur-sm'
             : 'bg-transparent'
         }`}
       >
-        <div className="container mx-auto px-4 py-4">
+        <div className="container mx-auto p-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <button
               onClick={handleLogoClick}
-              className="text-2xl font-bold text-primary transition-colors hover:text-primary-glow"
+              className="text-primary hover:text-primary-glow text-2xl font-bold transition-colors"
             >
-              WorkFlowAI
+              TCDynamics
             </button>
 
             {/* Desktop Navigation */}
@@ -131,7 +137,7 @@ const SimpleNavigation = () => {
                     <button
                       key={item.label}
                       onClick={() => handleNavClick(item)}
-                      className="px-0 py-2.5 text-foreground/80 transition-colors hover:text-primary"
+                      className="text-foreground/80 hover:text-primary px-0 py-2.5 transition-colors"
                       onMouseEnter={() => prefetchRoute(item.path)}
                     >
                       {item.label}
@@ -140,7 +146,7 @@ const SimpleNavigation = () => {
                   <button
                     onClick={goToApp}
                     onMouseEnter={() => !isExternalApp && prefetchRoute('/app')}
-                    className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary/50 rounded-full px-4 py-2 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2"
                   >
                     Accéder à l'app
                   </button>
@@ -163,14 +169,14 @@ const SimpleNavigation = () => {
                 <>
                   <Link
                     to="/"
-                    className="px-0 py-1.5 text-foreground/80 transition-colors hover:text-primary"
+                    className="text-foreground/80 hover:text-primary px-0 py-1.5 transition-colors"
                   >
                     Home
                   </Link>
                   <button
                     onClick={goToApp}
                     onMouseEnter={() => !isExternalApp && prefetchRoute('/app')}
-                    className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary/50 rounded-full px-4 py-2 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2"
                   >
                     Accéder à l'app
                   </button>
@@ -181,7 +187,7 @@ const SimpleNavigation = () => {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 text-foreground transition-colors hover:text-primary lg:hidden"
+              className="text-foreground hover:text-primary p-2 transition-colors lg:hidden"
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -191,25 +197,24 @@ const SimpleNavigation = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="border-b border-border bg-background/95 backdrop-blur-sm lg:hidden">
-            <div className="container mx-auto px-4 py-4">
+          <div className="border-border bg-background/95 border-b backdrop-blur-sm lg:hidden">
+            <div className="container mx-auto p-4">
               <nav className="flex flex-col space-y-3">
                 {location.pathname === '/' ? (
                   navigationItems.map(item => (
                     <button
                       key={item.label}
                       onClick={() => handleNavClick(item)}
-                      className="py-2 text-left text-foreground/80 transition-colors hover:text-primary"
+                      className="text-foreground/80 hover:text-primary py-2 text-left transition-colors"
                       onMouseEnter={() => prefetchRoute(item.path)}
                     >
                       {item.label}
                     </button>
                   ))
                 ) : (
-                  // eslint-disable-next-line jsx-a11y/no-static-element-interactions
                   <Link
                     to="/"
-                    className="py-2 text-left text-foreground/80 transition-colors hover:text-primary"
+                    className="text-foreground/80 hover:text-primary py-2 text-left transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                     onKeyDown={e =>
                       e.key === 'Enter' && setIsMobileMenuOpen(false)
@@ -220,14 +225,14 @@ const SimpleNavigation = () => {
                 )}
                 <button
                   onClick={goToApp}
-                  className="mt-2 rounded-full bg-primary px-4 py-2 text-left text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary/50 mt-2 rounded-full px-4 py-2 text-left text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2"
                   onMouseEnter={() => !isExternalApp && prefetchRoute('/app')}
                 >
                   Accéder à l'app
                 </button>
                 {/* Theme Toggle - Mobile */}
                 <button
-                  className="theme-toggle mx-auto my-2 h-12 w-12 p-2"
+                  className="theme-toggle mx-auto my-2 size-12 p-2"
                   onClick={() => {
                     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
                     setIsMobileMenuOpen(false)
@@ -250,7 +255,7 @@ const SimpleNavigation = () => {
       {showBackToTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-6 left-6 z-50 rounded-full bg-primary p-3 text-primary-foreground shadow-lg transition-all duration-300 hover:bg-primary-glow"
+          className="bg-primary text-primary-foreground hover:bg-primary-glow fixed bottom-6 left-6 z-50 rounded-full p-3 shadow-lg transition-all duration-300"
           aria-label="Back to top"
         >
           <ArrowUp size={20} />

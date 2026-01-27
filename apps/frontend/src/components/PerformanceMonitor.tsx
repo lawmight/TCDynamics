@@ -12,9 +12,7 @@ interface PerformanceMetrics {
 const PerformanceMonitor = () => {
   const isBrowser = typeof window !== 'undefined'
   const getStoredPreference = () =>
-    isBrowser
-      ? getWithMigration(LS.SHOW_PERF_MONITOR, 'showPerfMonitor')
-      : null
+    isBrowser ? getWithMigration(LS.SHOW_PERF_MONITOR, 'showPerfMonitor') : null
 
   type MetaEnv = { MODE?: string; VITEST?: string }
   const metaEnv: MetaEnv | undefined =

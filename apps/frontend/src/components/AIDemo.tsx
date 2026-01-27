@@ -45,16 +45,16 @@ const AIDemo = () => {
   ]
 
   return (
-    <section className="relative overflow-hidden bg-background py-20 lg:py-32">
+    <section className="bg-background relative overflow-hidden py-20 lg:py-32">
       {/* Background Network Patterns */}
       <div className="absolute inset-0 opacity-20">
-        <div className="left-1/6 absolute top-1/4 h-2 w-2 animate-pulse rounded-full bg-primary"></div>
-        <div className="fade-delay-10 absolute right-1/4 top-1/2 h-1 w-1 animate-pulse rounded-full bg-primary-glow"></div>
-        <div className="fade-delay-20 absolute bottom-1/4 left-1/3 h-1.5 w-1.5 animate-pulse rounded-full bg-primary"></div>
+        <div className="left-1/6 bg-primary absolute top-1/4 size-2 animate-pulse rounded-full"></div>
+        <div className="fade-delay-10 bg-primary-glow absolute right-1/4 top-1/2 size-1 animate-pulse rounded-full"></div>
+        <div className="fade-delay-20 bg-primary absolute bottom-1/4 left-1/3 size-1.5 animate-pulse rounded-full"></div>
 
         {/* Connection Lines */}
         <svg
-          className="absolute inset-0 h-full w-full opacity-10"
+          className="absolute inset-0 size-full opacity-10"
           xmlns="http://www.w3.org/2000/svg"
         >
           <defs>
@@ -99,16 +99,16 @@ const AIDemo = () => {
       <div className="container relative z-10 mx-auto px-6">
         {/* Section Header */}
         <div className="mb-16 space-y-6 text-center">
-          <div className="inline-flex items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-2 font-mono text-xs text-muted-foreground backdrop-blur-sm">
-            <Brain className="h-4 w-4" />
+          <div className="border-border bg-card/50 text-muted-foreground inline-flex items-center gap-2 rounded-lg border px-3 py-2 font-mono text-xs backdrop-blur-sm">
+            <Brain className="size-4" />
             DÉMONSTRATION IA EN TEMPS RÉEL
           </div>
 
-          <h2 className="text-4xl font-bold leading-tight tracking-tight text-foreground lg:text-6xl">
+          <h2 className="text-foreground text-4xl font-bold leading-tight tracking-tight lg:text-6xl">
             Découvrez l'IA en <span className="text-gradient">Action</span>
           </h2>
 
-          <p className="mx-auto max-w-3xl text-xl text-muted-foreground">
+          <p className="text-muted-foreground mx-auto max-w-3xl text-xl">
             Testez nos fonctionnalités d'intelligence artificielle propulsées
             par Azure.
             <span className="text-primary-glow">
@@ -126,17 +126,17 @@ const AIDemo = () => {
             className="w-full"
             aria-label="Fonctionnalités de démonstration IA"
           >
-            <TabsList className="mb-8 grid w-full grid-cols-2 bg-card/50 backdrop-blur-sm">
+            <TabsList className="bg-card/50 mb-8 grid w-full grid-cols-2 backdrop-blur-sm">
               {demoFeatures.map(feature => {
                 const IconComponent = feature.icon
                 return (
                   <TabsTrigger
                     key={feature.id}
                     value={feature.id}
-                    className="flex items-center gap-3 py-4 font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                    className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-3 py-4 font-mono"
                     aria-label={`Démonstration de ${feature.title}`}
                   >
-                    <IconComponent className="h-5 w-5" />
+                    <IconComponent className="size-5" />
                     <div className="text-left">
                       <div className="font-semibold">{feature.title}</div>
                       <div className="text-xs opacity-70">
@@ -156,8 +156,8 @@ const AIDemo = () => {
                   <Card className="border-primary/20 bg-card/30 backdrop-blur-sm">
                     <CardHeader>
                       <div className="flex items-center gap-3">
-                        <div className="rounded-lg bg-primary/20 p-2">
-                          <MessageSquare className="h-6 w-6 text-primary" />
+                        <div className="bg-primary/20 rounded-lg p-2">
+                          <MessageSquare className="text-primary size-6" />
                         </div>
                         <CardTitle className="font-mono text-2xl">
                           Assistant IA Conversationnel
@@ -165,7 +165,7 @@ const AIDemo = () => {
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <p className="font-mono text-muted-foreground">
+                      <p className="text-muted-foreground font-mono">
                         Notre chatbot alimenté par GPT-3.5-turbo comprend le
                         français et peut aider vos clients 24h/24 avec des
                         réponses contextuelles et pertinentes.
@@ -178,7 +178,7 @@ const AIDemo = () => {
                               key={index}
                               className="flex items-center gap-3"
                             >
-                              <div className="h-2 w-2 rounded-full bg-primary"></div>
+                              <div className="bg-primary size-2 rounded-full"></div>
                               <span className="font-mono text-sm">
                                 {capability}
                               </span>
@@ -187,9 +187,9 @@ const AIDemo = () => {
                         )}
                       </div>
 
-                      <div className="rounded-lg bg-primary/5 p-4">
+                      <div className="bg-primary/5 rounded-lg p-4">
                         <div className="mb-2 flex items-center gap-2">
-                          <Zap className="h-4 w-4 text-primary" />
+                          <Zap className="text-primary size-4" />
                           <span className="font-mono text-sm font-semibold">
                             Technologie:
                           </span>
@@ -209,7 +209,7 @@ const AIDemo = () => {
                         }}
                       >
                         Tester le Chatbot
-                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                        <ArrowRight className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
                       </Button>
                     </CardContent>
                   </Card>
@@ -223,8 +223,8 @@ const AIDemo = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3 font-mono text-sm">
-                        <div className="rounded-lg bg-muted/50 p-3">
-                          <div className="mb-1 text-muted-foreground">
+                        <div className="bg-muted/50 rounded-lg p-3">
+                          <div className="text-muted-foreground mb-1">
                             Client:
                           </div>
                           <div>
@@ -232,8 +232,8 @@ const AIDemo = () => {
                             ?"
                           </div>
                         </div>
-                        <div className="rounded-lg bg-primary/10 p-3">
-                          <div className="mb-1 text-primary">IA:</div>
+                        <div className="bg-primary/10 rounded-lg p-3">
+                          <div className="text-primary mb-1">IA:</div>
                           <div>
                             "Je peux vous guider à travers les étapes de
                             configuration..."
@@ -251,22 +251,22 @@ const AIDemo = () => {
                       <CardTitle className="font-mono text-xl">
                         Testez l'IA en Temps Réel
                       </CardTitle>
-                      <p className="font-mono text-sm text-muted-foreground">
+                      <p className="text-muted-foreground font-mono text-sm">
                         Cliquez sur le bouton bleu en bas à droite de l'écran
                         pour ouvrir le chatbot
                       </p>
                     </CardHeader>
                     <CardContent>
-                      <div className="rounded-lg bg-muted/30 p-6 text-center">
-                        <MessageSquare className="mx-auto mb-4 h-16 w-16 text-primary/50" />
+                      <div className="bg-muted/30 rounded-lg p-6 text-center">
+                        <MessageSquare className="text-primary/50 mx-auto mb-4 size-16" />
                         <h3 className="mb-2 font-mono text-lg">
                           Chatbot Interactif
                         </h3>
-                        <p className="mb-4 font-mono text-sm text-muted-foreground">
-                          Essayez de poser une question sur WorkFlowAI ou
+                        <p className="text-muted-foreground mb-4 font-mono text-sm">
+                          Essayez de poser une question sur TCDynamics ou
                           l'automatisation d'entreprise
                         </p>
-                        <Badge className="bg-primary/20 font-mono text-primary">
+                        <Badge className="bg-primary/20 text-primary font-mono">
                           Disponible 24h/24
                         </Badge>
                       </div>
@@ -308,8 +308,8 @@ const AIDemo = () => {
                   <Card className="border-primary/20 bg-card/30 backdrop-blur-sm">
                     <CardHeader>
                       <div className="flex items-center gap-3">
-                        <div className="rounded-lg bg-primary/20 p-2">
-                          <FileText className="h-6 w-6 text-primary" />
+                        <div className="bg-primary/20 rounded-lg p-2">
+                          <FileText className="text-primary size-6" />
                         </div>
                         <div>
                           <CardTitle className="font-mono text-2xl">
@@ -319,7 +319,7 @@ const AIDemo = () => {
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <p className="font-mono text-muted-foreground">
+                      <p className="text-muted-foreground font-mono">
                         Notre système d'IA analyse automatiquement vos documents
                         avec une précision de 99.7% et extrait les données
                         pertinentes en quelques secondes.
@@ -332,7 +332,7 @@ const AIDemo = () => {
                               key={index}
                               className="flex items-center gap-3"
                             >
-                              <div className="h-2 w-2 rounded-full bg-primary"></div>
+                              <div className="bg-primary size-2 rounded-full"></div>
                               <span className="font-mono text-sm">
                                 {capability}
                               </span>
@@ -341,9 +341,9 @@ const AIDemo = () => {
                         )}
                       </div>
 
-                      <div className="rounded-lg bg-primary/5 p-4">
+                      <div className="bg-primary/5 rounded-lg p-4">
                         <div className="mb-2 flex items-center gap-2">
-                          <Zap className="h-4 w-4 text-primary" />
+                          <Zap className="text-primary size-4" />
                           <span className="font-mono text-sm font-semibold">
                             Technologie:
                           </span>
@@ -364,35 +364,35 @@ const AIDemo = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
-                        <div className="flex items-center gap-3 rounded-lg bg-muted/30 p-3">
-                          <FileText className="h-5 w-5 text-primary" />
+                        <div className="bg-muted/30 flex items-center gap-3 rounded-lg p-3">
+                          <FileText className="text-primary size-5" />
                           <div>
                             <div className="font-mono text-sm font-semibold">
                               Factures
                             </div>
-                            <div className="text-xs text-muted-foreground">
+                            <div className="text-muted-foreground text-xs">
                               Extraction automatique des montants et dates
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3 rounded-lg bg-muted/30 p-3">
-                          <FileText className="h-5 w-5 text-primary" />
+                        <div className="bg-muted/30 flex items-center gap-3 rounded-lg p-3">
+                          <FileText className="text-primary size-5" />
                           <div>
                             <div className="font-mono text-sm font-semibold">
                               Contrats
                             </div>
-                            <div className="text-xs text-muted-foreground">
+                            <div className="text-muted-foreground text-xs">
                               Analyse des clauses et conditions
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3 rounded-lg bg-muted/30 p-3">
-                          <FileText className="h-5 w-5 text-primary" />
+                        <div className="bg-muted/30 flex items-center gap-3 rounded-lg p-3">
+                          <FileText className="text-primary size-5" />
                           <div>
                             <div className="font-mono text-sm font-semibold">
                               Formulaires
                             </div>
-                            <div className="text-xs text-muted-foreground">
+                            <div className="text-muted-foreground text-xs">
                               Remplissage automatique des données
                             </div>
                           </div>
@@ -413,12 +413,12 @@ const AIDemo = () => {
 
         {/* Call to Action */}
         <div className="mt-16 text-center">
-          <Card className="mx-auto max-w-2xl border-primary/20 bg-gradient-to-r from-primary/10 to-primary/5">
+          <Card className="border-primary/20 from-primary/10 to-primary/5 mx-auto max-w-2xl bg-gradient-to-r">
             <CardContent className="p-8">
               <h3 className="mb-4 font-mono text-2xl font-bold">
                 Prêt à Automatiser Votre Entreprise ?
               </h3>
-              <p className="mb-6 font-mono text-muted-foreground">
+              <p className="text-muted-foreground mb-6 font-mono">
                 Ces technologies d'IA sont maintenant intégrées à notre
                 plateforme et consomment activement votre crédit Azure pour des
                 fonctionnalités réelles.
@@ -430,7 +430,7 @@ const AIDemo = () => {
                   onClick={() => navigate('/get-started')}
                 >
                   Démarrer l'Essai Gratuit
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <ArrowRight className="ml-2 size-4" />
                 </Button>
                 <Button
                   size="lg"

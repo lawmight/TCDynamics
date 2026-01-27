@@ -185,11 +185,11 @@ const DocumentProcessor = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'processing':
-        return <Loader2 className="h-4 w-4 animate-spin text-primary" />
+        return <Loader2 className="text-primary size-4 animate-spin" />
       case 'completed':
-        return <CheckCircle className="h-4 w-4 text-green-500" />
+        return <CheckCircle className="size-4 text-green-500" />
       case 'error':
-        return <AlertCircle className="h-4 w-4 text-red-500" />
+        return <AlertCircle className="size-4 text-red-500" />
       default:
         return null
     }
@@ -219,8 +219,8 @@ const DocumentProcessor = () => {
     <Card className="w-full" data-testid="document-processor">
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className="rounded-lg bg-primary/10 p-2">
-            <FileText className="h-6 w-6 text-primary" />
+          <div className="bg-primary/10 rounded-lg p-2">
+            <FileText className="text-primary size-6" />
           </div>
           <div>
             <CardTitle
@@ -229,7 +229,7 @@ const DocumentProcessor = () => {
             >
               Traitement de Documents IA
             </CardTitle>
-            <p className="font-mono text-sm text-muted-foreground">
+            <p className="text-muted-foreground font-mono text-sm">
               Analysez automatiquement vos factures, contrats et documents
             </p>
           </div>
@@ -239,7 +239,7 @@ const DocumentProcessor = () => {
       <CardContent className="space-y-6">
         {/* Upload Area */}
         <div
-          className="rounded-lg border-2 border-dashed border-border p-8 text-center"
+          className="border-border rounded-lg border-2 border-dashed p-8 text-center"
           data-testid="upload-area"
         >
           <input
@@ -253,8 +253,8 @@ const DocumentProcessor = () => {
           />
 
           <div className="space-y-4">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-              <Upload className="h-8 w-8 text-primary" />
+            <div className="bg-primary/10 mx-auto flex size-16 items-center justify-center rounded-full">
+              <Upload className="text-primary size-8" />
             </div>
 
             <div>
@@ -265,19 +265,19 @@ const DocumentProcessor = () => {
               >
                 {isProcessing ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 size-4 animate-spin" />
                     Traitement en cours...
                   </>
                 ) : (
                   <>
-                    <Upload className="mr-2 h-4 w-4" />
+                    <Upload className="mr-2 size-4" />
                     Sélectionner des documents
                   </>
                 )}
               </Button>
             </div>
 
-            <p className="font-mono text-sm text-muted-foreground">
+            <p className="text-muted-foreground font-mono text-sm">
               Formats supportés: JPG, PNG, PDF, DOC, DOCX
             </p>
           </div>
@@ -306,7 +306,7 @@ const DocumentProcessor = () => {
 
                         {doc.status === 'completed' && doc.extractedText && (
                           <div className="space-y-2">
-                            <div className="rounded-lg bg-muted/50 p-3">
+                            <div className="bg-muted/50 rounded-lg p-3">
                               <p className="whitespace-pre-wrap font-mono text-sm">
                                 {doc.extractedText.length > 300
                                   ? `${doc.extractedText.substring(0, 300)}...`
@@ -315,7 +315,7 @@ const DocumentProcessor = () => {
                             </div>
                             {doc.confidence > 0 && (
                               <div className="flex items-center gap-2">
-                                <span className="font-mono text-xs text-muted-foreground">
+                                <span className="text-muted-foreground font-mono text-xs">
                                   Confiance: {Math.round(doc.confidence * 100)}%
                                 </span>
                               </div>
@@ -325,7 +325,7 @@ const DocumentProcessor = () => {
 
                         {doc.status === 'error' && (
                           <Alert>
-                            <AlertCircle className="h-4 w-4" />
+                            <AlertCircle className="size-4" />
                             <AlertDescription className="text-sm">
                               {doc.extractedText ||
                                 'Erreur lors du traitement du document'}
@@ -342,19 +342,19 @@ const DocumentProcessor = () => {
         )}
 
         {/* Features Info */}
-        <div className="rounded-lg bg-primary/5 p-4">
+        <div className="bg-primary/5 rounded-lg p-4">
           <h4 className="mb-3 font-mono font-semibold">Fonctionnalités IA :</h4>
           <div className="grid grid-cols-1 gap-4 font-mono text-sm md:grid-cols-3">
             <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
+              <CheckCircle className="size-4 text-green-500" />
               <span>OCR haute précision</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
+              <CheckCircle className="size-4 text-green-500" />
               <span>Analyse automatique</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
+              <CheckCircle className="size-4 text-green-500" />
               <span>Extraction de données</span>
             </div>
           </div>
