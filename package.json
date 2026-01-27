@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "TCDynamics WorkFlowAI - AI-powered automation platform for French SMEs",
   "private": true,
+  "type": "module",
   "workspaces": [
     "apps/*"
   ],
@@ -59,6 +60,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@types/canvas-confetti": "^1.9.0",
     "@typescript-eslint/scope-manager": "^8.53.1",
     "@vitejs/plugin-react-swc": "^3.11.0",
     "autoprefixer": "^10.4.23",
@@ -66,9 +68,11 @@
     "concurrently": "^8.2.2",
     "cross-env": "^10.1.0",
     "css-tree": "^2.3.1",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.26",
+    "eslint-plugin-tailwindcss": "^3.18.2",
     "fast-xml-parser": "^4.3.6",
     "globals": "^16.5.0",
     "postcss": "^8.5.6",
