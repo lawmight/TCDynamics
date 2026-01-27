@@ -8,9 +8,8 @@ import CheckoutEnterprise from '../CheckoutEnterprise'
 const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual<typeof import('react-router-dom')>(
-    'react-router-dom'
-  )
+  const actual =
+    await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
   return {
     ...actual,
     useNavigate: () => mockNavigate,
@@ -37,9 +36,7 @@ describe('CheckoutEnterprise page', () => {
     const input = screen.getByLabelText(/Montant/i)
     await user.type(input, '1000')
 
-    expect(
-      screen.getByText(/Le montant minimum est de/i)
-    ).toBeInTheDocument()
+    expect(screen.getByText(/Le montant minimum est de/i)).toBeInTheDocument()
   })
 
   it('submits and redirects on valid amount', async () => {

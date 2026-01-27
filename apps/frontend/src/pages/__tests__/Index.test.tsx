@@ -111,6 +111,6 @@ describe('Index Page', () => {
     )
 
     const heroSection = screen.getByTestId('hero').closest('section')
-    expect(heroSection).toHaveAttribute('aria-label', 'Présentation WorkFlowAI')
+    expect(heroSection).toHaveAttribute('aria-label', 'Présentation TCDynamics')
   })
 })

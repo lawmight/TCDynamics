@@ -22,7 +22,7 @@ describe('Features Page', () => {
         name: /Toute la profondeur produit/i,
       })
     ).toBeInTheDocument()
-    expect(screen.getByText(/Modules IA WorkFlowAI/i)).toBeInTheDocument()
+    expect(screen.getByText(/Modules IA TCDynamics/i)).toBeInTheDocument()
   })
 
   it('renders every module from the shared data source', () => {

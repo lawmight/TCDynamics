@@ -24,9 +24,7 @@ describe('Dashboard page', () => {
 
     render(<Dashboard />)
 
-    expect(
-      screen.getByText(/No project configured/i)
-    ).toBeInTheDocument()
+    expect(screen.getByText(/No project configured/i)).toBeInTheDocument()
   })
 
   it('renders metrics cards when data is available', () => {

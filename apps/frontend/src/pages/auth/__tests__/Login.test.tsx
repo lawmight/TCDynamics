@@ -14,8 +14,12 @@ vi.mock('@clerk/clerk-react', async () => {
       isLoaded: true,
       user: null,
     }),
-    SignedIn: ({ children: _children }: { children: React.ReactNode }) => null,
-    SignedOut: ({ children }: { children: React.ReactNode }) => children,
+    SignedIn: ({ children }: { children: React.ReactNode }) => (
+      <div>{children}</div>
+    ),
+    SignedOut: ({ children }: { children: React.ReactNode }) => (
+      <div>{children}</div>
+    ),
     SignInButton: ({ children }: { children: React.ReactNode }) => (
       <div>{children}</div>
     ),

@@ -8,7 +8,6 @@ import BarChart2 from '~icons/lucide/bar-chart-2'
 import Gauge from '~icons/lucide/gauge'
 import Loader2 from '~icons/lucide/loader-2'
 
-
 const Analytics = () => {
   const [data, setData] = useState<AnalyticsSummary | null>(null)
   const [loading, setLoading] = useState(true)
@@ -45,21 +44,21 @@ const Analytics = () => {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-4">
       <div className="flex flex-col gap-1">
-        <p className="text-sm text-muted-foreground">Usage insights</p>
+        <p className="text-muted-foreground text-sm">Usage insights</p>
         <h1 className="text-2xl font-semibold">Analytics</h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           High-level activity across chat, knowledge base, and active sessions.
         </p>
       </div>
 
       {loading ? (
-        <Card className="flex items-center justify-center gap-2 border-border bg-card/70 p-6">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          <p className="text-sm text-muted-foreground">Loading analytics…</p>
+        <Card className="border-border bg-card/70 flex items-center justify-center gap-2 p-6">
+          <Loader2 className="size-4 animate-spin" />
+          <p className="text-muted-foreground text-sm">Loading analytics…</p>
         </Card>
       ) : error ? (
         <Card className="border-border bg-card/70 p-6">
-          <p className="text-sm text-destructive">{error}</p>
+          <p className="text-destructive text-sm">{error}</p>
         </Card>
       ) : data ? (
         <>
@@ -67,17 +66,17 @@ const Analytics = () => {
             <Card className="border-border bg-card/80 p-4 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-muted-foreground">Chat messages</p>
+                  <p className="text-muted-foreground text-xs">Chat messages</p>
                   <AnimatedCounter
                     end={data.chatMessages ?? 0}
                     className="text-2xl font-semibold"
                   />
                 </div>
-                <div className="rounded-full bg-primary/10 p-3 text-primary">
-                  <BarChart2 className="h-5 w-5" />
+                <div className="bg-primary/10 text-primary rounded-full p-3">
+                  <BarChart2 className="size-5" />
                 </div>
               </div>
-              <p className="mt-2 text-xs text-muted-foreground">
+              <p className="text-muted-foreground mt-2 text-xs">
                 Vertex AI traffic captured this week.
               </p>
             </Card>
@@ -85,7 +84,7 @@ const Analytics = () => {
             <Card className="border-border bg-card/80 p-4 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     Knowledge uploads
                   </p>
                   <AnimatedCounter
@@ -93,11 +92,11 @@ const Analytics = () => {
                     className="text-2xl font-semibold"
                   />
                 </div>
-                <div className="rounded-full bg-primary/10 p-3 text-primary">
-                  <Activity className="h-5 w-5" />
+                <div className="bg-primary/10 text-primary rounded-full p-3">
+                  <Activity className="size-5" />
                 </div>
               </div>
-              <p className="mt-2 text-xs text-muted-foreground">
+              <p className="text-muted-foreground mt-2 text-xs">
                 Documents available for retrieval.
               </p>
             </Card>
@@ -105,17 +104,17 @@ const Analytics = () => {
             <Card className="border-border bg-card/80 p-4 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-muted-foreground">Active users</p>
+                  <p className="text-muted-foreground text-xs">Active users</p>
                   <AnimatedCounter
                     end={data.activeUsers ?? 0}
                     className="text-2xl font-semibold"
                   />
                 </div>
-                <div className="rounded-full bg-primary/10 p-3 text-primary">
-                  <Gauge className="h-5 w-5" />
+                <div className="bg-primary/10 text-primary rounded-full p-3">
+                  <Gauge className="size-5" />
                 </div>
               </div>
-              <p className="mt-2 text-xs text-muted-foreground">
+              <p className="text-muted-foreground mt-2 text-xs">
                 Signed-in users over the last 24h.
               </p>
             </Card>
@@ -123,7 +122,7 @@ const Analytics = () => {
 
           <Card className="border-border bg-card/80 p-4">
             <h3 className="text-base font-semibold">Latency snapshot</h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Average end-to-end latency from request to response for chat and
               uploads.
             </p>

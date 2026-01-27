@@ -26,7 +26,7 @@ describe('Demo page', () => {
     )
 
     expect(
-      screen.getByRole('heading', { name: /Découvrez WorkFlowAI/i })
+      screen.getByRole('heading', { name: /Découvrez TCDynamics/i })
     ).toBeInTheDocument()
   })
 
