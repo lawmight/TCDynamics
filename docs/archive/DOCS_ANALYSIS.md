@@ -1,4 +1,5 @@
 # Documentation Analysis Report
+
 ## TCDynamics Project - `/docs` Folder Comprehensive Review
 
 **Date**: 2026-01-09
@@ -11,9 +12,11 @@
 ---
 
 ## Executive Summary
+
 The `/docs` folder contains **17 documentation files** covering architecture, deployment, migrations, security, testing, and strategic research. The documentation is comprehensive but shows signs of **temporal evolution** with some outdated references and potential gaps.
 
 **Key Findings**:
+
 - ✅ Strong coverage of architecture and deployment patterns
 - ⚠️ Some outdated references (e.g., Azure Functions archived but migration plans still active)
 - ⚠️ Missing documentation for some active features
@@ -27,35 +30,35 @@ The `/docs` folder contains **17 documentation files** covering architecture, de
 
 ### 1.1 Active Documentation Files
 
-| File | Type | Status | Last Updated | Purpose |
-|------|------|--------|--------------|---------|
-| `AGENTS.md` | Quick Reference | ✅ Active | Recent | Build/test/lint commands, architecture overview |
-| `AZURE_FUNCTIONS.md` | Migration Guide | ⚠️ Archived Context | 2025-12-30 | Azure Functions archive + Vision API migration plan |
-| `azure-vision-migration.md` | Migration Plan | ⚠️ Planning | Recent | Azure Vision API migration (September 2026 deadline) |
-| `CLERK_CUSTOMIZATION.md` | Integration Guide | ✅ Active | 2026-01-06 | Clerk authentication theming and customization |
-| `coep-header-fix.md` | Technical Fix | ✅ Active | Recent | COEP header rationale (`credentialless` vs `require-corp`) |
-| `DEPLOYMENT.md` | Deployment Guide | ✅ Active | 2026-01 | GitHub Actions workflows, Vercel deployment, CI/CD |
-| `development/onboarding.md` | Onboarding Guide | ✅ Active | Recent | Comprehensive React SPA patterns and development guide |
-| `GIT_STATUS.md` | Git Reference | ⚠️ Static | Recent | Git remotes and branch management status |
-| `MCP_DIFFERENTIATION_STRATEGY.md` | Strategic Planning | ✅ Active | 2026-01-09 | MCP layer differentiation strategy |
-| `SECURITY_HEADERS.md` | Security Guide | ✅ Active | Recent | CSP hardening, COEP configuration, security headers |
-| `TCDYNAMICS_REPOSITORY_TREE.md` | Architecture Overview | ✅ Active | 2026-01-06 | Repository structure and technology stack |
-| `TESTING_GUIDE.md` | Testing Guide | ✅ Active | Recent | API Keys feature testing guide |
-| `VERTEX_LOCATION_MIGRATION.md` | Configuration Guide | ✅ Active | 2025-01 | Vertex AI location configuration (`us-central1` vs `global`) |
-| `WORKFLOW_RESEARCH.md` | Research Document | ✅ Active | 2025-01-06 | Workflow automation platform research (foundational) |
-| `WORKTREE_STRATEGY.md` | Development Workflow | ✅ Active | Recent | Git worktree setup for parallel development |
+| File                              | Type                  | Status              | Last Updated | Purpose                                                      |
+| --------------------------------- | --------------------- | ------------------- | ------------ | ------------------------------------------------------------ |
+| `AGENTS.md`                       | Quick Reference       | ✅ Active           | Recent       | Build/test/lint commands, architecture overview              |
+| `AZURE_FUNCTIONS.md`              | Migration Guide       | ⚠️ Archived Context | 2025-12-30   | Azure Functions archive + Vision API migration plan          |
+| `azure-vision-migration.md`       | Migration Plan        | ⚠️ Planning         | Recent       | Azure Vision API migration (September 2026 deadline)         |
+| `CLERK_CUSTOMIZATION.md`          | Integration Guide     | ✅ Active           | 2026-01-06   | Clerk authentication theming and customization               |
+| `coep-header-fix.md`              | Technical Fix         | ✅ Active           | Recent       | COEP header rationale (`credentialless` vs `require-corp`)   |
+| `DEPLOYMENT.md`                   | Deployment Guide      | ✅ Active           | 2026-01      | GitHub Actions workflows, Vercel deployment, CI/CD           |
+| `development/onboarding.md`       | Onboarding Guide      | ✅ Active           | Recent       | Comprehensive React SPA patterns and development guide       |
+| `GIT_STATUS.md`                   | Git Reference         | ⚠️ Static           | Recent       | Git remotes and branch management status                     |
+| `MCP_DIFFERENTIATION_STRATEGY.md` | Strategic Planning    | ✅ Active           | 2026-01-09   | MCP layer differentiation strategy                           |
+| `SECURITY_HEADERS.md`             | Security Guide        | ✅ Active           | Recent       | CSP hardening, COEP configuration, security headers          |
+| `TCDYNAMICS_REPOSITORY_TREE.md`   | Architecture Overview | ✅ Active           | 2026-01-06   | Repository structure and technology stack                    |
+| `TESTING_GUIDE.md`                | Testing Guide         | ✅ Active           | Recent       | API Keys feature testing guide                               |
+| `VERTEX_LOCATION_MIGRATION.md`    | Configuration Guide   | ✅ Active           | 2025-01      | Vertex AI location configuration (`us-central1` vs `global`) |
+| `WORKFLOW_RESEARCH.md`            | Research Document     | ✅ Active           | 2025-01-06   | Workflow automation platform research (foundational)         |
+| `WORKTREE_STRATEGY.md`            | Development Workflow  | ✅ Active           | Recent       | Git worktree setup for parallel development                  |
 
 ### 1.2 Archive Directory
 
-| File | Type | Status | Purpose |
-|------|------|--------|---------|
-| `archive/supabase-schema.sql` | Database Schema | ⚠️ Historical | Supabase schema (project migrated to MongoDB) |
-| `archive/vercel.json.backup` | Configuration Backup | ⚠️ Historical | Backup of old `vercel.json` configuration |
+| File                          | Type                 | Status        | Purpose                                       |
+| ----------------------------- | -------------------- | ------------- | --------------------------------------------- |
+| `archive/supabase-schema.sql` | Database Schema      | ⚠️ Historical | Supabase schema (project migrated to MongoDB) |
+| `archive/vercel.json.backup`  | Configuration Backup | ⚠️ Historical | Backup of old `vercel.json` configuration     |
 
 ### 1.3 Testing Subdirectory
 
-| File | Type | Status | Purpose |
-|------|------|--------|---------|
+| File                                          | Type          | Status    | Purpose                                           |
+| --------------------------------------------- | ------------- | --------- | ------------------------------------------------- |
 | `testing/api-key-management-testing-guide.md` | Testing Guide | ✅ Active | Detailed API key management UI testing procedures |
 
 ---
@@ -67,12 +70,14 @@ The `/docs` folder contains **17 documentation files** covering architecture, de
 **Files**: `TCDYNAMICS_REPOSITORY_TREE.md`, `AGENTS.md`, `engineer.md`
 
 **Coverage**: ✅ Excellent
+
 - Complete monorepo structure documentation
 - Frontend/API/Backend separation clearly explained
 - Technology stack comprehensively documented
 - Data flow diagrams included
 
 **Gaps**: ⚠️ Minor
+
 - No API endpoint catalog (all endpoints listed in one place)
 - Missing environment variables documentation (only mentioned in `ENV_VARIABLES.md` in `api/`)
 - No database schema documentation (MongoDB models not documented)
@@ -82,12 +87,14 @@ The `/docs` folder contains **17 documentation files** covering architecture, de
 **Files**: `DEPLOYMENT.md`
 
 **Coverage**: ✅ Excellent
+
 - GitHub Actions workflows fully documented
 - Vercel deployment configuration explained
 - Quality gate process documented
 - Historical workflow changes tracked
 
 **Gaps**: ⚠️ Minor
+
 - No deployment rollback procedures
 - Missing disaster recovery documentation
 - No environment promotion strategy (dev → staging → prod)
@@ -97,6 +104,7 @@ The `/docs` folder contains **17 documentation files** covering architecture, de
 **Files**: `SECURITY_HEADERS.md`, `coep-header-fix.md`
 
 **Coverage**: ✅ Excellent
+
 - CSP hardening fully documented
 - COEP configuration rationale explained
 - Security headers configuration complete
@@ -109,11 +117,13 @@ The `/docs` folder contains **17 documentation files** covering architecture, de
 **Files**: `CLERK_CUSTOMIZATION.md`
 
 **Coverage**: ✅ Good
+
 - Clerk theming integration well documented
 - Appearance API usage explained
 - Theme switching patterns documented
 
 **Gaps**: ⚠️ Minor
+
 - Missing webhook setup documentation (`api/webhooks/clerk.js` exists but not documented)
 - No OAuth flow documentation
 - API key authentication mentioned but not fully documented (see `TESTING_GUIDE.md`)
@@ -123,11 +133,13 @@ The `/docs` folder contains **17 documentation files** covering architecture, de
 **Files**: `AZURE_FUNCTIONS.md`, `azure-vision-migration.md`, `VERTEX_LOCATION_MIGRATION.md`
 
 **Coverage**: ✅ Good
+
 - Azure Functions archive status documented
 - Vision API migration plan with timeline
 - Vertex AI location configuration explained
 
 **Issues**: ⚠️ **Outdated References**
+
 - `AZURE_FUNCTIONS.md` references `docs/implementation-tasks.md` which doesn't exist
 - Azure Vision migration deadline (September 2026) may need review if functions remain archived
 - Migration plans assume functions will be restored, but they're archived indefinitely
@@ -137,12 +149,14 @@ The `/docs` folder contains **17 documentation files** covering architecture, de
 **Files**: `MCP_DIFFERENTIATION_STRATEGY.md`, `WORKFLOW_RESEARCH.md`
 
 **Coverage**: ✅ Excellent
+
 - MCP strategy comprehensively documented
 - Workflow platform research detailed
 - Competitive analysis included
 - Implementation roadmap provided
 
 **Gaps**: ⚠️ Minor
+
 - No status tracking for MCP implementation (roadmap exists but no progress tracking)
 - Workflow research is foundational but no implementation status
 
@@ -151,11 +165,13 @@ The `/docs` folder contains **17 documentation files** covering architecture, de
 **Files**: `TESTING_GUIDE.md`, `testing/api-key-management-testing-guide.md`
 
 **Coverage**: ✅ Good
+
 - API key testing thoroughly documented
 - Manual and automated testing procedures included
 - Test checklist provided
 
 **Gaps**: ⚠️ Notable
+
 - No general testing strategy document
 - Missing E2E testing guide (Playwright tests exist but not documented)
 - No test coverage goals documentation
@@ -166,11 +182,13 @@ The `/docs` folder contains **17 documentation files** covering architecture, de
 **Files**: `WORKTREE_STRATEGY.md`, `GIT_STATUS.md`, `engineer.md`
 
 **Coverage**: ✅ Good
+
 - Git worktree strategy documented
 - Branch management explained
 - Development patterns documented
 
 **Gaps**: ⚠️ Minor
+
 - `GIT_STATUS.md` is static (branch list may be outdated)
 - No code review process documentation
 - Missing contribution guidelines
@@ -190,6 +208,7 @@ Frontend (React SPA) → API Client → Vercel Serverless Functions → MongoDB 
 ```
 
 **Key Patterns**:
+
 - Monorepo with npm workspaces
 - Frontend deployed to Vercel CDN
 - API as Vercel serverless functions (production)
@@ -204,6 +223,7 @@ GitHub Push → GitHub Actions (Quality Gate) → Vercel Deployment → CDN Dist
 ```
 
 **Quality Gate Enforces**:
+
 - Type checking
 - Linting
 - Unit tests (60% coverage threshold)
@@ -218,6 +238,7 @@ Worktree Creation → Feature Branch → Development → Testing → Merge to Ma
 ```
 
 **Key Tools**:
+
 - Git worktrees for parallel development
 - npm workspaces for monorepo management
 - Vercel dev server for local API testing
@@ -240,14 +261,14 @@ Worktree Creation → Feature Branch → Development → Testing → Merge to Ma
    - Missing OpenAPI/Swagger specification
    - Endpoints not documented:
      - `/api/analytics`
-     - `/api/chat`
-     - `/api/files`
-     - `/api/forms`
-     - `/api/vertex`
-     - `/api/vision`
-     - `/api/app/api-keys/*`
-     - `/api/polar/*`
-     - `/api/webhooks/clerk`
+   - `/api/ai?provider=openai&action=chat`
+   - `/api/files`
+   - `/api/forms`
+   - `/api/ai?provider=vertex&action=chat`
+   - `/api/ai?provider=openai&action=vision`
+   - `/api/app/api-keys/*`
+   - `/api/polar/*`
+   - `/api/webhooks/clerk`
 
 3. **Database Schema Documentation**
    - MongoDB models exist but not documented
@@ -486,6 +507,7 @@ docs/
 The `/docs` folder provides **strong foundational documentation** for the TCDynamics project, with excellent coverage of architecture, deployment, and security. However, there are **notable gaps** in API documentation, database schema documentation, and operational procedures.
 
 **Key Takeaways**:
+
 - ✅ Documentation quality is generally high
 - ⚠️ Some outdated references need fixing
 - ⚠️ Missing critical documentation for API and database
@@ -493,6 +515,7 @@ The `/docs` folder provides **strong foundational documentation** for the TCDyna
 - ✅ Strategic planning documents are excellent
 
 **Recommended Next Steps**:
+
 1. Create `/docs/README.md` as central navigation
 2. Fix broken references in existing docs
 3. Create API endpoint documentation

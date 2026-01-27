@@ -59,11 +59,11 @@ graph TB
     subgraph "⚙️ Service Layer"
         direction TB
         Analytics[Analytics Service<br/>POST /api/analytics]
-        Chat[Chat Service<br/>POST /api/chat • /api/vertex]
+        Chat[Chat Service<br/>POST /api/ai?provider=openai&action=chat • /api/ai?provider=vertex&action=chat]
         Files[File Service<br/>POST /api/files • GridFS]
         Forms[Forms Service<br/>POST /api/forms]
         Payments[Payments Service<br/>POST /api/polar/*]
-        Vision[Vision Service<br/>POST /api/vision]
+        Vision[Vision Service<br/>POST /api/ai?provider=openai&action=vision]
         App[App Service<br/>POST /api/app/*]
         Webhooks[Webhook Handlers<br/>POST /api/webhooks/*]
 
@@ -324,8 +324,8 @@ graph TB
     end
 
     subgraph "🔌 API Gateway"
-        VertexAPI[Vertex AI Gateway<br/>POST /api/vertex]
-        OpenAIAPI[OpenAI Gateway<br/>POST /api/vision]
+        VertexAPI[Vertex AI Gateway<br/>POST /api/ai?provider=vertex&action=chat]
+        OpenAIAPI[OpenAI Gateway<br/>POST /api/ai?provider=openai&action=vision]
         AzureAPI[Azure Gateway<br/>POST /api/azure]
 
         ChatComponent --> VertexAPI
@@ -562,16 +562,16 @@ graph TB
 
 ### External Service Integration Matrix
 
-| Integration | Purpose | Endpoint | Authentication | Rate Limits |
-|-------------|---------|----------|----------------|-------------|
-| **Clerk** | User Authentication | `/api/webhooks/clerk` | Webhook Secret | 1000/min |
-| **Polar** | Payments & Subscriptions | `/api/polar/*` | API Key | 500/min |
-| **Vertex AI** | AI Chat & Embeddings | `/api/vertex` | Service Account | 60/min |
-| **OpenAI** | Vision & Image Analysis | `/api/vision` | API Key | 60/min |
-| **Azure OpenAI** | Chat (GPT-3.5-turbo) | `/api/azure` | API Key | 60/min |
-| **Resend** | Email Notifications | `/api/forms` | API Key | 100/min |
-| **Sentry** | Error & Performance Monitoring | Client SDKs | DSN Token | N/A |
-| **Cloudflare Turnstile** | Bot Protection | Forms | Site Key | 10/min |
+| Integration              | Purpose                        | Endpoint                                | Authentication  | Rate Limits |
+| ------------------------ | ------------------------------ | --------------------------------------- | --------------- | ----------- |
+| **Clerk**                | User Authentication            | `/api/webhooks/clerk`                   | Webhook Secret  | 1000/min    |
+| **Polar**                | Payments & Subscriptions       | `/api/polar/*`                          | API Key         | 500/min     |
+| **Vertex AI**            | AI Chat & Embeddings           | `/api/ai?provider=vertex&action=chat`   | Service Account | 60/min      |
+| **OpenAI**               | Vision & Image Analysis        | `/api/ai?provider=openai&action=vision` | API Key         | 60/min      |
+| **Azure OpenAI**         | Chat (GPT-3.5-turbo)           | `/api/azure`                            | API Key         | 60/min      |
+| **Resend**               | Email Notifications            | `/api/forms`                            | API Key         | 100/min     |
+| **Sentry**               | Error & Performance Monitoring | Client SDKs                             | DSN Token       | N/A         |
+| **Cloudflare Turnstile** | Bot Protection                 | Forms                                   | Site Key        | 10/min      |
 
 ---
 

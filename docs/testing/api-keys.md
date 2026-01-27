@@ -13,6 +13,7 @@ The API Key Manager is integrated into the Settings page:
 - **Requires**: Authentication (Clerk)
 
 **From your current location** (`/app/chat`):
+
 - Click on your user profile/avatar (top right)
 - Look for a "Settings" link, OR
 - Navigate directly to: `http://localhost:5173/settings`
@@ -73,6 +74,7 @@ Test invalid names:
 4. **Valid**: Enter `My-API-Key_123` → Should work
 
 **Expected errors**:
+
 - "API key name cannot be empty"
 - "API key name must be 100 characters or less"
 - "API key name can only contain letters, numbers, spaces, hyphens, and underscores"
@@ -156,12 +158,14 @@ After creating keys, you should see:
 ### Test 11: Error Handling
 
 **Test network error**:
+
 1. Open browser DevTools → Network tab
 2. Set to "Offline" mode
 3. Try to create a key
 4. **Expected**: Error toast with message
 
 **Test 401 (Unauthorized)**:
+
 1. Log out or expire session
 2. Try to access `/settings`
 3. **Expected**: Redirected to login
@@ -192,6 +196,7 @@ apps/frontend/src/components/app/__tests__/ApiKeyManager.test.tsx
 ### Current Test Coverage
 
 The existing tests cover:
+
 - ✅ Component renders correctly
 - ✅ Key list displays
 - ✅ Create button appears
@@ -290,7 +295,7 @@ it('displays error message on API failure', () => {
 ### Test 4: Restore API Key
 
 1. Revoke a key, then click "Undo" in toast
-2. Find request: `POST /api/app/api-keys/{id}/restore`
+2. Find request: `POST /api/app/api-keys?action=restore&keyId={id}`
 3. **Check**:
    - Status: `200 OK`
    - Response:
@@ -304,14 +309,17 @@ it('displays error message on API failure', () => {
 ### Test 5: Error Cases
 
 **401 Unauthorized**:
+
 - Remove `Authorization` header
 - Expected: `401` with error message
 
 **400 Bad Request** (invalid name):
+
 - Send `POST` with invalid name
 - Expected: `400` with validation error
 
 **404 Not Found** (revoke non-existent key):
+
 - Send `DELETE` with invalid `keyId`
 - Expected: `404` with error message
 
@@ -322,6 +330,7 @@ it('displays error message on API failure', () => {
 Use this checklist to verify all features:
 
 ### Core Features
+
 - [ ] View empty state when no keys exist
 - [ ] Create API key (without name)
 - [ ] Create API key (with name)
@@ -334,17 +343,20 @@ Use this checklist to verify all features:
 - [ ] Prevent accidental key loss
 
 ### Validation
+
 - [ ] Name validation (empty, length, characters)
 - [ ] Error messages display correctly
 - [ ] Form resets after creation
 
 ### Security
+
 - [ ] Full key shown only once
 - [ ] Keys masked in list (prefix only)
 - [ ] Authentication required
 - [ ] User can only see own keys
 
 ### UX/UI
+
 - [ ] Loading states during operations
 - [ ] Toast notifications appear
 - [ ] Error states display correctly
@@ -353,6 +365,7 @@ Use this checklist to verify all features:
 - [ ] Screen reader friendly
 
 ### Edge Cases
+
 - [ ] Network errors handled
 - [ ] 401 redirects to login
 - [ ] Restore window expires correctly
@@ -366,6 +379,7 @@ Use this checklist to verify all features:
 ### Issue: "Authentication required" error
 
 **Solution**:
+
 - Ensure you're logged in via Clerk
 - Check browser console for auth errors
 - Verify `Authorization` header in Network tab
@@ -373,6 +387,7 @@ Use this checklist to verify all features:
 ### Issue: Keys not appearing
 
 **Solution**:
+
 - Check MongoDB connection
 - Verify `clerkId` matches your user
 - Check browser console for errors
@@ -381,6 +396,7 @@ Use this checklist to verify all features:
 ### Issue: Copy button doesn't work
 
 **Solution**:
+
 - Check browser permissions for clipboard
 - Test in HTTPS or localhost (clipboard requires secure context)
 - Check console for errors
@@ -388,6 +404,7 @@ Use this checklist to verify all features:
 ### Issue: Dialog doesn't auto-close
 
 **Solution**:
+
 - Check browser console for errors
 - Verify countdown timer is running
 - Check if dialog is manually closed before timeout
@@ -395,6 +412,7 @@ Use this checklist to verify all features:
 ### Issue: Undo doesn't work
 
 **Solution**:
+
 - Ensure you click "Undo" within 10 seconds
 - Check Network tab for restore request
 - Verify key was actually revoked (check `revokedAt` in DB)
@@ -427,7 +445,7 @@ curl -X DELETE http://localhost:5173/api/app/api-keys \
   -d '{"keyId": "KEY_ID"}'
 
 # Restore key (replace KEY_ID)
-curl -X POST http://localhost:5173/api/app/api-keys/KEY_ID/restore \
+curl -X POST "http://localhost:5173/api/app/api-keys?action=restore&keyId=KEY_ID" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json"
 ```

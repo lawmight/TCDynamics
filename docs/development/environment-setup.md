@@ -65,7 +65,7 @@ npm run dev:all
 
 ## Environment Variables
 
-### Frontend Variables (VITE_ prefix)
+### Frontend Variables (VITE\_ prefix)
 
 Frontend environment variables must be prefixed with `VITE_` to be exposed to the client. These are configured in `apps/frontend/src/utils/config.ts`.
 
@@ -216,7 +216,7 @@ API environment variables are used by Vercel serverless functions in the `api/` 
 
 **Chat**:
 
-- `ALLOW_VERCEL_CHAT` (default: `false`) - Enable Vercel chat endpoint (`/api/chat`)
+- `ALLOW_VERCEL_CHAT` (default: `false`) - Enable Vercel chat endpoint (`/api/ai?provider=openai&action=chat`)
 - `INTERNAL_CHAT_TOKEN` (optional) - Internal token for chat endpoint security
   - Generate: `openssl rand -hex 32`
 - `ALLOWED_ORIGIN` (default: `https://tcdynamics.fr`) - Allowed origin for chat endpoint
@@ -263,6 +263,7 @@ API environment variables are used by Vercel serverless functions in the `api/` 
    - Add to `.env` as `MONGODB_URI`
 
 **Example**:
+
 ```
 MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority
 ```
@@ -349,8 +350,9 @@ MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database?retryWr
    ```
 
 **Models Used**:
-- GPT-3.5-turbo (for `/api/chat`)
-- GPT-4o (for `/api/vision`)
+
+- GPT-3.5-turbo (for `/api/ai?provider=openai&action=chat`)
+- GPT-4o (for `/api/ai?provider=openai&action=vision`)
 
 ---
 
@@ -533,6 +535,7 @@ VITE_FEATURE_ENABLE_VERCEL_CHAT=true
 **Error**: `MongoServerError: bad auth`
 
 **Solution**:
+
 - Check `MONGODB_URI` format (replace `<password>` placeholder)
 - Verify database user credentials
 - Check IP whitelist in MongoDB Atlas
@@ -540,6 +543,7 @@ VITE_FEATURE_ENABLE_VERCEL_CHAT=true
 **Error**: `MongooseServerSelectionError: connect ECONNREFUSED`
 
 **Solution**:
+
 - Check IP whitelist includes your IP
 - Verify network access in MongoDB Atlas
 - Check firewall settings
@@ -551,6 +555,7 @@ VITE_FEATURE_ENABLE_VERCEL_CHAT=true
 **Error**: `401 Unauthorized`
 
 **Solution**:
+
 - Verify `CLERK_SECRET_KEY` format (starts with `sk_test_` or `sk_live_`)
 - Check key is not expired or revoked
 - Ensure `Authorization: Bearer <token>` header format
@@ -558,6 +563,7 @@ VITE_FEATURE_ENABLE_VERCEL_CHAT=true
 **Error**: Webhook signature verification failed
 
 **Solution**:
+
 - Verify `CLERK_WEBHOOK_SIGNING_SECRET` matches Clerk dashboard
 - Check webhook endpoint URL is correct
 - Verify webhook events are subscribed
@@ -571,12 +577,15 @@ VITE_FEATURE_ENABLE_VERCEL_CHAT=true
 **Cause**: This error occurs when request headers (primarily the Clerk JWT token in the Authorization header) exceed Node.js's default 16KB limit.
 
 **Solution**:
+
 1. Ensure you're running the development server with the correct command:
+
    ```bash
    npm run dev  # This includes the header size fix
    ```
 
 2. If running Vercel dev manually, use the increased header size:
+
    ```bash
    NODE_OPTIONS="--max-http-header-size=32768" vercel dev --listen 3001
    ```
@@ -587,6 +596,7 @@ VITE_FEATURE_ENABLE_VERCEL_CHAT=true
    - This generates a new, potentially smaller token
 
 **Prevention**:
+
 - Keep Clerk user metadata lean (avoid storing large objects)
 - Use database references instead of embedding data in tokens
 - Consider using Clerk sessions with shorter expiration times
@@ -594,6 +604,7 @@ VITE_FEATURE_ENABLE_VERCEL_CHAT=true
 
 **Production Deployment**:
 The fix is automatically applied in production via Vercel's serverless functions configuration. If deploying elsewhere, ensure Node.js is started with:
+
 ```bash
 NODE_OPTIONS="--max-http-header-size=32768" node server.js
 ```
@@ -605,6 +616,7 @@ NODE_OPTIONS="--max-http-header-size=32768" node server.js
 **Issue**: Frontend variables (`VITE_*`) not accessible
 
 **Solution**:
+
 - Ensure variables start with `VITE_` prefix
 - Restart Vite dev server after adding variables
 - Check variable names match exactly (case-sensitive)
@@ -613,6 +625,7 @@ NODE_OPTIONS="--max-http-header-size=32768" node server.js
 **Issue**: API variables not loading
 
 **Solution**:
+
 - For Vercel: Add variables in Vercel Dashboard
 - For local: Ensure `.env` file is in project root
 - Restart Vercel dev server after adding variables

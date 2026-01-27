@@ -94,9 +94,9 @@ flowchart TB
 
     AppRoutes --> APIKeys[api-keys/<br/>api-keys.js]
 
-    Polar --> PolarFiles[create-checkout-session.js<br/>webhook.js]
+    Polar --> PolarFiles[checkout.js<br/>webhook.js]
 
-    Endpoints --> EndpointFiles[analytics.js<br/>chat.js<br/>files.js<br/>forms.js<br/>vertex.js]
+    Endpoints --> EndpointFiles[analytics.js<br/>ai.js<br/>emails.js<br/>files.js<br/>forms.js<br/>user.js]
 ```
 
 ### API Endpoints
@@ -104,10 +104,10 @@ flowchart TB
 ```mermaid
 flowchart LR
     Endpoints[API Endpoints] --> Analytics[/api/analytics]
-    Endpoints --> Chat[/api/chat]
+    Endpoints --> Chat[/api/ai?provider=openai&action=chat]
     Endpoints --> Files[/api/files]
     Endpoints --> Forms[/api/forms]
-    Endpoints --> Vertex[/api/vertex]
+    Endpoints --> Vertex[/api/ai?provider=vertex&action=chat]
     Endpoints --> APIKeys[/api/app/api-keys]
     Endpoints --> Polar[/api/polar/*]
     Endpoints --> ClerkWebhook[/api/webhooks/clerk]

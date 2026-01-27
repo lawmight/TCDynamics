@@ -26,6 +26,7 @@ User accounts synced from Clerk authentication service.
 **Collection**: `users`
 
 **Schema**:
+
 ```javascript
 {
   clerkId: String (required, unique, indexed)
@@ -44,11 +45,13 @@ User accounts synced from Clerk authentication service.
 ```
 
 **Indexes**:
+
 - `{ clerkId: 1 }` (unique)
 - `{ email: 1 }`
 - `{ subscriptionStatus: 1, plan: 1 }` (compound)
 
 **Relationships**:
+
 - One-to-many: `ApiKey` (via `clerkId`)
 - One-to-many: `ChatConversation` (via `clerkId`)
 - One-to-many: `KnowledgeFile` (via `clerkId`)
@@ -59,12 +62,14 @@ User accounts synced from Clerk authentication service.
 - One-to-many: `Feedback` (via `clerkId`, optional)
 
 **Usage Patterns**:
+
 - Created automatically via Clerk webhook (`user.created` event)
 - Updated via Clerk webhook (`user.updated` event)
 - Soft-deleted via Clerk webhook (`user.deleted` event)
 - Subscription status synced via Polar webhook
 
 **Example Document**:
+
 ```json
 {
   "_id": "507f1f77bcf86cd799439011",
@@ -92,6 +97,7 @@ Contact form submissions from the website.
 **Collection**: `contacts`
 
 **Schema**:
+
 ```javascript
 {
   name: String (required, maxlength: 100, trimmed)
@@ -109,6 +115,7 @@ Contact form submissions from the website.
 ```
 
 **Indexes**:
+
 - `{ email: 1 }` (unique, case-insensitive, French locale collation)
 - `{ status: 1 }`
 - `{ createdAt: -1 }`
@@ -116,14 +123,17 @@ Contact form submissions from the website.
 - `{ clerkId: 1 }` (sparse)
 
 **Relationships**:
+
 - Many-to-one: `User` (via `clerkId`, optional)
 
 **Usage Patterns**:
+
 - Created via `/api/forms` endpoint (contact form)
 - Email validation and duplicate detection
 - Case-insensitive unique email constraint (handles duplicate errors gracefully)
 
 **Example Document**:
+
 ```json
 {
   "_id": "507f1f77bcf86cd799439012",
@@ -150,6 +160,7 @@ Demo request form submissions.
 **Collection**: `demorequests`
 
 **Schema**:
+
 ```javascript
 {
   name: String (required)
@@ -173,19 +184,23 @@ Demo request form submissions.
 ```
 
 **Indexes**:
+
 - `{ email: 1 }`
 - `{ status: 1 }`
 - `{ company: 1 }`
 - `{ createdAt: -1 }`
 
 **Relationships**:
+
 - Many-to-one: `User` (via `clerkId`, optional)
 
 **Usage Patterns**:
+
 - Created via `/api/forms` endpoint (demo form)
 - Status updated manually or via automation
 
 **Example Document**:
+
 ```json
 {
   "_id": "507f1f77bcf86cd799439013",
@@ -218,6 +233,7 @@ API keys for tenant authentication (server-to-server).
 **Collection**: `apikeys`
 
 **Schema**:
+
 ```javascript
 {
   clerkId: String (required, indexed)
@@ -232,6 +248,7 @@ API keys for tenant authentication (server-to-server).
 ```
 
 **Indexes**:
+
 - `{ clerkId: 1 }`
 - `{ keyHash: 1 }` (unique)
 - `{ keyPrefix: 1 }`
@@ -240,17 +257,20 @@ API keys for tenant authentication (server-to-server).
 - `{ revokedAt: 1, keyPrefix: 1 }` (compound)
 
 **Relationships**:
+
 - Many-to-one: `User` (via `clerkId`)
 
 **Usage Patterns**:
+
 - Created via `/api/app/api-keys` POST endpoint
 - Listed via `/api/app/api-keys` GET endpoint (prefixes only)
 - Revoked via `/api/app/api-keys` DELETE endpoint
-- Restored via `/api/app/api-keys/[id]/restore` POST endpoint (within 10 seconds)
+- Restored via `/api/app/api-keys?action=restore&keyId=<id>` POST endpoint (within 10 seconds)
 - Full key only returned once on creation
 - Verification via bcrypt comparison against `keyHash`
 
 **Example Document**:
+
 ```json
 {
   "_id": "507f1f77bcf86cd799439014",
@@ -274,6 +294,7 @@ Chat conversation logs with embedded messages.
 **Collection**: `chatconversations`
 
 **Schema**:
+
 ```javascript
 {
   sessionId: String (required, indexed)
@@ -296,20 +317,24 @@ Chat conversation logs with embedded messages.
 ```
 
 **Indexes**:
+
 - `{ sessionId: 1 }`
 - `{ clerkId: 1 }`
 - `{ clerkId: 1, conversationStatus: 1 }` (compound)
 - `{ lastMessageAt: -1 }`
 
 **Relationships**:
+
 - Many-to-one: `User` (via `clerkId`, optional)
 
 **Usage Patterns**:
-- Created via `/api/chat` endpoint
+
+- Created via `/api/ai?provider=openai&action=chat` endpoint
 - Messages appended to `messages` array
 - `messageCount` and `lastMessageAt` updated automatically via pre-save middleware
 
 **Example Document**:
+
 ```json
 {
   "_id": "507f1f77bcf86cd799439015",
@@ -352,6 +377,7 @@ File metadata with reference to GridFS storage.
 **Collection**: `knowledgefiles`
 
 **Schema**:
+
 ```javascript
 {
   path: String (required, unique, indexed)
@@ -369,21 +395,25 @@ File metadata with reference to GridFS storage.
 ```
 
 **Indexes**:
+
 - `{ path: 1 }` (unique)
 - `{ clerkId: 1 }`
 - `{ createdAt: -1 }`
 
 **Relationships**:
+
 - Many-to-one: `User` (via `clerkId`, optional)
 - Storage: GridFS bucket named `files`
 
 **Usage Patterns**:
+
 - Created via `/api/files` POST endpoint
 - Files stored in MongoDB GridFS
 - Text-like files automatically embedded (vector search)
 - PII detection prevents summary generation if sensitive data found
 
 **Example Document**:
+
 ```json
 {
   "_id": "507f1f77bcf86cd799439016",
@@ -410,6 +440,7 @@ Custom analytics events.
 **Collection**: `analyticevents`
 
 **Schema**:
+
 ```javascript
 {
   event: String (required, indexed)
@@ -421,19 +452,23 @@ Custom analytics events.
 ```
 
 **Indexes**:
+
 - `{ event: 1 }`
 - `{ clerkId: 1 }`
 - `{ clerkId: 1, event: 1 }` (compound)
 - `{ createdAt: -1 }`
 
 **Relationships**:
+
 - Many-to-one: `User` (via `clerkId`, optional)
 
 **Usage Patterns**:
+
 - Created via `/api/analytics` POST endpoint
 - Used for custom event tracking
 
 **Example Document**:
+
 ```json
 {
   "_id": "507f1f77bcf86cd799439018",
@@ -457,6 +492,7 @@ API activity tracking for analytics and billing.
 **Collection**: `usagelogs`
 
 **Schema**:
+
 ```javascript
 {
   clerkId: String (required, indexed)
@@ -473,24 +509,28 @@ API activity tracking for analytics and billing.
 ```
 
 **Indexes**:
+
 - `{ clerkId: 1, createdAt: -1 }` (compound)
 - `{ endpoint: 1, status: 1 }` (compound)
 - `{ createdAt: 1 }` (TTL: 90 days)
 
 **Relationships**:
+
 - Many-to-one: `User` (via `clerkId`)
 
 **Usage Patterns**:
+
 - Created automatically on API requests (if enabled)
 - Auto-deleted after 90 days (TTL index)
 - Used for analytics and billing calculations
 
 **Example Document**:
+
 ```json
 {
   "_id": "507f1f77bcf86cd799439019",
   "clerkId": "user_2abc123def456",
-  "endpoint": "/api/vertex",
+  "endpoint": "/api/ai?provider=vertex&action=chat",
   "method": "POST",
   "status": 200,
   "responseTimeMs": 1250,
@@ -514,6 +554,7 @@ Customer feedback from demo and contact forms.
 **Collection**: `feedbacks`
 
 **Schema**:
+
 ```javascript
 {
   formType: String (enum: ['demo', 'contact'], required, indexed)
@@ -529,17 +570,21 @@ Customer feedback from demo and contact forms.
 ```
 
 **Indexes**:
+
 - `{ createdAt: -1 }`
 - `{ formType: 1, createdAt: -1 }` (compound)
 
 **Relationships**:
+
 - Many-to-one: `User` (via `clerkId`, optional)
 
 **Usage Patterns**:
+
 - Created via feedback forms
 - Used for customer satisfaction tracking
 
 **Example Document**:
+
 ```json
 {
   "_id": "507f1f77bcf86cd799439020",
@@ -564,27 +609,31 @@ Polar webhook events for idempotency and auditing.
 **Collection**: `polarevents`
 
 **Schema**:
+
 ```javascript
 {
-  eventId: String (required, unique, indexed)
-  type: String (required, indexed) // Event type (e.g., 'checkout.succeeded')
-  payload: Object (required) // Full webhook payload
-  createdAt: Date (auto)
-  updatedAt: Date (auto)
+  eventId: String(required, unique, indexed)
+  type: String(required, indexed) // Event type (e.g., 'checkout.succeeded')
+  payload: Object(required) // Full webhook payload
+  createdAt: Date(auto)
+  updatedAt: Date(auto)
 }
 ```
 
 **Indexes**:
+
 - `{ eventId: 1 }` (unique)
 
 **Relationships**: None (standalone event log)
 
 **Usage Patterns**:
+
 - Created via `/api/polar/webhook` endpoint
 - Used for idempotency (prevent duplicate processing)
 - Full event payload stored for auditing
 
 **Example Document**:
+
 ```json
 {
   "_id": "507f1f77bcf86cd799439021",
@@ -665,29 +714,35 @@ Models with optional `clerkId` support both authenticated and anonymous usage.
 ### Common Queries
 
 **Get all API keys for a user**:
+
 ```javascript
 ApiKey.find({ clerkId, revokedAt: null })
 ```
 
 **Get user's conversations**:
+
 ```javascript
 ChatConversation.find({ clerkId, conversationStatus: 'active' })
 ```
 
 **Get contacts by status**:
+
 ```javascript
 Contact.find({ status: 'new' }).sort({ createdAt: -1 })
 ```
 
 **Get user's subscription info**:
+
 ```javascript
 User.findOne({ clerkId })
 ```
 
 **Check if API key is valid**:
+
 ```javascript
-ApiKey.findOne({ keyPrefix: prefix, revokedAt: null })
-  .then(key => bcrypt.compare(fullKey, key.keyHash))
+ApiKey.findOne({ keyPrefix: prefix, revokedAt: null }).then(key =>
+  bcrypt.compare(fullKey, key.keyHash)
+)
 ```
 
 ---

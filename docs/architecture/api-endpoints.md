@@ -50,9 +50,11 @@ Get analytics summary statistics.
 **Authentication**: Not required (optional)
 
 **Query Parameters**:
+
 - `health=true` - Simple health check (no database required)
 
 **Response** (with `health=true`):
+
 ```json
 {
   "status": "ok",
@@ -64,6 +66,7 @@ Get analytics summary statistics.
 ```
 
 **Response** (without `health=true`):
+
 ```json
 {
   "chatMessages": 150,
@@ -74,6 +77,7 @@ Get analytics summary statistics.
 ```
 
 **Error Responses**:
+
 - `503 Service Unavailable` - Database not configured
 
 ---
@@ -85,6 +89,7 @@ Record an analytics event.
 **Authentication**: Not required (optional)
 
 **Request Body**:
+
 ```json
 {
   "event": "page_view",
@@ -97,6 +102,7 @@ Record an analytics event.
 ```
 
 **Response**:
+
 ```json
 {
   "success": true
@@ -104,6 +110,7 @@ Record an analytics event.
 ```
 
 **Error Responses**:
+
 - `400 Bad Request` - Missing `event` field
 - `500 Internal Server Error` - Failed to record event
 
@@ -118,15 +125,21 @@ Counts of new contacts, pending demo requests, and recent Polar events. Used by 
 **Authentication**: Required — `x-internal-token: <INTERNAL_HOOK_TOKEN>` or `Authorization: Bearer <INTERNAL_HOOK_TOKEN>`
 
 **Response**:
+
 ```json
 {
   "contacts": { "new": 3, "last24h": 5 },
   "demoRequests": { "pending": 2, "last7d": 2 },
-  "polar": { "last24h": 1, "last7d": 3, "byType": { "order.paid": 1, "checkout.updated": 0 } }
+  "polar": {
+    "last24h": 1,
+    "last7d": 3,
+    "byType": { "order.paid": 1, "checkout.updated": 0 }
+  }
 }
 ```
 
 **Error Responses**:
+
 - `401 Unauthorized` - Missing or invalid `INTERNAL_HOOK_TOKEN`
 - `503 Service Unavailable` - Database unavailable
 - `500 Internal Server Error` - Query failed
@@ -137,18 +150,20 @@ Counts of new contacts, pending demo requests, and recent Polar events. Used by 
 
 ### Chat
 
-#### `POST /api/chat`
+#### `POST /api/ai?provider=openai&action=chat`
 
 AI chat conversation endpoint.
 
 **Authentication**: Not required (but may require internal token if `INTERNAL_CHAT_TOKEN` is set)
 
 **Configuration**:
+
 - Route is internal-only unless `ALLOW_VERCEL_CHAT=true`
 - Optional `INTERNAL_CHAT_TOKEN` for additional security
 - Rate limited: 5 requests per 60 seconds per IP
 
 **Request Body**:
+
 ```json
 {
   "message": "Bonjour, comment puis-je vous aider?",
@@ -159,6 +174,7 @@ AI chat conversation endpoint.
 ```
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -168,6 +184,7 @@ AI chat conversation endpoint.
 ```
 
 **Error Responses**:
+
 - `403 Forbidden` - Route disabled or origin not allowed
 - `401 Unauthorized` - Invalid internal token
 - `429 Too Many Requests` - Rate limit exceeded
@@ -176,6 +193,7 @@ AI chat conversation endpoint.
 - `500 Internal Server Error` - AI service error
 
 **Notes**:
+
 - Maximum message length: 2000 characters (configurable via `MAX_MESSAGE_LENGTH`)
 - Maximum tokens: 512 (configurable via `MAX_TOKENS`)
 - Conversations are saved to MongoDB (best-effort)
@@ -191,10 +209,12 @@ List uploaded files with optional pagination.
 **Authentication**: Not required
 
 **Query Parameters**:
+
 - `page` (optional, default: 1) - Page number
 - `limit` (optional, default: 50) - Items per page
 
 **Response**:
+
 ```json
 {
   "files": [
@@ -212,6 +232,7 @@ List uploaded files with optional pagination.
 ```
 
 **Error Responses**:
+
 - `500 Internal Server Error` - Database error
 
 ---
@@ -223,6 +244,7 @@ Upload a file to MongoDB GridFS.
 **Authentication**: Not required
 
 **Request Body**:
+
 ```json
 {
   "fileName": "document.pdf",
@@ -234,6 +256,7 @@ Upload a file to MongoDB GridFS.
 ```
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -243,10 +266,12 @@ Upload a file to MongoDB GridFS.
 ```
 
 **Error Responses**:
+
 - `400 Bad Request` - Missing `fileName` or `base64`
 - `500 Internal Server Error` - Upload failed
 
 **Notes**:
+
 - Maximum file size: 15MB (configurable via Vercel limits)
 - Files are stored in MongoDB GridFS
 - Text-like files are automatically embedded (vector search)
@@ -265,6 +290,7 @@ Submit contact form or demo request form.
 **Rate Limiting**: 5 requests per 15 minutes per IP
 
 **Request Body** (Contact Form):
+
 ```json
 {
   "formType": "contact",
@@ -278,6 +304,7 @@ Submit contact form or demo request form.
 ```
 
 **Request Body** (Demo Form):
+
 ```json
 {
   "formType": "demo",
@@ -298,6 +325,7 @@ Submit contact form or demo request form.
 ```
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -310,6 +338,7 @@ Submit contact form or demo request form.
 ```
 
 **Error Responses**:
+
 - `400 Bad Request` - Missing required fields or validation error
 - `429 Too Many Requests` - Rate limit exceeded
 - `500 Internal Server Error` - Server error
@@ -317,11 +346,13 @@ Submit contact form or demo request form.
 **Validation Rules**:
 
 **Contact Form**:
+
 - `name`: Required, string
 - `email`: Required, valid email format
 - `message`: Required, 10-5000 characters
 
 **Demo Form**:
+
 - `name`: Required, string
 - `email`: Required, valid email format
 - `company`: Required, string
@@ -331,19 +362,21 @@ Submit contact form or demo request form.
 
 ### Vertex AI
 
-#### `POST /api/vertex`
+#### `POST /api/ai?provider=vertex&action=chat`
 
 Vertex AI integration endpoint for chat and embeddings.
 
 **Authentication**: Not required
 
 **Query Parameters**:
+
+- `provider` (required) - `vertex`
 - `action` (required) - Either `chat` or `embed`
 
 **Request Body** (Chat):
+
 ```json
 {
-  "action": "chat",
   "messages": [
     { "role": "system", "content": "You are a helpful assistant." },
     { "role": "user", "content": "Hello!" }
@@ -354,14 +387,15 @@ Vertex AI integration endpoint for chat and embeddings.
 ```
 
 **Request Body** (Embed):
+
 ```json
 {
-  "action": "embed",
   "text": "Text to embed"
 }
 ```
 
 **Response** (Chat):
+
 ```json
 {
   "message": "Hello! How can I help you?",
@@ -375,6 +409,7 @@ Vertex AI integration endpoint for chat and embeddings.
 ```
 
 **Response** (Embed):
+
 ```json
 {
   "embedding": [0.123, -0.456, 0.789, ...]
@@ -382,10 +417,12 @@ Vertex AI integration endpoint for chat and embeddings.
 ```
 
 **Error Responses**:
+
 - `400 Bad Request` - Invalid action or missing required fields
 - `500 Internal Server Error` - Vertex AI not configured or request failed
 
 **Notes**:
+
 - Requires `VERTEX_PROJECT_ID` environment variable
 - Default location: `us-central1` (configurable via `VERTEX_LOCATION`)
 
@@ -393,13 +430,14 @@ Vertex AI integration endpoint for chat and embeddings.
 
 ### Vision
 
-#### `POST /api/vision`
+#### `POST /api/ai?provider=openai&action=vision`
 
 Image analysis using OpenAI GPT-4o Vision API.
 
 **Authentication**: Not required
 
 **Request Body**:
+
 ```json
 {
   "imageUrl": "https://example.com/image.jpg"
@@ -407,6 +445,7 @@ Image analysis using OpenAI GPT-4o Vision API.
 ```
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -418,11 +457,13 @@ Image analysis using OpenAI GPT-4o Vision API.
 ```
 
 **Error Responses**:
+
 - `400 Bad Request` - Missing or invalid `imageUrl`
 - `503 Service Unavailable` - OpenAI API not configured
 - `500 Internal Server Error` - Vision API error
 
 **Notes**:
+
 - Requires `OPENAI_API_KEY` environment variable
 - Uses GPT-4o model for vision analysis
 
@@ -439,6 +480,7 @@ List all API keys for the authenticated user.
 **Authentication**: Required (Clerk JWT)
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -456,11 +498,13 @@ List all API keys for the authenticated user.
 ```
 
 **Error Responses**:
+
 - `401 Unauthorized` - Authentication required
 - `503 Service Unavailable` - Database connection failed
 - `500 Internal Server Error` - Database error
 
 **Notes**:
+
 - Only returns active (non-revoked) keys
 - Never returns full keys, only prefixes
 
@@ -473,6 +517,7 @@ Create a new API key.
 **Authentication**: Required (Clerk JWT)
 
 **Request Body**:
+
 ```json
 {
   "name": "Production Server"
@@ -480,6 +525,7 @@ Create a new API key.
 ```
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -491,12 +537,14 @@ Create a new API key.
 ```
 
 **Error Responses**:
+
 - `401 Unauthorized` - Authentication required
 - `400 Bad Request` - Invalid name (empty, too long, or invalid characters)
 - `503 Service Unavailable` - Database connection failed
 - `500 Internal Server Error` - Database error
 
 **Validation Rules**:
+
 - `name`: Optional, 1-100 characters, alphanumeric + spaces, hyphens, underscores only
 - Full key is only returned once on creation
 
@@ -509,6 +557,7 @@ Revoke an API key.
 **Authentication**: Required (Clerk JWT)
 
 **Request Body**:
+
 ```json
 {
   "keyId": "key_id_123"
@@ -516,6 +565,7 @@ Revoke an API key.
 ```
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -524,6 +574,7 @@ Revoke an API key.
 ```
 
 **Error Responses**:
+
 - `401 Unauthorized` - Authentication required
 - `400 Bad Request` - Missing `keyId`
 - `404 Not Found` - Key not found or access denied
@@ -531,16 +582,18 @@ Revoke an API key.
 
 ---
 
-#### `POST /api/app/api-keys/[id]/restore`
+#### `POST /api/app/api-keys?action=restore&keyId=<id>`
 
 Restore a recently revoked API key (within 10 seconds).
 
 **Authentication**: Required (Clerk JWT)
 
-**Path Parameters**:
-- `id` - API key ID
+**Query Parameters**:
+
+- `keyId` - API key ID
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -549,12 +602,14 @@ Restore a recently revoked API key (within 10 seconds).
 ```
 
 **Error Responses**:
+
 - `401 Unauthorized` - Authentication required
 - `400 Bad Request` - Key ID required, key not revoked, or restore window expired
 - `404 Not Found` - Key not found or access denied
 - `500 Internal Server Error` - Database error
 
 **Notes**:
+
 - Restore window: 10 seconds after revocation
 - Only keys owned by the authenticated user can be restored
 
@@ -564,16 +619,18 @@ Restore a recently revoked API key (within 10 seconds).
 
 ### Polar Checkout
 
-#### `POST /api/polar/create-checkout-session`
+#### `POST /api/polar/checkout`
 
 Create a Polar checkout session.
 
 **Authentication**: Optional (Clerk JWT for authenticated flow)
 
 **Query Parameters**:
+
 - `public=true` - Enable public checkout flow (no auth required)
 
 **Request Body** (Authenticated):
+
 ```json
 {
   "planName": "professional",
@@ -584,6 +641,7 @@ Create a Polar checkout session.
 ```
 
 **Request Body** (Public):
+
 ```json
 {
   "planName": "enterprise",
@@ -595,9 +653,11 @@ Create a Polar checkout session.
 ```
 
 **Headers** (Public checkout, if `PUBLIC_CHECKOUT_SECRET` is set):
+
 - `X-Checkout-Token`: Token matching `PUBLIC_CHECKOUT_SECRET`
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -606,14 +666,48 @@ Create a Polar checkout session.
 ```
 
 **Error Responses**:
+
 - `401 Unauthorized` - Invalid checkout token (public flow)
 - `400 Bad Request` - Missing required fields or amount below minimum
 - `500 Internal Server Error` - Polar not configured or checkout creation failed
 
 **Notes**:
+
 - Public checkout requires minimum amount: 2160€ (216000 cents) by default
 - Authenticated checkout links to Clerk user via `externalCustomerId`
 - Public checkout supports manual onboarding without Clerk account
+
+#### `GET /api/polar/checkout?checkoutId=<id>`
+
+Retrieve checkout session details (PII-protected).
+
+**Authentication**: Required (Clerk JWT)
+
+**Query Parameters**:
+
+- `checkoutId` (required) - Checkout session ID
+
+**Response**:
+
+```json
+{
+  "success": true,
+  "session": {
+    "id": "checkout_id_123",
+    "status": "succeeded",
+    "customerEmail": "customer@example.com",
+    "amountTotal": 216000,
+    "currency": "usd",
+    "paymentStatus": "paid"
+  }
+}
+```
+
+**Error Responses**:
+
+- `401 Unauthorized` - Authentication required
+- `404 Not Found` - Checkout not found
+- `500 Internal Server Error` - Failed to retrieve checkout
 
 ---
 
@@ -626,11 +720,13 @@ Handle Polar payment webhook events.
 **Authentication**: Webhook signature verification (via Polar SDK)
 
 **Headers**:
+
 - `polar-signature`: Webhook signature for verification
 
 **Request Body**: Polar webhook event payload
 
 **Response**:
+
 ```json
 {
   "received": true,
@@ -639,6 +735,7 @@ Handle Polar payment webhook events.
 ```
 
 **Supported Events**:
+
 - `checkout.succeeded` - Checkout completed
 - `checkout.failed` - Checkout failed
 - `subscription.created` - Subscription created
@@ -646,11 +743,13 @@ Handle Polar payment webhook events.
 - `subscription.canceled` - Subscription canceled
 
 **Error Responses**:
+
 - `403 Forbidden` - Invalid webhook signature
 - `400 Bad Request` - Invalid webhook payload
 - `500 Internal Server Error` - Webhook processing failed
 
 **Notes**:
+
 - Events are deduplicated (in-memory cache)
 - Subscriptions are synced to MongoDB User collection
 - Manual onboarding checkouts send admin notification emails
@@ -668,6 +767,7 @@ Handle Clerk user lifecycle webhook events.
 **Authentication**: Webhook signature verification (via Svix)
 
 **Headers**:
+
 - `svix-id`: Webhook ID
 - `svix-timestamp`: Webhook timestamp
 - `svix-signature`: Webhook signature
@@ -675,6 +775,7 @@ Handle Clerk user lifecycle webhook events.
 **Request Body**: Clerk webhook event payload
 
 **Response**:
+
 ```json
 {
   "received": true,
@@ -683,15 +784,18 @@ Handle Clerk user lifecycle webhook events.
 ```
 
 **Supported Events**:
+
 - `user.created` - Create User document in MongoDB
 - `user.updated` - Update User document in MongoDB
 - `user.deleted` - Soft-delete User document (set `deletedAt`)
 
 **Error Responses**:
+
 - `403 Forbidden` - Invalid webhook signature
 - `500 Internal Server Error` - Webhook processing failed
 
 **Notes**:
+
 - Users are synced to MongoDB User collection
 - Soft delete preserves user records for audit purposes
 - Default plan: `starter` for new users
@@ -700,25 +804,25 @@ Handle Clerk user lifecycle webhook events.
 
 ## Error Codes
 
-| Code | Meaning | Common Causes |
-|------|---------|---------------|
-| 400 | Bad Request | Invalid input, missing required fields |
-| 401 | Unauthorized | Missing or invalid authentication token |
-| 403 | Forbidden | Invalid webhook signature, origin not allowed |
-| 404 | Not Found | Resource not found or access denied |
-| 405 | Method Not Allowed | HTTP method not supported |
-| 429 | Too Many Requests | Rate limit exceeded |
-| 500 | Internal Server Error | Server error, check logs |
-| 503 | Service Unavailable | Database or external service not configured |
+| Code | Meaning               | Common Causes                                 |
+| ---- | --------------------- | --------------------------------------------- |
+| 400  | Bad Request           | Invalid input, missing required fields        |
+| 401  | Unauthorized          | Missing or invalid authentication token       |
+| 403  | Forbidden             | Invalid webhook signature, origin not allowed |
+| 404  | Not Found             | Resource not found or access denied           |
+| 405  | Method Not Allowed    | HTTP method not supported                     |
+| 429  | Too Many Requests     | Rate limit exceeded                           |
+| 500  | Internal Server Error | Server error, check logs                      |
+| 503  | Service Unavailable   | Database or external service not configured   |
 
 ---
 
 ## Rate Limiting
 
-| Endpoint | Limit | Window |
-|----------|-------|--------|
-| `/api/chat` | 5 requests | 60 seconds per IP |
-| `/api/forms` | 5 requests | 15 minutes per IP |
+| Endpoint                              | Limit      | Window            |
+| ------------------------------------- | ---------- | ----------------- |
+| `/api/ai?provider=openai&action=chat` | 5 requests | 60 seconds per IP |
+| `/api/forms`                          | 5 requests | 15 minutes per IP |
 
 ---
 

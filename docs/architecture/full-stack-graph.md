@@ -60,17 +60,17 @@ flowchart LR
     subgraph Frontend["apps/frontend (React + Vite)"]
         Pages[Pages<br/>Index • About • Features • Pricing<br/>Contact • Demo • Dashboard • Chat • Files<br/>Checkout • Login • Settings • etc.]
         Hooks[Hooks<br/>useAuth • useApiKeys • useContactForm<br/>useDemoForm • useFormSubmit]
-        APIClients[API Clients<br/>analytics • apiKeys • files • vertex]
+        APIClients[API Clients<br/>analytics • apiKeys • files • ai]
         UI[shadcn/ui • Tailwind]
     end
 
     subgraph API["api/ (Vercel Serverless)"]
         E_Analytics[/api/analytics]
-        E_Chat[/api/chat]
+        E_Chat[/api/ai?provider=openai&action=chat]
         E_Files[/api/files]
         E_Forms[/api/forms]
-        E_Vertex[/api/vertex]
-        E_Vision[/api/vision]
+        E_Vertex[/api/ai?provider=vertex&action=chat]
+        E_Vision[/api/ai?provider=openai&action=vision]
         E_App[/api/app/api-keys]
         E_Polar[/api/polar/*]
         E_Webhooks[/api/webhooks/clerk]
@@ -129,7 +129,7 @@ flowchart TB
     end
 
     subgraph Payments["Payments"]
-        Checkout[Checkout Page] --> CreateSession[POST /api/polar/create-checkout-session]
+        Checkout[Checkout Page] --> CreateSession[POST /api/polar/checkout]
         CreateSession --> PolarAPI[Polar API]
         PolarWebhook[POST /api/polar/webhook] --> PolarAPI
         PolarWebhook --> UserModel
@@ -137,9 +137,9 @@ flowchart TB
     end
 
     subgraph AI["AI Services"]
-        ChatUI[Chat / Demo] --> VertexAPI[POST /api/vertex]
+        ChatUI[Chat / Demo] --> VertexAPI[POST /api/ai?provider=vertex&action=chat]
         VertexAPI --> VertexAI[Vertex AI]
-        VisionUI[Vision] --> VisionAPI[POST /api/vision]
+        VisionUI[Vision] --> VisionAPI[POST /api/ai?provider=openai&action=vision]
         VisionAPI --> OpenAIAPI[OpenAI GPT-4o]
         EmbedAPI[Embed] --> VertexAI
     end
@@ -197,23 +197,23 @@ flowchart TB
 
 ## 5. Stack Summary
 
-| Layer | Technology | Notes |
-|-------|------------|-------|
-| **Frontend** | React 18, Vite 7, TypeScript | SPA, React Router, TanStack Query |
-| **UI** | Tailwind, shadcn/ui | 20+ UI components |
-| **Auth (client)** | Clerk React | JWT, protected routes |
-| **Hosting** | Vercel | CDN, serverless, rewrites to index.html |
-| **API** | Vercel Serverless (Node ESM) | /api/*, rate limits, CORS |
-| **Database** | MongoDB Atlas | Mongoose, 10 models |
-| **Files** | MongoDB GridFS | Via /api/files |
-| **Auth (server)** | Clerk JWT, API Keys | verifyClerkAuth, bcrypt for keys |
-| **Payments** | Polar | Checkout, webhooks, plans |
-| **AI** | Vertex AI, OpenAI GPT-4o | Chat, embeddings, vision |
-| **Email** | Resend | Forms, notifications |
-| **CAPTCHA** | Cloudflare Turnstile | Forms only |
-| **Monitoring** | Sentry | Node + Browser |
-| **Cache (API)** | LRU in-memory | Rate limit, Polar dedupe, Vertex client |
-| **Docker (optional)** | Nginx, Express, Postgres, Redis | Prometheus, Grafana, backup profiles |
+| Layer                 | Technology                      | Notes                                   |
+| --------------------- | ------------------------------- | --------------------------------------- |
+| **Frontend**          | React 18, Vite 7, TypeScript    | SPA, React Router, TanStack Query       |
+| **UI**                | Tailwind, shadcn/ui             | 20+ UI components                       |
+| **Auth (client)**     | Clerk React                     | JWT, protected routes                   |
+| **Hosting**           | Vercel                          | CDN, serverless, rewrites to index.html |
+| **API**               | Vercel Serverless (Node ESM)    | /api/\*, rate limits, CORS              |
+| **Database**          | MongoDB Atlas                   | Mongoose, 10 models                     |
+| **Files**             | MongoDB GridFS                  | Via /api/files                          |
+| **Auth (server)**     | Clerk JWT, API Keys             | verifyClerkAuth, bcrypt for keys        |
+| **Payments**          | Polar                           | Checkout, webhooks, plans               |
+| **AI**                | Vertex AI, OpenAI GPT-4o        | Chat, embeddings, vision                |
+| **Email**             | Resend                          | Forms, notifications                    |
+| **CAPTCHA**           | Cloudflare Turnstile            | Forms only                              |
+| **Monitoring**        | Sentry                          | Node + Browser                          |
+| **Cache (API)**       | LRU in-memory                   | Rate limit, Polar dedupe, Vertex client |
+| **Docker (optional)** | Nginx, Express, Postgres, Redis | Prometheus, Grafana, backup profiles    |
 
 ---
 

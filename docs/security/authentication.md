@@ -46,6 +46,7 @@ function MyComponent() {
 ```
 
 **Components**:
+
 - `<SignIn />` - Sign-in form
 - `<SignUp />` - Sign-up form
 - `<UserButton />` - User profile button
@@ -111,6 +112,7 @@ const { userId: clerkId, error } = await verifyClerkAuth(
 **Location**: `api/webhooks/clerk.js`
 
 **Webhook Events**:
+
 - `user.created` - Create User document in MongoDB
 - `user.updated` - Update User document in MongoDB
 - `user.deleted` - Soft-delete User document (set `deletedAt`)
@@ -158,6 +160,7 @@ const event = wh.verify(payload, {
    - Copy signing secret to environment variable
 
 **Security**:
+
 - Verifies webhook signature using Svix library
 - Rejects requests with invalid signatures (403 Forbidden)
 - Requires raw body for signature verification
@@ -171,6 +174,7 @@ const event = wh.verify(payload, {
 **Example**: `tc_live_1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef`
 
 **Storage**:
+
 - Full key hashed with bcrypt (`keyHash`)
 - Prefix stored for display (`keyPrefix`: first 20 chars + `...`)
 - Full key only returned once on creation
@@ -213,7 +217,9 @@ const event = wh.verify(payload, {
 import { verifyTenantApiKey } from './_lib/api-key-auth.js'
 
 export default async function handler(req, res) {
-  const apiKey = req.headers['x-api-key'] || req.headers.authorization?.replace('Bearer ', '')
+  const apiKey =
+    req.headers['x-api-key'] ||
+    req.headers.authorization?.replace('Bearer ', '')
   const { clerkId, error } = await verifyTenantApiKey(apiKey)
 
   if (error || !clerkId) {
@@ -226,25 +232,30 @@ export default async function handler(req, res) {
 ```
 
 **Performance Optimization**:
+
 1. Pre-filter by `keyPrefix` (first 20 chars) - Reduces candidates
 2. Filter by `revokedAt: null` - Only check active keys
 3. Bcrypt comparison loop - Typically 0-1 keys per request
 
 **Indexes**:
+
 - `{ keyPrefix: 1 }` - Fast prefix matching
 - `{ revokedAt: 1, keyPrefix: 1 }` - Compound index for optimal queries
 
 ### Managing API Keys
 
 **List Keys**: `GET /api/app/api-keys`
+
 - Returns key prefixes (never full keys)
 - Only active (non-revoked) keys
 
 **Revoke Key**: `DELETE /api/app/api-keys`
+
 - Soft revoke (sets `revokedAt` timestamp)
 - Can be restored within 10 seconds
 
-**Restore Key**: `POST /api/app/api-keys/[id]/restore`
+**Restore Key**: `POST /api/app/api-keys?action=restore&keyId=<id>`
+
 - Restore window: 10 seconds after revocation
 - Only within restore window
 
@@ -253,6 +264,7 @@ See [API Endpoints](../architecture/api-endpoints.md) for complete API documenta
 ### API Key Security
 
 **Best Practices**:
+
 1. **Store securely** - Never log or expose full keys
 2. **Use HTTPS** - Always transmit over encrypted connections
 3. **Rotate regularly** - Revoke and create new keys periodically
@@ -260,6 +272,7 @@ See [API Endpoints](../architecture/api-endpoints.md) for complete API documenta
 5. **Monitor usage** - Track `lastUsedAt` for suspicious activity
 
 **Revocation**:
+
 - Immediate revocation via DELETE endpoint
 - 10-second restore window for accidental revocations
 - After restore window, key is permanently revoked
@@ -273,6 +286,7 @@ See [API Endpoints](../architecture/api-endpoints.md) for complete API documenta
 **Authentication**: Svix signature verification
 
 **Headers Required**:
+
 - `svix-id` - Webhook ID
 - `svix-timestamp` - Webhook timestamp
 - `svix-signature` - Webhook signature
@@ -291,6 +305,7 @@ const event = wh.verify(payload.toString(), {
 ```
 
 **Security**:
+
 - Verifies webhook signature using Svix library
 - Rejects requests with invalid signatures (403 Forbidden)
 - Requires raw body (not parsed JSON) for verification
@@ -302,6 +317,7 @@ const event = wh.verify(payload.toString(), {
 **Authentication**: Polar SDK signature verification
 
 **Headers Required**:
+
 - `polar-signature` - Webhook signature
 
 **Verification**:
@@ -312,16 +328,22 @@ import { validateEvent } from '@polar-sh/sdk/webhooks'
 const signature = req.headers['polar-signature']
 const rawBody = await getRawBody(req)
 
-const event = validateEvent(rawBody.toString(), signature, process.env.POLAR_WEBHOOK_SECRET)
+const event = validateEvent(
+  rawBody.toString(),
+  signature,
+  process.env.POLAR_WEBHOOK_SECRET
+)
 ```
 
 **Security**:
+
 - Verifies webhook signature using Polar SDK
 - Rejects requests with invalid signatures (403 Forbidden)
 - Deduplicates events using in-memory cache
 - Requires raw body for signature verification
 
 **Deduplication**:
+
 - In-memory cache of processed event IDs
 - 15-minute TTL
 - Maximum 1000 events cached
@@ -330,11 +352,13 @@ const event = validateEvent(rawBody.toString(), signature, process.env.POLAR_WEB
 
 ### API Rate Limits
 
-**Chat Endpoint** (`/api/chat`):
+**Chat Endpoint** (`/api/ai?provider=openai&action=chat`):
+
 - Limit: 5 requests per 60 seconds per IP
 - In-memory rate limiter (replace with Redis in production)
 
 **Forms Endpoint** (`/api/forms`):
+
 - Limit: 5 requests per 15 minutes per IP
 - Cloudflare Turnstile CAPTCHA required
 - Combined scope for contact and demo forms
@@ -342,11 +366,13 @@ const event = validateEvent(rawBody.toString(), signature, process.env.POLAR_WEB
 ### Rate Limit Headers
 
 **Response Headers**:
+
 - `X-RateLimit-Limit` - Maximum requests allowed
 - `X-RateLimit-Remaining` - Requests remaining
 - `X-RateLimit-Reset` - Reset timestamp
 
 **Rate Limit Exceeded**:
+
 - Status: `429 Too Many Requests`
 - Response: `{ error: 'Rate limit exceeded' }`
 
