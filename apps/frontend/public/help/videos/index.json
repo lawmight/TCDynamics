@@ -1,0 +1,35 @@
+{
+  "resources": {
+    "step-account-setup": {
+      "title": "Configuration du compte",
+      "url": "/help/videos/account-setup.mp4",
+      "duration": "2:30",
+      "thumbnail": "/help/videos/thumbnails/account-setup.jpg"
+    },
+    "step-first-workflow": {
+      "title": "Créer votre premier workflow",
+      "url": "/help/videos/create-workflow.mp4",
+      "duration": "4:15",
+      "thumbnail": "/help/videos/thumbnails/create-workflow.jpg"
+    },
+    "step-upload-document": {
+      "title": "Importer des documents",
+      "url": "/help/videos/upload-documents.mp4",
+      "duration": "1:45",
+      "thumbnail": "/help/videos/thumbnails/upload-documents.jpg"
+    },
+    "step-invite-team": {
+      "title": "Inviter votre équipe",
+      "url": "/help/videos/invite-team.mp4",
+      "duration": "2:00",
+      "thumbnail": "/help/videos/thumbnails/invite-team.jpg"
+    },
+    "step-connect-integration": {
+      "title": "Connecter une intégration",
+      "url": "/help/videos/integrations.mp4",
+      "duration": "3:30",
+      "thumbnail": "/help/videos/thumbnails/integrations.jpg"
+    }
+  },
+  "_note": "This is a placeholder index. Add actual video files to this directory."
+}

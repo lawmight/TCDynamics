@@ -1,0 +1,35 @@
+{
+  "resources": {
+    "step-account-setup": {
+      "title": "Guide de démarrage rapide",
+      "url": "/docs/getting-started",
+      "description": "Configurez votre compte en quelques étapes simples"
+    },
+    "step-first-workflow": {
+      "title": "Templates de workflows",
+      "url": "/app/workflows/templates",
+      "description": "Utilisez nos templates prêts à l'emploi"
+    },
+    "step-upload-document": {
+      "title": "Formats supportés",
+      "url": "/docs/supported-formats",
+      "description": "Liste des formats de fichiers acceptés"
+    },
+    "step-invite-team": {
+      "title": "Gestion des accès",
+      "url": "/docs/team-management",
+      "description": "Gérez les permissions et invitations"
+    },
+    "step-connect-integration": {
+      "title": "Guide d'intégration",
+      "url": "/docs/integrations",
+      "description": "Connectez vos outils favoris"
+    }
+  },
+  "fallback": {
+    "title": "Centre d'aide",
+    "url": "/docs",
+    "description": "Consultez notre documentation complète"
+  },
+  "_note": "This is a placeholder index. Add actual guide content to the docs directory."
+}

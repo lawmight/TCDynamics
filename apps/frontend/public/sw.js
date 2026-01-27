@@ -1,4 +1,4 @@
-const CACHE_NAME = 'workflowai-v1'
+const CACHE_NAME = 'tcdynamics-v1'
 const urlsToCache = [
   '/',
   '/manifest.json',
