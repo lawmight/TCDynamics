@@ -55,6 +55,7 @@
     "@radix-ui/react-scroll-area": "^1.2.10",
     "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-switch": "^1.2.6",
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-toast": "^1.2.14",
     "@radix-ui/react-tooltip": "^1.2.7",
@@ -77,6 +78,7 @@
     "@commitlint/cli": "^20.3.1",
     "@commitlint/config-conventional": "^20.3.1",
     "@eslint/js": "^9.39.2",
+    "@iconify-json/lucide": "^1.2.43",
     "@sentry/vite-plugin": "^2.0.0",
     "@svgr/core": "^8.1.0",
     "@svgr/plugin-jsx": "^8.1.0",
@@ -115,7 +117,6 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.53.1",
     "unplugin-icons": "^23.0.1",
-    "@iconify-json/lucide": "^1.2.43",
     "vite": "^7.3.0",
     "vitest": "^3.2.4"
   }
