@@ -30,10 +30,12 @@ npm run dev:all       # all three together
 ### Environment Variables
 
 **Required for API functions**:
+
 - `CLERK_SECRET_KEY` - Clerk secret key for authentication (get from Clerk Dashboard)
 - `MONGODB_URI` - MongoDB Atlas connection string
 
 **Frontend**:
+
 - `VITE_CLERK_PUBLISHABLE_KEY` - Clerk publishable key (starts with `pk_`)
 
 See `docs/development/environment-setup.md` for complete documentation of all environment variables.
@@ -47,6 +49,16 @@ npm run test          # frontend + backend
 npm run lint          # frontend + backend
 npm run type-check
 ```
+
+### ESLint Configuration
+
+The project uses a unified ESLint configuration with flat config format across all apps:
+
+- **Root**: `eslint.config.js` - Shared configuration for the entire monorepo
+- **Frontend**: Extends root config with React/TSX specific rules
+- **Backend**: `apps/backend/eslint.config.js` - Node.js/Express specific rules
+
+Both frontend and backend now use ESLint v9 with consistent TypeScript ESLint versions for unified code quality standards.
 
 ## Deployment
 
