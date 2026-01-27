@@ -11,7 +11,18 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode }) => {
+  // Get environment variables for HTML replacement
+  const frontendUrl =
+    process.env.VITE_FRONTEND_URL ||
+    process.env.FRONTEND_URL ||
+    'https://tcdynamics.fr'
+  const apiUrl =
+    process.env.VITE_API_URL ||
+    process.env.API_URL ||
+    'https://api.tcdynamics.fr'
+
+  return {
   server: {
     host: '127.0.0.1',
     port: 5173,
@@ -39,15 +50,6 @@ export default defineConfig(({ mode }) => ({
     {
       name: 'html-env-replace',
       transformIndexHtml(html) {
-        const frontendUrl =
-          process.env.VITE_FRONTEND_URL ||
-          process.env.FRONTEND_URL ||
-          'https://tcdynamics.fr'
-        const apiUrl =
-          process.env.VITE_API_URL ||
-          process.env.API_URL ||
-          'https://api.tcdynamics.fr'
-
         return html
           .replace(/%VITE_FRONTEND_URL%/g, frontendUrl)
           .replace(/%API_URL%/g, apiUrl)
@@ -163,5 +165,6 @@ export default defineConfig(({ mode }) => ({
       'tailwind-merge',
       'class-variance-authority',
     ],
-  },
-}))
+  }
+  }
+})
