@@ -2,18 +2,24 @@
   "name": "tcdynamics-api",
   "version": "1.0.0",
   "description": "Serverless API functions for TCDynamics",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "echo 'API functions deployed via Vercel - no build needed'",
+    "dev": "echo 'API functions run via Vercel dev'",
+    "lint": "echo 'API linting handled by root ESLint'"
+  },
   "private": true,
   "type": "module",
   "dependencies": {
-    "@clerk/backend": "^1.0.0",
+    "@clerk/backend": "^2.29.5",
     "@polar-sh/sdk": "^0.42.1",
-    "@sentry/node": "^7.0.0",
+    "@sentry/node": "^10.37.0",
     "bcryptjs": "^2.4.3",
     "google-auth-library": "^9.14.1",
     "lru-cache": "^11.0.1",
     "mongodb": "^7.0.0",
     "mongoose": "^9.1.1",
-    "resend": "^6.4.2",
+    "resend": "^6.9.1",
     "svix": "^1.84.1"
   }
 }

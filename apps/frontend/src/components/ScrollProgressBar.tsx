@@ -23,26 +23,11 @@ const ScrollProgressBar = ({
       aria-valuemax={100}
       aria-label="Progression de la lecture de la page"
       className={`scroll-progress-bar ${className}`}
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '3px',
-        zIndex: 45,
-        backgroundColor: 'hsl(var(--muted) / 0.3)',
-        pointerEvents: 'none',
-      }}
     >
       <div
         className="scroll-progress-bar__fill"
         style={{
-          height: '100%',
-          width: '100%',
-          backgroundColor: 'hsl(var(--primary))',
-          transformOrigin: 'left',
           transform: `scaleX(${progress})`,
-          transition: 'transform 0.1s ease-out',
         }}
       />
     </div>

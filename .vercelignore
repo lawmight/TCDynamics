@@ -8,6 +8,11 @@ api/**/jest.config.js
 api/**/*.test.js
 api/**/*.spec.js
 
+# Exclude utility libraries and templates (not serverless functions)
+api/_lib/**
+api/emails/templates/**
+api/scripts/**
+
 # Also exclude backend and other non-production directories
 apps/backend/
 apps/functions-archive/

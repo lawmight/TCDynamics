@@ -52,25 +52,8 @@ const SectionIndicators = ({
       <nav
         aria-label="Navigation des sections"
         className="section-indicators section-indicators--desktop"
-        style={{
-          position: 'fixed',
-          right: '1.25rem',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          zIndex: 35,
-          display: 'none',
-        }}
       >
-        <ul
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.75rem',
-            listStyle: 'none',
-            margin: 0,
-            padding: 0,
-          }}
-        >
+        <ul>
           {indicators.map(({ id, label }) => (
             <li key={id}>
               <button
@@ -79,29 +62,16 @@ const SectionIndicators = ({
                 aria-current={activeId === id ? 'true' : undefined}
                 title={label}
                 className="section-indicator-btn"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '0.25rem',
-                  borderRadius: '9999px',
-                  transition: 'all 0.2s ease',
-                }}
               >
                 {/* Dot */}
                 <span
                   style={{
                     width: activeId === id ? '12px' : '8px',
                     height: activeId === id ? '12px' : '8px',
-                    borderRadius: '50%',
                     backgroundColor:
                       activeId === id
                         ? 'hsl(var(--primary))'
                         : 'hsl(var(--muted-foreground) / 0.4)',
-                    transition: 'all 0.2s ease',
                     boxShadow:
                       activeId === id
                         ? '0 0 8px hsl(var(--primary) / 0.5)'
@@ -112,15 +82,10 @@ const SectionIndicators = ({
                 <span
                   className="section-indicator-label"
                   style={{
-                    fontSize: '0.75rem',
                     color:
                       activeId === id
                         ? 'hsl(var(--primary))'
                         : 'hsl(var(--muted-foreground))',
-                    opacity: 0,
-                    transform: 'translateX(-4px)',
-                    transition: 'all 0.2s ease',
-                    whiteSpace: 'nowrap',
                   }}
                 >
                   {label}
@@ -135,29 +100,8 @@ const SectionIndicators = ({
       <nav
         aria-label="Navigation des sections"
         className="section-indicators section-indicators--mobile"
-        style={{
-          position: 'fixed',
-          bottom: '5rem',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 35,
-          display: 'none',
-        }}
       >
-        <ul
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            gap: '0.5rem',
-            listStyle: 'none',
-            margin: 0,
-            padding: '0.5rem 0.75rem',
-            backgroundColor: 'hsl(var(--background) / 0.9)',
-            backdropFilter: 'blur(8px)',
-            borderRadius: '9999px',
-            boxShadow: '0 4px 20px hsl(0 0% 0% / 0.15)',
-          }}
-        >
+        <ul>
           {indicators.map(({ id, label }) => (
             <li key={id}>
               <button
@@ -167,16 +111,10 @@ const SectionIndicators = ({
                 title={label}
                 style={{
                   width: activeId === id ? '24px' : '8px',
-                  height: '8px',
-                  borderRadius: '9999px',
                   backgroundColor:
                     activeId === id
                       ? 'hsl(var(--primary))'
                       : 'hsl(var(--muted-foreground) / 0.4)',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: 0,
-                  transition: 'all 0.2s ease',
                 }}
               />
             </li>
