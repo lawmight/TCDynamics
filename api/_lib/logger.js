@@ -165,7 +165,6 @@ class Logger {
    */
   info(message, data) {
     if (!isProduction) {
-      // eslint-disable-next-line no-console
       console.log(formatMessage('INFO', message, data))
     }
     // In production, could send to monitoring service (Sentry, etc.)
@@ -178,7 +177,6 @@ class Logger {
    */
   warn(message, data) {
     if (!isProduction) {
-      // eslint-disable-next-line no-console
       console.warn(formatMessage('WARN', message, data))
     }
     // In production, could send to monitoring service
@@ -199,7 +197,6 @@ class Logger {
         : error
 
     if (!isProduction) {
-      // eslint-disable-next-line no-console
       console.error(formatMessage('ERROR', message, errorData))
     }
     // In production, send to monitoring service (Sentry, etc.)
@@ -213,7 +210,6 @@ class Logger {
    */
   debug(message, data) {
     if (!isProduction) {
-      // eslint-disable-next-line no-console
       console.debug(formatMessage('DEBUG', message, data))
     }
   }

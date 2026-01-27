@@ -10,8 +10,12 @@ const rateLimiter = new LRUCache({
   updateAgeOnGet: true,
 })
 
-function getClientIp(req) {
+export function getClientIp(req) {
   const forwarded = req.headers['x-forwarded-for']
+  if (Array.isArray(forwarded) && forwarded.length > 0) {
+    const v = forwarded[0]
+    return typeof v === 'string' ? v.trim() : String(v)
+  }
   if (typeof forwarded === 'string' && forwarded.length > 0) {
     return forwarded.split(',')[0].trim()
   }
@@ -218,19 +222,23 @@ export function withGuards(handler, options = {}) {
       return handler(req, res, body)
     } catch (error) {
       if (error?.message === 'PayloadTooLarge') {
-        return res.status(413).json({ error: 'Payload too large' })
+        return res.status(413).json({ error: 'Payload too large', requestId: req.requestId })
       }
       if (error?.message === 'InvalidJSON') {
-        return res.status(400).json({ error: 'Invalid JSON payload' })
+        return res.status(400).json({ error: 'Invalid JSON payload', requestId: req.requestId })
       }
       console.error('Handler failure', error)
-      return res.status(500).json({ error: 'Internal server error' })
+      return res.status(500).json({
+        error: 'Internal server error',
+        requestId: req.requestId,
+      })
     }
   }
 }
 
 export default {
   applyRateLimit,
+  getClientIp,
   parseJsonBody,
   validateAllowedFields,
   withGuards,

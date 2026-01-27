@@ -9,19 +9,12 @@
  */
 
 import { Webhook } from 'svix'
+import { getRawBody } from '../_lib/body.js'
 import { User } from '../_lib/models/User.js'
 import { connectToDatabase } from '../_lib/mongodb.js'
 
 export const config = {
   api: { bodyParser: false },
-}
-
-async function getRawBody(req) {
-  const chunks = []
-  for await (const chunk of req) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
-  }
-  return Buffer.concat(chunks)
 }
 
 export default async function handler(req, res) {
@@ -35,7 +28,6 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Webhook secret not configured' })
   }
 
-  // Verify webhook signature
   const payload = await getRawBody(req)
   const headers = {
     'svix-id': req.headers['svix-id'],
@@ -73,6 +65,25 @@ export default async function handler(req, res) {
         })
 
         console.log('✅ Created user from Clerk webhook', { clerkId: id })
+
+        // Trigger welcome email (fire and forget - don't block webhook response)
+        if (primaryEmail) {
+          fetch(
+            `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : ''}/api/emails?action=trigger&type=signup`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                userId: id,
+                email: primaryEmail.toLowerCase(),
+                firstName: first_name || undefined,
+              }),
+            }
+          ).catch(err => {
+            console.error('⚠️ Failed to trigger welcome email:', err.message)
+          })
+        }
+
         break
       }
 

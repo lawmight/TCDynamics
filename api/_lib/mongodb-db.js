@@ -209,11 +209,7 @@ export async function saveFeedback(feedbackData) {
       allowFollowup: feedbackData.allow_followup || false,
       clerkId: feedbackData.clerkId || null,
     })
-    console.error('Save feedback error:', error.message || 'Unknown error')
-    return {
-      success: false,
-      error: 'Unable to save feedback. Please try again.',
-    }
+    return { success: true, id: feedback._id.toString() }
   } catch (error) {
     console.error('Save feedback error:', error)
     return { success: false, error: error.message }

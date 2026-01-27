@@ -2,6 +2,7 @@ import { AnalyticsEvent } from './_lib/models/AnalyticsEvent.js'
 import { ChatConversation } from './_lib/models/ChatConversation.js'
 import { KnowledgeFile } from './_lib/models/KnowledgeFile.js'
 import { connectToDatabase } from './_lib/mongodb.js'
+import { withSentry } from './_lib/sentry.js'
 
 /**
  * Consolidated Analytics API
@@ -12,7 +13,7 @@ import { connectToDatabase } from './_lib/mongodb.js'
  * - GET /api/analytics - Get analytics summary stats
  * - POST /api/analytics - Record an analytics event
  */
-export default async function handler(req, res) {
+async function handler(req, res) {
   // Health check endpoint (no database required)
   if (req.method === 'GET' && req.query.health === 'true') {
     return res.status(200).json({
@@ -79,3 +80,5 @@ export default async function handler(req, res) {
 
   return res.status(405).json({ error: 'Method not allowed' })
 }
+
+export default withSentry(handler)

@@ -40,11 +40,9 @@ const ChatConversationSchema = new mongoose.Schema(
 ChatConversationSchema.pre('save', function (next) {
   if (Array.isArray(this.messages)) {
     this.messageCount = this.messages.length
-
-    // Update lastMessageAt to the timestamp of the last message (if any)
     if (this.messages.length > 0) {
       const lastMessage = this.messages[this.messages.length - 1]
-      if (lastMessage && lastMessage.timestamp) {
+      if (lastMessage?.timestamp) {
         this.lastMessageAt = lastMessage.timestamp
       }
     }
@@ -52,9 +50,7 @@ ChatConversationSchema.pre('save', function (next) {
   next()
 })
 
-// Indexes for chat retrieval
 ChatConversationSchema.index({ sessionId: 1 })
-ChatConversationSchema.index({ clerkId: 1 })
 ChatConversationSchema.index({ clerkId: 1, conversationStatus: 1 })
 ChatConversationSchema.index({ lastMessageAt: -1 })
 

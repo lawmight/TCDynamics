@@ -2,6 +2,7 @@ import crypto from 'crypto'
 import mongoose from 'mongoose'
 import { KnowledgeFile } from './_lib/models/KnowledgeFile.js'
 import { connectToDatabase } from './_lib/mongodb.js'
+import { withSentry } from './_lib/sentry.js'
 import { embedText } from './_lib/vertex.js'
 
 /**
@@ -70,15 +71,17 @@ export const config = {
   },
 }
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method === 'GET') {
     return await handleListFiles(req, res)
-  } else if (req.method === 'POST') {
-    return await handleUploadFile(req, res)
-  } else {
-    return res.status(405).json({ error: 'Method not allowed' })
   }
+  if (req.method === 'POST') {
+    return await handleUploadFile(req, res)
+  }
+  return res.status(405).json({ error: 'Method not allowed' })
 }
+
+export default withSentry(handler)
 
 /**
  * Handle file listing

@@ -7,6 +7,7 @@ import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
 import { verifyClerkAuth } from '../_lib/auth.js'
 import { createErrorResponse } from '../_lib/error-handler.js'
+import { allowCors } from '../_lib/cors.js'
 import { logger } from '../_lib/logger.js'
 import { ApiKey } from '../_lib/models/ApiKey.js'
 import { connectToDatabase } from '../_lib/mongodb.js'
@@ -20,22 +21,13 @@ function generateApiKey() {
   return `tc_live_${random}`
 }
 
-// Enable CORS
-const allowCors = fn => async (req, res) => {
-  res.setHeader('Access-Control-Allow-Credentials', true)
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST,DELETE')
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
-  )
+const API_KEY_CORS_HEADERS =
+  'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
+const RESTORE_WINDOW_MS = 10 * 1000
 
-  if (req.method === 'OPTIONS') {
-    res.status(200).end()
-    return
-  }
-
-  return await fn(req, res)
+function getQueryValue(value) {
+  if (Array.isArray(value)) return value[0]
+  return value
 }
 
 const handler = async (req, res) => {
@@ -99,6 +91,65 @@ const handler = async (req, res) => {
 
   // POST - Create new API key
   if (req.method === 'POST') {
+    const action = getQueryValue(req.query.action)
+
+    if (action === 'restore') {
+      try {
+        const keyId =
+          getQueryValue(req.query.keyId) ||
+          getQueryValue(req.query.id) ||
+          req.body?.keyId ||
+          req.body?.id
+
+        if (!keyId) {
+          return res.status(400).json({
+            success: false,
+            error: 'Key ID is required',
+          })
+        }
+
+        const key = await ApiKey.findOne({ _id: keyId, clerkId })
+
+        if (!key) {
+          return res.status(404).json({
+            success: false,
+            error: 'API key not found or access denied',
+          })
+        }
+
+        if (!key.revokedAt) {
+          return res.status(400).json({
+            success: false,
+            error: 'API key is not revoked',
+          })
+        }
+
+        const revokedAgo = Date.now() - key.revokedAt.getTime()
+        if (revokedAgo > RESTORE_WINDOW_MS) {
+          return res.status(400).json({
+            success: false,
+            error: 'Restore window expired',
+            message: `Keys can only be restored within ${RESTORE_WINDOW_MS / 1000} seconds of revocation`,
+          })
+        }
+
+        await ApiKey.findByIdAndUpdate(keyId, { $set: { revokedAt: null } })
+
+        logger.info('API key restored', { clerkId, keyId })
+
+        return res.json({
+          success: true,
+          message: 'API key restored',
+        })
+      } catch (err) {
+        logger.error('Exception restoring API key', err)
+        return res.status(500).json({
+          success: false,
+          error: err.message,
+        })
+      }
+    }
+
     try {
       const { name } = req.body || {}
 
@@ -239,4 +290,7 @@ const handler = async (req, res) => {
   return res.status(statusCode).json(response)
 }
 
-export default allowCors(handler)
+export default allowCors(handler, {
+  methods: ['GET', 'OPTIONS', 'POST', 'DELETE'],
+  headers: API_KEY_CORS_HEADERS,
+})

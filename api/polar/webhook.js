@@ -1,4 +1,5 @@
 import { validateEvent, WebhookVerificationError } from '@polar-sh/sdk/webhooks'
+import { getRawBody } from '../_lib/body.js'
 import { getResendClient } from '../_lib/email.js'
 import { User } from '../_lib/models/User.js'
 import { savePolarEvent } from '../_lib/mongodb-db.js'
@@ -25,25 +26,6 @@ function pruneCache() {
     const oldest = processedEvents.keys().next().value
     processedEvents.delete(oldest)
   }
-}
-
-/**
- * Read raw body as Buffer for signature verification
- * Required for Vercel serverless functions
- */
-async function getRawBody(req) {
-  if (req.body && typeof req.body === 'string') {
-    return Buffer.from(req.body, 'utf8')
-  }
-  if (Buffer.isBuffer(req.body)) {
-    return req.body
-  }
-
-  const chunks = []
-  for await (const chunk of req) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
-  }
-  return Buffer.concat(chunks)
 }
 
 /**
