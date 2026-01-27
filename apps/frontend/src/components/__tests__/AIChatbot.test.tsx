@@ -1,6 +1,5 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import React from 'react'
 import { vi } from 'vitest'
 
 import AIChatbot from '../AIChatbot'
@@ -36,7 +35,7 @@ describe('AIChatbot Component', () => {
     const floatingButton = screen.getByRole('button')
     fireEvent.click(floatingButton)
 
-    expect(screen.getByText(/WorkFlowAI Assistant/i)).toBeInTheDocument()
+    expect(screen.getByText(/TCDynamics Assistant/i)).toBeInTheDocument()
     expect(
       screen.getByPlaceholderText(/Posez votre question/i)
     ).toBeInTheDocument()
@@ -74,7 +73,7 @@ describe('AIChatbot Component', () => {
 
     // Wait for chatbot to open
     await waitFor(() => {
-      expect(screen.getByText(/WorkFlowAI Assistant/i)).toBeInTheDocument()
+      expect(screen.getByText(/TCDynamics Assistant/i)).toBeInTheDocument()
     })
 
     const input = screen.getByPlaceholderText(/Posez votre question/i)
@@ -102,7 +101,7 @@ describe('AIChatbot Component', () => {
 
     // Wait for chatbot to open
     await waitFor(() => {
-      expect(screen.getByText(/WorkFlowAI Assistant/i)).toBeInTheDocument()
+      expect(screen.getByText(/TCDynamics Assistant/i)).toBeInTheDocument()
     })
 
     const input = screen.getByPlaceholderText(/Posez votre question/i)
@@ -127,7 +126,7 @@ describe('AIChatbot Component', () => {
 
     // Wait for chatbot to open
     await waitFor(() => {
-      expect(screen.getByText(/WorkFlowAI Assistant/i)).toBeInTheDocument()
+      expect(screen.getByText(/TCDynamics Assistant/i)).toBeInTheDocument()
     })
 
     const input = screen.getByPlaceholderText(/Posez votre question/i)

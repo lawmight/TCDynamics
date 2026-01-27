@@ -1,10 +1,4 @@
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
 import Hero from '../Hero'
@@ -26,14 +20,23 @@ describe('Hero Component', () => {
     expect(heading).toHaveTextContent('Automatisez Votre')
     expect(heading).toHaveTextContent("Entreprise avec l'IA")
 
-    // Vérifier le paragraphe de description
-    const descriptionElement = screen.getByText(/Gagnez/i)
+    // Vérifier le paragraphe de description (story-driven)
+    const descriptionElement = screen.getByText(/Finies les heures perdues/i)
     expect(descriptionElement).toBeInTheDocument()
-    expect(descriptionElement).toHaveTextContent('10h par semaine')
+    expect(descriptionElement).toHaveTextContent('10h')
 
     // Vérifier les boutons CTA
     expect(screen.getByText('VOIR LA DÉMO')).toBeInTheDocument()
     expect(screen.getByText('PARLER À UN EXPERT')).toBeInTheDocument()
+  })
+
+  it('should render MCP in overline with tooltip', () => {
+    renderWithRouter()
+
+    const mcpElement = screen.getByTitle(/Model Context Protocol/i)
+    expect(mcpElement).toBeInTheDocument()
+    expect(mcpElement).toHaveTextContent('MCP')
+    expect(mcpElement).toHaveAttribute('title')
   })
 
   it('should render trust indicators', () => {

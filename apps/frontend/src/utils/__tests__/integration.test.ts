@@ -275,7 +275,8 @@ describe('Integration Tests', () => {
   describe('End-to-End Integration', () => {
     it('should work together without conflicts', async () => {
       // Initialize config
-      const configInstance = new (config.constructor as new () => ConfigManager)()
+      const configInstance =
+        new (config.constructor as new () => ConfigManager)()
       await configInstance.initialize()
 
       // Test cache with config

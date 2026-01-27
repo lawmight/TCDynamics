@@ -6,7 +6,9 @@ import { analytics, useEventTracking, usePageTracking } from '../analytics'
 describe('analytics utilities', () => {
   it('pushes events to Matomo when enabled', () => {
     const matomoSpy = vi.fn()
-    Object.assign(analytics as unknown as { enabled: boolean }, { enabled: true })
+    Object.assign(analytics as unknown as { enabled: boolean }, {
+      enabled: true,
+    })
     Object.defineProperty(window, '_paq', {
       value: { push: matomoSpy },
       writable: true,
@@ -29,7 +31,9 @@ describe('analytics utilities', () => {
   })
 
   it('tracks page view and time on page', () => {
-    Object.assign(analytics as unknown as { enabled: boolean }, { enabled: true })
+    Object.assign(analytics as unknown as { enabled: boolean }, {
+      enabled: true,
+    })
     const trackSpy = vi.spyOn(analytics, 'trackEvent')
 
     const { unmount } = renderHook(() => usePageTracking('Home'))
@@ -54,7 +58,9 @@ describe('analytics utilities', () => {
   })
 
   it('exposes event tracking helpers', () => {
-    Object.assign(analytics as unknown as { enabled: boolean }, { enabled: true })
+    Object.assign(analytics as unknown as { enabled: boolean }, {
+      enabled: true,
+    })
     const trackSpy = vi.spyOn(analytics, 'trackEvent')
 
     const { result } = renderHook(() => useEventTracking())

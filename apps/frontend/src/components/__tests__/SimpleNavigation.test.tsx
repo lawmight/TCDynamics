@@ -57,7 +57,7 @@ describe('SimpleNavigation Component', () => {
   it('should render logo and navigation items', () => {
     renderSimpleNavigation()
 
-    expect(screen.getByText('WorkFlowAI')).toBeInTheDocument()
+    expect(screen.getByText('TCDynamics')).toBeInTheDocument()
     expect(screen.getByText('Accueil')).toBeInTheDocument()
     expect(screen.getByText('Fonctionnalités')).toBeInTheDocument()
     expect(screen.getByText('Tarifs')).toBeInTheDocument()
@@ -69,14 +69,16 @@ describe('SimpleNavigation Component', () => {
   it('should render mobile menu button', () => {
     renderSimpleNavigation()
 
-    const mobileMenuButton = screen.getByRole('button', { name: /Toggle menu/i })
+    const mobileMenuButton = screen.getByRole('button', {
+      name: /Toggle menu/i,
+    })
     expect(mobileMenuButton).toBeInTheDocument()
   })
 
   it('should handle logo click to scroll to hero section', () => {
     renderSimpleNavigation()
 
-    const logoButton = screen.getByText('WorkFlowAI')
+    const logoButton = screen.getByText('TCDynamics')
     const mockScrollIntoView = vi.fn()
 
     // Mock getElementById and scrollIntoView
@@ -107,7 +109,9 @@ describe('SimpleNavigation Component', () => {
   it('should toggle mobile menu on button click', () => {
     renderSimpleNavigation()
 
-    const mobileMenuButton = screen.getByRole('button', { name: /Toggle menu/i })
+    const mobileMenuButton = screen.getByRole('button', {
+      name: /Toggle menu/i,
+    })
 
     // Initially closed: one "Accéder à l'app" (desktop only)
     expect(screen.getAllByText(/Accéder à l'app/i)).toHaveLength(1)
@@ -134,7 +138,9 @@ describe('SimpleNavigation Component', () => {
   it('should close mobile menu when navigation item is clicked', () => {
     renderSimpleNavigation()
 
-    const mobileMenuButton = screen.getByRole('button', { name: /Toggle menu/i })
+    const mobileMenuButton = screen.getByRole('button', {
+      name: /Toggle menu/i,
+    })
 
     // Open mobile menu
     fireEvent.click(mobileMenuButton)
@@ -172,7 +178,9 @@ describe('SimpleNavigation Component', () => {
     renderSimpleNavigation()
 
     // Initially no back to top button
-    expect(screen.queryByRole('button', { name: /Back to top/i })).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /Back to top/i })
+    ).not.toBeInTheDocument()
 
     // Simulate scroll past 300px
     Object.defineProperty(window, 'scrollY', {
@@ -183,7 +191,9 @@ describe('SimpleNavigation Component', () => {
     fireEvent.scroll(window)
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /Back to top/i })).toBeInTheDocument()
+      expect(
+        screen.getByRole('button', { name: /Back to top/i })
+      ).toBeInTheDocument()
     })
   })
 
@@ -211,11 +221,9 @@ describe('SimpleNavigation Component', () => {
   it('should add scroll event listener on mount', () => {
     renderSimpleNavigation()
 
-    expect(scrollSpy).toHaveBeenCalledWith(
-      'scroll',
-      expect.any(Function),
-      { passive: true }
-    )
+    expect(scrollSpy).toHaveBeenCalledWith('scroll', expect.any(Function), {
+      passive: true,
+    })
   })
 
   it('should cleanup scroll event listener on unmount', () => {

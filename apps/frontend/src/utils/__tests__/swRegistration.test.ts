@@ -1,9 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import {
-  registerServiceWorker,
-  triggerInstallPrompt,
-} from '../swRegistration'
+import { registerServiceWorker, triggerInstallPrompt } from '../swRegistration'
 
 vi.mock('../logger', () => ({
   logger: {

@@ -170,9 +170,7 @@ describe('Azure Services API Client', () => {
 
       expect(result.success).toBe(false)
       expect(result.errors).toEqual(
-        expect.arrayContaining([
-          expect.stringMatching(/Network error:/)
-        ])
+        expect.arrayContaining([expect.stringMatching(/Network error:/)])
       )
     })
 
@@ -463,7 +461,7 @@ describe('Azure Services API Client', () => {
       expect(result.message).toBe('Health check failed')
       expect(result.errors).toEqual(
         expect.arrayContaining([
-          expect.stringMatching(/Network error:.*Connection failed/)
+          expect.stringMatching(/Network error:.*Connection failed/),
         ])
       )
     })
