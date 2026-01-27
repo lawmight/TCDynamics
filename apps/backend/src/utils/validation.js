@@ -1,6 +1,9 @@
 const Joi = require('joi')
 const { commonFields } = require('./validationHelpers')
 
+/** Joi validation options: collect all errors, strip unknown keys */
+const JOI_VALIDATE_OPTIONS = { abortEarly: false, stripUnknown: true }
+
 // Schéma de validation pour le formulaire de contact
 // Uses reusable validation helpers for consistency
 const contactSchema = Joi.object({
@@ -25,13 +28,10 @@ const demoSchema = Joi.object({
 
 // Fonction de validation générique
 const validateData = schema => (req, res, next) => {
-  const { error, value } = schema.validate(req.body, {
-    abortEarly: false,
-    stripUnknown: true,
-  })
+  const { error, value } = schema.validate(req.body, JOI_VALIDATE_OPTIONS)
 
   if (error) {
-    const errorMessages = error.details.map(detail => detail.message)
+    const errorMessages = error.details.map(d => d.message)
     return res.status(400).json({
       success: false,
       message: 'Données invalides',

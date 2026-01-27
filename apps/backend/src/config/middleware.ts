@@ -3,6 +3,7 @@
  * Centralizes middleware setup and configuration
  */
 
+import type { CorsOptions } from 'cors'
 import express, { Express, Request, Response } from 'express'
 import cors from 'cors'
 import compression from 'compression'
@@ -49,11 +50,10 @@ export function configureMiddleware(
   )
 
   // CORS configuration
-  const corsOptions: cors.CorsOptions = {
+  const corsOptions: CorsOptions = {
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
       // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true)
-
       if (config.allowedOrigins.includes(origin)) {
         callback(null, true)
       } else {

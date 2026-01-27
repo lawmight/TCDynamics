@@ -5,25 +5,25 @@ const { apiKeyAuth, optionalApiKeyAuth } = require('../middleware/auth')
 
 const router = express.Router()
 
+/** Returns a new metrics object with default structure. */
+function createInitialMetrics() {
+  return {
+    startTime: Date.now(),
+    requests: { total: 0, byMethod: {}, byStatus: {}, byEndpoint: {} },
+    errors: { total: 0, byType: {}, recent: [] },
+    performance: { averageResponseTime: 0, slowestEndpoints: [], memoryUsage: {} },
+  }
+}
+
 // In-memory metrics storage (use Redis in production)
-let metrics = {
-  startTime: Date.now(),
-  requests: {
-    total: 0,
-    byMethod: {},
-    byStatus: {},
-    byEndpoint: {},
-  },
-  errors: {
-    total: 0,
-    byType: {},
-    recent: [],
-  },
-  performance: {
-    averageResponseTime: 0,
-    slowestEndpoints: [],
-    memoryUsage: {},
-  },
+let metrics = createInitialMetrics()
+
+// Update slowest endpoints tracking
+function updateSlowestEndpoints(endpoint, duration) {
+  const slowest = metrics.performance.slowestEndpoints
+  slowest.push({ endpoint, duration, timestamp: Date.now() })
+  slowest.sort((a, b) => b.duration - a.duration)
+  metrics.performance.slowestEndpoints = slowest.slice(0, 10) // Keep top 10
 }
 
 // Middleware to collect request metrics
@@ -34,7 +34,6 @@ const collectMetrics = (req, res, next) => {
   res.send = function (body) {
     const duration = Date.now() - start
 
-    // Update metrics
     metrics.requests.total++
     metrics.requests.byMethod[req.method] = (metrics.requests.byMethod[req.method] || 0) + 1
     metrics.requests.byStatus[res.statusCode] = (metrics.requests.byStatus[res.statusCode] || 0) + 1
@@ -42,27 +41,15 @@ const collectMetrics = (req, res, next) => {
     const endpoint = `${req.method} ${req.route?.path || req.path}`
     metrics.requests.byEndpoint[endpoint] = (metrics.requests.byEndpoint[endpoint] || 0) + 1
 
-    // Update performance metrics
     const currentAvg = metrics.performance.averageResponseTime
     const totalRequests = metrics.requests.total
     metrics.performance.averageResponseTime = (currentAvg * (totalRequests - 1) + duration) / totalRequests
 
-    // Track slowest endpoints
-    // eslint-disable-next-line no-use-before-define
     updateSlowestEndpoints(endpoint, duration)
-
     originalSend.call(this, body)
   }
 
   next()
-}
-
-// Update slowest endpoints tracking
-const updateSlowestEndpoints = (endpoint, duration) => {
-  const slowest = metrics.performance.slowestEndpoints
-  slowest.push({ endpoint, duration, timestamp: Date.now() })
-  slowest.sort((a, b) => b.duration - a.duration)
-  metrics.performance.slowestEndpoints = slowest.slice(0, 10) // Keep top 10
 }
 
 // Collect error metrics
@@ -311,26 +298,7 @@ router.post(
   '/metrics/reset',
   apiKeyAuth,
   asyncHandler(async (req, res) => {
-    // Reset metrics
-    metrics = {
-      startTime: Date.now(),
-      requests: {
-        total: 0,
-        byMethod: {},
-        byStatus: {},
-        byEndpoint: {},
-      },
-      errors: {
-        total: 0,
-        byType: {},
-        recent: [],
-      },
-      performance: {
-        averageResponseTime: 0,
-        slowestEndpoints: [],
-        memoryUsage: {},
-      },
-    }
+    metrics = createInitialMetrics()
 
     logger.info('Metrics reset requested', {
       ip: req.ip,

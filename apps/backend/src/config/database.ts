@@ -8,6 +8,14 @@ import { EnvironmentConfig } from './environment'
 
 let pool: Pool | null = null
 
+/** Throws if pool not initialized; returns the pool otherwise. */
+function assertPool(): Pool {
+  if (!pool) {
+    throw new Error('Database pool not initialized. Call initializeDatabase first.')
+  }
+  return pool
+}
+
 /**
  * Initialize database connection pool
  */
@@ -40,12 +48,8 @@ export async function query(
   text: string,
   params?: unknown[],
 ): Promise<{ rows: unknown[]; rowCount: number | null }> {
-  if (!pool) {
-    throw new Error('Database pool not initialized. Call initializeDatabase first.')
-  }
-
   const start = Date.now()
-  const res = await pool.query(text, params)
+  const res = await assertPool().query(text, params)
   const durationMs = Date.now() - start
 
   if (durationMs > 500) {
@@ -59,11 +63,7 @@ export async function query(
  * Get a database client from the pool
  */
 export function getClient(): Promise<PoolClient> {
-  if (!pool) {
-    throw new Error('Database pool not initialized. Call initializeDatabase first.')
-  }
-
-  return pool.connect()
+  return assertPool().connect()
 }
 
 /**
