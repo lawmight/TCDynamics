@@ -38,7 +38,7 @@ const Pages = () => {
   if (isLoading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-primary"></div>
+        <div className="border-primary size-12 animate-spin rounded-full border-b-2"></div>
       </div>
     )
   }
@@ -79,7 +79,7 @@ const Pages = () => {
           </tbody>
         </table>
       </div>
-      <p className="mt-4 text-sm text-muted-foreground">
+      <p className="text-muted-foreground mt-4 text-sm">
         Window: last {days} days • Project: {projectId}
       </p>
     </div>

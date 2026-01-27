@@ -5,15 +5,34 @@ import Hero from '@/components/Hero'
 import HowItWorks from '@/components/HowItWorks'
 import LocalAdvantages from '@/components/LocalAdvantages'
 import Pricing from '@/components/Pricing'
+import SectionIndicators from '@/components/SectionIndicators'
 import SocialProof from '@/components/SocialProof'
+import { useScrollSpy } from '@/hooks/useScrollSpy'
 
 // Scroll offset to account for fixed navigation header
 const scrollMarginStyle = { scrollMarginTop: '5rem' }
 
+// Section IDs for scroll spy
+const SECTION_IDS = [
+  'hero',
+  'features',
+  'how-it-works',
+  'local-advantages',
+  'social-proof',
+  'pricing',
+  'faq',
+  'contact',
+] as const
+
 const Index = () => {
+  const { activeId } = useScrollSpy([...SECTION_IDS])
+
   return (
     <main id="main">
-      <section id="hero" aria-label="Présentation WorkFlowAI">
+      {/* Section Indicators */}
+      <SectionIndicators activeId={activeId} sectionIds={[...SECTION_IDS]} />
+
+      <section id="hero" aria-label="Présentation TCDynamics">
         <Hero />
       </section>
       <section

@@ -9,7 +9,6 @@ import ShieldCheck from '~icons/lucide/shield-check'
 import Sparkles from '~icons/lucide/sparkles'
 import Workflow from '~icons/lucide/workflow'
 
-
 const integrationHighlights = [
   {
     title: 'Polar + Node.js',
@@ -69,11 +68,11 @@ const FeaturesPage = () => {
       className="bg-background text-foreground"
     >
       {/* Hero */}
-      <section className="border-b border-border/40 bg-card/20 py-20">
+      <section className="border-border/40 bg-card/20 border-b py-20">
         <div className="container mx-auto px-4">
           <div className="mb-4 flex flex-wrap items-center gap-3">
             <Badge className="bg-primary/15 text-primary" variant="outline">
-              Modules IA WorkFlowAI
+              Modules IA TCDynamics
             </Badge>
             <Badge variant="outline" className="font-mono">
               React 18 · Node 18 · Azure Functions
@@ -85,7 +84,7 @@ const FeaturesPage = () => {
           >
             Toute la profondeur produit au-delà de la page d&apos;accueil
           </h1>
-          <p className="max-w-3xl text-lg text-muted-foreground">
+          <p className="text-muted-foreground max-w-3xl text-lg">
             Découvrez comment chaque module s&apos;intègre à l&apos;architecture
             hybride décrite dans PROJECT_MASTER.md : capture documentaire, IA
             conversationnelle, analytics métier et conformité RGPD.
@@ -94,13 +93,13 @@ const FeaturesPage = () => {
       </section>
 
       {/* Detailed modules */}
-      <section className="border-b border-border/40 py-16">
+      <section className="border-border/40 border-b py-16">
         <div className="container mx-auto px-4">
           <div className="mb-8 flex items-center gap-3">
             <Workflow className="text-primary" aria-hidden="true" />
             <div>
               <h2 className="text-2xl font-semibold">
-                Modules détaillés WorkFlowAI
+                Modules détaillés TCDynamics
               </h2>
               <p className="text-muted-foreground">
                 Même données que sur la home, mais avec leurs preuves
@@ -112,17 +111,17 @@ const FeaturesPage = () => {
             {featureModules.map(module => (
               <Card key={module.slug} className="p-6">
                 <div className="mb-4 flex flex-wrap items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                  <div className="bg-primary/10 flex size-12 items-center justify-center rounded-lg">
                     <module.icon aria-hidden="true" className="text-primary" />
                   </div>
                   <div>
-                    <p className="font-mono text-xs text-muted-foreground">
+                    <p className="text-muted-foreground font-mono text-xs">
                       {module.subtitle}
                     </p>
                     <h3 className="text-xl font-semibold">{module.title}</h3>
                   </div>
                 </div>
-                <p className="mb-4 text-muted-foreground">
+                <p className="text-muted-foreground mb-4">
                   {module.detail.mission}
                 </p>
                 <div className="mb-4 grid gap-4 md:grid-cols-2">
@@ -130,12 +129,12 @@ const FeaturesPage = () => {
                     <p className="mb-2 text-sm font-semibold">
                       Ce que nous garantissons
                     </p>
-                    <ul className="space-y-2 text-sm text-muted-foreground">
+                    <ul className="text-muted-foreground space-y-2 text-sm">
                       {module.detail.proofPoints.map(point => (
                         <li key={point} className="flex items-start gap-2">
                           <CheckCircle2
                             size={16}
-                            className="mt-1 text-primary"
+                            className="text-primary mt-1"
                             aria-hidden="true"
                           />
                           <span>{point}</span>
@@ -152,19 +151,19 @@ const FeaturesPage = () => {
                         <Badge
                           key={integration}
                           variant="outline"
-                          className="border-primary/20 text-xs text-primary"
+                          className="border-primary/20 text-primary text-xs"
                         >
                           {integration}
                         </Badge>
                       ))}
                     </div>
-                    <div className="mt-4 grid grid-cols-2 gap-3 text-sm text-muted-foreground">
+                    <div className="text-muted-foreground mt-4 grid grid-cols-2 gap-3 text-sm">
                       {module.detail.metrics.map(metric => (
                         <div key={metric.label}>
                           <p className="text-xs uppercase tracking-wide">
                             {metric.label}
                           </p>
-                          <p className="text-lg font-semibold text-foreground">
+                          <p className="text-foreground text-lg font-semibold">
                             {metric.value}
                           </p>
                         </div>
@@ -177,7 +176,7 @@ const FeaturesPage = () => {
                     <Badge
                       key={benefit}
                       variant="outline"
-                      className="bg-card font-mono text-xs text-foreground"
+                      className="bg-card text-foreground font-mono text-xs"
                     >
                       {benefit}
                     </Badge>
@@ -190,7 +189,7 @@ const FeaturesPage = () => {
       </section>
 
       {/* Integrations */}
-      <section className="border-b border-border/40 py-16">
+      <section className="border-border/40 border-b py-16">
         <div className="container mx-auto px-4">
           <div className="mb-8 flex items-center gap-3">
             <PlugZap className="text-primary-glow" aria-hidden="true" />
@@ -207,10 +206,10 @@ const FeaturesPage = () => {
             {integrationHighlights.map(item => (
               <Card key={item.title} className="p-6">
                 <h3 className="text-lg font-semibold">{item.title}</h3>
-                <p className="mb-4 text-sm text-muted-foreground">
+                <p className="text-muted-foreground mb-4 text-sm">
                   {item.detail}
                 </p>
-                <ul className="space-y-1 text-sm text-muted-foreground">
+                <ul className="text-muted-foreground space-y-1 text-sm">
                   {item.benefits.map(benefit => (
                     <li key={benefit} className="flex items-center gap-2">
                       <CheckCircle2
@@ -229,7 +228,7 @@ const FeaturesPage = () => {
       </section>
 
       {/* Reliability */}
-      <section className="border-b border-border/40 py-16">
+      <section className="border-border/40 border-b py-16">
         <div className="container mx-auto px-4">
           <div className="mb-8 flex items-center gap-3">
             <ShieldCheck className="text-primary" aria-hidden="true" />
@@ -244,7 +243,7 @@ const FeaturesPage = () => {
             {reliabilityHighlights.map(item => (
               <Card key={item.title} className="p-6">
                 <h3 className="text-lg font-semibold">{item.title}</h3>
-                <p className="text-sm text-muted-foreground">{item.detail}</p>
+                <p className="text-muted-foreground text-sm">{item.detail}</p>
               </Card>
             ))}
           </div>
@@ -254,8 +253,8 @@ const FeaturesPage = () => {
       {/* CTA */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <div className="rounded-lg border border-border/40 p-8 text-center">
-            <div className="mb-4 flex items-center justify-center gap-2 text-primary">
+          <div className="border-border/40 rounded-lg border p-8 text-center">
+            <div className="text-primary mb-4 flex items-center justify-center gap-2">
               <Sparkles aria-hidden="true" />
               <span className="font-mono text-xs uppercase">
                 Roadmap 30 prochains jours
@@ -264,7 +263,7 @@ const FeaturesPage = () => {
             <h2 className="mb-4 text-3xl font-semibold">
               Connectez vos équipes en moins d&apos;une semaine
             </h2>
-            <p className="mx-auto mb-8 max-w-2xl text-muted-foreground">
+            <p className="text-muted-foreground mx-auto mb-8 max-w-2xl">
               Polar production, réactivation du chatbot et optimisation bundle
               &lt; 500 KB sont planifiés. Démarrons par une démo guidée ou un
               atelier de co-conception.
@@ -272,13 +271,13 @@ const FeaturesPage = () => {
             <div className="flex flex-col justify-center gap-4 md:flex-row">
               <Link
                 to="/get-started"
-                className="rounded-full bg-primary px-8 py-3 font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-8 py-3 font-semibold transition-colors"
               >
                 Démarrer maintenant
               </Link>
               <Link
                 to="/contact"
-                className="rounded-full border border-primary px-8 py-3 font-semibold text-primary transition-colors hover:bg-primary/10"
+                className="border-primary text-primary hover:bg-primary/10 rounded-full border px-8 py-3 font-semibold transition-colors"
               >
                 Parler à un expert
               </Link>

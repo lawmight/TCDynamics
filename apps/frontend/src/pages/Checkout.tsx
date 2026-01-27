@@ -15,7 +15,7 @@ import Shield from '~icons/lucide/shield'
 const Checkout = () => {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  const { getToken, loading: _authLoading } = useAuth()
+  const { getToken } = useAuth()
   const planParam = searchParams.get('plan') || 'starter'
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -106,13 +106,13 @@ const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-background/50 py-16">
+    <div className="from-background to-background/50 min-h-screen bg-gradient-to-b py-16">
       <div className="container mx-auto px-6">
         <div className="mx-auto max-w-5xl">
           {/* Back Button */}
           <Button asChild variant="ghost" className="mb-8" size="sm">
             <Link to="/#pricing">
-              <ArrowLeft className="mr-2 h-4 w-4" />
+              <ArrowLeft className="mr-2 size-4" />
               Retour aux tarifs
             </Link>
           </Button>
@@ -121,15 +121,15 @@ const Checkout = () => {
           <div className="mb-12 text-center">
             <Badge
               variant="outline"
-              className="mb-4 border-primary/40 text-primary"
+              className="border-primary/40 text-primary mb-4"
             >
-              <Lock className="mr-1 h-3 w-3" />
+              <Lock className="mr-1 size-3" />
               Paiement sécurisé
             </Badge>
-            <h1 className="mb-4 text-4xl font-bold text-foreground lg:text-5xl">
+            <h1 className="text-foreground mb-4 text-4xl font-bold lg:text-5xl">
               Finaliser votre abonnement
             </h1>
-            <p className="text-xl text-muted-foreground">
+            <p className="text-muted-foreground text-xl">
               Vous êtes à un clic de transformer votre entreprise
             </p>
           </div>
@@ -143,16 +143,16 @@ const Checkout = () => {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Plan Info */}
-                  <div className="rounded-lg border border-primary/10 bg-primary/5 p-6">
+                  <div className="border-primary/10 bg-primary/5 rounded-lg border p-6">
                     <div className="mb-4 flex items-baseline justify-between">
-                      <h3 className="text-2xl font-bold text-foreground">
+                      <h3 className="text-foreground text-2xl font-bold">
                         {currentPlan.name}
                       </h3>
                       <div className="text-right">
-                        <span className="text-3xl font-bold text-primary">
+                        <span className="text-primary text-3xl font-bold">
                           {currentPlan.price}
                         </span>
-                        <span className="ml-1 text-muted-foreground">
+                        <span className="text-muted-foreground ml-1">
                           {currentPlan.period}
                         </span>
                       </div>
@@ -162,8 +162,8 @@ const Checkout = () => {
                     <div className="space-y-3">
                       {currentPlan.features.map((feature, index) => (
                         <div key={index} className="flex items-start gap-3">
-                          <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
-                          <span className="text-sm text-muted-foreground">
+                          <CheckCircle className="text-primary mt-0.5 size-4 shrink-0" />
+                          <span className="text-muted-foreground text-sm">
                             {feature}
                           </span>
                         </div>
@@ -172,7 +172,7 @@ const Checkout = () => {
                   </div>
 
                   {/* Pricing Breakdown */}
-                  <div className="space-y-3 border-t border-border pt-4">
+                  <div className="border-border space-y-3 border-t pt-4">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">
                         Abonnement mensuel
@@ -183,13 +183,13 @@ const Checkout = () => {
                       <span className="text-muted-foreground">
                         14 jours d'essai
                       </span>
-                      <span className="font-medium text-primary">Gratuit</span>
+                      <span className="text-primary font-medium">Gratuit</span>
                     </div>
-                    <div className="flex justify-between border-t border-border pt-3 text-lg font-bold">
+                    <div className="border-border flex justify-between border-t pt-3 text-lg font-bold">
                       <span>À payer aujourd'hui</span>
                       <span className="text-primary">0$</span>
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       Vous serez facturé {currentPlan.price} après la période
                       d'essai de 14 jours. Annulation possible à tout moment.
                     </p>
@@ -201,18 +201,18 @@ const Checkout = () => {
               <div className="grid grid-cols-2 gap-4">
                 <Card className="border-primary/10 bg-card/40">
                   <CardContent className="p-4 text-center">
-                    <Shield className="mx-auto mb-2 h-8 w-8 text-primary" />
+                    <Shield className="text-primary mx-auto mb-2 size-8" />
                     <p className="text-sm font-medium">Paiement sécurisé</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       Chiffrement SSL
                     </p>
                   </CardContent>
                 </Card>
                 <Card className="border-primary/10 bg-card/40">
                   <CardContent className="p-4 text-center">
-                    <Lock className="mx-auto mb-2 h-8 w-8 text-primary" />
+                    <Lock className="text-primary mx-auto mb-2 size-8" />
                     <p className="text-sm font-medium">Conformité RGPD</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       Données protégées
                     </p>
                   </CardContent>
@@ -225,18 +225,18 @@ const Checkout = () => {
               <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-2xl">
-                    <CreditCard className="h-6 w-6 text-primary" />
+                    <CreditCard className="text-primary size-6" />
                     Paiement
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="space-y-4 rounded-lg bg-muted/30 p-8 text-center">
-                    <CreditCard className="mx-auto h-16 w-16 text-primary/50" />
+                  <div className="bg-muted/30 space-y-4 rounded-lg p-8 text-center">
+                    <CreditCard className="text-primary/50 mx-auto size-16" />
                     <div>
                       <h3 className="mb-2 text-lg font-semibold">
                         Paiement sécurisé par Polar
                       </h3>
-                      <p className="mb-4 text-sm text-muted-foreground">
+                      <p className="text-muted-foreground mb-4 text-sm">
                         Vos informations de paiement sont traitées de manière
                         sécurisée. Nous n'enregistrons pas vos données
                         bancaires.
@@ -244,8 +244,8 @@ const Checkout = () => {
                     </div>
 
                     {error && (
-                      <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-4 text-left">
-                        <p className="text-sm text-destructive">{error}</p>
+                      <div className="border-destructive/20 bg-destructive/10 rounded-lg border p-4 text-left">
+                        <p className="text-destructive text-sm">{error}</p>
                       </div>
                     )}
 
@@ -257,18 +257,18 @@ const Checkout = () => {
                     >
                       {isLoading ? (
                         <>
-                          <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
+                          <div className="mr-2 size-4 animate-spin rounded-full border-b-2 border-white"></div>
                           Redirection...
                         </>
                       ) : (
                         <>
-                          <Lock className="mr-2 h-4 w-4" />
+                          <Lock className="mr-2 size-4" />
                           Procéder au paiement sécurisé
                         </>
                       )}
                     </Button>
 
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       En cliquant sur "Procéder au paiement", vous acceptez nos
                       conditions générales de vente et notre politique de
                       confidentialité.
@@ -277,7 +277,7 @@ const Checkout = () => {
 
                   {/* Payment Methods */}
                   <div>
-                    <p className="mb-3 text-center text-sm text-muted-foreground">
+                    <p className="text-muted-foreground mb-3 text-center text-sm">
                       Méthodes de paiement acceptées
                     </p>
                     <div className="flex flex-wrap justify-center gap-2">
@@ -299,7 +299,7 @@ const Checkout = () => {
               </Card>
 
               {/* Support */}
-              <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10">
+              <Card className="border-primary/20 from-primary/5 to-primary/10 bg-gradient-to-r">
                 <CardContent className="p-6">
                   <p className="mb-4 text-center text-sm">
                     Des questions sur votre abonnement ?
@@ -328,14 +328,14 @@ const Checkout = () => {
           </div>
 
           {/* Money Back Guarantee */}
-          <Card className="mt-8 border-primary/20 bg-primary/10">
+          <Card className="border-primary/20 bg-primary/10 mt-8">
             <CardContent className="p-6 text-center">
-              <CheckCircle className="mx-auto mb-4 h-12 w-12 text-primary" />
+              <CheckCircle className="text-primary mx-auto mb-4 size-12" />
               <h3 className="mb-2 text-xl font-bold">
                 Garantie satisfait ou remboursé
               </h3>
               <p className="text-muted-foreground">
-                Essayez WorkFlowAI pendant 14 jours. Si vous n'êtes pas
+                Essayez TCDynamics pendant 14 jours. Si vous n'êtes pas
                 satisfait, annulez avant la fin de la période d'essai sans
                 frais.
               </p>

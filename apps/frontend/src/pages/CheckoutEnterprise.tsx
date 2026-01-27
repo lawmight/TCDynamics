@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -15,7 +15,6 @@ import Shield from '~icons/lucide/shield'
 const MIN_AMOUNT_EUROS = 2160
 
 const CheckoutEnterprise = () => {
-  const _navigate = useNavigate()
   const [amount, setAmount] = useState<string>('')
   const [isSubscription, setIsSubscription] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -44,21 +43,18 @@ const CheckoutEnterprise = () => {
       const paymentType = isSubscription ? 'subscription' : 'one_time'
 
       // Call public checkout API
-      const response = await fetch(
-        '/api/polar/checkout?public=true',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            planName: 'enterprise',
-            amount: amountCents,
-            currency: 'usd',
-            paymentType,
-          }),
-        }
-      )
+      const response = await fetch('/api/polar/checkout?public=true', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          planName: 'enterprise',
+          amount: amountCents,
+          currency: 'usd',
+          paymentType,
+        }),
+      })
 
       const data = await response.json()
 
@@ -97,13 +93,13 @@ const CheckoutEnterprise = () => {
   const isAmountValid = amountNum >= MIN_AMOUNT_EUROS
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-background/50 py-16">
+    <div className="from-background to-background/50 min-h-screen bg-gradient-to-b py-16">
       <div className="container mx-auto px-6">
         <div className="mx-auto max-w-5xl">
           {/* Back Button */}
           <Button asChild variant="ghost" className="mb-8" size="sm">
             <Link to="/">
-              <ArrowLeft className="mr-2 h-4 w-4" />
+              <ArrowLeft className="mr-2 size-4" />
               Retour à l'accueil
             </Link>
           </Button>
@@ -112,15 +108,15 @@ const CheckoutEnterprise = () => {
           <div className="mb-12 text-center">
             <Badge
               variant="outline"
-              className="mb-4 border-primary/40 text-primary"
+              className="border-primary/40 text-primary mb-4"
             >
-              <Lock className="mr-1 h-3 w-3" />
+              <Lock className="mr-1 size-3" />
               Paiement sécurisé
             </Badge>
-            <h1 className="mb-4 text-4xl font-bold text-foreground lg:text-5xl">
+            <h1 className="text-foreground mb-4 text-4xl font-bold lg:text-5xl">
               Checkout Entreprise
             </h1>
-            <p className="text-xl text-muted-foreground">
+            <p className="text-muted-foreground text-xl">
               Configurez votre paiement sur mesure pour l'entreprise
             </p>
           </div>
@@ -154,7 +150,9 @@ const CheckoutEnterprise = () => {
                           inputMode="decimal"
                           placeholder="2160.00"
                           value={amount}
-                          onChange={e => setAmount(formatAmount(e.target.value))}
+                          onChange={e =>
+                            setAmount(formatAmount(e.target.value))
+                          }
                           min={MIN_AMOUNT_EUROS}
                           step="0.01"
                           className="pl-10"
@@ -162,7 +160,7 @@ const CheckoutEnterprise = () => {
                         />
                       </div>
                       {amount && !isAmountValid && (
-                        <p className="text-sm text-destructive">
+                        <p className="text-destructive text-sm">
                           Le montant minimum est de{' '}
                           {MIN_AMOUNT_EUROS.toLocaleString('en-US', {
                             style: 'currency',
@@ -171,8 +169,9 @@ const CheckoutEnterprise = () => {
                         </p>
                       )}
                       {amount && isAmountValid && (
-                        <p className="text-sm text-muted-foreground">
-                          Montant: {amountNum.toLocaleString('en-US', {
+                        <p className="text-muted-foreground text-sm">
+                          Montant:{' '}
+                          {amountNum.toLocaleString('en-US', {
                             style: 'currency',
                             currency: 'USD',
                           })}
@@ -181,7 +180,7 @@ const CheckoutEnterprise = () => {
                     </div>
 
                     {/* Payment Type Selection */}
-                    <div className="space-y-3 border-t border-border pt-4">
+                    <div className="border-border space-y-3 border-t pt-4">
                       <Label className="text-base">Type de paiement</Label>
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
@@ -191,7 +190,7 @@ const CheckoutEnterprise = () => {
                             name="paymentType"
                             checked={!isSubscription}
                             onChange={() => setIsSubscription(false)}
-                            className="h-4 w-4 border-primary text-primary focus:ring-primary"
+                            className="border-primary text-primary focus:ring-primary size-4"
                           />
                           <Label
                             htmlFor="one-time"
@@ -207,7 +206,7 @@ const CheckoutEnterprise = () => {
                             name="paymentType"
                             checked={isSubscription}
                             onChange={() => setIsSubscription(true)}
-                            className="h-4 w-4 border-primary text-primary focus:ring-primary"
+                            className="border-primary text-primary focus:ring-primary size-4"
                           />
                           <Label
                             htmlFor="subscription"
@@ -220,8 +219,8 @@ const CheckoutEnterprise = () => {
                     </div>
 
                     {error && (
-                      <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-4">
-                        <p className="text-sm text-destructive">{error}</p>
+                      <div className="border-destructive/20 bg-destructive/10 rounded-lg border p-4">
+                        <p className="text-destructive text-sm">{error}</p>
                       </div>
                     )}
 
@@ -233,21 +232,21 @@ const CheckoutEnterprise = () => {
                     >
                       {isLoading ? (
                         <>
-                          <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
+                          <div className="mr-2 size-4 animate-spin rounded-full border-b-2 border-white"></div>
                           Redirection...
                         </>
                       ) : (
                         <>
-                          <Lock className="mr-2 h-4 w-4" />
+                          <Lock className="mr-2 size-4" />
                           Continuer vers le paiement
                         </>
                       )}
                     </Button>
 
-                    <p className="text-xs text-muted-foreground">
-                      En cliquant sur "Continuer vers le paiement", vous acceptez
-                      nos conditions générales de vente et notre politique de
-                      confidentialité.
+                    <p className="text-muted-foreground text-xs">
+                      En cliquant sur "Continuer vers le paiement", vous
+                      acceptez nos conditions générales de vente et notre
+                      politique de confidentialité.
                     </p>
                   </CardContent>
                 </Card>
@@ -256,18 +255,18 @@ const CheckoutEnterprise = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <Card className="border-primary/10 bg-card/40">
                     <CardContent className="p-4 text-center">
-                      <Shield className="mx-auto mb-2 h-8 w-8 text-primary" />
+                      <Shield className="text-primary mx-auto mb-2 size-8" />
                       <p className="text-sm font-medium">Paiement sécurisé</p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-muted-foreground text-xs">
                         Chiffrement SSL
                       </p>
                     </CardContent>
                   </Card>
                   <Card className="border-primary/10 bg-card/40">
                     <CardContent className="p-4 text-center">
-                      <Lock className="mx-auto mb-2 h-8 w-8 text-primary" />
+                      <Lock className="text-primary mx-auto mb-2 size-8" />
                       <p className="text-sm font-medium">Conformité RGPD</p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-muted-foreground text-xs">
                         Données protégées
                       </p>
                     </CardContent>
@@ -280,31 +279,31 @@ const CheckoutEnterprise = () => {
                 <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-2xl">
-                      <CreditCard className="h-6 w-6 text-primary" />
+                      <CreditCard className="text-primary size-6" />
                       Informations
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="rounded-lg bg-muted/30 p-6">
+                    <div className="bg-muted/30 rounded-lg p-6">
                       <h3 className="mb-3 text-lg font-semibold">
                         Paiement sécurisé par Polar
                       </h3>
-                      <p className="mb-4 text-sm text-muted-foreground">
+                      <p className="text-muted-foreground mb-4 text-sm">
                         Vos informations de paiement sont traitées de manière
                         sécurisée. Nous n'enregistrons pas vos données
                         bancaires.
                       </p>
-                      <p className="text-sm text-muted-foreground">
-                        Après avoir cliqué sur "Continuer vers le paiement", vous
-                        serez redirigé vers la page sécurisée de Polar où vous
-                        pourrez entrer votre email et vos informations de
+                      <p className="text-muted-foreground text-sm">
+                        Après avoir cliqué sur "Continuer vers le paiement",
+                        vous serez redirigé vers la page sécurisée de Polar où
+                        vous pourrez entrer votre email et vos informations de
                         paiement.
                       </p>
                     </div>
 
                     {/* Payment Methods */}
                     <div>
-                      <p className="mb-3 text-center text-sm text-muted-foreground">
+                      <p className="text-muted-foreground mb-3 text-center text-sm">
                         Méthodes de paiement acceptées
                       </p>
                       <div className="flex flex-wrap justify-center gap-2">
@@ -326,7 +325,7 @@ const CheckoutEnterprise = () => {
                 </Card>
 
                 {/* Support */}
-                <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10">
+                <Card className="border-primary/20 from-primary/5 to-primary/10 bg-gradient-to-r">
                   <CardContent className="p-6">
                     <p className="mb-4 text-center text-sm">
                       Des questions sur votre paiement ?

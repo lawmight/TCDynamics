@@ -2,6 +2,9 @@ import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 
 import { fetchMetricsOverview } from '@/api/metrics'
+import { CelebrationModal } from '@/components/app/CelebrationModal'
+import { useMilestoneDetection } from '@/hooks/useMilestoneDetection'
+import type { UserMilestoneState } from '@/utils/celebrations'
 import { getWithMigration, LS } from '@/utils/storageMigration'
 
 const getStoredProjectId = (): string => {
@@ -21,6 +24,23 @@ const Dashboard = () => {
     queryFn: () => fetchMetricsOverview(projectId, days),
     enabled: !!projectId,
   })
+
+  // Milestone detection - in production, this would come from user API/context
+  // For now, using placeholder state that can be connected to real user data
+  const userMilestoneState: UserMilestoneState = {
+    onboardingCompleted: false, // TODO: Connect to real user state
+    firstWorkflowCreatedAt: undefined,
+    firstDocumentUploadedAt: undefined,
+    workflowCount: 0,
+    teamMemberCount: 0,
+    integrationCount: 0,
+  }
+
+  const { activeMilestone, dismissMilestone, handleCtaClick } =
+    useMilestoneDetection({
+      userState: userMilestoneState,
+      disabled: isLoading,
+    })
 
   // React Compiler handles optimization automatically
   const r = data?.results || {}
@@ -65,7 +85,7 @@ const Dashboard = () => {
   if (isLoading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-primary"></div>
+        <div className="border-primary size-12 animate-spin rounded-full border-b-2"></div>
       </div>
     )
   }
@@ -82,31 +102,44 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="mx-auto max-w-5xl p-6">
-      <h1 className="mb-4 text-2xl font-semibold">Web Performance Dashboard</h1>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-        {cards.map(card => (
-          <div
-            key={card.key}
-            role="group"
-            aria-label={`${card.label}: ${card.value}`}
-            className="rounded-lg border p-4"
-          >
-            <div className="text-sm text-muted-foreground">{card.label}</div>
-            <div className="mt-1 text-2xl font-bold">
-              {card.value !== '-' ? (
-                <data value={card.value}>{String(card.value)}</data>
-              ) : (
-                String(card.value)
-              )}
+    <>
+      {/* Milestone Celebration Modal */}
+      {activeMilestone && (
+        <CelebrationModal
+          milestone={activeMilestone}
+          onDismiss={dismissMilestone}
+          onCtaClick={handleCtaClick}
+        />
+      )}
+
+      <div className="mx-auto max-w-5xl p-6">
+        <h1 className="mb-4 text-2xl font-semibold">
+          Web Performance Dashboard
+        </h1>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
+          {cards.map(card => (
+            <div
+              key={card.key}
+              role="group"
+              aria-label={`${card.label}: ${card.value}`}
+              className="rounded-lg border p-4"
+            >
+              <div className="text-muted-foreground text-sm">{card.label}</div>
+              <div className="mt-1 text-2xl font-bold">
+                {card.value !== '-' ? (
+                  <data value={card.value}>{String(card.value)}</data>
+                ) : (
+                  String(card.value)
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+        <p className="text-muted-foreground mt-4 text-sm">
+          Window: last {days} days • Project: {projectId}
+        </p>
       </div>
-      <p className="mt-4 text-sm text-muted-foreground">
-        Window: last {days} days • Project: {projectId}
-      </p>
-    </div>
+    </>
   )
 }
 

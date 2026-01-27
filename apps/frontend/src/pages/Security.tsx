@@ -29,19 +29,19 @@ const Security = () => {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-background/60">
+    <div className="from-background to-background/60 min-h-screen bg-gradient-to-b">
       <div className="container mx-auto px-6 py-16">
         <div className="mb-12 text-center">
           <Badge
             variant="outline"
-            className="mb-4 border-primary/40 text-primary"
+            className="border-primary/40 text-primary mb-4"
           >
             Security & Availability
           </Badge>
-          <h1 className="mb-4 text-4xl font-bold text-foreground lg:text-5xl">
+          <h1 className="text-foreground mb-4 text-4xl font-bold lg:text-5xl">
             Sécurité, conformité et disponibilité
           </h1>
-          <p className="mx-auto max-w-3xl text-lg text-muted-foreground">
+          <p className="text-muted-foreground mx-auto max-w-3xl text-lg">
             Cette page est un point de passage rapide en attendant la
             publication complète (certifications, statuts temps réel et
             runbooks). Contactez-nous pour obtenir les documents à jour.
@@ -56,12 +56,12 @@ const Security = () => {
             >
               <CardContent className="space-y-3 p-6">
                 <div className="flex items-center gap-3">
-                  <item.icon className="h-6 w-6 text-primary" />
-                  <h3 className="text-lg font-semibold text-foreground">
+                  <item.icon className="text-primary size-6" />
+                  <h3 className="text-foreground text-lg font-semibold">
                     {item.title}
                   </h3>
                 </div>
-                <p className="font-mono text-sm text-muted-foreground">
+                <p className="text-muted-foreground font-mono text-sm">
                   {item.description}
                 </p>
               </CardContent>
@@ -72,15 +72,15 @@ const Security = () => {
         <div className="mt-12 grid gap-6 md:grid-cols-2">
           <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
             <CardContent className="space-y-3 p-6">
-              <h3 className="text-xl font-bold text-foreground">
+              <h3 className="text-foreground text-xl font-bold">
                 Documents disponibles
               </h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
+              <ul className="text-muted-foreground space-y-2 text-sm">
                 <li>• DPA / RGPD</li>
                 <li>• Architecture & zones d'hébergement</li>
                 <li>• Politique de sauvegarde et rétention</li>
               </ul>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Demandez-les lors de la démo ou par le canal support.
               </p>
             </CardContent>
@@ -88,14 +88,14 @@ const Security = () => {
 
           <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
             <CardContent className="space-y-3 p-6">
-              <h3 className="text-xl font-bold text-foreground">
+              <h3 className="text-foreground text-xl font-bold">
                 Contact sécurité
               </h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Besoin d'une revue ou d'un questionnaire ? Contactez-nous.
               </p>
-              <div className="flex items-center gap-2 font-mono text-sm text-primary">
-                <Phone className="h-4 w-4" />
+              <div className="text-primary flex items-center gap-2 font-mono text-sm">
+                <Phone className="size-4" />
                 <Link
                   to="/#contact"
                   className="underline-offset-4 hover:underline"
@@ -112,4 +112,3 @@ const Security = () => {
 }
 
 export default Security
-

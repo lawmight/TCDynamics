@@ -11,7 +11,6 @@ import Server from '~icons/lucide/server'
 import ShieldCheck from '~icons/lucide/shield-check'
 import Users from '~icons/lucide/users'
 
-
 const missionPillars = [
   {
     title: 'Automatisation locale',
@@ -54,8 +53,7 @@ const deploymentFootprint = [
   },
   {
     label: 'Base de données',
-    detail:
-      'MongoDB pour la persistance et le feedback post-soumission.',
+    detail: 'MongoDB pour la persistance et le feedback post-soumission.',
   },
 ]
 
@@ -133,13 +131,13 @@ const About = () => {
       className="bg-background text-foreground"
     >
       {/* Hero */}
-      <section className="border-b border-border/40 bg-gradient-to-br from-background via-background to-primary/5 py-20">
+      <section className="border-border/40 from-background via-background to-primary/5 border-b bg-gradient-to-br py-20">
         <div className="container mx-auto px-4">
           <div className="mb-6 flex flex-wrap items-center gap-3">
             <Badge variant="outline" className="font-mono">
               Made in France · Vercel + Azure
             </Badge>
-            <Badge className="bg-primary/15 font-mono text-primary">
+            <Badge className="bg-primary/15 text-primary font-mono">
               Réponse sous 2h garantie
             </Badge>
           </div>
@@ -149,21 +147,21 @@ const About = () => {
           >
             L&apos;IA opérationnelle pensée pour les PME françaises
           </h1>
-          <p className="mb-8 max-w-3xl text-lg text-muted-foreground">
-            WorkFlowAI orchestre une architecture hybride React + Node + Azure
+          <p className="text-muted-foreground mb-8 max-w-3xl text-lg">
+            TCDynamics orchestre une architecture hybride React + Node + Azure
             Functions pour automatiser vos documents, vos workflows et vos
             interactions clients tout en restant pleinement conforme au RGPD.
           </p>
           <div className="flex flex-col gap-4 md:flex-row">
             <div className="flex items-center gap-3">
               <CheckCircle2 className="text-primary" aria-hidden="true" />
-              <span className="font-mono text-sm text-muted-foreground">
+              <span className="text-muted-foreground font-mono text-sm">
                 Frontend + backend live sur Vercel
               </span>
             </div>
             <div className="flex items-center gap-3">
               <Server className="text-primary-glow" aria-hidden="true" />
-              <span className="font-mono text-sm text-muted-foreground">
+              <span className="text-muted-foreground font-mono text-sm">
                 Azure Functions Python 3.11 actives
               </span>
             </div>
@@ -172,7 +170,7 @@ const About = () => {
       </section>
 
       {/* Mission */}
-      <section className="border-b border-border/40 py-16">
+      <section className="border-border/40 border-b py-16">
         <div className="container mx-auto px-4">
           <div className="mb-10">
             <h2 className="text-2xl font-semibold">Notre mission</h2>
@@ -183,14 +181,14 @@ const About = () => {
           <div className="grid gap-6 md:grid-cols-3">
             {missionPillars.map(pillar => (
               <Card key={pillar.title} className="h-full p-6">
-                <div className="mb-4 flex items-center gap-3 text-primary">
+                <div className="text-primary mb-4 flex items-center gap-3">
                   <pillar.icon aria-hidden="true" />
                   <h3 className="text-lg font-semibold">{pillar.title}</h3>
                 </div>
-                <p className="mb-3 text-muted-foreground">
+                <p className="text-muted-foreground mb-3">
                   {pillar.description}
                 </p>
-                <p className="font-mono text-xs text-foreground/70">
+                <p className="text-foreground/70 font-mono text-xs">
                   {pillar.proof}
                 </p>
               </Card>
@@ -200,7 +198,7 @@ const About = () => {
       </section>
 
       {/* Stats */}
-      <section className="border-b border-border/40 py-16">
+      <section className="border-border/40 border-b py-16">
         <div className="container mx-auto px-4">
           <div className="grid gap-6 md:grid-cols-3">
             {stats.map(stat => (
@@ -208,15 +206,15 @@ const About = () => {
                 key={stat.label}
                 className="flex flex-col items-start gap-3 p-6"
               >
-                <span className="text-sm uppercase tracking-wide text-muted-foreground">
+                <span className="text-muted-foreground text-sm uppercase tracking-wide">
                   {stat.label}
                 </span>
                 <AnimatedCounter
                   end={stat.end}
                   suffix={stat.suffix}
-                  className="text-4xl font-bold text-primary"
+                  className="text-primary text-4xl font-bold"
                 />
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   {stat.description}
                 </p>
               </Card>
@@ -226,7 +224,7 @@ const About = () => {
       </section>
 
       {/* Architecture */}
-      <section className="border-b border-border/40 py-16">
+      <section className="border-border/40 border-b py-16">
         <div className="container mx-auto px-4">
           <div className="mb-10 flex items-center gap-3">
             <Globe className="text-primary" aria-hidden="true" />
@@ -241,7 +239,7 @@ const About = () => {
             {deploymentFootprint.map(item => (
               <Card key={item.label} className="p-6">
                 <h3 className="text-lg font-semibold">{item.label}</h3>
-                <p className="text-sm text-muted-foreground">{item.detail}</p>
+                <p className="text-muted-foreground text-sm">{item.detail}</p>
               </Card>
             ))}
           </div>
@@ -249,7 +247,7 @@ const About = () => {
       </section>
 
       {/* Compliance */}
-      <section className="border-b border-border/40 py-16">
+      <section className="border-border/40 border-b py-16">
         <div className="container mx-auto px-4">
           <div className="mb-10 flex items-center gap-3">
             <ShieldCheck className="text-primary-glow" aria-hidden="true" />
@@ -264,7 +262,7 @@ const About = () => {
             {complianceCommitments.map(item => (
               <Card key={item.title} className="p-6">
                 <h3 className="text-lg font-semibold">{item.title}</h3>
-                <p className="text-sm text-muted-foreground">{item.detail}</p>
+                <p className="text-muted-foreground text-sm">{item.detail}</p>
               </Card>
             ))}
           </div>
@@ -286,11 +284,11 @@ const About = () => {
           <div className="space-y-6">
             {milestones.map(milestone => (
               <Card key={milestone.title} className="p-6">
-                <div className="mb-2 font-mono text-xs uppercase tracking-wide text-primary">
+                <div className="text-primary mb-2 font-mono text-xs uppercase tracking-wide">
                   {milestone.date}
                 </div>
                 <h3 className="text-lg font-semibold">{milestone.title}</h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   {milestone.detail}
                 </p>
               </Card>
@@ -300,16 +298,16 @@ const About = () => {
       </section>
 
       {/* CTA */}
-      <section className="border-t border-border/40 bg-card/30 py-16">
+      <section className="border-border/40 bg-card/30 border-t py-16">
         <div className="container mx-auto px-4">
-          <div className="rounded-lg border border-border/40 p-8 text-center">
-            <p className="mb-4 font-mono text-sm text-muted-foreground">
+          <div className="border-border/40 rounded-lg border p-8 text-center">
+            <p className="text-muted-foreground mb-4 font-mono text-sm">
               Une équipe basée en Île-de-France · Accès RER C
             </p>
             <h2 className="mb-6 text-3xl font-semibold">
               Parlons de votre prochain workflow
             </h2>
-            <p className="mx-auto mb-8 max-w-2xl text-muted-foreground">
+            <p className="text-muted-foreground mx-auto mb-8 max-w-2xl">
               Contactez-nous pour une démo guidée ou pour relancer le chatbot IA
               sur votre périmètre métier. Nous nous engageons à répondre sous
               deux heures ouvrées.
@@ -317,13 +315,13 @@ const About = () => {
             <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
               <Link
                 to="/contact"
-                className="rounded-full bg-primary px-8 py-3 font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-8 py-3 font-semibold transition-colors"
               >
                 Contacter l&apos;équipe
               </Link>
               <Link
                 to="/demo"
-                className="rounded-full border border-primary px-8 py-3 font-semibold text-primary transition-colors hover:bg-primary/10"
+                className="border-primary text-primary hover:bg-primary/10 rounded-full border px-8 py-3 font-semibold transition-colors"
               >
                 Programmer une démo
               </Link>

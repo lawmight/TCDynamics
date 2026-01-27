@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 
 import ApiKeyManager from '@/components/app/ApiKeyManager'
@@ -43,8 +44,8 @@ const Settings = () => {
     return (
       <div className="mx-auto max-w-3xl p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 w-32 rounded bg-muted" />
-          <div className="h-64 rounded bg-muted" />
+          <div className="bg-muted h-8 w-32 rounded" />
+          <div className="bg-muted h-64 rounded" />
         </div>
       </div>
     )
@@ -62,6 +63,22 @@ const Settings = () => {
       {/* API Keys Section */}
       <section>
         <ApiKeyManager />
+      </section>
+
+      <Separator />
+
+      {/* Email Preferences Section */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold">Email Preferences</h2>
+        <p className="text-muted-foreground text-sm">
+          Manage your email notification preferences.
+        </p>
+        <Link
+          to="/app/email-preferences"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center rounded-md px-4 py-2 text-sm transition-colors"
+        >
+          Manage Email Preferences
+        </Link>
       </section>
 
       <Separator />
@@ -111,7 +128,7 @@ const Settings = () => {
           </label>
           <pre
             id="embedSnippet"
-            className="whitespace-pre-wrap break-all rounded-md border bg-muted p-3 text-xs"
+            className="bg-muted whitespace-pre-wrap break-all rounded-md border p-3 text-xs"
           >
             {snippet}
           </pre>
