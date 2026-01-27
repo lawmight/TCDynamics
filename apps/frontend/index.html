@@ -24,7 +24,7 @@
       })()
     </script>
 
-    <title>WorkFlowAI - Automatisez Votre Entreprise avec l'IA</title>
+    <title>TCDynamics - Automatisez Votre Entreprise avec l'IA</title>
     <meta
       name="description"
       content="Gagnez 10h par semaine avec notre intelligence artificielle. Spécialement conçu pour les entreprises françaises de Montigny-le-Bretonneux et Guyancourt."
@@ -40,7 +40,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="WorkFlowAI" />
+    <meta name="apple-mobile-web-app-title" content="TCDynamics" />
     <meta name="msapplication-TileColor" content="#667eea" />
 
     <!-- Preconnects & critical fonts (use onload-preload pattern to avoid double downloads) -->
@@ -50,7 +50,10 @@
       rel="preload"
       as="style"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-      onload="this.onload=null;this.rel='stylesheet'"
+      onload="
+        this.onload = null
+        this.rel = 'stylesheet'
+      "
     />
     <noscript>
       <link
@@ -60,9 +63,9 @@
     </noscript>
     <!-- Ensure sensible referrer policy for cross-origin requests -->
     <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <link rel="preconnect" href="https://api.tcdynamics.fr" crossorigin />
+    <link rel="preconnect" href="%API_URL%" crossorigin />
     <link rel="preconnect" href="https://connect.facebook.net" crossorigin />
-    <link rel="canonical" href="https://tcdynamics.fr/" />
+    <link rel="canonical" href="%VITE_FRONTEND_URL%/" />
 
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -74,9 +77,9 @@
       {
         "@context": "https://schema.org",
         "@type": "Organization",
-        "name": "WorkFlowAI",
-        "url": "https://tcdynamics.fr/",
-        "logo": "https://tcdynamics.fr/apple-touch-icon.png",
+        "name": "TCDynamics",
+        "url": "%VITE_FRONTEND_URL%/",
+        "logo": "%VITE_FRONTEND_URL%/apple-touch-icon.png",
         "contactPoint": {
           "@type": "ContactPoint",
           "telephone": "+33-1-39-44-75-00",
@@ -88,7 +91,13 @@
   </head>
   <body>
     <!-- Fallback styles for users with JavaScript disabled -->
-    <noscript><style>html{color-scheme: light;} </style></noscript>
+    <noscript
+      ><style>
+        html {
+          color-scheme: light;
+        }
+      </style></noscript
+    >
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <!-- Facebook SDK initialization - moved to external file for CSP compliance -->

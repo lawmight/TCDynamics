@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react'
 
-import { useToast } from '../use-toast'
+import { useToast } from '../useToast'
 
 describe('useToast Hook', () => {
   it('should return toast functions and state', () => {

@@ -35,6 +35,24 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     Icons({ compiler: 'jsx' }),
+    // HTML env variable replacement plugin
+    {
+      name: 'html-env-replace',
+      transformIndexHtml(html) {
+        const frontendUrl =
+          process.env.VITE_FRONTEND_URL ||
+          process.env.FRONTEND_URL ||
+          'https://tcdynamics.fr'
+        const apiUrl =
+          process.env.VITE_API_URL ||
+          process.env.API_URL ||
+          'https://api.tcdynamics.fr'
+
+        return html
+          .replace(/%VITE_FRONTEND_URL%/g, frontendUrl)
+          .replace(/%API_URL%/g, apiUrl)
+      },
+    },
     // Sentry source maps plugin (production only)
     mode === 'production' &&
       process.env.SENTRY_AUTH_TOKEN &&

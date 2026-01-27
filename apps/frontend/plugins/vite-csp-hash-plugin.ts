@@ -3,10 +3,9 @@
  * This allows us to use strict CSP without 'unsafe-inline'
  */
 
-import type { Plugin } from 'vite'
 import { createHash } from 'crypto'
-import { readFileSync } from 'fs'
 import { resolve } from 'path'
+import type { Plugin } from 'vite'
 
 interface ScriptHash {
   script: string
@@ -17,7 +16,10 @@ interface ScriptHash {
 /**
  * Compute SHA-256 hash of a script content
  */
-function computeHash(content: string, algorithm: 'sha256' | 'sha384' | 'sha512' = 'sha256'): string {
+function computeHash(
+  content: string,
+  algorithm: 'sha256' | 'sha384' | 'sha512' = 'sha256'
+): string {
   const hash = createHash(algorithm)
   hash.update(content)
   return hash.digest('base64')
@@ -30,7 +32,8 @@ function extractInlineScriptHashes(html: string): ScriptHash[] {
   const hashes: ScriptHash[] = []
 
   // Match inline script tags (not type="module" or type="application/ld+json")
-  const scriptRegex = /<script(?![^>]*(?:type=["']module["']|type=["']application\/ld\+json["']))[^>]*>([\s\S]*?)<\/script>/gi
+  const scriptRegex =
+    /<script(?![^>]*(?:type=["']module["']|type=["']application\/ld\+json["']))[^>]*>([\s\S]*?)<\/script>/gi
   let match
 
   while ((match = scriptRegex.exec(html)) !== null) {
@@ -75,12 +78,8 @@ export function viteCSPHashPlugin(): Plugin {
         // Extract inline script hashes
         inlineHashes = extractInlineScriptHashes(html)
 
-        if (inlineHashes.length > 0) {
-          console.log(`[CSP Hash Plugin] Found ${inlineHashes.length} inline script(s) to hash`)
-          inlineHashes.forEach((h, i) => {
-            console.log(`[CSP Hash Plugin] Script ${i + 1} hash: ${h.algorithm}-${h.hash.substring(0, 20)}...`)
-          })
-        }
+        // Logging removed for production builds
+        // Hash information is written to csp-hashes.json file
 
         // Store hashes in a way that can be accessed during build
         // We'll write them to a JSON file for use in vercel.json generation
@@ -101,7 +100,6 @@ export function viteCSPHashPlugin(): Plugin {
         }
 
         fs.writeFileSync(outputPath, JSON.stringify(hashData, null, 2))
-        console.log(`[CSP Hash Plugin] Wrote CSP hashes to ${outputPath}`)
 
         return html
       },
