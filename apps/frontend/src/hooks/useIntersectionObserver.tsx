@@ -33,9 +33,7 @@ export const useIntersectionObserver = (
 
         if (isElementIntersecting && !hasIntersected) {
           setHasIntersected(true)
-        }
-
-        if (freezeOnceVisible && hasIntersected) {
+          // Performance: disconnect after first reveal (no need to keep observing)
           observer.disconnect()
         }
       },

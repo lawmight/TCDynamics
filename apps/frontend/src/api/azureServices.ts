@@ -394,9 +394,10 @@ async function apiRequest<T>(
       throw new ApiError('Request timeout', 408)
     }
 
-    const errorMessage = error instanceof Error
-      ? `Network error: ${error.message}`
-      : 'Unknown error occurred'
+    const errorMessage =
+      error instanceof Error
+        ? `Network error: ${error.message}`
+        : 'Unknown error occurred'
     throw new ApiError(errorMessage, 0, error)
   }
 }
@@ -592,7 +593,7 @@ export const chatAPI = {
         {
           role: 'system',
           content:
-            "Vous êtes WorkFlowAI, un assistant IA spécialisé en automatisation d'entreprise pour les PME françaises. Répondez en français avec des conseils pratiques.",
+            "Vous êtes TCDynamics, un assistant IA spécialisé en automatisation d'entreprise pour les PME françaises. Répondez en français avec des conseils pratiques.",
         },
         { role: 'user', content: prompt },
       ],

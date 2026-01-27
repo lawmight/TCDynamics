@@ -17,6 +17,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import Footer from './components/Footer'
 import LazyAIChatbot from './components/LazyAIChatbot'
 import OfflineIndicator from './components/OfflineIndicator'
+import { PageSkeleton } from './components/PageSkeleton'
 import PerformanceMonitor from './components/PerformanceMonitor'
 import ScrollToTop from './components/ScrollToTop'
 import SimpleNavigation from './components/SimpleNavigation'
@@ -49,11 +50,12 @@ const WaitlistSuccess = lazy(() => import('./pages/auth/WaitlistSuccess'))
 const ChatApp = lazy(() => import('./pages/app/Chat'))
 const FilesApp = lazy(() => import('./pages/app/Files'))
 const AnalyticsApp = lazy(() => import('./pages/app/Analytics'))
+const EmailPreferences = lazy(() => import('./pages/app/EmailPreferences'))
 const Security = lazy(() => import('./pages/Security'))
 
 // Defer analytics until after initial paint (bundle-defer-third-party)
 const Analytics = lazy(() =>
-  import('@vercel/analytics/react').then((m) => ({ default: m.Analytics }))
+  import('@vercel/analytics/react').then(m => ({ default: m.Analytics }))
 )
 
 const queryClient = new QueryClient({
@@ -75,12 +77,8 @@ const queryClient = new QueryClient({
   },
 })
 
-// Loading component for Suspense fallback
-const PageLoader = () => (
-  <div className="flex min-h-screen items-center justify-center">
-    <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-primary"></div>
-  </div>
-)
+// PageLoader replaced by PageSkeleton for layout-based loading states
+// See: components/PageSkeleton.tsx
 
 // Error handler for the ErrorBoundary
 const handleAppError = (
@@ -124,7 +122,7 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { isSignedIn, loading } = useAuth()
 
   if (loading) {
-    return <PageLoader />
+    return <PageSkeleton />
   }
 
   if (!isSignedIn) {
@@ -156,7 +154,7 @@ const AppRouter = () => {
     <>
       {!hideMarketingChrome && <SimpleNavigation />}
       <ScrollToTop />
-      <Suspense fallback={<PageLoader />}>
+      <Suspense fallback={<PageSkeleton />}>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<Dashboard />} />
@@ -165,28 +163,16 @@ const AppRouter = () => {
           <Route path="/recommendations" element={<Recommendations />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/checkout" element={<Checkout />} />
-          <Route
-            path="/checkout-enterprise"
-            element={<CheckoutEnterprise />}
-          />
+          <Route path="/checkout-enterprise" element={<CheckoutEnterprise />} />
           <Route path="/checkout-success" element={<CheckoutSuccess />} />
           <Route path="/demo" element={<Demo />} />
           <Route path="/get-started" element={<GetStarted />} />
           <Route path="/about" element={<About />} />
           <Route path="/security" element={<Security />} />
 
-          <Route
-            path="/features"
-            element={<HashRedirect hash="features" />}
-          />
-          <Route
-            path="/pricing"
-            element={<HashRedirect hash="pricing" />}
-          />
-          <Route
-            path="/contact"
-            element={<HashRedirect hash="contact" />}
-          />
+          <Route path="/features" element={<HashRedirect hash="features" />} />
+          <Route path="/pricing" element={<HashRedirect hash="pricing" />} />
+          <Route path="/contact" element={<HashRedirect hash="contact" />} />
 
           <Route path="/login" element={<Login />} />
           <Route path="/waitlist" element={<Waitlist />} />
@@ -203,6 +189,7 @@ const AppRouter = () => {
             <Route path="chat" element={<ChatApp />} />
             <Route path="files" element={<FilesApp />} />
             <Route path="analytics" element={<AnalyticsApp />} />
+            <Route path="settings/email" element={<EmailPreferences />} />
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
@@ -219,19 +206,16 @@ const AppRouter = () => {
  * ClerkProvider wrapper that uses dynamic theming
  * Must be inside ThemeProvider to access theme context
  */
-const ThemedClerkProvider = ({
-  children,
-}: {
-  children: React.ReactNode
-}) => {
+const ThemedClerkProvider = ({ children }: { children: React.ReactNode }) => {
   const { resolvedTheme } = useTheme()
-  
+
   // Use preview/test key for localhost and Vercel preview deployments
   // Use production key for production deployment only
-  const isPreview = 
-    import.meta.env.MODE === 'development' || 
-    (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app'))
-  
+  const isPreview =
+    import.meta.env.MODE === 'development' ||
+    (typeof window !== 'undefined' &&
+      window.location.hostname.includes('vercel.app'))
+
   const PUBLISHABLE_KEY = isPreview
     ? import.meta.env.VITE_CLERK_PREVIEW_PUBLISHABLE_KEY
     : import.meta.env.VITE_CLERK_PUBLISHABLE_KEY

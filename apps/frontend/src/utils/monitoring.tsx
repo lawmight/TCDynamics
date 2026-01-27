@@ -68,10 +68,14 @@ class Monitoring {
         environment: import.meta.env.MODE,
         tracesSampleRate,
         release,
-        beforeSend(event, _hint) {
+        beforeSend(event, _hint: SentryScope) {
           // Only send errors in production
           if (import.meta.env.MODE !== 'production') {
             return null
+          }
+          // Log the error details for debugging if hint contains error info
+          if (_hint && event.exception) {
+            console.error('Sentry error details:', event.exception)
           }
           return event
         },
@@ -174,7 +178,7 @@ export class ErrorBoundary extends React.Component<
             </p>
             <button
               onClick={this.resetError}
-              className="rounded-lg bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2"
             >
               Réessayer
             </button>

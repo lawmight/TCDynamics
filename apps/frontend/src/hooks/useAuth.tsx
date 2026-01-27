@@ -1,8 +1,6 @@
 import { useAuth as useClerkAuth, useUser } from '@clerk/clerk-react'
-import type { User } from '@clerk/clerk-react'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-
 
 // Adapter type to maintain compatibility with existing code
 type AuthContextType = {
@@ -38,12 +36,13 @@ export const useAuth = (): AuthContextType => {
   }
 
   // Create a session-like object for compatibility
-  const session = isSignedIn && user
-    ? {
-        access_token: undefined, // Use getToken() instead
-        id: user.id,
-      }
-    : null
+  const session =
+    isSignedIn && user
+      ? {
+          access_token: undefined, // Use getToken() instead
+          id: user.id,
+        }
+      : null
 
   // Wrapper for getToken that ensures proper error handling
   // In development, Clerk sessions might expire more frequently

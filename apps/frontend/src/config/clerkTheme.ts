@@ -222,8 +222,6 @@ export const clerkDarkAppearance: Appearance = {
  * @param theme - Current theme ('light' | 'dark')
  * @returns Clerk Appearance configuration
  */
-export function getClerkAppearance(
-  theme: 'light' | 'dark'
-): Appearance {
+export function getClerkAppearance(theme: 'light' | 'dark'): Appearance {
   return theme === 'dark' ? clerkDarkAppearance : clerkAppearance
 }

@@ -96,7 +96,9 @@ export const listApiKeys = async (
           'API endpoint not found. Make sure the Vercel dev server is running (use `npm run dev` to start both frontend and API)'
         )
       }
-      throw new Error('API endpoint not found. Please check your configuration.')
+      throw new Error(
+        'API endpoint not found. Please check your configuration.'
+      )
     }
 
     // Handle 431 - Request headers too large (usually large auth tokens)
@@ -266,14 +268,17 @@ export const restoreApiKey = async (
   }
 
   try {
-    const response = await fetch(getApiKeysUrl(`/${keyId}/restore`), {
-      method: 'POST',
-      credentials: 'omit',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    const response = await fetch(
+      getApiKeysUrl(`?action=restore&keyId=${keyId}`),
+      {
+        method: 'POST',
+        credentials: 'omit',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
 
     const data: RestoreApiKeyResponse = await response.json()
 

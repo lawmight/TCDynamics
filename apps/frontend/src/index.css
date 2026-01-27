@@ -496,11 +496,8 @@ html {
 
 /* Background gradient patterns for CSP compliance (replaces inline styles) */
 .network-background-gradient {
-  background-image: radial-gradient(
-      circle at 20% 50%,
-      hsl(var(--primary)) 0%,
-      transparent 50%
-    ),
+  background-image:
+    radial-gradient(circle at 20% 50%, hsl(var(--primary)) 0%, transparent 50%),
     radial-gradient(circle at 80% 20%, hsl(var(--primary)) 0%, transparent 50%),
     radial-gradient(circle at 40% 80%, hsl(var(--primary)) 0%, transparent 50%);
 }
@@ -567,7 +564,50 @@ html {
   height: auto;
 }
 
+/* Scroll Progress Bar - reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-progress-bar,
+  .scroll-progress-bar__fill {
+    display: none !important;
+  }
+}
 
+/* Section Indicators - Desktop (lg+) */
+@media (min-width: 1024px) {
+  .section-indicators--desktop {
+    display: block !important;
+  }
+
+  .section-indicators--mobile {
+    display: none !important;
+  }
+
+  /* Hover effect to show labels */
+  .section-indicator-btn:hover .section-indicator-label,
+  .section-indicator-btn:focus .section-indicator-label {
+    opacity: 1 !important;
+    transform: translateX(0) !important;
+  }
+}
+
+/* Section Indicators - Mobile (<lg) */
+@media (max-width: 1023px) {
+  .section-indicators--desktop {
+    display: none !important;
+  }
+
+  .section-indicators--mobile {
+    display: block !important;
+  }
+}
+
+/* Section Indicators - reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .section-indicators,
+  .section-indicators * {
+    transition: none !important;
+  }
+}
 
 @layer base {
   * {
