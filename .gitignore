@@ -35,6 +35,7 @@ AzureFunctionsTools/
 .idea/
 cursor/*
 !.cursor/rules/
+.cursor/agents/
 .cursor/skills/
 .cursor/plans/
 .cursor/hooks/logs/

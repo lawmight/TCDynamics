@@ -98,22 +98,12 @@ const Contact = () => {
     {
       icon: Building,
       title: 'Siège social',
-      details: [
-        'TCDynamics France',
-        '12 Avenue des Prés',
-        '78180 Montigny-le-Bretonneux',
-        'Île-de-France',
-      ],
+      details: ['TCDynamics', '1 Rue Marguerin - 75014 - Paris'],
     },
     {
       icon: Phone,
       title: 'Téléphone',
-      details: [
-        'Standard : 01 39 44 75 00',
-        'Support : 01 39 44 75 01',
-        'Commercial : 01 39 44 75 02',
-        'Lundi-Vendredi 8h-19h',
-      ],
+      details: ['0686941684', 'Lundi-Vendredi 8h-19h'],
     },
     {
       icon: Mail,
