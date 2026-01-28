@@ -35,6 +35,7 @@ const Index = lazy(() => import('./pages/Index'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 const Checkout = lazy(() => import('./pages/Checkout'))
 const CheckoutEnterprise = lazy(() => import('./pages/CheckoutEnterprise'))
+const CheckoutPersonal = lazy(() => import('./pages/CheckoutPersonal'))
 const CheckoutSuccess = lazy(() => import('./pages/CheckoutSuccess'))
 const Demo = lazy(() => import('./pages/Demo'))
 const GetStarted = lazy(() => import('./pages/GetStarted'))
@@ -165,6 +166,7 @@ const AppRouter = () => {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/checkout-enterprise" element={<CheckoutEnterprise />} />
           <Route path="/checkout-success" element={<CheckoutSuccess />} />
+          <Route path="/checkout-personal" element={<CheckoutPersonal />} />
           <Route path="/demo" element={<Demo />} />
           <Route path="/get-started" element={<GetStarted />} />
           <Route path="/about" element={<About />} />
