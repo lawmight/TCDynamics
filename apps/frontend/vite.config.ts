@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => {
   return {
     server: {
       host: '127.0.0.1',
-      port: 5173,
+      port: 3000,
       // Proxy API requests to Vercel Dev (serverless functions with MongoDB)
       proxy: {
         '/api': {
