@@ -6,7 +6,8 @@
   "scripts": {
     "build": "echo 'API functions deployed via Vercel - no build needed'",
     "dev": "echo 'API functions run via Vercel dev'",
-    "lint": "echo 'API linting handled by root ESLint'"
+    "lint": "echo 'API linting handled by root ESLint'",
+    "type-check": "echo 'API type checking handled by root TypeScript'"
   },
   "private": true,
   "type": "module",
