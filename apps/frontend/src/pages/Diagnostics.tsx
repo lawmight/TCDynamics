@@ -40,7 +40,7 @@ const Diagnostics = () => {
   return (
     <div className="mx-auto max-w-5xl p-6">
       <h1 className="mb-4 text-2xl font-semibold">Diagnostics</h1>
-      <p className="text-muted-foreground mb-4">
+      <p className="mb-4 text-muted-foreground">
         Recent main-thread long tasks observed in this session.
       </p>
       <div className="overflow-x-auto rounded-md border">

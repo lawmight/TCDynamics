@@ -108,7 +108,7 @@ export default [
   },
   // Test files configuration
   {
-    files: ['**/*.test.{js,ts}'],
+    files: ['**/*.test.{js,ts}', '**/__tests__/**/*.{js,ts}'],
     languageOptions: {
       globals: {
         ...globals.jest,

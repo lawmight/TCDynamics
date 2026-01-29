@@ -48,31 +48,31 @@ const Demo = () => {
   ]
 
   return (
-    <div className="from-background to-background/50 min-h-screen bg-gradient-to-b">
+    <div className="min-h-screen bg-gradient-to-b from-background to-background/50">
       {/* Hero Section */}
       <section className="relative overflow-hidden py-20">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-20">
-          <div className="left-1/6 bg-primary absolute top-1/4 size-2 animate-pulse rounded-full"></div>
-          <div className="bg-primary-glow absolute right-1/4 top-1/2 size-1 animate-pulse rounded-full"></div>
+          <div className="left-1/6 absolute top-1/4 size-2 animate-pulse rounded-full bg-primary"></div>
+          <div className="absolute right-1/4 top-1/2 size-1 animate-pulse rounded-full bg-primary-glow"></div>
         </div>
 
         <div className="container relative z-10 mx-auto px-6">
           <div className="mx-auto max-w-4xl text-center">
             <Badge
               variant="outline"
-              className="border-primary/40 text-primary mb-6"
+              className="mb-6 border-primary/40 text-primary"
             >
               <Video className="mr-1 size-3" />
               Démonstration Interactive
             </Badge>
 
-            <h1 className="text-foreground mb-6 text-4xl font-bold lg:text-6xl">
+            <h1 className="mb-6 text-4xl font-bold text-foreground lg:text-6xl">
               Découvrez <span className="text-gradient">TCDynamics</span> en
               Action
             </h1>
 
-            <p className="text-muted-foreground mx-auto mb-8 max-w-2xl text-xl">
+            <p className="mx-auto mb-8 max-w-2xl text-xl text-muted-foreground">
               Voyez comment notre plateforme d'intelligence artificielle peut
               transformer votre entreprise avec une démonstration personnalisée
               et interactive.
@@ -101,10 +101,10 @@ const Demo = () => {
       <section className="bg-card/20 py-16">
         <div className="container mx-auto px-6">
           <div className="mb-12 text-center">
-            <h2 className="text-foreground mb-4 text-3xl font-bold lg:text-4xl">
+            <h2 className="mb-4 text-3xl font-bold text-foreground lg:text-4xl">
               Ce que vous allez découvrir
             </h2>
-            <p className="text-muted-foreground text-lg">
+            <p className="text-lg text-muted-foreground">
               Une démonstration complète de nos fonctionnalités phares
             </p>
           </div>
@@ -113,14 +113,14 @@ const Demo = () => {
             {demoFeatures.map((feature, index) => (
               <Card
                 key={index}
-                className="border-primary/20 bg-card/60 hover:border-primary/40 backdrop-blur-sm transition-all"
+                className="border-primary/20 bg-card/60 backdrop-blur-sm transition-all hover:border-primary/40"
               >
                 <CardContent className="p-6 text-center">
-                  <div className="bg-primary/20 mx-auto mb-4 flex size-12 items-center justify-center rounded-lg">
-                    <feature.icon className="text-primary size-6" />
+                  <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-lg bg-primary/20">
+                    <feature.icon className="size-6 text-primary" />
                   </div>
                   <h3 className="mb-2 text-lg font-bold">{feature.title}</h3>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-sm text-muted-foreground">
                     {feature.description}
                   </p>
                 </CardContent>
@@ -137,20 +137,20 @@ const Demo = () => {
             <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-2xl">
-                  <Play className="text-primary size-6" />
+                  <Play className="size-6 text-primary" />
                   Vidéo de Démonstration
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {/* TODO: Embed actual demo video when available */}
-                <div className="bg-muted/30 flex aspect-video items-center justify-center rounded-lg">
+                <div className="flex aspect-video items-center justify-center rounded-lg bg-muted/30">
                   <div className="space-y-4 text-center">
-                    <Video className="text-primary/50 mx-auto size-16" />
+                    <Video className="mx-auto size-16 text-primary/50" />
                     <div>
                       <h3 className="mb-2 text-lg font-semibold">
                         Vidéo de démonstration à venir
                       </h3>
-                      <p className="text-muted-foreground max-w-md text-sm">
+                      <p className="max-w-md text-sm text-muted-foreground">
                         En attendant, réservez une démonstration personnalisée
                         avec notre équipe pour découvrir toutes les
                         fonctionnalités en détail.
@@ -180,8 +180,8 @@ const Demo = () => {
                 <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                   <CardHeader>
                     <div className="mb-2 flex items-center gap-3">
-                      <div className="bg-primary/10 rounded-full p-2">
-                        <Calendar className="text-primary size-5" />
+                      <div className="rounded-full bg-primary/10 p-2">
+                        <Calendar className="size-5 text-primary" />
                       </div>
                       <CardTitle className="text-2xl">
                         Réserver votre démonstration
@@ -326,7 +326,7 @@ const Demo = () => {
                           id="demo-needs"
                           name="needs"
                           placeholder="Décrivez brièvement vos processus à automatiser..."
-                          className="bg-background/50 min-h-[100px]"
+                          className="min-h-[100px] bg-background/50"
                         />
                       </div>
 
@@ -351,15 +351,15 @@ const Demo = () => {
                       <div
                         className={`mt-4 rounded-lg p-4 ${
                           demoForm.response.success
-                            ? 'border-primary/20 bg-primary/10 text-primary border'
-                            : 'border-destructive/20 bg-destructive/10 text-destructive border'
+                            ? 'border border-primary/20 bg-primary/10 text-primary'
+                            : 'border border-destructive/20 bg-destructive/10 text-destructive'
                         }`}
                       >
                         {demoForm.response.message}
                       </div>
                     )}
 
-                    <p className="text-muted-foreground mt-4 text-center text-xs">
+                    <p className="mt-4 text-center text-xs text-muted-foreground">
                       Démonstration de 45min • Sans engagement • Réponse sous 2h
                     </p>
                   </CardContent>
@@ -371,7 +371,7 @@ const Demo = () => {
                 <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-2xl">
-                      <CheckCircle className="text-primary size-6" />
+                      <CheckCircle className="size-6 text-primary" />
                       Inclus dans votre démo
                     </CardTitle>
                   </CardHeader>
@@ -379,7 +379,7 @@ const Demo = () => {
                     <ul className="space-y-3">
                       {demoIncludes.map((item, index) => (
                         <li key={index} className="flex items-start gap-3">
-                          <div className="bg-primary mt-2 size-1.5 shrink-0 rounded-full" />
+                          <div className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
                           <span className="text-muted-foreground">{item}</span>
                         </li>
                       ))}
@@ -390,60 +390,60 @@ const Demo = () => {
                 <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-xl">
-                      <Clock className="text-primary size-5" />
+                      <Clock className="size-5 text-primary" />
                       Comment ça se passe ?
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ol className="space-y-4">
                       <li className="flex items-start gap-3">
-                        <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold">
+                        <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
                           1
                         </div>
                         <div>
                           <h4 className="mb-1 font-semibold">
                             Remplissez le formulaire
                           </h4>
-                          <p className="text-muted-foreground text-sm">
+                          <p className="text-sm text-muted-foreground">
                             Partagez vos besoins et coordonnées
                           </p>
                         </div>
                       </li>
                       <li className="flex items-start gap-3">
-                        <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold">
+                        <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
                           2
                         </div>
                         <div>
                           <h4 className="mb-1 font-semibold">
                             Notre équipe vous contacte
                           </h4>
-                          <p className="text-muted-foreground text-sm">
+                          <p className="text-sm text-muted-foreground">
                             Sous 2h pour planifier un créneau
                           </p>
                         </div>
                       </li>
                       <li className="flex items-start gap-3">
-                        <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold">
+                        <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
                           3
                         </div>
                         <div>
                           <h4 className="mb-1 font-semibold">
                             Démonstration personnalisée
                           </h4>
-                          <p className="text-muted-foreground text-sm">
+                          <p className="text-sm text-muted-foreground">
                             45min de démo adaptée à vos besoins
                           </p>
                         </div>
                       </li>
                       <li className="flex items-start gap-3">
-                        <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold">
+                        <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
                           4
                         </div>
                         <div>
                           <h4 className="mb-1 font-semibold">
                             Devis sur mesure
                           </h4>
-                          <p className="text-muted-foreground text-sm">
+                          <p className="text-sm text-muted-foreground">
                             Recevez une proposition adaptée
                           </p>
                         </div>
@@ -452,15 +452,15 @@ const Demo = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="border-primary/20 from-primary/5 to-primary/10 bg-gradient-to-r">
+                <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-3">
-                      <Users className="text-primary size-6 shrink-0" />
+                      <Users className="size-6 shrink-0 text-primary" />
                       <div>
                         <h4 className="mb-2 font-semibold">
                           Accompagnement personnalisé
                         </h4>
-                        <p className="text-muted-foreground mb-4 text-sm">
+                        <p className="mb-4 text-sm text-muted-foreground">
                           Notre équipe française vous accompagne tout au long du
                           processus, de la démonstration à la mise en
                           production.
@@ -484,12 +484,12 @@ const Demo = () => {
       {/* CTA Section */}
       <section className="py-16">
         <div className="container mx-auto px-6">
-          <Card className="border-primary/20 from-primary/10 to-primary/5 mx-auto max-w-4xl bg-gradient-to-r">
+          <Card className="mx-auto max-w-4xl border-primary/20 bg-gradient-to-r from-primary/10 to-primary/5">
             <CardContent className="p-8 text-center md:p-12">
               <h2 className="mb-4 text-3xl font-bold">
                 Prêt à transformer votre entreprise ?
               </h2>
-              <p className="text-muted-foreground mx-auto mb-8 max-w-2xl">
+              <p className="mx-auto mb-8 max-w-2xl text-muted-foreground">
                 Rejoignez les centaines d'entreprises françaises qui ont déjà
                 fait confiance à TCDynamics pour automatiser leurs processus
                 métier.

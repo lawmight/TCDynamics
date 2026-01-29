@@ -89,13 +89,13 @@ export const PostSubmissionFeedback = ({
 
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="border-border bg-background w-full max-w-md rounded-lg border shadow-lg">
+        <div className="w-full max-w-md rounded-lg border border-border bg-background shadow-lg">
           {/* Header */}
-          <div className="border-border relative border-b p-6">
+          <div className="relative border-b border-border p-6">
             <button
               type="button"
               onClick={onClose}
-              className="ring-offset-background focus:ring-ring absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2"
+              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               aria-label="Close dialog"
             >
               <X className="size-4" />
@@ -105,7 +105,7 @@ export const PostSubmissionFeedback = ({
               <h2 className="text-xl font-semibold">
                 Votre avis nous intéresse
               </h2>
-              <p className="text-muted-foreground pt-2 text-sm">
+              <p className="pt-2 text-sm text-muted-foreground">
                 Avez-vous trouvé ce que vous cherchiez ? Votre retour nous aide
                 à améliorer
               </p>
@@ -135,7 +135,7 @@ export const PostSubmissionFeedback = ({
                   </button>
                 ))}
               </div>
-              <p className="text-muted-foreground text-xs">
+              <p className="text-xs text-muted-foreground">
                 {rating === 1 && 'Pas satisfait'}
                 {rating === 2 && 'Peu satisfait'}
                 {rating === 3 && 'Neutre'}
@@ -155,9 +155,9 @@ export const PostSubmissionFeedback = ({
                 value={feedback}
                 onChange={e => setFeedback(e.target.value)}
                 maxLength={500}
-                className="bg-background/50 min-h-[100px] resize-none"
+                className="min-h-[100px] resize-none bg-background/50"
               />
-              <p className="text-muted-foreground text-xs">
+              <p className="text-xs text-muted-foreground">
                 {feedback.length}/500 caractères
               </p>
             </div>
@@ -169,7 +169,7 @@ export const PostSubmissionFeedback = ({
                 id="followup"
                 checked={followup}
                 onChange={e => setFollowup(e.target.checked)}
-                className="border-border mt-1 size-4 rounded"
+                className="mt-1 size-4 rounded border-border"
               />
               <label htmlFor="followup" className="text-sm">
                 Puis-je vous contacter pour discuter de vos besoins spécifiques

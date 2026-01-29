@@ -6,9 +6,9 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import type { HelpResource, StruggleContext } from '@/components/app/HelpBubble'
 import { analytics } from '@/utils/analytics'
 
-import type { HelpResource, StruggleContext } from '@/components/app/HelpBubble'
 
 interface UseProactiveSupportOptions {
   /** User ID to monitor */
@@ -184,9 +184,9 @@ export function useProactiveSupport({
           label: data.context.stepId,
         })
       }
-    } catch (error) {
+    } catch {
       // Silently fail - proactive support should never break the app
-      console.debug('Proactive support check failed:', error)
+      // Error logged via logger if needed
     }
   }, [userId, disabled, onCooldown, detectStruggleLocally])
 

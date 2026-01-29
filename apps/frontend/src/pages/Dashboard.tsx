@@ -85,7 +85,7 @@ const Dashboard = () => {
   if (isLoading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-        <div className="border-primary size-12 animate-spin rounded-full border-b-2"></div>
+        <div className="size-12 animate-spin rounded-full border-b-2 border-primary"></div>
       </div>
     )
   }
@@ -124,7 +124,7 @@ const Dashboard = () => {
               aria-label={`${card.label}: ${card.value}`}
               className="rounded-lg border p-4"
             >
-              <div className="text-muted-foreground text-sm">{card.label}</div>
+              <div className="text-sm text-muted-foreground">{card.label}</div>
               <div className="mt-1 text-2xl font-bold">
                 {card.value !== '-' ? (
                   <data value={card.value}>{String(card.value)}</data>
@@ -135,7 +135,7 @@ const Dashboard = () => {
             </div>
           ))}
         </div>
-        <p className="text-muted-foreground mt-4 text-sm">
+        <p className="mt-4 text-sm text-muted-foreground">
           Window: last {days} days • Project: {projectId}
         </p>
       </div>

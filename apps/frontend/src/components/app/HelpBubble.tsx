@@ -118,7 +118,7 @@ export function HelpBubble({
 
   return (
     <div
-      className={`fixed ${positionClasses} animate-in fade-in slide-in-from-bottom-4 z-50 max-w-sm duration-300`}
+      className={`fixed ${positionClasses} z-50 max-w-sm duration-300 animate-in fade-in slide-in-from-bottom-4`}
       role="complementary"
       aria-label="Aide contextuelle"
     >
@@ -134,8 +134,8 @@ export function HelpBubble({
 
         <CardHeader className="pb-3 pt-4">
           <div className="flex items-start gap-3">
-            <div className="bg-primary/10 flex size-10 shrink-0 items-center justify-center rounded-full">
-              <HelpCircle className="text-primary size-5" />
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+              <HelpCircle className="size-5 text-primary" />
             </div>
             <div>
               <CardTitle className="text-base font-semibold">
@@ -184,7 +184,7 @@ export function HelpBubble({
             </div>
           ) : !feedbackGiven ? (
             <div className="space-y-2">
-              <p className="text-muted-foreground text-sm">
+              <p className="text-sm text-muted-foreground">
                 Cette aide vous a-t-elle été utile ?
               </p>
               <div className="flex gap-2">
@@ -209,14 +209,14 @@ export function HelpBubble({
               </div>
             </div>
           ) : (
-            <p className="text-muted-foreground text-sm">
+            <p className="text-sm text-muted-foreground">
               Merci pour votre retour ! 🙏
             </p>
           )}
         </CardContent>
 
         <CardFooter className="border-t py-3">
-          <p className="text-muted-foreground text-xs">
+          <p className="text-xs text-muted-foreground">
             Étape : {struggle.stepName}
           </p>
         </CardFooter>

@@ -79,7 +79,7 @@ const Recommendations = () => {
         {recs.map(r => (
           <li key={r.id} className="rounded-md border p-4">
             <div className="text-lg font-medium">{r.title}</div>
-            <div className="text-muted-foreground mt-1 text-sm">
+            <div className="mt-1 text-sm text-muted-foreground">
               {r.rationale}
             </div>
             <span

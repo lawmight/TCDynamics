@@ -203,11 +203,11 @@ export function ApiKeyCreateDialog({
                 aria-describedby={nameError ? 'key-name-error' : undefined}
               />
               {nameError ? (
-                <p className="text-destructive text-xs" id="key-name-error">
+                <p className="text-xs text-destructive" id="key-name-error">
                   {nameError}
                 </p>
               ) : (
-                <p className="text-muted-foreground text-xs">
+                <p className="text-xs text-muted-foreground">
                   Give your key a name to identify it later (max 100 characters,
                   alphanumeric, spaces, hyphens, and underscores only).
                 </p>
@@ -252,7 +252,7 @@ export function ApiKeyCreateDialog({
               </AlertDescription>
             </Alert>
 
-            <p className="text-muted-foreground text-center text-xs">
+            <p className="text-center text-xs text-muted-foreground">
               This dialog will auto-close in {autoCloseCountdown} seconds
             </p>
           </div>

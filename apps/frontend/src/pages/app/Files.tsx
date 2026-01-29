@@ -110,27 +110,27 @@ const Files = () => {
 
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-4">
         <div className="flex flex-col gap-1">
-          <p className="text-muted-foreground text-sm">
+          <p className="text-sm text-muted-foreground">
             Files & Knowledge Base
           </p>
           <h1 className="text-2xl font-semibold">
             Upload documents for Vertex retrieval
           </h1>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-sm text-muted-foreground">
             Files are stored in MongoDB GridFS and embedded with Vertex AI for
             semantic search.
           </p>
         </div>
 
-        <Card className="border-border bg-card/80 flex flex-col gap-4 p-4 shadow-sm">
+        <Card className="flex flex-col gap-4 border-border bg-card/80 p-4 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="bg-primary/10 text-primary ring-primary/30 flex size-12 items-center justify-center rounded-xl ring-1">
+              <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/30">
                 <CloudUpload className="size-5" />
               </div>
               <div>
                 <p className="text-sm font-semibold">Upload a document</p>
-                <p className="text-muted-foreground text-xs">
+                <p className="text-xs text-muted-foreground">
                   PDF, TXT, DOCX supported. Max 10 MB while we stabilize the
                   pipeline.
                 </p>
@@ -160,17 +160,17 @@ const Files = () => {
             </div>
           </div>
           {message ? (
-            <p className="text-muted-foreground text-sm">{message}</p>
+            <p className="text-sm text-muted-foreground">{message}</p>
           ) : null}
         </Card>
 
         <Card className="border-border bg-card/70 p-4 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <FileText className="text-primary size-4" />
+              <FileText className="size-4 text-primary" />
               <h2 className="text-lg font-semibold">Recent uploads</h2>
             </div>
-            <span className="text-muted-foreground text-xs">
+            <span className="text-xs text-muted-foreground">
               {isLoading ? 'Loading…' : `${files.length} files`}
             </span>
           </div>
@@ -181,16 +181,16 @@ const Files = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-semibold">{file.name}</p>
-                    <p className="text-muted-foreground text-xs">
+                    <p className="text-xs text-muted-foreground">
                       {(file.size / 1024).toFixed(1)} KB • {file.mimeType}
                     </p>
                   </div>
-                  <span className="bg-primary/10 text-primary rounded-full px-3 py-1 text-xs">
+                  <span className="rounded-full bg-primary/10 px-3 py-1 text-xs text-primary">
                     KB ready
                   </span>
                 </div>
                 {file.summary && (
-                  <p className="text-muted-foreground mt-2 text-sm">
+                  <p className="mt-2 text-sm text-muted-foreground">
                     {file.summary}
                   </p>
                 )}
@@ -198,7 +198,7 @@ const Files = () => {
             ))}
 
             {!isLoading && files.length === 0 && (
-              <div className="border-border bg-muted/30 text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
+              <div className="rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center text-sm text-muted-foreground">
                 No files yet. Upload your first PDF or TXT to enable retrieval
                 in chat.
               </div>

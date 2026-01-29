@@ -85,7 +85,7 @@ const SocialProof = () => {
   return (
     <section
       ref={sectionRef}
-      className="from-background/50 to-background relative overflow-hidden bg-gradient-to-b py-24"
+      className="relative overflow-hidden bg-gradient-to-b from-background/50 to-background py-24"
       aria-labelledby="social-proof-title"
     >
       {/* Network Background */}
@@ -129,7 +129,7 @@ const SocialProof = () => {
         >
           <Badge
             variant="outline"
-            className="border-primary/40 text-primary mb-6 font-mono"
+            className="mb-6 border-primary/40 font-mono text-primary"
           >
             Témoignages clients
           </Badge>
@@ -139,7 +139,7 @@ const SocialProof = () => {
           >
             Ils nous font confiance
           </h2>
-          <p className="text-muted-foreground mx-auto max-w-3xl font-mono text-xl">
+          <p className="mx-auto max-w-3xl font-mono text-xl text-muted-foreground">
             Déploiements pilotes en cours (processus finance, support et
             documentation). Logos et cas clients vérifiés arrivent.
           </p>
@@ -148,7 +148,7 @@ const SocialProof = () => {
         {/* Logo Strip */}
         <div className={`mb-16 ${hasIntersected ? 'fade-in-up' : hiddenClass}`}>
           {import.meta.env.DEV && (
-            <div className="text-muted-foreground mb-4 text-center font-mono text-sm">
+            <div className="mb-4 text-center font-mono text-sm text-muted-foreground">
               Remplacez par vos logos clients validés
             </div>
           )}
@@ -156,12 +156,12 @@ const SocialProof = () => {
             {logos.map(logo => (
               <div
                 key={logo.name}
-                className="border-primary/10 bg-card/40 hover:border-primary/30 rounded-lg border p-4 text-center backdrop-blur-sm transition-all duration-300"
+                className="rounded-lg border border-primary/10 bg-card/40 p-4 text-center backdrop-blur-sm transition-all duration-300 hover:border-primary/30"
               >
-                <div className="text-foreground text-sm font-semibold">
+                <div className="text-sm font-semibold text-foreground">
                   {logo.name}
                 </div>
-                <p className="text-muted-foreground mt-1 font-mono text-xs">
+                <p className="mt-1 font-mono text-xs text-muted-foreground">
                   {logo.tagline}
                 </p>
               </div>
@@ -176,7 +176,7 @@ const SocialProof = () => {
           {testimonials.map((testimonial, index) => (
             <Card
               key={index}
-              className="card-hover border-primary/20 bg-card/60 hover:border-primary/40 group backdrop-blur-sm transition-all duration-500"
+              className="card-hover group border-primary/20 bg-card/60 backdrop-blur-sm transition-all duration-500 hover:border-primary/40"
               role="article"
               aria-labelledby={`testimonial-${index}-author`}
             >
@@ -192,7 +192,7 @@ const SocialProof = () => {
                     />
                   ))}
                 </div>
-                <blockquote className="text-muted-foreground mb-6 italic leading-relaxed">
+                <blockquote className="mb-6 italic leading-relaxed text-muted-foreground">
                   "{testimonial.quote}"
                 </blockquote>
                 <div className="flex flex-wrap items-center gap-3">
@@ -212,14 +212,14 @@ const SocialProof = () => {
                   <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
                     <cite
                       id={`testimonial-${index}-author`}
-                      className="text-foreground group-hover:text-primary font-semibold not-italic transition-colors"
+                      className="font-semibold not-italic text-foreground transition-colors group-hover:text-primary"
                     >
                       {testimonial.author}
                     </cite>
-                    <p className="text-muted-foreground font-mono text-sm">
+                    <p className="font-mono text-sm text-muted-foreground">
                       {testimonial.position}
                     </p>
-                    <p className="text-primary font-mono text-sm">
+                    <p className="font-mono text-sm text-primary">
                       {testimonial.company}
                     </p>
                   </div>
@@ -238,18 +238,18 @@ const SocialProof = () => {
             return (
               <Card
                 key={index}
-                className="border-primary/20 from-primary/10 to-primary/5 hover:from-primary/15 hover:to-primary/10 group bg-gradient-to-r transition-all duration-300"
+                className="group border-primary/20 bg-gradient-to-r from-primary/10 to-primary/5 transition-all duration-300 hover:from-primary/15 hover:to-primary/10"
               >
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">
-                    <div className="bg-primary/20 group-hover:bg-primary/30 rounded-full p-3 transition-colors">
-                      <IconComponent className="text-primary size-6" />
+                    <div className="rounded-full bg-primary/20 p-3 transition-colors group-hover:bg-primary/30">
+                      <IconComponent className="size-6 text-primary" />
                     </div>
                     <div>
-                      <h4 className="group-hover:text-primary mb-1 text-lg font-bold transition-colors">
+                      <h4 className="mb-1 text-lg font-bold transition-colors group-hover:text-primary">
                         {indicator.title}
                       </h4>
-                      <p className="text-muted-foreground font-mono text-sm">
+                      <p className="font-mono text-sm text-muted-foreground">
                         {indicator.description}
                       </p>
                     </div>
@@ -279,7 +279,7 @@ const SocialProof = () => {
             Voir la démo personnalisée
             <ArrowRight className="size-4" />
           </Button>
-          <p className="text-muted-foreground mt-3 font-mono text-sm">
+          <p className="mt-3 font-mono text-sm text-muted-foreground">
             Programmes pilotes ouverts — sécurité et conformité revues pendant
             le parcours démo.
           </p>

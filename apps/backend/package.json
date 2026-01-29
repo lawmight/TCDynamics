@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Backend API pour TCDynamics",
   "license": "MIT",
+  "type": "module",
   "main": "dist/server.js",
   "scripts": {
     "start": "node dist/server.js",

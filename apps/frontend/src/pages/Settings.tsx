@@ -44,8 +44,8 @@ const Settings = () => {
     return (
       <div className="mx-auto max-w-3xl p-6">
         <div className="animate-pulse space-y-4">
-          <div className="bg-muted h-8 w-32 rounded" />
-          <div className="bg-muted h-64 rounded" />
+          <div className="h-8 w-32 rounded bg-muted" />
+          <div className="h-64 rounded bg-muted" />
         </div>
       </div>
     )
@@ -70,12 +70,12 @@ const Settings = () => {
       {/* Email Preferences Section */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">Email Preferences</h2>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           Manage your email notification preferences.
         </p>
         <Link
           to="/app/email-preferences"
-          className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center rounded-md px-4 py-2 text-sm transition-colors"
+          className="inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground transition-colors hover:bg-primary/90"
         >
           Manage Email Preferences
         </Link>
@@ -128,7 +128,7 @@ const Settings = () => {
           </label>
           <pre
             id="embedSnippet"
-            className="bg-muted whitespace-pre-wrap break-all rounded-md border p-3 text-xs"
+            className="whitespace-pre-wrap break-all rounded-md border bg-muted p-3 text-xs"
           >
             {snippet}
           </pre>

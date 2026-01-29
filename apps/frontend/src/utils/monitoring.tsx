@@ -178,7 +178,7 @@ export class ErrorBoundary extends React.Component<
             </p>
             <button
               onClick={this.resetError}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2"
+              className="rounded-lg bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90"
             >
               Réessayer
             </button>

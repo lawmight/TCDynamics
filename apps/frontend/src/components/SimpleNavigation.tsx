@@ -115,7 +115,7 @@ const SimpleNavigation = () => {
       <header
         className={`fixed inset-x-0 top-0 z-40 transition-all duration-300 ${
           isScrolled
-            ? 'border-border bg-background/95 border-b backdrop-blur-sm'
+            ? 'border-b border-border bg-background/95 backdrop-blur-sm'
             : 'bg-transparent'
         }`}
       >
@@ -124,7 +124,7 @@ const SimpleNavigation = () => {
             {/* Logo */}
             <button
               onClick={handleLogoClick}
-              className="text-primary hover:text-primary-glow text-2xl font-bold transition-colors"
+              className="text-2xl font-bold text-primary transition-colors hover:text-primary-glow"
             >
               TCDynamics
             </button>
@@ -137,7 +137,7 @@ const SimpleNavigation = () => {
                     <button
                       key={item.label}
                       onClick={() => handleNavClick(item)}
-                      className="text-foreground/80 hover:text-primary px-0 py-2.5 transition-colors"
+                      className="px-0 py-2.5 text-foreground/80 transition-colors hover:text-primary"
                       onMouseEnter={() => prefetchRoute(item.path)}
                     >
                       {item.label}
@@ -146,7 +146,7 @@ const SimpleNavigation = () => {
                   <button
                     onClick={goToApp}
                     onMouseEnter={() => !isExternalApp && prefetchRoute('/app')}
-                    className="bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary/50 rounded-full px-4 py-2 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2"
+                    className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
                   >
                     Accéder à l'app
                   </button>
@@ -169,14 +169,14 @@ const SimpleNavigation = () => {
                 <>
                   <Link
                     to="/"
-                    className="text-foreground/80 hover:text-primary px-0 py-1.5 transition-colors"
+                    className="px-0 py-1.5 text-foreground/80 transition-colors hover:text-primary"
                   >
                     Home
                   </Link>
                   <button
                     onClick={goToApp}
                     onMouseEnter={() => !isExternalApp && prefetchRoute('/app')}
-                    className="bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary/50 rounded-full px-4 py-2 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2"
+                    className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
                   >
                     Accéder à l'app
                   </button>
@@ -187,7 +187,7 @@ const SimpleNavigation = () => {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-foreground hover:text-primary p-2 transition-colors lg:hidden"
+              className="p-2 text-foreground transition-colors hover:text-primary lg:hidden"
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -197,7 +197,7 @@ const SimpleNavigation = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="border-border bg-background/95 border-b backdrop-blur-sm lg:hidden">
+          <div className="border-b border-border bg-background/95 backdrop-blur-sm lg:hidden">
             <div className="container mx-auto p-4">
               <nav className="flex flex-col space-y-3">
                 {location.pathname === '/' ? (
@@ -205,27 +205,30 @@ const SimpleNavigation = () => {
                     <button
                       key={item.label}
                       onClick={() => handleNavClick(item)}
-                      className="text-foreground/80 hover:text-primary py-2 text-left transition-colors"
+                      className="py-2 text-left text-foreground/80 transition-colors hover:text-primary"
                       onMouseEnter={() => prefetchRoute(item.path)}
                     >
                       {item.label}
                     </button>
                   ))
                 ) : (
+                  /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
                   <Link
                     to="/"
-                    className="text-foreground/80 hover:text-primary py-2 text-left transition-colors"
+                    className="py-2 text-left text-foreground/80 transition-colors hover:text-primary"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    onKeyDown={e =>
-                      e.key === 'Enter' && setIsMobileMenuOpen(false)
-                    }
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        setIsMobileMenuOpen(false)
+                      }
+                    }}
                   >
                     Home
                   </Link>
                 )}
                 <button
                   onClick={goToApp}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary/50 mt-2 rounded-full px-4 py-2 text-left text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2"
+                  className="mt-2 rounded-full bg-primary px-4 py-2 text-left text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
                   onMouseEnter={() => !isExternalApp && prefetchRoute('/app')}
                 >
                   Accéder à l'app
@@ -255,7 +258,7 @@ const SimpleNavigation = () => {
       {showBackToTop && (
         <button
           onClick={scrollToTop}
-          className="bg-primary text-primary-foreground hover:bg-primary-glow fixed bottom-6 left-6 z-50 rounded-full p-3 shadow-lg transition-all duration-300"
+          className="fixed bottom-6 left-6 z-50 rounded-full bg-primary p-3 text-primary-foreground shadow-lg transition-all duration-300 hover:bg-primary-glow"
           aria-label="Back to top"
         >
           <ArrowUp size={20} />

@@ -38,7 +38,7 @@ const CheckoutSuccess = () => {
   }
 
   return (
-    <div className="from-background to-background/50 min-h-screen bg-gradient-to-b py-16">
+    <div className="min-h-screen bg-gradient-to-b from-background to-background/50 py-16">
       <div className="container mx-auto px-6">
         <div className="mx-auto max-w-4xl space-y-8">
           {/* Success Header */}
@@ -50,19 +50,19 @@ const CheckoutSuccess = () => {
                 </div>
               </div>
 
-              <h1 className="text-foreground mb-4 text-4xl font-bold lg:text-5xl">
+              <h1 className="mb-4 text-4xl font-bold text-foreground lg:text-5xl">
                 Paiement réussi ! 🎉
               </h1>
 
-              <p className="text-muted-foreground mb-6 text-xl">
+              <p className="mb-6 text-xl text-muted-foreground">
                 {isManualCheckout
                   ? 'Votre paiement a été enregistré. Vous recevrez un email de confirmation avec les instructions pour créer votre compte.'
                   : 'Merci pour votre confiance. Votre paiement a été traité avec succès.'}
               </p>
 
               {sessionId && (
-                <div className="bg-muted/50 inline-flex items-center gap-2 rounded-lg px-4 py-2">
-                  <span className="text-muted-foreground text-sm">
+                <div className="inline-flex items-center gap-2 rounded-lg bg-muted/50 px-4 py-2">
+                  <span className="text-sm text-muted-foreground">
                     Session ID:
                   </span>
                   <Badge variant="secondary" className="font-mono">
@@ -77,7 +77,7 @@ const CheckoutSuccess = () => {
           <Card className="border-primary/20 bg-card/95 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-3 text-2xl">
-                <Mail className="text-primary size-6" />
+                <Mail className="size-6 text-primary" />
                 Confirmation de commande
               </CardTitle>
             </CardHeader>
@@ -98,14 +98,14 @@ const CheckoutSuccess = () => {
             <CardContent>
               <ol className="space-y-4">
                 <li className="flex items-start gap-3">
-                  <div className="bg-primary/10 mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full">
-                    <Mail className="text-primary size-4" />
+                  <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                    <Mail className="size-4 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-foreground font-semibold">
+                    <h3 className="font-semibold text-foreground">
                       Vérifiez votre email
                     </h3>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                       Consultez votre boîte de réception pour l'email de
                       confirmation et les instructions de configuration.
                     </p>
@@ -113,16 +113,16 @@ const CheckoutSuccess = () => {
                 </li>
 
                 <li className="flex items-start gap-3">
-                  <div className="bg-primary/10 mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full">
-                    <Download className="text-primary size-4" />
+                  <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                    <Download className="size-4 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-foreground font-semibold">
+                    <h3 className="font-semibold text-foreground">
                       {isManualCheckout
                         ? 'Créez votre compte'
                         : 'Configurez votre compte'}
                     </h3>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                       {isManualCheckout
                         ? "Suivez le lien dans l'email pour créer votre compte et accéder à votre tableau de bord. Votre paiement sera automatiquement lié à votre compte."
                         : "Suivez le lien dans l'email pour créer votre compte et accéder à votre tableau de bord."}
@@ -131,14 +131,14 @@ const CheckoutSuccess = () => {
                 </li>
 
                 <li className="flex items-start gap-3">
-                  <div className="bg-primary/10 mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full">
-                    <ArrowRight className="text-primary size-4" />
+                  <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                    <ArrowRight className="size-4 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-foreground font-semibold">
+                    <h3 className="font-semibold text-foreground">
                       Commencez à utiliser TCDynamics
                     </h3>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                       Explorez les fonctionnalités et commencez à automatiser
                       vos processus métier.
                     </p>
@@ -146,14 +146,14 @@ const CheckoutSuccess = () => {
                 </li>
 
                 <li className="flex items-start gap-3">
-                  <div className="bg-primary/10 mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full">
-                    <CheckCircle className="text-primary size-4" />
+                  <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                    <CheckCircle className="size-4 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-foreground font-semibold">
+                    <h3 className="font-semibold text-foreground">
                       Support disponible
                     </h3>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                       Notre équipe technique est disponible pour vous
                       accompagner dans votre prise en main.
                     </p>
@@ -196,9 +196,9 @@ const CheckoutSuccess = () => {
           </Card>
 
           {/* Thank You Message */}
-          <Card className="border-primary/20 from-primary/5 to-primary/10 bg-gradient-to-r text-center">
+          <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10 text-center">
             <CardContent className="py-8">
-              <p className="text-foreground mb-2 text-lg font-medium">
+              <p className="mb-2 text-lg font-medium text-foreground">
                 Merci pour votre confiance !
               </p>
               <p className="text-muted-foreground">

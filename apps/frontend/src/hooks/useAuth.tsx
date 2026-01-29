@@ -1,4 +1,4 @@
-import { useAuth as useClerkAuth, useUser } from '@clerk/clerk-react'
+import { type User, useAuth as useClerkAuth, useUser } from '@clerk/clerk-react'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 

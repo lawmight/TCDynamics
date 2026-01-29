@@ -128,14 +128,14 @@ const EmailPreferences = () => {
       <div className="mb-8">
         <Link
           to="/app/settings"
-          className="text-muted-foreground hover:text-foreground mb-4 inline-flex items-center text-sm"
+          className="mb-4 inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
         >
           <ChevronLeft className="mr-1 size-4" />
           Retour aux paramètres
         </Link>
 
         <h1 className="text-2xl font-bold">Préférences email</h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="mt-2 text-muted-foreground">
           Gérez les types d'emails que vous souhaitez recevoir.
         </p>
       </div>
@@ -155,12 +155,12 @@ const EmailPreferences = () => {
               className="flex items-center justify-between rounded-lg border p-4"
             >
               <div className="flex items-start gap-4">
-                <div className="bg-primary/10 flex size-10 items-center justify-center rounded-lg">
-                  <pref.icon className="text-primary size-5" />
+                <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
+                  <pref.icon className="size-5 text-primary" />
                 </div>
                 <div>
                   <p className="font-medium">{pref.label}</p>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-sm text-muted-foreground">
                     {pref.description}
                   </p>
                 </div>
@@ -202,7 +202,7 @@ const EmailPreferences = () => {
       </div>
 
       {/* Legal Note */}
-      <p className="text-muted-foreground mt-8 text-center text-xs">
+      <p className="mt-8 text-center text-xs text-muted-foreground">
         Les emails transactionnels (réinitialisation de mot de passe,
         confirmations) seront toujours envoyés quel que soit votre choix.
       </p>

@@ -76,19 +76,19 @@ function ApiKeyCard({
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1 space-y-2">
             <div className="flex items-center gap-2">
-              <Key className="text-muted-foreground size-4 shrink-0" />
+              <Key className="size-4 shrink-0 text-muted-foreground" />
               {apiKey.name ? (
                 <span className="truncate font-medium">{apiKey.name}</span>
               ) : (
-                <span className="text-muted-foreground italic">
+                <span className="italic text-muted-foreground">
                   Unnamed key
                 </span>
               )}
             </div>
-            <code className="bg-muted block truncate rounded px-2 py-1 font-mono text-xs">
+            <code className="block truncate rounded bg-muted px-2 py-1 font-mono text-xs">
               {apiKey.key_prefix}
             </code>
-            <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
                 <Calendar className="size-3" />
                 Created {formatDate(apiKey.created_at)}
@@ -104,7 +104,7 @@ function ApiKeyCard({
             size="sm"
             onClick={onRevoke}
             disabled={isRevoking}
-            className="text-destructive hover:bg-destructive/10 hover:text-destructive shrink-0"
+            className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
           >
             {isRevoking ? (
               <Loader2 className="size-4 animate-spin" />
@@ -123,9 +123,9 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
   return (
     <Card className="border-dashed">
       <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-        <Key className="text-muted-foreground mb-4 size-12" />
+        <Key className="mb-4 size-12 text-muted-foreground" />
         <h3 className="mb-2 text-lg font-semibold">No API keys</h3>
-        <p className="text-muted-foreground mb-6 max-w-sm text-sm">
+        <p className="mb-6 max-w-sm text-sm text-muted-foreground">
           Create an API key to access the API programmatically from your
           applications, scripts, or integrations.
         </p>
@@ -146,13 +146,13 @@ function LoadingSkeleton() {
           <CardContent className="pt-6">
             <div className="animate-pulse space-y-3">
               <div className="flex items-center gap-2">
-                <div className="bg-muted size-4 rounded" />
-                <div className="bg-muted h-4 w-32 rounded" />
+                <div className="size-4 rounded bg-muted" />
+                <div className="h-4 w-32 rounded bg-muted" />
               </div>
-              <div className="bg-muted h-6 w-48 rounded" />
+              <div className="h-6 w-48 rounded bg-muted" />
               <div className="flex gap-4">
-                <div className="bg-muted h-3 w-28 rounded" />
-                <div className="bg-muted h-3 w-24 rounded" />
+                <div className="h-3 w-28 rounded bg-muted" />
+                <div className="h-3 w-24 rounded bg-muted" />
               </div>
             </div>
           </CardContent>
@@ -222,7 +222,7 @@ export default function ApiKeyManager() {
             {error.message || 'An unexpected error occurred. Please try again.'}
           </p>
           {import.meta.env.DEV && isAuthError && (
-            <p className="text-muted-foreground text-xs italic">
+            <p className="text-xs italic text-muted-foreground">
               Tip: In development mode, Clerk sessions may expire quickly. Make
               sure your Vercel dev server is running and both frontend and API
               are using the same Clerk instance.
@@ -315,7 +315,7 @@ export default function ApiKeyManager() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <div className="flex items-center gap-2">
-              <AlertTriangle className="text-destructive size-5" />
+              <AlertTriangle className="size-5 text-destructive" />
               <AlertDialogTitle>Revoke API Key?</AlertDialogTitle>
             </div>
             <AlertDialogDescription>
@@ -327,7 +327,7 @@ export default function ApiKeyManager() {
           {/* Context and warnings outside Description (block elements) */}
           <div className="space-y-3 pt-2">
             {/* Key Context Card */}
-            <div className="bg-muted/50 space-y-2 rounded-md border p-3">
+            <div className="space-y-2 rounded-md border bg-muted/50 p-3">
               {keyToRevoke?.name && (
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Name:</span>
@@ -336,16 +336,16 @@ export default function ApiKeyManager() {
               )}
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Key Prefix:</span>
-                <code className="bg-background rounded px-2 py-1 font-mono text-xs">
+                <code className="rounded bg-background px-2 py-1 font-mono text-xs">
                   {keyToRevoke?.key_prefix}
                 </code>
               </div>
-              <div className="text-muted-foreground flex items-center justify-between text-xs">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>Created:</span>
                 <span>{formatDate(keyToRevoke?.created_at ?? null)}</span>
               </div>
               {keyToRevoke?.last_used_at && (
-                <div className="text-muted-foreground flex items-center justify-between text-xs">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>Last Used:</span>
                   <span>{formatDate(keyToRevoke.last_used_at)}</span>
                 </div>

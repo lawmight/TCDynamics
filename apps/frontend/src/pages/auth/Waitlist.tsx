@@ -5,14 +5,14 @@ import Sparkles from '~icons/lucide/sparkles'
 
 const Waitlist = () => {
   return (
-    <div className="bg-gradient-hero flex min-h-screen items-center justify-center px-4">
-      <Card className="shadow-elegant w-full max-w-md space-y-6 p-8">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-hero px-4">
+      <Card className="w-full max-w-md space-y-6 p-8 shadow-elegant">
         <div className="space-y-2 text-center">
-          <div className="bg-primary/10 text-primary ring-primary/30 mx-auto flex size-12 items-center justify-center rounded-2xl ring-1">
+          <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/30">
             <Sparkles className="size-6" />
           </div>
           <h1 className="text-2xl font-semibold">Join the Waitlist</h1>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-sm text-muted-foreground">
             Be among the first to experience TCDynamics. We'll notify you when
             it's your turn.
           </p>

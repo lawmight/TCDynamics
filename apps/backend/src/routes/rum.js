@@ -61,7 +61,7 @@ const hashIp = ip => {
   try {
     const salt = process.env.IP_HASH_SALT || 'dev-salt'
     return crypto.createHash('sha256').update(`${salt}:${ip}`).digest('hex')
-  } catch (_) {
+  } catch {
     return null
   }
 }
@@ -130,7 +130,6 @@ router.post(
       const ts = e.ts ? new Date(e.ts) : serverNow
       // Build parameter placeholders for SQL query
       const currentIndex = paramIndex
-      // eslint-disable-next-line no-loop-func
       const placeholders = Array.from(
         { length: 13 },
         (_, i) => `$${currentIndex + i}`,

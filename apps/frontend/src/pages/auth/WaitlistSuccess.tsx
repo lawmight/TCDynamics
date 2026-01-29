@@ -7,8 +7,8 @@ import CheckCircle2 from '~icons/lucide/check-circle-2'
 
 const WaitlistSuccess = () => {
   return (
-    <div className="bg-gradient-hero flex min-h-screen items-center justify-center px-4">
-      <Card className="shadow-elegant w-full max-w-md space-y-6 p-8 text-center">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-hero px-4">
+      <Card className="w-full max-w-md space-y-6 p-8 text-center shadow-elegant">
         <div className="space-y-4">
           <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
             <CheckCircle2 className="size-8" />
@@ -21,7 +21,7 @@ const WaitlistSuccess = () => {
         </div>
 
         <div className="space-y-3">
-          <p className="text-muted-foreground text-sm">
+          <p className="text-sm text-muted-foreground">
             In the meantime, feel free to explore our features and learn more
             about what TCDynamics can do for your business.
           </p>

@@ -87,7 +87,7 @@ export function CelebrationModal({
         {/* Close button */}
         <button
           onClick={handleDismiss}
-          className="ring-offset-background focus:ring-ring absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2"
+          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
           aria-label="Fermer"
         >
           <X className="size-4" />
@@ -95,8 +95,8 @@ export function CelebrationModal({
 
         <DialogHeader className="text-center sm:text-center">
           {/* Icon with gradient background */}
-          <div className="from-primary/20 to-primary/5 mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-gradient-to-br">
-            <Sparkles className="text-primary size-8" />
+          <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/5">
+            <Sparkles className="size-8 text-primary" />
           </div>
 
           <DialogTitle className="text-2xl font-bold tracking-tight">
@@ -105,7 +105,7 @@ export function CelebrationModal({
 
           <DialogDescription
             id="celebration-description"
-            className="text-muted-foreground text-base"
+            className="text-base text-muted-foreground"
           >
             {milestone.message}
           </DialogDescription>
@@ -114,7 +114,16 @@ export function CelebrationModal({
         <DialogFooter className="flex-col gap-3 sm:flex-col">
           {/* Primary CTA */}
           <Button asChild size="lg" className="w-full">
-            <Link to={milestone.ctaLink} onClick={handleCtaClick}>
+            {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+            <Link
+              to={milestone.ctaLink}
+              onClick={handleCtaClick}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  handleCtaClick()
+                }
+              }}
+            >
               {milestone.ctaText}
             </Link>
           </Button>

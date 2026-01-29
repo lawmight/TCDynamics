@@ -146,47 +146,47 @@ const GetStarted = () => {
         />
       )}
 
-      <div className="from-background to-background/50 min-h-screen bg-gradient-to-b">
+      <div className="min-h-screen bg-gradient-to-b from-background to-background/50">
         {/* Hero Section */}
         <section className="relative overflow-hidden py-20">
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-20">
-            <div className="left-1/6 bg-primary absolute top-1/4 size-2 animate-pulse rounded-full"></div>
-            <div className="bg-primary-glow absolute right-1/4 top-1/2 size-1 animate-pulse rounded-full"></div>
+            <div className="left-1/6 absolute top-1/4 size-2 animate-pulse rounded-full bg-primary"></div>
+            <div className="absolute right-1/4 top-1/2 size-1 animate-pulse rounded-full bg-primary-glow"></div>
           </div>
 
           <div className="container relative z-10 mx-auto px-6">
             <div className="mx-auto max-w-4xl text-center">
               <Badge
                 variant="outline"
-                className="border-primary/40 text-primary mb-6"
+                className="mb-6 border-primary/40 text-primary"
               >
                 <Sparkles className="mr-1 size-3" />
                 Démarrage via une démo guidée
               </Badge>
 
-              <h1 className="text-foreground mb-6 text-4xl font-bold lg:text-6xl">
+              <h1 className="mb-6 text-4xl font-bold text-foreground lg:text-6xl">
                 Activez TCDynamics via{' '}
                 <span className="text-gradient">une démo personnalisée</span>
               </h1>
 
-              <p className="text-muted-foreground mx-auto mb-8 max-w-2xl text-xl">
+              <p className="mx-auto mb-8 max-w-2xl text-xl text-muted-foreground">
                 Nous présentons la configuration, la sécurité et le déploiement
                 pendant une session démo. L’activation se fait après validation,
                 sans carte bancaire à ce stade.
               </p>
 
-              <div className="text-muted-foreground flex items-center justify-center gap-8 text-sm">
+              <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="text-primary size-4" />
+                  <CheckCircle className="size-4 text-primary" />
                   <span>Sans paiement à ce stade</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="text-primary size-4" />
+                  <CheckCircle className="size-4 text-primary" />
                   <span>Configuration guidée</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="text-primary size-4" />
+                  <CheckCircle className="size-4 text-primary" />
                   <span>Support inclus</span>
                 </div>
               </div>
@@ -204,11 +204,11 @@ const GetStarted = () => {
                   className="border-primary/20 bg-card/60 text-center backdrop-blur-sm"
                 >
                   <CardContent className="p-6">
-                    <div className="bg-primary/20 mx-auto mb-4 flex size-12 items-center justify-center rounded-lg">
-                      <benefit.icon className="text-primary size-6" />
+                    <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-lg bg-primary/20">
+                      <benefit.icon className="size-6 text-primary" />
                     </div>
                     <h3 className="mb-2 font-bold">{benefit.title}</h3>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                       {benefit.description}
                     </p>
                   </CardContent>
@@ -226,7 +226,7 @@ const GetStarted = () => {
                 {/* Plan Selection & Form */}
                 <div className="space-y-6">
                   <div>
-                    <h2 className="text-foreground mb-4 text-3xl font-bold">
+                    <h2 className="mb-4 text-3xl font-bold text-foreground">
                       Choisissez votre plan pour la démo
                     </h2>
                     <p className="text-muted-foreground">
@@ -269,12 +269,12 @@ const GetStarted = () => {
                                 <h3 className="text-2xl font-bold">
                                   {plan.name}
                                 </h3>
-                                <p className="text-muted-foreground text-sm">
+                                <p className="text-sm text-muted-foreground">
                                   {plan.description}
                                 </p>
                               </div>
                               <div className="text-right">
-                                <span className="text-primary text-3xl font-bold">
+                                <span className="text-3xl font-bold text-primary">
                                   {plan.price}
                                 </span>
                                 <span className="text-muted-foreground">
@@ -289,7 +289,7 @@ const GetStarted = () => {
                                   key={index}
                                   className="flex items-center gap-2"
                                 >
-                                  <CheckCircle className="text-primary size-4 shrink-0" />
+                                  <CheckCircle className="size-4 shrink-0 text-primary" />
                                   <span className="text-sm">{feature}</span>
                                 </div>
                               ))}
@@ -304,7 +304,7 @@ const GetStarted = () => {
                   <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-2xl">
-                        <Rocket className="text-primary size-6" />
+                        <Rocket className="size-6 text-primary" />
                         Créez votre compte
                       </CardTitle>
                     </CardHeader>
@@ -421,7 +421,7 @@ const GetStarted = () => {
                           )}
                         </Button>
 
-                        <p className="text-muted-foreground text-center text-xs">
+                        <p className="text-center text-xs text-muted-foreground">
                           En créant un compte, vous acceptez nos{' '}
                           <Link
                             to="/terms"
@@ -448,7 +448,7 @@ const GetStarted = () => {
                   <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-2xl">
-                        <Clock className="text-primary size-6" />
+                        <Clock className="size-6 text-primary" />
                         Processus d'onboarding
                       </CardTitle>
                     </CardHeader>
@@ -456,14 +456,14 @@ const GetStarted = () => {
                       <ol className="space-y-4">
                         {onboardingSteps.map((step, index) => (
                           <li key={index} className="flex items-start gap-3">
-                            <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold">
+                            <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
                               {step.step}
                             </div>
                             <div>
                               <h4 className="mb-1 font-semibold">
                                 {step.title}
                               </h4>
-                              <p className="text-muted-foreground text-sm">
+                              <p className="text-sm text-muted-foreground">
                                 {step.description}
                               </p>
                             </div>
@@ -476,26 +476,26 @@ const GetStarted = () => {
                   <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                     <CardContent className="p-6">
                       <div className="flex items-start gap-3">
-                        <Gift className="text-primary size-8 shrink-0" />
+                        <Gift className="size-8 shrink-0 text-primary" />
                         <div>
                           <h3 className="mb-2 text-lg font-bold">
                             14 jours pour tout essayer
                           </h3>
-                          <ul className="text-muted-foreground space-y-2 text-sm">
+                          <ul className="space-y-2 text-sm text-muted-foreground">
                             <li className="flex items-center gap-2">
-                              <CheckCircle className="text-primary size-4" />
+                              <CheckCircle className="size-4 text-primary" />
                               Accès complet à toutes les fonctionnalités
                             </li>
                             <li className="flex items-center gap-2">
-                              <CheckCircle className="text-primary size-4" />
+                              <CheckCircle className="size-4 text-primary" />
                               Support technique inclus
                             </li>
                             <li className="flex items-center gap-2">
-                              <CheckCircle className="text-primary size-4" />
+                              <CheckCircle className="size-4 text-primary" />
                               Annulation en un clic
                             </li>
                             <li className="flex items-center gap-2">
-                              <CheckCircle className="text-primary size-4" />
+                              <CheckCircle className="size-4 text-primary" />
                               Aucun engagement
                             </li>
                           </ul>
@@ -507,12 +507,12 @@ const GetStarted = () => {
                   <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                     <CardContent className="p-6">
                       <div className="flex items-start gap-3">
-                        <Mail className="text-primary size-6 shrink-0" />
+                        <Mail className="size-6 shrink-0 text-primary" />
                         <div>
                           <h4 className="mb-2 font-semibold">
                             Besoin d'aide pour démarrer ?
                           </h4>
-                          <p className="text-muted-foreground mb-4 text-sm">
+                          <p className="mb-4 text-sm text-muted-foreground">
                             Notre équipe est disponible pour vous accompagner
                             dans la configuration de votre compte.
                           </p>
@@ -554,7 +554,7 @@ const GetStarted = () => {
                     <h4 className="mb-2 font-semibold">
                       Puis-je changer de plan pendant l'essai ?
                     </h4>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                       Oui, vous pouvez passer à un plan supérieur ou inférieur à
                       tout moment pendant votre période d'essai.
                     </p>
@@ -566,7 +566,7 @@ const GetStarted = () => {
                     <h4 className="mb-2 font-semibold">
                       Que se passe-t-il après les 14 jours ?
                     </h4>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                       Nous vous demanderons vos informations de paiement. Si
                       vous ne souhaitez pas continuer, votre compte sera
                       simplement désactivé.
@@ -579,7 +579,7 @@ const GetStarted = () => {
                     <h4 className="mb-2 font-semibold">
                       Puis-je importer mes données existantes ?
                     </h4>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                       Oui, nous proposons des outils d'importation pour la
                       plupart des formats courants et pouvons vous aider à
                       migrer vos données.
@@ -592,7 +592,7 @@ const GetStarted = () => {
                     <h4 className="mb-2 font-semibold">
                       Le support est-il inclus pendant l'essai ?
                     </h4>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                       Absolument ! Vous bénéficiez du même support que nos
                       clients payants pendant toute la période d'essai.
                     </p>

@@ -77,17 +77,17 @@ const Chat = () => {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-4">
       <div className="flex flex-col gap-1">
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           Vertex AI · Gemini · Session {sessionId.slice(0, 8)}
         </p>
         <h1 className="text-2xl font-semibold">Workspace Chat</h1>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           Ask questions about your documents or create new content. Responses
           are powered by Google Vertex AI.
         </p>
       </div>
 
-      <Card className="border-border bg-card/70 h-[60vh] overflow-y-auto p-4 shadow-sm">
+      <Card className="h-[60vh] overflow-y-auto border-border bg-card/70 p-4 shadow-sm">
         <div className="space-y-4">
           {messages.map((msg, index) => (
             <div
@@ -120,9 +120,9 @@ const Chat = () => {
             disabled={isSending}
             aria-label="Chat message input"
           />
-          {error ? <p className="text-destructive text-sm">{error}</p> : null}
+          {error ? <p className="text-sm text-destructive">{error}</p> : null}
           <div className="flex items-center justify-between gap-3">
-            <div className="text-muted-foreground text-xs">
+            <div className="text-xs text-muted-foreground">
               Uses Vertex AI (Gemini) with safe defaults. Data is not stored
               unless you upload to KB.
             </div>

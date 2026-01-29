@@ -122,7 +122,7 @@ const AccordionTrigger = ({
   return (
     <button
       id={triggerId}
-      className={`${className} focus:ring-primary flex w-full items-center justify-between rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-offset-2`}
+      className={`${className} flex w-full items-center justify-between rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2`}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       aria-expanded={isOpen}
@@ -288,7 +288,7 @@ const FAQ = () => {
   return (
     <section
       ref={sectionRef}
-      className="from-background/50 to-background relative overflow-hidden bg-gradient-to-b py-24"
+      className="relative overflow-hidden bg-gradient-to-b from-background/50 to-background py-24"
     >
       {/* Network Background */}
       <div className="absolute inset-0 opacity-5">
@@ -329,14 +329,14 @@ const FAQ = () => {
         >
           <Badge
             variant="outline"
-            className="border-primary/40 text-primary mb-6 font-mono"
+            className="mb-6 border-primary/40 font-mono text-primary"
           >
             Questions fréquentes
           </Badge>
           <h2 className="text-gradient mb-6 text-4xl font-bold md:text-5xl">
             Vos questions, nos réponses
           </h2>
-          <p className="text-muted-foreground mx-auto max-w-3xl font-mono text-xl">
+          <p className="mx-auto max-w-3xl font-mono text-xl text-muted-foreground">
             Tout ce que vous devez savoir sur TCDynamics avant de commencer
           </p>
         </div>
@@ -353,24 +353,24 @@ const FAQ = () => {
                   <AccordionItem
                     key={faq.id}
                     value={faq.id}
-                    className="border-primary/10 hover:border-primary/30 rounded-lg border px-6 py-2 transition-colors"
+                    className="rounded-lg border border-primary/10 px-6 py-2 transition-colors hover:border-primary/30"
                   >
                     <AccordionTrigger
                       value={faq.id}
                       className="group py-6 text-left hover:no-underline"
                     >
                       <div className="flex flex-1 items-center gap-4">
-                        <div className="bg-primary/10 group-hover:bg-primary/20 shrink-0 rounded-full p-2 transition-colors">
-                          <IconComponent className="text-primary size-5" />
+                        <div className="shrink-0 rounded-full bg-primary/10 p-2 transition-colors group-hover:bg-primary/20">
+                          <IconComponent className="size-5 text-primary" />
                         </div>
                         <div className="flex-1">
                           <div className="mb-1 flex items-center gap-3">
-                            <h3 className="group-hover:text-primary text-lg font-semibold transition-colors">
+                            <h3 className="text-lg font-semibold transition-colors group-hover:text-primary">
                               {faq.question}
                             </h3>
                             <Badge
                               variant="secondary"
-                              className="border-primary/20 bg-primary/10 text-primary font-mono text-xs"
+                              className="border-primary/20 bg-primary/10 font-mono text-xs text-primary"
                             >
                               {faq.badge}
                             </Badge>
@@ -387,13 +387,13 @@ const FAQ = () => {
                             return (
                               <p
                                 key={lineIndex}
-                                className="text-muted-foreground leading-relaxed"
+                                className="leading-relaxed text-muted-foreground"
                               >
                                 {parts.map((part, partIndex) =>
                                   partIndex % 2 === 1 ? (
                                     <strong
                                       key={partIndex}
-                                      className="text-foreground font-semibold"
+                                      className="font-semibold text-foreground"
                                     >
                                       {part}
                                     </strong>
@@ -407,7 +407,7 @@ const FAQ = () => {
                           return (
                             <p
                               key={lineIndex}
-                              className="text-muted-foreground leading-relaxed"
+                              className="leading-relaxed text-muted-foreground"
                             >
                               {line}
                             </p>
@@ -426,24 +426,24 @@ const FAQ = () => {
         <div
           className={`mt-12 text-center ${hasIntersected ? 'fade-in-up fade-delay-04' : hiddenClass}`}
         >
-          <div className="border-primary/20 bg-card/30 mx-auto max-w-2xl rounded-2xl border p-8 backdrop-blur-sm">
+          <div className="mx-auto max-w-2xl rounded-2xl border border-primary/20 bg-card/30 p-8 backdrop-blur-sm">
             <div className="mb-4 flex items-center justify-center gap-3">
-              <Phone className="text-primary size-6" />
+              <Phone className="size-6 text-primary" />
               <h3 className="text-xl font-bold">Une autre question ?</h3>
             </div>
-            <p className="text-muted-foreground mb-6 font-mono">
+            <p className="mb-6 font-mono text-muted-foreground">
               Notre équipe française est là pour vous répondre
             </p>
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
-              <div className="border-primary/20 bg-primary/10 flex items-center gap-2 rounded-full border px-4 py-2">
-                <CheckCircle className="text-primary size-4" />
-                <span className="text-primary font-mono text-sm">
+              <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2">
+                <CheckCircle className="size-4 text-primary" />
+                <span className="font-mono text-sm text-primary">
                   📞 01 39 44 75 00
                 </span>
               </div>
-              <div className="border-primary/20 bg-primary/10 flex items-center gap-2 rounded-full border px-4 py-2">
-                <CheckCircle className="text-primary size-4" />
-                <span className="text-primary font-mono text-sm">
+              <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2">
+                <CheckCircle className="size-4 text-primary" />
+                <span className="font-mono text-sm text-primary">
                   ✉️ contact@tcdynamics.fr
                 </span>
               </div>

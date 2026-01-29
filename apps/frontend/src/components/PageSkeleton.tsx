@@ -80,10 +80,10 @@ function FormSkeleton() {
  */
 function AppSkeleton() {
   return (
-    <div className="bg-background text-foreground min-h-screen">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="flex min-h-screen">
         {/* Sidebar - matches AppLayout aside: w-72, hidden md:flex */}
-        <aside className="border-border bg-sidebar hidden w-72 shrink-0 border-r md:flex md:flex-col">
+        <aside className="hidden w-72 shrink-0 border-r border-border bg-sidebar md:flex md:flex-col">
           {/* Logo + workspace name */}
           <div className="flex items-center gap-3 p-6">
             <Skeleton className="size-10 rounded-xl" />
@@ -107,7 +107,7 @@ function AppSkeleton() {
           </nav>
 
           {/* User section at bottom */}
-          <div className="border-border space-y-3 border-t px-6 py-4">
+          <div className="space-y-3 border-t border-border px-6 py-4">
             <div className="flex items-center gap-3">
               <Skeleton className="size-10 rounded-full" delay={300} />
               <div className="space-y-2">
@@ -122,7 +122,7 @@ function AppSkeleton() {
         {/* Main content area */}
         <main className="flex min-h-screen flex-1 flex-col">
           {/* Mobile header - matches AppLayout header md:hidden */}
-          <header className="border-border flex items-center justify-between border-b p-4 md:hidden">
+          <header className="flex items-center justify-between border-b border-border p-4 md:hidden">
             <div className="flex items-center gap-2">
               <Skeleton className="size-9 rounded-xl" />
               <div className="space-y-1">
@@ -137,7 +137,7 @@ function AppSkeleton() {
           </header>
 
           {/* Content area - matches AppLayout gradient background */}
-          <div className="from-background via-muted/40 to-background flex flex-1 flex-col gap-6 bg-gradient-to-b px-4 py-6 md:px-8">
+          <div className="flex flex-1 flex-col gap-6 bg-gradient-to-b from-background via-muted/40 to-background px-4 py-6 md:px-8">
             {/* Mobile nav card - md:hidden */}
             <Card className="p-3 md:hidden">
               <div className="flex items-center justify-between">
@@ -216,7 +216,7 @@ export function PageSkeleton() {
       role="status"
       aria-label="Loading page"
       aria-busy="true"
-      className="animate-in fade-in duration-200"
+      className="duration-200 animate-in fade-in"
     >
       {skeletonType === 'app' && <AppSkeleton />}
       {skeletonType === 'form' && <FormSkeleton />}
