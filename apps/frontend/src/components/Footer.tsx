@@ -93,6 +93,50 @@ const Footer = () => {
                   <span>Twitter/X</span>
                 </a>
               </li>
+              <li>
+                <a
+                  href="https://www.linkedin.com/in/tom-coustols/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary flex items-center justify-center gap-2 text-slate-400 transition-colors md:justify-start"
+                >
+                  <span className="text-primary">🔗</span>
+                  <span>LinkedIn</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.facebook.com/profile.php?id=61551507203997"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary flex items-center justify-center gap-2 text-slate-400 transition-colors md:justify-start"
+                >
+                  <span className="text-primary">📘</span>
+                  <span>Facebook</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.instagram.com/tomcoustols/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary flex items-center justify-center gap-2 text-slate-400 transition-colors md:justify-start"
+                >
+                  <span className="text-primary">📸</span>
+                  <span>Instagram</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.youtube.com/@tomcoustols"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary flex items-center justify-center gap-2 text-slate-400 transition-colors md:justify-start"
+                >
+                  <span className="text-primary">📺</span>
+                  <span>YouTube</span>
+                </a>
+              </li>
             </ul>
           </div>
 

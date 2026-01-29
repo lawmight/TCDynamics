@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import heroAutomationVideo from '@/assets/hero-automation-video.mp4'
@@ -27,6 +27,29 @@ const Hero = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isVideoHovered, setIsVideoHovered] = useState(false)
   const [isVideoEnded, setIsVideoEnded] = useState(false)
+  const [hasUserInteracted, setHasUserInteracted] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Detect mobile devices and user interaction
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+
+    // Check for user interaction to allow autoplay
+    const handleInteraction = () => {
+      setHasUserInteracted(true)
+    }
+    document.addEventListener('touchstart', handleInteraction, { once: true })
+    document.addEventListener('click', handleInteraction, { once: true })
+    document.addEventListener('scroll', handleInteraction, { once: true })
+
+    return () => {
+      window.removeEventListener('resize', checkMobile)
+    }
+  }, [])
 
   const goTo = (target: string) => {
     if (target.startsWith('http')) {
@@ -136,6 +159,10 @@ const Hero = () => {
                 Automatisez Votre{' '}
                 <span className="text-gradient">Entreprise avec l'IA</span>
               </h1>
+              <p className="text-muted-foreground text-lg font-light tracking-wide">
+                WorkFlowAI - L'automatisation intelligente de vos processus
+                métier
+              </p>
             </div>
 
             {/* Subheading */}
@@ -284,8 +311,10 @@ const Hero = () => {
                       aria-label="Démonstration en direct de l'automatisation des workflows avec l'IA"
                       poster={heroAutomationPoster}
                       controls
-                      preload="metadata"
-                      autoPlay
+                      preload={
+                        isMobile && !hasUserInteracted ? 'none' : 'metadata'
+                      }
+                      autoPlay={hasUserInteracted && !isMobile}
                       muted
                       playsInline
                       onPlay={() => {

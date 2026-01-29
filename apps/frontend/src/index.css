@@ -626,7 +626,17 @@ html {
   transition: all 0.2s ease;
 }
 
-.section-indicator-btn span:first-child {
+/* Fixed-size container for dot to prevent layout shift */
+.section-indicator-dot-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.section-indicator-dot {
   border-radius: 50%;
   transition: all 0.2s ease;
 }

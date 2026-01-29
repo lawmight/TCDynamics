@@ -63,21 +63,24 @@ const SectionIndicators = ({
                 title={label}
                 className="section-indicator-btn"
               >
-                {/* Dot */}
-                <span
-                  style={{
-                    width: activeId === id ? '12px' : '8px',
-                    height: activeId === id ? '12px' : '8px',
-                    backgroundColor:
-                      activeId === id
-                        ? 'hsl(var(--primary))'
-                        : 'hsl(var(--muted-foreground) / 0.4)',
-                    boxShadow:
-                      activeId === id
-                        ? '0 0 8px hsl(var(--primary) / 0.5)'
-                        : 'none',
-                  }}
-                />
+                {/* Dot container - fixed size to prevent layout shift */}
+                <span className="section-indicator-dot-container">
+                  <span
+                    className="section-indicator-dot"
+                    style={{
+                      width: activeId === id ? '12px' : '8px',
+                      height: activeId === id ? '12px' : '8px',
+                      backgroundColor:
+                        activeId === id
+                          ? 'hsl(var(--primary))'
+                          : 'hsl(var(--muted-foreground) / 0.4)',
+                      boxShadow:
+                        activeId === id
+                          ? '0 0 8px hsl(var(--primary) / 0.5)'
+                          : 'none',
+                    }}
+                  />
+                </span>
                 {/* Label - visible on hover via CSS */}
                 <span
                   className="section-indicator-label"
