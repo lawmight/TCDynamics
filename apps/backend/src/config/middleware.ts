@@ -3,14 +3,16 @@
  * Centralizes middleware setup and configuration
  */
 
-import type { CorsOptions } from 'cors'
-import express, { Express, Request, Response } from 'express'
-import cors from 'cors'
 import compression from 'compression'
+import type { CorsOptions } from 'cors'
+import cors from 'cors'
+import express, { Express, Request, Response } from 'express'
+import { createRequire } from 'module'
 import morgan from 'morgan'
 import { EnvironmentConfig } from './environment'
 
-// Import middleware modules
+// Import middleware modules using createRequire for CommonJS compatibility
+const require = createRequire(import.meta.url)
 const securityModule = require('../middleware/security')
 const csrfModule = require('../middleware/csrf')
 const loggerModule = require('../utils/logger')
@@ -22,7 +24,7 @@ const monitoringModule = require('../routes/monitoring')
  */
 export function configureMiddleware(
   app: Express,
-  config: EnvironmentConfig,
+  config: EnvironmentConfig
 ): void {
   const { addRequestId } = loggerModule
   const { helmetConfig, validateIP, sanitizeInput } = securityModule
@@ -46,12 +48,15 @@ export function configureMiddleware(
         }
         return compression.filter(req, res)
       },
-    }),
+    })
   )
 
   // CORS configuration
   const corsOptions: CorsOptions = {
-    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void
+    ) => {
       // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true)
       if (config.allowedOrigins.includes(origin)) {
@@ -73,9 +78,9 @@ export function configureMiddleware(
       limit: '10mb',
       verify: (req: Request, _res: Response, buf: Buffer) => {
         // Store raw body for webhook verification if needed
-        (req as Request & { rawBody?: Buffer }).rawBody = buf
+        ;(req as Request & { rawBody?: Buffer }).rawBody = buf
       },
-    }),
+    })
   )
   app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 

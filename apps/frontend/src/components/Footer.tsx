@@ -106,7 +106,7 @@ const Footer = () => {
               </li>
               <li>
                 <a
-                  href="https://www.facebook.com/profile.php?id=61551507203997"
+                  href="https://www.facebook.com/tom.coustols"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 text-slate-400 transition-colors hover:text-primary md:justify-start"
@@ -128,7 +128,7 @@ const Footer = () => {
               </li>
               <li>
                 <a
-                  href="https://www.youtube.com/@tomcoustols"
+                  href="https://www.youtube.com/@tomtowo"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 text-slate-400 transition-colors hover:text-primary md:justify-start"

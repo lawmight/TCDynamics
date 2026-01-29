@@ -4,6 +4,7 @@
  */
 
 import express, { Express } from 'express'
+import { createRequire } from 'module'
 import { initializeDatabase } from './config/database'
 import { loadEnvironment, validateEnvironment } from './config/environment'
 import {
@@ -12,7 +13,8 @@ import {
 } from './config/middleware'
 import { initializeEmailService } from './services/email.service'
 
-// Import routes
+// Import routes using createRequire for CommonJS compatibility
+const require = createRequire(import.meta.url)
 const contactRoutes = require('./routes/contact')
 const demoRoutes = require('./routes/demo')
 const monitoringModule = require('./routes/monitoring')
@@ -111,7 +113,7 @@ export function createApp(): Express {
   app.use(
     '/api-docs',
     swaggerUi.serve,
-    swaggerUi.setup(swaggerSpec, swaggerUiOptions),
+    swaggerUi.setup(swaggerSpec, swaggerUiOptions)
   )
   app.get('/api-docs.json', (_req, res) => {
     res.setHeader('Content-Type', 'application/json')

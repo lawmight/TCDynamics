@@ -594,7 +594,8 @@ html {
 
 /* Section Indicators - Base Styles */
 .section-indicators {
-  z-index: 35;
+  z-index: 20;
+  pointer-events: none;
 }
 
 .section-indicators--desktop {
@@ -612,6 +613,7 @@ html {
   list-style: none;
   margin: 0;
   padding: 0;
+  pointer-events: auto;
 }
 
 .section-indicator-btn {
@@ -624,6 +626,7 @@ html {
   padding: 0.25rem;
   border-radius: 9999px;
   transition: all 0.2s ease;
+  pointer-events: auto;
 }
 
 /* Fixed-size container for dot to prevent layout shift */
@@ -655,6 +658,7 @@ html {
   left: 50%;
   transform: translateX(-50%);
   display: none;
+  pointer-events: auto;
 }
 
 .section-indicators--mobile ul {
@@ -668,6 +672,10 @@ html {
   backdrop-filter: blur(8px);
   border-radius: 9999px;
   box-shadow: 0 4px 20px hsl(0 0% 0% / 0.15);
+  pointer-events: auto;
+  width: max-content;
+  max-width: calc(100vw - 2rem);
+  box-sizing: border-box;
 }
 
 .section-indicators--mobile button {
@@ -681,6 +689,11 @@ html {
 
 /* Section Indicators - Desktop (lg+) */
 @media (min-width: 1024px) {
+  /* Reserve right space so hero/video card and other content don't overlap indicators */
+  main#main {
+    padding-right: 12rem;
+  }
+
   .section-indicators--desktop {
     display: block !important;
   }
@@ -697,6 +710,13 @@ html {
   }
 }
 
+/* Section Indicators - Medium screens (1024px-1280px) - adjust positioning */
+@media (min-width: 1024px) and (max-width: 1280px) {
+  .section-indicators--desktop {
+    right: 0.5rem;
+  }
+}
+
 /* Section Indicators - Mobile (<lg) */
 @media (max-width: 1023px) {
   .section-indicators--desktop {
@@ -705,6 +725,15 @@ html {
 
   .section-indicators--mobile {
     display: block !important;
+  }
+}
+
+/* Section Indicators - Small screens - reduce padding and gap */
+@media (max-width: 640px) {
+  .section-indicators--mobile ul {
+    padding: 0.375rem 0.5rem;
+    gap: 0.375rem;
+    max-width: calc(100vw - 1rem);
   }
 }
 

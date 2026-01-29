@@ -5,10 +5,13 @@
 
 // Add error handlers at the very top before any imports
 import dotenv from 'dotenv'
+import { createRequire } from 'module'
 
 import { createApp } from './app'
 import { loadEnvironment } from './config/environment'
-import { logger } from './utils/logger'
+
+const require = createRequire(import.meta.url)
+const { logger } = require('./utils/logger.js')
 
 process.on('uncaughtException', (error: Error) => {
   console.error('❌ Uncaught Exception:', error)
@@ -16,10 +19,13 @@ process.on('uncaughtException', (error: Error) => {
   process.exit(1)
 })
 
-process.on('unhandledRejection', (reason: unknown, promise: Promise<unknown>) => {
-  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason)
-  process.exit(1)
-})
+process.on(
+  'unhandledRejection',
+  (reason: unknown, promise: Promise<unknown>) => {
+    console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason)
+    process.exit(1)
+  }
+)
 
 // Load environment variables
 console.log('🔧 Loading environment variables...')
@@ -73,7 +79,7 @@ function startServer(): void {
       console.error('❌ Server failed to start:', error)
       if (error.code === 'EADDRINUSE') {
         console.error(
-          `❌ Port ${PORT} is already in use. Please use a different port or kill the process using this port.`,
+          `❌ Port ${PORT} is already in use. Please use a different port or kill the process using this port.`
         )
       }
       process.exit(1)

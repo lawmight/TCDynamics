@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import heroAutomationVideo from '@/assets/hero-automation-video.mp4'
-import heroAutomationPoster from '@/assets/hero-automation.jpg'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import AlertCircle from '~icons/lucide/alert-circle'
@@ -309,7 +308,6 @@ const Hero = () => {
                       ref={videoRef}
                       src={heroAutomationVideo}
                       aria-label="Démonstration en direct de l'automatisation des workflows avec l'IA"
-                      poster={heroAutomationPoster}
                       controls
                       preload={
                         isMobile && !hasUserInteracted ? 'none' : 'metadata'
@@ -334,7 +332,7 @@ const Hero = () => {
                     >
                       Votre navigateur ne supporte pas la lecture de vidéos.
                     </video>
-                    <div className="absolute inset-0 bg-gradient-to-tr from-background/40 via-transparent to-background/10"></div>
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-background/40 via-transparent to-background/10"></div>
                     {/* Accessible Pause/Play Control Overlay */}
                     <div className="absolute right-4 top-4 z-20">
                       <Button

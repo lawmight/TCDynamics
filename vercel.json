@@ -144,7 +144,7 @@
   ],
   "redirects": [
     {
-      "source": "https://www.tcdynamics.fr/:path*",
+      "source": "/www.tcdynamics.fr/:path*",
       "destination": "https://tcdynamics.fr/:path*",
       "permanent": true
     }
