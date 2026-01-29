@@ -9,7 +9,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useContactForm } from '@/hooks/useContactForm'
+import { useCookieConsent } from '@/hooks/useCookieConsent'
 import { useDemoForm } from '@/hooks/useDemoForm'
+import {
+  trackContactSubmission,
+  trackDemoSubmission,
+} from '@/utils/facebookEvents'
 import Building from '~icons/lucide/building'
 import Calendar from '~icons/lucide/calendar'
 import Car from '~icons/lucide/car'
@@ -21,6 +26,7 @@ import Phone from '~icons/lucide/phone'
 const Contact = () => {
   const demoForm = useDemoForm()
   const contactForm = useContactForm()
+  const { hasAnalyticsConsent, hasMarketingConsent } = useCookieConsent()
   const [showDemoFeedback, setShowDemoFeedback] = useState(false)
   const [showContactFeedback, setShowContactFeedback] = useState(false)
   const [demoUserData, setDemoUserData] = useState<{
@@ -46,12 +52,24 @@ const Contact = () => {
   const demoFormStartTracked = useRef(false)
   const contactFormStartTracked = useRef(false)
 
+  const trackWithConsent = (
+    eventName: string,
+    data: Record<string, unknown>
+  ) => {
+    if (!hasAnalyticsConsent) return
+    try {
+      track(eventName, data)
+    } catch {
+      // Ignore analytics failures
+    }
+  }
+
   // Track demo form start
   const handleDemoFormStart = () => {
     if (!demoFormStartTracked.current) {
       setDemoFormStarted(true)
       demoFormStartTracked.current = true
-      track('demo_form_started', {
+      trackWithConsent('demo_form_started', {
         timestamp: new Date().toISOString(),
       })
     }
@@ -62,7 +80,7 @@ const Contact = () => {
     if (!contactFormStartTracked.current) {
       setContactFormStarted(true)
       contactFormStartTracked.current = true
-      track('contact_form_started', {
+      trackWithConsent('contact_form_started', {
         timestamp: new Date().toISOString(),
       })
     }
@@ -70,28 +88,29 @@ const Contact = () => {
 
   // Track form abandonment when user leaves page
   useEffect(() => {
-    const handleBeforeUnload = () => {
+    const handlePageHide = () => {
       // Track demo form abandonment
       if (demoFormStarted && !demoFormSubmitted) {
-        track('demo_form_abandoned', {
+        trackWithConsent('demo_form_abandoned', {
           timestamp: new Date().toISOString(),
         })
       }
       // Track contact form abandonment
       if (contactFormStarted && !contactFormSubmitted) {
-        track('contact_form_abandoned', {
+        trackWithConsent('contact_form_abandoned', {
           timestamp: new Date().toISOString(),
         })
       }
     }
 
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+    window.addEventListener('pagehide', handlePageHide)
+    return () => window.removeEventListener('pagehide', handlePageHide)
   }, [
     demoFormStarted,
     demoFormSubmitted,
     contactFormStarted,
     contactFormSubmitted,
+    hasAnalyticsConsent,
   ])
 
   const contactInfo = [
@@ -256,6 +275,9 @@ const Contact = () => {
                       setDemoCaptchaToken(undefined)
                       demoCaptchaRef.current?.reset()
                       setTimeout(() => demoForm.clearResponse(), 5000)
+                      if (hasMarketingConsent) {
+                        trackDemoSubmission()
+                      }
                     }
                   }}
                 >
@@ -590,6 +612,9 @@ const Contact = () => {
                       setContactCaptchaToken(undefined)
                       contactCaptchaRef.current?.reset()
                       setTimeout(() => contactForm.clearResponse(), 5000)
+                      if (hasMarketingConsent) {
+                        trackContactSubmission()
+                      }
                     }
                   }}
                 >

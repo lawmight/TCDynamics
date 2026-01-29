@@ -14,6 +14,7 @@ import {
 import ErrorBoundary from './components/ErrorBoundary'
 // import MobileNavigation from './components/MobileNavigation' // DISABLED: Causes black page
 // import StickyHeader from './components/StickyHeader' // DISABLED: Causes black page
+import CookieConsent from './components/CookieConsent'
 import Footer from './components/Footer'
 import LazyAIChatbot from './components/LazyAIChatbot'
 import OfflineIndicator from './components/OfflineIndicator'
@@ -25,6 +26,8 @@ import { ThemeProvider, useTheme } from './components/ThemeProvider'
 import { AppLayout } from './components/app/AppLayout'
 import { getClerkAppearance } from './config/clerkTheme'
 import { useAuth } from './hooks/useAuth'
+import { useCookieConsent } from './hooks/useCookieConsent'
+import { useThirdPartyTracking } from './hooks/useThirdPartyTracking'
 
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import { Toaster } from '@/components/ui/toaster'
@@ -150,6 +153,9 @@ const AppRouter = () => {
     location.pathname.startsWith('/app') ||
     location.pathname.startsWith('/login') ||
     location.pathname.startsWith('/waitlist')
+  const isMarketingRoute = !hideMarketingChrome
+
+  useThirdPartyTracking({ isMarketingRoute })
 
   return (
     <>
@@ -204,6 +210,18 @@ const AppRouter = () => {
   )
 }
 
+const ConsentAnalytics = () => {
+  const { hasAnalyticsConsent } = useCookieConsent()
+
+  if (!hasAnalyticsConsent) return null
+
+  return (
+    <Suspense fallback={null}>
+      <Analytics />
+    </Suspense>
+  )
+}
+
 /**
  * ClerkProvider wrapper that uses dynamic theming
  * Must be inside ThemeProvider to access theme context
@@ -250,15 +268,14 @@ const App = () => (
             <Sonner />
             <OfflineIndicator />
             <PerformanceMonitor />
-            <Suspense fallback={null}>
-              <Analytics />
-            </Suspense>
+            <ConsentAnalytics />
             <BrowserRouter
               future={{
                 v7_startTransition: true,
                 v7_relativeSplatPath: true,
               }}
             >
+              <CookieConsent />
               <AppRouter />
             </BrowserRouter>
           </TooltipProvider>

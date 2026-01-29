@@ -2,8 +2,11 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import heroAutomationVideo from '@/assets/hero-automation-video.mp4'
+import heroPosterImage from '@/assets/hero-network.jpg'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { useCookieConsent } from '@/hooks/useCookieConsent'
+import { trackContactClick, trackDemoClick } from '@/utils/facebookEvents'
 import AlertCircle from '~icons/lucide/alert-circle'
 import ArrowRight from '~icons/lucide/arrow-right'
 import CheckCircle from '~icons/lucide/check-circle'
@@ -20,6 +23,7 @@ const Hero = () => {
   const demoLink = import.meta.env.VITE_DEMO_URL || '/demo'
   const contactLink = '/#contact'
   const securityLink = '/security'
+  const { hasMarketingConsent } = useCookieConsent()
   const videoRef = useRef<HTMLVideoElement>(null)
   const [isPlaying, setIsPlaying] = useState(true)
   const [videoError, setVideoError] = useState(false)
@@ -190,7 +194,12 @@ const Hero = () => {
                 variant="default"
                 size="xl"
                 className="group font-mono"
-                onClick={() => goTo(demoLink)}
+                onClick={() => {
+                  if (hasMarketingConsent) {
+                    trackDemoClick()
+                  }
+                  goTo(demoLink)
+                }}
               >
                 VOIR LA DÉMO
                 <ArrowRight
@@ -203,7 +212,12 @@ const Hero = () => {
                 variant="outline"
                 size="xl"
                 className="group font-mono"
-                onClick={() => goTo(contactLink)}
+                onClick={() => {
+                  if (hasMarketingConsent) {
+                    trackContactClick()
+                  }
+                  goTo(contactLink)
+                }}
               >
                 <Play
                   size={16}
@@ -255,7 +269,12 @@ const Hero = () => {
                   size="sm"
                   variant="ghost"
                   className="text-xs"
-                  onClick={() => goTo(demoLink)}
+                  onClick={() => {
+                    if (hasMarketingConsent) {
+                      trackDemoClick()
+                    }
+                    goTo(demoLink)
+                  }}
                 >
                   Voir la démo
                 </Button>
@@ -307,6 +326,7 @@ const Hero = () => {
                     <video
                       ref={videoRef}
                       src={heroAutomationVideo}
+                      poster={heroPosterImage}
                       aria-label="Démonstration en direct de l'automatisation des workflows avec l'IA"
                       controls
                       preload={

@@ -1,7 +1,8 @@
 import { track } from '@vercel/analytics'
 import { useState } from 'react'
 
-import { type ApiResponse, apiRequest } from '@/utils/apiConfig'
+import { useCookieConsent } from '@/hooks/useCookieConsent'
+import { apiRequest, type ApiResponse } from '@/utils/apiConfig'
 import { logger } from '@/utils/logger'
 
 /**
@@ -92,6 +93,7 @@ export const useFormSubmit = <T = Record<string, unknown>>(
 ): UseFormSubmitReturn<T> => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [response, setResponse] = useState<ApiResponse | null>(null)
+  const { hasAnalyticsConsent } = useCookieConsent()
 
   const {
     primaryEndpoint,
@@ -149,25 +151,29 @@ export const useFormSubmit = <T = Record<string, unknown>>(
       setIsSubmitting(false)
 
       if (safeResult.success) {
-        try {
-          track?.('form_submitted', {
-            endpoint: primaryEndpoint,
-            timestamp: new Date().toISOString(),
-          })
-        } catch {
-          // Ignore analytics failures in tests/runtime
+        if (hasAnalyticsConsent) {
+          try {
+            track?.('form_submitted', {
+              endpoint: primaryEndpoint,
+              timestamp: new Date().toISOString(),
+            })
+          } catch {
+            // Ignore analytics failures in tests/runtime
+          }
         }
         onSuccess?.(safeResult)
       } else {
-        try {
-          track?.('form_error', {
-            endpoint: primaryEndpoint,
-            errorType: 'validation',
-            errorMessage: safeResult.message || 'Validation error',
-            timestamp: new Date().toISOString(),
-          })
-        } catch {
-          // Ignore analytics failures
+        if (hasAnalyticsConsent) {
+          try {
+            track?.('form_error', {
+              endpoint: primaryEndpoint,
+              errorType: 'validation',
+              errorMessage: safeResult.message || 'Validation error',
+              timestamp: new Date().toISOString(),
+            })
+          } catch {
+            // Ignore analytics failures
+          }
         }
       }
 
@@ -185,15 +191,17 @@ export const useFormSubmit = <T = Record<string, unknown>>(
       setResponse(errorResponse)
       setIsSubmitting(false)
 
-      try {
-        track?.('form_error', {
-          endpoint: primaryEndpoint,
-          errorType: 'submission',
-          errorMessage: normalizedMessage,
-          timestamp: new Date().toISOString(),
-        })
-      } catch {
-        // Ignore analytics failures
+      if (hasAnalyticsConsent) {
+        try {
+          track?.('form_error', {
+            endpoint: primaryEndpoint,
+            errorType: 'submission',
+            errorMessage: normalizedMessage,
+            timestamp: new Date().toISOString(),
+          })
+        } catch {
+          // Ignore analytics failures
+        }
       }
 
       onError?.(

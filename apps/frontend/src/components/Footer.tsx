@@ -6,6 +6,8 @@ import Train from '~icons/lucide/train'
 import Twitter from '~icons/lucide/twitter'
 import Users from '~icons/lucide/users'
 
+import ExternalLink from '@/components/ui/ExternalLink'
+
 const Footer = () => {
   return (
     <footer className="border-t border-border/40 bg-background py-12">
@@ -83,59 +85,49 @@ const Footer = () => {
             <h3 className="text-lg font-bold text-foreground">Social</h3>
             <ul className="space-y-2">
               <li>
-                <a
+                <ExternalLink
                   href="https://x.com/tomcoustols"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 text-slate-400 transition-colors hover:text-primary md:justify-start"
                 >
                   <Twitter className="size-4" />
                   <span>Twitter/X</span>
-                </a>
+                </ExternalLink>
               </li>
               <li>
-                <a
+                <ExternalLink
                   href="https://www.linkedin.com/in/tom-coustols/"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 text-slate-400 transition-colors hover:text-primary md:justify-start"
                 >
                   <span className="text-primary">🔗</span>
                   <span>LinkedIn</span>
-                </a>
+                </ExternalLink>
               </li>
               <li>
-                <a
+                <ExternalLink
                   href="https://www.facebook.com/tom.coustols"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 text-slate-400 transition-colors hover:text-primary md:justify-start"
                 >
                   <span className="text-primary">📘</span>
                   <span>Facebook</span>
-                </a>
+                </ExternalLink>
               </li>
               <li>
-                <a
+                <ExternalLink
                   href="https://www.instagram.com/tomcoustols/"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 text-slate-400 transition-colors hover:text-primary md:justify-start"
                 >
                   <span className="text-primary">📸</span>
                   <span>Instagram</span>
-                </a>
+                </ExternalLink>
               </li>
               <li>
-                <a
+                <ExternalLink
                   href="https://www.youtube.com/@tomtowo"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 text-slate-400 transition-colors hover:text-primary md:justify-start"
                 >
                   <span className="text-primary">📺</span>
                   <span>YouTube</span>
-                </a>
+                </ExternalLink>
               </li>
             </ul>
           </div>
@@ -145,34 +137,28 @@ const Footer = () => {
             <h3 className="text-lg font-bold text-foreground">Legal</h3>
             <ul className="space-y-2">
               <li>
-                <a
+                <ExternalLink
                   href="https://www.termsfeed.com/live/fa645ea2-fa78-4258-9064-630eeef14d62"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="text-slate-400 transition-colors hover:text-primary"
                 >
                   Privacy Policy
-                </a>
+                </ExternalLink>
               </li>
               <li>
-                <a
+                <ExternalLink
                   href="https://www.termsfeed.com/live/0d2ed5d6-3b2e-4040-b09d-1ff7cb705693"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="text-slate-400 transition-colors hover:text-primary"
                 >
                   Terms & Conditions
-                </a>
+                </ExternalLink>
               </li>
               <li>
-                <a
+                <ExternalLink
                   href="https://app.termsfeed.com/download/5a5ab972-5165-4b73-97d1-ed0a6524d7ac"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="text-slate-400 transition-colors hover:text-primary"
                 >
                   EULA
-                </a>
+                </ExternalLink>
               </li>
             </ul>
           </div>

@@ -10,6 +10,7 @@ export const LS = {
   SHOW_PERF_MONITOR: 'showPerfMonitor:v1',
   AI_RESPONSE_CACHE: 'ai_response_cache:v1',
   CURRENT_MONTH_TOKENS: 'current_month_tokens:v1',
+  COOKIE_CONSENT: 'cookieConsent:v1',
 } as const
 
 /**

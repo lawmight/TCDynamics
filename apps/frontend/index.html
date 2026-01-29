@@ -113,7 +113,13 @@
     <!-- Ensure sensible referrer policy for cross-origin requests -->
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <link rel="preconnect" href="%API_URL%" crossorigin />
-    <link rel="preconnect" href="https://connect.facebook.net" crossorigin />
+    <link
+      rel="preload"
+      as="image"
+      href="/src/assets/hero-network.jpg"
+      type="image/jpeg"
+      fetchpriority="high"
+    />
     <link rel="canonical" href="%VITE_FRONTEND_URL%/" />
 
     <!-- Favicon -->
@@ -190,28 +196,6 @@
         ]
       }
     </script>
-
-    <!-- Google Analytics 4 -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-EN83MJ0CX4"
-    ></script>
-    <script>
-      window.dataLayer = window.dataLayer || []
-      function gtag() {
-        dataLayer.push(arguments)
-      }
-      gtag('js', new Date())
-      gtag('config', 'G-EN83MJ0CX4')
-    </script>
-
-    <script
-      defer
-      data-website-id="dfid_Q6KUNKXJWLZ88SKFP2uMi"
-      data-domain="tcdynamics.fr"
-      data-allow-localhost="true"
-      src="https://datafa.st/js/script.js"
-    ></script>
   </head>
   <body>
     <!-- Fallback styles for users with JavaScript disabled -->

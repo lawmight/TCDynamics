@@ -3,6 +3,7 @@ import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { useCookieConsent } from '@/hooks/useCookieConsent'
 import X from '~icons/lucide/x'
 
 interface PostSubmissionFeedbackProps {
@@ -22,6 +23,7 @@ export const PostSubmissionFeedback = ({
   const [feedback, setFeedback] = useState('')
   const [followup, setFollowup] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const { hasAnalyticsConsent } = useCookieConsent()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -29,13 +31,15 @@ export const PostSubmissionFeedback = ({
 
     try {
       // Track feedback submission
-      track('feedback_submitted', {
-        formType,
-        rating,
-        hasComment: feedback.length > 0,
-        allowFollowup: followup,
-        timestamp: new Date().toISOString(),
-      })
+      if (hasAnalyticsConsent) {
+        track('feedback_submitted', {
+          formType,
+          rating,
+          hasComment: feedback.length > 0,
+          allowFollowup: followup,
+          timestamp: new Date().toISOString(),
+        })
+      }
 
       // Save feedback to MongoDB
       const feedbackData = {
@@ -64,11 +68,13 @@ export const PostSubmissionFeedback = ({
       onClose()
     } catch (error) {
       // Track error
-      track('feedback_error', {
-        formType,
-        error: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString(),
-      })
+      if (hasAnalyticsConsent) {
+        track('feedback_error', {
+          formType,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          timestamp: new Date().toISOString(),
+        })
+      }
 
       console.error('Error submitting feedback:', error)
       // Still close dialog even if save fails
