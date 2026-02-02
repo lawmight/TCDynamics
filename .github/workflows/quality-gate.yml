@@ -87,6 +87,9 @@ jobs:
 
       - name: Install Dependencies
         uses: ./.github/actions/install-dependencies
+        with:
+          # Single root install so ESM resolution from apps/frontend finds @eslint/js in root node_modules
+          skip-frontend: true
 
       - name: Type Check
         id: type-check
@@ -98,9 +101,6 @@ jobs:
         id: lint
         if: ${{ inputs.skip_lint != 'true' && github.event.inputs.skip_lint != 'true' }}
         working-directory: ./apps/frontend
-        env:
-          # Resolve ESLint flat-config deps (e.g. @eslint/js) from root in monorepo CI
-          NODE_PATH: ${{ github.workspace }}/node_modules
         run: npm run lint
 
       - name: Unit Tests
