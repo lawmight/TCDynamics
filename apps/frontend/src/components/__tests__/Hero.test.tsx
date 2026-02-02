@@ -76,12 +76,10 @@ describe('Hero Component', () => {
         /Démonstration en direct de l'automatisation des workflows avec l'IA/i
       )
       expect(video).toBeInTheDocument()
-      expect(video).toHaveAttribute('autoplay')
-      // Check muted property instead of attribute (boolean attributes in JSX)
+      // autoplay is conditional (hasUserInteracted && !isMobile) in Hero
       expect(video).toHaveProperty('muted', true)
       expect(video).toHaveAttribute('playsinline')
       expect(video).toHaveAttribute('controls')
-      // Video should NOT have loop attribute for accessibility
       expect(video).not.toHaveAttribute('loop')
     })
 

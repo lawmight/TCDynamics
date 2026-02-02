@@ -53,6 +53,7 @@ export default [
         RequestInit: 'readonly',
         PerformanceObserver: 'readonly',
         PerformanceObserverInit: 'readonly',
+        EventListener: 'readonly',
         // Node.js types
         NodeJS: 'readonly',
         // React types

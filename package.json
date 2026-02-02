@@ -75,6 +75,9 @@
     "google-auth-library": "^9.14.1"
   },
   "devDependencies": {
+    "dotenv-cli": "^7.4.2",
+    "turbo": "^2.3.3",
+    "vercel": "^50.9.6",
     "@eslint/js": "^9.39.2",
     "@typescript-eslint/scope-manager": "^8.54.0",
     "@vitejs/plugin-react-swc": "^3.11.0",

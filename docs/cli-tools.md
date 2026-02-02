@@ -1,23 +1,60 @@
 # Recommended CLI Tools for TCDynamics
 
-**Last Updated**: 2026-01-09
+**Last Updated**: 2026-02-01
 **Status**: Active
 
-This document lists CLI tools that can streamline your development workflow.
+This document lists CLI tools that can streamline your development workflow.  
+**Full inventory**: See [cli-tools-list.md](./cli-tools-list.md) for every CLI used by scripts and where it’s referenced.
+
+---
+
+## All CLI tools in this project (summary)
+
+| Role | Tools |
+|------|--------|
+| **Required by scripts** | `git`, `vercel`, `gh`, `npm`/`npx`, `node`, PowerShell |
+| **Via npm (no global)** | eslint, prettier, vitest, playwright, vite, concurrently, cross-env, rimraf, husky, commitlint, tsc |
+| **Optional** | mongosh, jq, http (HTTPie), bat, fd, rg (ripgrep) |
+
+---
+
+## Add these to ease your use (recommended)
+
+Based on project usage, common DX best practices, and **NIA research** (indexed Turborepo/Vercel/dotenv docs):
+
+1. **Pin Vercel CLI** – Add `vercel` to root `package.json` devDependencies (e.g. `^50.9.6`) so `npm run dev:vercel` and deploy scripts use a consistent version.
+2. **gh** – Already in use via `scripts/github-actions.ps1`. Install if you haven’t; needed for workflow list/trigger/status/watch.
+3. **mongosh** – For MongoDB Atlas; use `scripts/mongosh.sh` (or Windows equivalent) with `MONGODB_URI` from `vercel env pull`.
+4. **Turbo** (NIA-backed) – Task orchestration for monorepos: `turbo run lint test build`; parallel + cached. Eases running lint/test/build across workspaces. Add to root devDependencies or `npm i -g turbo`.
+5. **dotenv-cli** (NIA-backed) – Load `.env`/`.env.local` into commands (e.g. `dotenv -- vercel dev`, `dotenv -- turbo run build`). Add `dotenv-cli` to root devDependencies; use in scripts as `dotenv -- <command>`.
+6. **jq, HTTPie, bat, fd, ripgrep** – Optional but useful for JSON, API calls, and code search (see Optional section below).
+7. **pnpm** (optional) – Faster, disk-efficient installs. Only if you’re open to switching from npm; not required.
+8. **dotenvx** (optional) – Alternative to dotenv-cli; cross-platform env + optional encryption.
+9. **fnm / nvm** – If you need to match CI Node 20/22 locally.
+
+**Full “consider adding” list with install notes**: [cli-tools-list.md § Consider adding (NIA-backed)](./cli-tools-list.md#5-consider-adding-to-ease-use-nia-backed).
+
+---
 
 ## Essential Tools
 
 ### 1. **GitHub CLI (`gh`)** ⭐ Highly Recommended
 
-**Why**: You have GitHub Actions workflows - this makes managing PRs, issues, and workflows much easier.
+**Why**: You have GitHub Actions workflows - this makes managing PRs, issues, and workflows much easier. Used by `scripts/github-actions.ps1`.
 
 **Install**:
 
 ```bash
+# Windows (winget)
+winget install GitHub.cli
+
+# Windows (scoop)
+scoop install gh
+
 # Arch Linux
 sudo pacman -S github-cli
 
-# Or via package manager
+# Or via package manager (Debian/Ubuntu)
 curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
 sudo apt update && sudo apt install gh
@@ -56,20 +93,22 @@ gh repo clone owner/repo
 
 ### 2. **MongoDB Shell (`mongosh`)** ⭐ Recommended
 
-**Why**: You use MongoDB Atlas - useful for direct database queries and debugging.
+**Why**: You use MongoDB Atlas - useful for direct database queries and debugging. Use `scripts/mongosh.sh` (Bash) or load `.env.local` in PowerShell and run `mongosh $env:MONGODB_URI`.
 
 **Install**:
 
 ```bash
-# Arch Linux (via AUR - requires yay or paru)
-yay -S mongosh-bin
-# or
-paru -S mongosh-bin
+# Windows (winget)
+winget install MongoDB.Shell
 
-# Or via npm (recommended - works everywhere)
+# Or via npm (works everywhere)
 npm install -g mongosh
 
-# Or download binary directly
+# Arch Linux (via AUR)
+yay -S mongosh-bin
+# or: paru -S mongosh-bin
+
+# Or download binary
 # https://www.mongodb.com/try/download/shell
 ```
 
@@ -86,7 +125,26 @@ mongosh $MONGODB_URI
 mongosh --eval "db.users.find().limit(5)"
 ```
 
-### 3. **jq** - JSON Processor
+### 3. **Vercel CLI (`vercel`)** ⭐ Required for dev/deploy
+
+**Why**: Used by `dev:vercel`, `deploy-vercel.ps1`, and related scripts. Pin the version in the project for consistency.
+
+**Install**:
+
+```bash
+# Global (any OS)
+npm install -g vercel
+
+# Or add to root package.json devDependencies (recommended)
+# "vercel": "^50.9.6"
+# Then: npm install
+```
+
+**Verify**: `vercel whoami` (login: `vercel login`).
+
+---
+
+### 4. **jq** - JSON Processor
 
 **Why**: Great for parsing JSON responses, configs, and API outputs.
 
@@ -95,6 +153,15 @@ mongosh --eval "db.users.find().limit(5)"
 ```bash
 # Arch Linux
 sudo pacman -S jq
+```
+
+**Install (Windows)**:
+
+```bash
+# Windows (winget)
+winget install jqlang.jq
+
+# Or Chocolatey: choco install jq
 ```
 
 **Useful Commands**:
@@ -110,7 +177,7 @@ curl https://api.example.com/data | jq '.results[] | select(.status == "active")
 cat config.json | jq '.'
 ```
 
-### 4. **HTTPie** - Modern HTTP Client
+### 5. **HTTPie** - Modern HTTP Client
 
 **Why**: Better alternative to curl for testing your Vercel API endpoints.
 
@@ -137,7 +204,7 @@ http GET localhost:3000/api/users Authorization:"Bearer $TOKEN"
 
 ## Development Tools
 
-### 5. **Node Version Manager (`fnm` or `nvm`)** - Optional
+### 6. **Node Version Manager (`fnm` or `nvm`)** - Optional
 
 **What it is**: A tool to install and switch between different Node.js versions (like 18, 20, 22).
 
@@ -189,7 +256,7 @@ fnm default 20
 # (if you add eval "$(fnm env --use-on-cd)" to .zshrc)
 ```
 
-### 6. **direnv** - Environment Variable Management
+### 7. **direnv** - Environment Variable Management
 
 **Why**: Automatically load `.env` files when entering directories.
 
@@ -211,7 +278,7 @@ echo 'dotenv .env' > .envrc
 direnv allow
 ```
 
-### 7. **bat** - Better `cat`
+### 8. **bat** - Better `cat`
 
 **Why**: Syntax highlighting for code files.
 
@@ -228,7 +295,7 @@ bat package.json
 bat apps/frontend/src/App.tsx
 ```
 
-### 8. **fd** - Better `find`
+### 9. **fd** - Better `find`
 
 **Why**: Faster and more intuitive than `find`.
 
@@ -248,7 +315,7 @@ fd '\.tsx?$'
 fd 'button' apps/frontend
 ```
 
-### 9. **ripgrep (`rg`)** - Better `grep`
+### 10. **ripgrep (`rg`)** - Better `grep`
 
 **Why**: Much faster than grep for code search.
 
@@ -268,7 +335,7 @@ rg 'TODO|FIXME'
 
 ## Optional but Useful
 
-### 10. **tldr** - Simplified Man Pages
+### 11. **tldr** - Simplified Man Pages
 
 **Why**: Quick examples instead of full man pages.
 
@@ -287,7 +354,7 @@ tldr npm
 tldr docker
 ```
 
-### 11. **zoxide** - Smarter `cd`
+### 12. **zoxide** - Smarter `cd`
 
 **Why**: Jump to directories by name, learns your habits.
 
@@ -307,22 +374,44 @@ z frontend  # Jump to frontend directory
 z api       # Jump to api directory
 ```
 
-### 12. **exa** - Better `ls`
+### 13. **eza** - Better `ls` (exa successor)
 
-**Why**: Modern replacement with colors, git status, tree view.
+**Why**: Modern replacement with colors, git status, tree view. (exa was renamed to eza.)
 
-**Install**:
+**Install (Windows)**:
 
-```bash
-sudo pacman -S exa
+```powershell
+winget install --id eza-community.eza
 ```
 
 **Usage**:
 
 ```bash
-exa -l --git    # List with git status
-exa --tree      # Tree view
+eza -l --git    # List with git status
+eza --tree      # Tree view
 ```
+
+### 14. **Turbo** - Monorepo task runner (optional)
+
+**Why**: Run lint/test/build across workspaces in parallel with caching. Eases use when you run many tasks often.
+
+**Install**: `npm install -g turbo` or add to root devDependencies.
+
+**Usage**: `turbo run lint`, `turbo run build`, `turbo dev --filter=apps/frontend`.
+
+### 15. **pnpm** - Alternative package manager (optional)
+
+**Why**: Faster installs and less disk usage. Only consider if you’re open to switching from npm.
+
+**Install**: `npm install -g pnpm` or [pnpm.io/installation](https://pnpm.io/installation).
+
+### 16. **dotenvx** - Env and secrets (optional)
+
+**Why**: Cross-platform env loading, multi-environment, optional encryption. Alternative to manual `.env`/`.env.local`.
+
+**Install**: `npm install -g @dotenvx/dotenvx` or [dotenvx.com](https://dotenvx.com).
+
+---
 
 ## Quick Install Script
 
@@ -543,4 +632,5 @@ Since you're using zsh, consider these plugins:
 
 ---
 
-**Last Updated**: 2026-01-09
+**Full CLI inventory**: [cli-tools-list.md](./cli-tools-list.md)  
+**Last Updated**: 2026-02-01

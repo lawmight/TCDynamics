@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react'
-
 import { FacebookPixel } from 'react-meta-pixel'
 
 import { setFacebookPixelInstance } from '@/utils/facebookEvents'

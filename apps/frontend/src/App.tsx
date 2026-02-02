@@ -11,10 +11,10 @@ import {
   useNavigate,
 } from 'react-router-dom'
 
+import CookieConsent from './components/CookieConsent'
 import ErrorBoundary from './components/ErrorBoundary'
 // import MobileNavigation from './components/MobileNavigation' // DISABLED: Causes black page
 // import StickyHeader from './components/StickyHeader' // DISABLED: Causes black page
-import CookieConsent from './components/CookieConsent'
 import Footer from './components/Footer'
 import LazyAIChatbot from './components/LazyAIChatbot'
 import OfflineIndicator from './components/OfflineIndicator'

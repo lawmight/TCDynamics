@@ -1,8 +1,16 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 
 import Settings from '../Settings'
+
+const renderSettings = () =>
+  render(
+    <MemoryRouter>
+      <Settings />
+    </MemoryRouter>
+  )
 
 const mockUseRequireAuth = vi.fn()
 const mockSuccess = vi.fn()
@@ -27,7 +35,7 @@ describe('Settings page', () => {
   it('renders configuration fields when signed in', () => {
     mockUseRequireAuth.mockReturnValue({ isSignedIn: true, loading: false })
 
-    render(<Settings />)
+    renderSettings()
 
     expect(screen.getByText('Settings')).toBeInTheDocument()
     expect(screen.getByTestId('api-key-manager')).toBeInTheDocument()
@@ -37,7 +45,7 @@ describe('Settings page', () => {
     const user = userEvent.setup()
     mockUseRequireAuth.mockReturnValue({ isSignedIn: true, loading: false })
 
-    render(<Settings />)
+    renderSettings()
 
     await user.type(screen.getByLabelText(/Project ID/i), 'project-1')
     await user.type(screen.getByLabelText(/Public Write Key/i), 'pk_123')

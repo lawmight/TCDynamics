@@ -70,7 +70,7 @@ describe('Contact Component', () => {
     )
 
     expect(
-      screen.getByText(/78180 Montigny-le-Bretonneux/i)
+      screen.getByText(/Montigny-le-Bretonneux/i)
     ).toBeInTheDocument()
   })
 

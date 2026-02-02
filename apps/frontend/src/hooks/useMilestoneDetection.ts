@@ -68,7 +68,7 @@ export function useMilestoneDetection({
 
   // Detect milestones when user state changes
   useEffect(() => {
-    if (disabled || celebrationsDisabled) {
+    if (disabled || celebrationsDisabled || areCelebrationsDisabled()) {
       return
     }
 
