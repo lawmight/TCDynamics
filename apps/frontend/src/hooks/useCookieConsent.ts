@@ -36,14 +36,14 @@ export const useCookieConsent = () => {
 
     window.addEventListener(
       CONSENT_UPDATED_EVENT,
-      handleConsentUpdate as EventListener
+      handleConsentUpdate as (event: Event) => void
     )
     window.addEventListener('storage', handleStorage)
 
     return () => {
       window.removeEventListener(
         CONSENT_UPDATED_EVENT,
-        handleConsentUpdate as EventListener
+        handleConsentUpdate as (event: Event) => void
       )
       window.removeEventListener('storage', handleStorage)
     }

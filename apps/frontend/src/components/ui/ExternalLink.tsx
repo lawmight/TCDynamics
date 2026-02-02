@@ -12,14 +12,24 @@ const mergeRel = (rel: string | undefined, tokens: string[]) => {
   return Array.from(merged).join(' ')
 }
 
-const ExternalLink = ({ href, rel, target, ...props }: ExternalLinkProps) => {
+const ExternalLink = ({
+  href,
+  rel,
+  target,
+  children,
+  ...props
+}: ExternalLinkProps) => {
   const external = isExternalLink(href)
   const resolvedRel = external
     ? mergeRel(rel, ['noopener', 'noreferrer', 'nofollow'])
     : rel
   const resolvedTarget = external ? (target ?? '_blank') : target
 
-  return <a href={href} rel={resolvedRel} target={resolvedTarget} {...props} />
+  return (
+    <a href={href} rel={resolvedRel} target={resolvedTarget} {...props}>
+      {children ?? <span className="sr-only">{href}</span>}
+    </a>
+  )
 }
 
 export default ExternalLink
