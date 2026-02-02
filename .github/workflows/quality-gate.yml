@@ -98,6 +98,9 @@ jobs:
         id: lint
         if: ${{ inputs.skip_lint != 'true' && github.event.inputs.skip_lint != 'true' }}
         working-directory: ./apps/frontend
+        env:
+          # Resolve ESLint flat-config deps (e.g. @eslint/js) from root in monorepo CI
+          NODE_PATH: ${{ github.workspace }}/node_modules
         run: npm run lint
 
       - name: Unit Tests
