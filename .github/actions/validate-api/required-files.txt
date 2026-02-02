@@ -3,19 +3,17 @@
 # Empty lines and lines starting with # are ignored
 
 # Core API endpoints
-chat.js
+ai.js
 forms.js
 analytics.js
 files.js
-vertex.js
-vision.js
 
 # Polar integration
 polar/webhook.js
-polar/create-checkout-session.js
-polar/checkout-session.js
+polar/checkout.js
 
 # Shared libraries
 _lib/cache.js
 _lib/mongodb.js
 _lib/email.js
+_lib/vertex.js
