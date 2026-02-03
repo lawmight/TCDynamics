@@ -19,11 +19,7 @@ export function getClientIp(req) {
   if (typeof forwarded === 'string' && forwarded.length > 0) {
     return forwarded.split(',')[0].trim()
   }
-  return (
-    req.headers['x-real-ip'] ||
-    req.socket?.remoteAddress ||
-    'unknown'
-  )
+  return req.headers['x-real-ip'] || req.socket?.remoteAddress || 'unknown'
 }
 
 function ensureRequestId(req, res) {
@@ -35,7 +31,10 @@ function ensureRequestId(req, res) {
   return id
 }
 
-export async function parseJsonBody(req, { maxBytes = DEFAULT_MAX_BYTES } = {}) {
+export async function parseJsonBody(
+  req,
+  { maxBytes = DEFAULT_MAX_BYTES } = {}
+) {
   if (req.body && typeof req.body === 'object') {
     return req.body
   }
@@ -79,7 +78,10 @@ export function validateAllowedFields(body, allowedFields = []) {
   }
 }
 
-export function applyRateLimit(req, { limit = 10, windowMs = DEFAULT_WINDOW_MS, scope = 'api' } = {}) {
+export function applyRateLimit(
+  req,
+  { limit = 10, windowMs = DEFAULT_WINDOW_MS, scope = 'api' } = {}
+) {
   const client = getClientIp(req)
   const key = `${scope}:${client}`
   const current = rateLimiter.get(key) || { count: 0 }
@@ -106,10 +108,13 @@ async function verifyTurnstile(token, remoteip, secret) {
   params.append('response', token)
   if (remoteip) params.append('remoteip', remoteip)
 
-  const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-    method: 'POST',
-    body: params,
-  })
+  const response = await fetch(
+    'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+    {
+      method: 'POST',
+      body: params,
+    }
+  )
 
   const data = await response.json()
   if (data?.success) {
@@ -139,11 +144,15 @@ async function verifyHCaptcha(token, remoteip, secret) {
 }
 
 async function verifyCaptcha(token, remoteip) {
-  const turnstileSecret = process.env.TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET
-  const hcaptchaSecret = process.env.HCAPTCHA_SECRET_KEY || process.env.HCAPTCHA_SECRET
+  const turnstileSecret =
+    process.env.TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET
+  const hcaptchaSecret =
+    process.env.HCAPTCHA_SECRET_KEY || process.env.HCAPTCHA_SECRET
 
   if (!turnstileSecret && !hcaptchaSecret) {
-    console.warn('[Captcha] No captcha secret configured - skipping verification')
+    console.warn(
+      '[Captcha] No captcha secret configured - skipping verification'
+    )
     return { ok: true, skipped: true }
   }
 
@@ -177,9 +186,7 @@ export function withGuards(handler, options = {}) {
       }
 
       if (!allowedMethods.includes(req.method)) {
-        return res
-          .status(405)
-          .json({ error: 'Method not allowed', requestId })
+        return res.status(405).json({ error: 'Method not allowed', requestId })
       }
 
       const rateResult = applyRateLimit(req, rateLimitOptions)
@@ -187,13 +194,11 @@ export function withGuards(handler, options = {}) {
         if (rateResult.retryAfter) {
           res.setHeader('Retry-After', rateResult.retryAfter.toString())
         }
-        return res
-          .status(429)
-          .json({
-            error: 'Rate limit exceeded',
-            retryAfterSeconds: rateResult.retryAfter,
-            requestId,
-          })
+        return res.status(429).json({
+          error: 'Rate limit exceeded',
+          retryAfterSeconds: rateResult.retryAfter,
+          requestId,
+        })
       }
 
       const body = await parseJsonBody(req, { maxBytes: maxBodyBytes })
@@ -210,8 +215,12 @@ export function withGuards(handler, options = {}) {
       }
 
       if (requireCaptcha) {
-        const captchaToken = body?.captchaToken || req.headers['x-captcha-token']
-        const captchaResult = await verifyCaptcha(captchaToken, getClientIp(req))
+        const captchaToken =
+          body?.captchaToken || req.headers['x-captcha-token']
+        const captchaResult = await verifyCaptcha(
+          captchaToken,
+          getClientIp(req)
+        )
         if (!captchaResult.ok) {
           return res
             .status(captchaResult.status)
@@ -222,14 +231,19 @@ export function withGuards(handler, options = {}) {
       return handler(req, res, body)
     } catch (error) {
       if (error?.message === 'PayloadTooLarge') {
-        return res.status(413).json({ error: 'Payload too large', requestId: req.requestId })
+        return res
+          .status(413)
+          .json({ error: 'Payload too large', requestId: req.requestId })
       }
       if (error?.message === 'InvalidJSON') {
-        return res.status(400).json({ error: 'Invalid JSON payload', requestId: req.requestId })
+        return res
+          .status(400)
+          .json({ error: 'Invalid JSON payload', requestId: req.requestId })
       }
       console.error('Handler failure', error)
       return res.status(500).json({
         error: 'Internal server error',
+        message: error?.message || 'Internal server error',
         requestId: req.requestId,
       })
     }
@@ -243,4 +257,3 @@ export default {
   validateAllowedFields,
   withGuards,
 }
-

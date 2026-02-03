@@ -2,6 +2,7 @@ import { sendContactNotification, sendDemoNotification } from './_lib/email.js'
 import { saveContact, saveDemoRequest } from './_lib/mongodb-db.js'
 import { withGuards } from './_lib/request-guards.js'
 import { withSentry } from './_lib/sentry.js'
+import { validateFormData } from './_lib/validation.js'
 
 // Disable Vercel's automatic body parsing - we handle size + JSON manually
 export const config = {
@@ -23,58 +24,55 @@ async function handler(req, res, body) {
       return await handleContactForm(req, res, body, requestId)
     }
   } catch (error) {
+    const msg = error?.message || ''
+    const isMongoConfig =
+      /MONGODB_URI|MongoDB configuration missing/i.test(msg) ||
+      (error?.name === 'MongoServerSelectionError' && !process.env.MONGODB_URI)
+
+    if (isMongoConfig) {
+      console.warn('Form submission skipped: database not configured', {
+        requestId: req.requestId,
+      })
+      return res.status(503).json({
+        error: 'Service indisponible',
+        message:
+          'Base de données non configurée. Définissez MONGODB_URI dans .env pour le développement local.',
+        requestId: req.requestId,
+      })
+    }
+
     console.error('Form submission error:', { requestId: req.requestId, error })
     res.status(500).json({
       error: 'Erreur serveur',
-      message: error.message,
+      message: msg || 'Une erreur inattendue est survenue',
       requestId: req.requestId,
     })
   }
 }
 
-async function handleContactForm(req, res, body, requestId) {
+export async function handleContactForm(req, res, body, requestId) {
   const { name, email, message, phone, company } = body
 
-  // Validate required fields
-  if (!name || !email || !message) {
+  const { valid, errors: validationErrors, warnings: validationWarnings } =
+    validateFormData(
+      { name, email, message, phone, company: company ?? '' },
+      'contact'
+    )
+
+  if (!valid) {
     return res.status(400).json({
-      error: 'Champs requis manquants',
-      message:
-        'Veuillez remplir tous les champs obligatoires : nom, email et message.',
-      required: ['name', 'email', 'message'],
+      error: 'Validation échouée',
+      message: 'Certains champs contiennent des erreurs de validation.',
+      errors: validationErrors,
+      warnings:
+        validationWarnings.length > 0 ? validationWarnings : undefined,
+      requestId,
     })
   }
 
-  // Basic email validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (typeof email !== 'string') {
-    return res.status(400).json({
-      error: 'Format email invalide',
-      message: "L'email doit être une chaîne de caractères.",
-    })
-  }
-  const sanitizedEmail = email.trim()
-  if (!emailRegex.test(sanitizedEmail)) {
-    return res.status(400).json({
-      error: 'Format email invalide',
-      message: 'Veuillez entrer une adresse email valide.',
-    })
-  }
-
-  // Validate message length (per schema: 10-5000 characters)
-  if (typeof message !== 'string') {
-    return res.status(400).json({
-      error: 'Longueur du message invalide',
-      message: 'Le message doit être une chaîne de caractères.',
-    })
-  }
-  const sanitizedMessage = message.trim()
-  if (sanitizedMessage.length < 10 || sanitizedMessage.length > 5000) {
-    return res.status(400).json({
-      error: 'Longueur du message invalide',
-      message: 'Le message doit contenir entre 10 et 5000 caractères.',
-    })
-  }
+  const sanitizedEmail = typeof email === 'string' ? email.trim() : email
+  const sanitizedMessage =
+    typeof message === 'string' ? message.trim() : message
 
   console.log('New contact form submission:', {
     requestId,
@@ -128,7 +126,7 @@ async function handleContactForm(req, res, body, requestId) {
   })
 }
 
-async function handleDemoForm(req, res, body, requestId) {
+export async function handleDemoForm(req, res, body, requestId) {
   const {
     name,
     email,
@@ -144,49 +142,36 @@ async function handleDemoForm(req, res, body, requestId) {
     preferredDate,
   } = body
 
-  // Validate required fields
-  if (!name || !email || !company || !businessNeeds) {
+  const { valid, errors: validationErrors, warnings: validationWarnings } =
+    validateFormData(
+      {
+        name,
+        email,
+        company: company ?? '',
+        businessNeeds: businessNeeds ?? '',
+        phone: phone ?? '',
+        companySize: companySize ?? '',
+        industry: industry ?? '',
+        useCase: useCase ?? '',
+        timeline: timeline ?? '',
+      },
+      'demo'
+    )
+
+  if (!valid) {
     return res.status(400).json({
-      error: 'Champs requis manquants',
-      message:
-        'Veuillez remplir tous les champs obligatoires : nom, email, entreprise et besoins spécifiques.',
-      required: ['name', 'email', 'company', 'businessNeeds'],
+      error: 'Validation échouée',
+      message: 'Certains champs contiennent des erreurs de validation.',
+      errors: validationErrors,
+      warnings:
+        validationWarnings.length > 0 ? validationWarnings : undefined,
+      requestId,
     })
   }
 
-  if (typeof businessNeeds !== 'string') {
-    return res.status(400).json({
-      error: 'Invalid field type',
-      message:
-        'Le champ "Besoins spécifiques" doit être une chaîne de caractères.',
-    })
-  }
-
-  const sanitizedBusinessNeeds = businessNeeds.trim()
-  // Validate businessNeeds length (10-5000 characters)
-  if (
-    sanitizedBusinessNeeds.length < 10 ||
-    sanitizedBusinessNeeds.length > 5000
-  ) {
-    return res.status(400).json({
-      error: 'Validation error',
-      message:
-        'Le champ "Besoins spécifiques" doit contenir entre 10 et 5000 caractères.',
-    })
-  }
-
-  // Basic email validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (typeof email !== 'string') {
-    return res.status(400).json({
-      error: 'Invalid email format',
-      message: "L'email doit être une chaîne de caractères.",
-    })
-  }
-  const sanitizedEmail = email.trim()
-  if (!emailRegex.test(sanitizedEmail)) {
-    return res.status(400).json({ error: 'Invalid email format' })
-  }
+  const sanitizedEmail = typeof email === 'string' ? email.trim() : email
+  const sanitizedBusinessNeeds =
+    typeof businessNeeds === 'string' ? businessNeeds.trim() : businessNeeds
 
   console.log('New demo request:', {
     requestId,
