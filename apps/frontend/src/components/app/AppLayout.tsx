@@ -5,15 +5,14 @@ import { Link, NavLink, Outlet } from 'react-router-dom'
 import { useTheme } from '@/components/ThemeProvider'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { getClerkAppearance } from '@/config/clerkTheme'
 import { useAuth } from '@/hooks/useAuth'
 import BarChart3 from '~icons/lucide/bar-chart-3'
 import Folder from '~icons/lucide/folder'
 import LogOut from '~icons/lucide/log-out'
 import MessageSquare from '~icons/lucide/message-square'
-import Moon from '~icons/lucide/moon'
 import Settings from '~icons/lucide/settings'
-import Sun from '~icons/lucide/sun'
 
 const navItems = [
   { to: '/app/chat', label: 'Chat', icon: MessageSquare },
@@ -26,7 +25,7 @@ const baseNavClasses =
   'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition hover:bg-muted hover:text-foreground'
 
 export const AppLayout = () => {
-  const { resolvedTheme, setTheme, theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const { signOut } = useAuth()
   const { user } = useUser()
 
@@ -37,9 +36,6 @@ export const AppLayout = () => {
       'user'
     return email.slice(0, 2).toUpperCase()
   }, [user])
-
-  const toggleTheme = () =>
-    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -96,22 +92,7 @@ export const AppLayout = () => {
               </div>
             </div>
             <div className="flex items-center justify-between gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={toggleTheme}
-                className="w-full"
-              >
-                {resolvedTheme === 'dark' ? (
-                  <div className="flex w-full items-center justify-center gap-2">
-                    <Sun className="size-4" /> Light
-                  </div>
-                ) : (
-                  <div className="flex w-full items-center justify-center gap-2">
-                    <Moon className="size-4" /> Dark
-                  </div>
-                )}
-              </Button>
+              <ThemeToggle className="w-full" />
               <div className="flex items-center">
                 <UserButton
                   afterSignOutUrl="/"
@@ -135,13 +116,7 @@ export const AppLayout = () => {
               </div>
             </Link>
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" onClick={toggleTheme}>
-                {theme === 'dark' ? (
-                  <Sun className="size-4" />
-                ) : (
-                  <Moon className="size-4" />
-                )}
-              </Button>
+              <ThemeToggle />
               <Button
                 variant="outline"
                 size="sm"

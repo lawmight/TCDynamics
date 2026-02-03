@@ -9,7 +9,6 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { HelpResource, StruggleContext } from '@/components/app/HelpBubble'
 import { analytics } from '@/utils/analytics'
 
-
 interface UseProactiveSupportOptions {
   /** User ID to monitor */
   userId?: string

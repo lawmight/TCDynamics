@@ -7,7 +7,6 @@ import Train from '~icons/lucide/train'
 import Twitter from '~icons/lucide/twitter'
 import Users from '~icons/lucide/users'
 
-
 const Footer = () => {
   return (
     <footer className="border-t border-border/40 bg-background py-12">

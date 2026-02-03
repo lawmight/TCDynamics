@@ -22,6 +22,7 @@ import CheckCircle from '~icons/lucide/check-circle'
 import Mail from '~icons/lucide/mail'
 import MapPin from '~icons/lucide/map-pin'
 import Phone from '~icons/lucide/phone'
+import XCircle from '~icons/lucide/x-circle'
 
 const Contact = () => {
   const demoForm = useDemoForm()
@@ -41,6 +42,18 @@ const Contact = () => {
   const [contactCaptchaToken, setContactCaptchaToken] = useState<
     string | undefined
   >()
+  const [demoValidation, setDemoValidation] = useState({
+    firstName: { valid: false, message: '' },
+    lastName: { valid: false, message: '' },
+    email: { valid: false, message: '' },
+    needs: { valid: false, message: '' },
+  })
+  const [contactValidation, setContactValidation] = useState({
+    firstName: { valid: false, message: '' },
+    lastName: { valid: false, message: '' },
+    email: { valid: false, message: '' },
+    message: { valid: false, message: '' },
+  })
   const demoCaptchaRef = useRef<CaptchaHandle | null>(null)
   const contactCaptchaRef = useRef<CaptchaHandle | null>(null)
 
@@ -112,6 +125,81 @@ const Contact = () => {
     contactFormSubmitted,
     hasAnalyticsConsent,
   ])
+
+  // Validation helpers
+  const validateEmail = (
+    email: string
+  ): { valid: boolean; message: string } => {
+    if (!email.trim()) {
+      return { valid: false, message: "L'email est requis" }
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return {
+        valid: false,
+        message: 'Veuillez entrer une adresse email valide',
+      }
+    }
+    return { valid: true, message: '' }
+  }
+
+  const validateName = (name: string): { valid: boolean; message: string } => {
+    if (!name.trim()) {
+      return { valid: false, message: 'Ce champ est requis' }
+    }
+    if (name.length < 2) {
+      return {
+        valid: false,
+        message: 'Le nom doit contenir au moins 2 caractères',
+      }
+    }
+    return { valid: true, message: '' }
+  }
+
+  const validateMessage = (
+    message: string,
+    minLength = 10
+  ): { valid: boolean; message: string } => {
+    if (!message.trim()) {
+      return { valid: false, message: 'Ce champ est requis' }
+    }
+    if (message.length < minLength) {
+      return { valid: false, message: `Minimum ${minLength} caractères requis` }
+    }
+    if (message.length > 5000) {
+      return { valid: false, message: 'Maximum 5000 caractères autorisés' }
+    }
+    return { valid: true, message: '' }
+  }
+
+  const ValidationIcon = ({ valid }: { valid: boolean }) => {
+    if (valid) {
+      return <CheckCircle className="size-4 text-green-500" />
+    }
+    return <XCircle className="size-4 text-red-500" />
+  }
+
+  const ValidationMessage = ({
+    message,
+    valid,
+    id,
+  }: {
+    message: string
+    valid: boolean
+    id?: string
+  }) => {
+    if (!message) return null
+    return (
+      <p
+        id={id}
+        className={`mt-1 text-sm ${valid ? 'text-green-600' : 'text-red-600'}`}
+        role="status"
+        aria-live="polite"
+      >
+        {message}
+      </p>
+    )
+  }
 
   const contactInfo = [
     {
@@ -247,14 +335,58 @@ const Contact = () => {
                 <form
                   className="space-y-4"
                   aria-label="Formulaire de demande de démonstration"
+                  noValidate
                   onSubmit={async e => {
                     e.preventDefault()
                     if (demoForm.isSubmitting) return
+
+                    // Validate before submission
                     const form = e.currentTarget
                     const formData = new FormData(form)
                     const firstName = formData.get('firstName') as string
                     const lastName = formData.get('lastName') as string
                     const email = formData.get('email') as string
+                    const needs = formData.get('needs') as string
+
+                    const firstNameValidation = validateName(firstName)
+                    const lastNameValidation = validateName(lastName)
+                    const emailValidation = validateEmail(email)
+                    const needsValidation = validateMessage(needs, 10)
+
+                    setDemoValidation({
+                      firstName: firstNameValidation,
+                      lastName: lastNameValidation,
+                      email: emailValidation,
+                      needs: needsValidation,
+                    })
+
+                    // Check if all validations pass
+                    const allValid =
+                      firstNameValidation.valid &&
+                      lastNameValidation.valid &&
+                      emailValidation.valid &&
+                      needsValidation.valid
+
+                    if (!allValid) {
+                      // Focus on first invalid field
+                      const firstInvalidField = Object.entries(
+                        demoValidation
+                      ).find(([_, validation]) => !validation.valid)
+
+                      if (firstInvalidField) {
+                        const fieldId = `demo-${firstInvalidField[0]}`
+                        const fieldElement = document.getElementById(fieldId)
+                        if (fieldElement) {
+                          fieldElement.focus()
+                          fieldElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center',
+                          })
+                        }
+                      }
+                      return
+                    }
+
                     const company = formData.get('company') as string
                     const data = {
                       name: `${firstName} ${lastName}`.trim(),
@@ -262,7 +394,7 @@ const Contact = () => {
                       phone: formData.get('phone') as string,
                       company,
                       companySize: formData.get('employees') as string,
-                      businessNeeds: formData.get('needs') as string,
+                      businessNeeds: needs,
                       captchaToken: demoCaptchaToken,
                     }
 
@@ -273,65 +405,161 @@ const Contact = () => {
                       setDemoUserData({ email, company })
                       setShowDemoFeedback(true)
                       setDemoCaptchaToken(undefined)
+                      setDemoValidation({
+                        firstName: { valid: false, message: '' },
+                        lastName: { valid: false, message: '' },
+                        email: { valid: false, message: '' },
+                        needs: { valid: false, message: '' },
+                      })
                       demoCaptchaRef.current?.reset()
                       setTimeout(() => demoForm.clearResponse(), 5000)
                       if (hasMarketingConsent) {
                         trackDemoSubmission()
                       }
                     }
+                    // On failure, demoForm.response is already set by useFormSubmit
                   }}
                 >
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <label
-                        htmlFor="firstName"
+                        htmlFor="demo-firstName"
                         className="mb-2 block text-sm font-medium"
                       >
                         Prénom *
                       </label>
-                      <Input
-                        id="firstName"
-                        name="firstName"
-                        placeholder="Jean"
-                        className="bg-background/50"
-                        required
-                        aria-required="true"
-                        onFocus={handleDemoFormStart}
+                      <div className="relative">
+                        <Input
+                          id="demo-firstName"
+                          name="firstName"
+                          placeholder="Jean"
+                          className={`bg-background/50 ${
+                            demoValidation.firstName.message
+                              ? 'border-red-500'
+                              : ''
+                          }`}
+                          required
+                          aria-required="true"
+                          aria-invalid={
+                            demoValidation.firstName.message ? 'true' : 'false'
+                          }
+                          aria-describedby={
+                            demoValidation.firstName.message
+                              ? 'demo-firstName-error'
+                              : undefined
+                          }
+                          onFocus={handleDemoFormStart}
+                          onChange={e => {
+                            const validation = validateName(e.target.value)
+                            setDemoValidation(prev => ({
+                              ...prev,
+                              firstName: validation,
+                            }))
+                          }}
+                        />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <ValidationIcon
+                            valid={demoValidation.firstName.valid}
+                          />
+                        </div>
+                      </div>
+                      <ValidationMessage
+                        id="demo-firstName-error"
+                        message={demoValidation.firstName.message}
+                        valid={demoValidation.firstName.valid}
                       />
                     </div>
                     <div>
                       <label
-                        htmlFor="lastName"
+                        htmlFor="demo-lastName"
                         className="mb-2 block text-sm font-medium"
                       >
                         Nom *
                       </label>
-                      <Input
-                        id="lastName"
-                        name="lastName"
-                        placeholder="Dupont"
-                        className="bg-background/50"
-                        required
-                        aria-required="true"
+                      <div className="relative">
+                        <Input
+                          id="demo-lastName"
+                          name="lastName"
+                          placeholder="Dupont"
+                          className={`bg-background/50 ${
+                            demoValidation.lastName.message
+                              ? 'border-red-500'
+                              : ''
+                          }`}
+                          required
+                          aria-required="true"
+                          aria-invalid={
+                            demoValidation.lastName.message ? 'true' : 'false'
+                          }
+                          aria-describedby={
+                            demoValidation.lastName.message
+                              ? 'demo-lastName-error'
+                              : undefined
+                          }
+                          onChange={e => {
+                            const validation = validateName(e.target.value)
+                            setDemoValidation(prev => ({
+                              ...prev,
+                              lastName: validation,
+                            }))
+                          }}
+                        />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <ValidationIcon
+                            valid={demoValidation.lastName.valid}
+                          />
+                        </div>
+                      </div>
+                      <ValidationMessage
+                        id="demo-lastName-error"
+                        message={demoValidation.lastName.message}
+                        valid={demoValidation.lastName.valid}
                       />
                     </div>
                   </div>
 
                   <div>
                     <label
-                      htmlFor="email"
+                      htmlFor="demo-email"
                       className="mb-2 block text-sm font-medium"
                     >
                       Email professionnel *
                     </label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="jean.dupont@entreprise.fr"
-                      className="bg-background/50"
-                      required
-                      aria-required="true"
+                    <div className="relative">
+                      <Input
+                        id="demo-email"
+                        name="email"
+                        type="email"
+                        placeholder="jean.dupont@entreprise.fr"
+                        className={`bg-background/50 ${
+                          demoValidation.email.message ? 'border-red-500' : ''
+                        }`}
+                        required
+                        aria-required="true"
+                        aria-invalid={
+                          demoValidation.email.message ? 'true' : 'false'
+                        }
+                        aria-describedby={
+                          demoValidation.email.message
+                            ? 'demo-email-error'
+                            : undefined
+                        }
+                        onChange={e => {
+                          const validation = validateEmail(e.target.value)
+                          setDemoValidation(prev => ({
+                            ...prev,
+                            email: validation,
+                          }))
+                        }}
+                      />
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <ValidationIcon valid={demoValidation.email.valid} />
+                      </div>
+                    </div>
+                    <ValidationMessage
+                      id="demo-email-error"
+                      message={demoValidation.email.message}
+                      valid={demoValidation.email.valid}
                     />
                   </div>
 
@@ -387,7 +615,7 @@ const Contact = () => {
 
                   <div>
                     <label
-                      htmlFor="needs"
+                      htmlFor="demo-needs"
                       className="mb-2 block text-sm font-medium"
                     >
                       Besoins spécifiques *{' '}
@@ -395,16 +623,55 @@ const Contact = () => {
                         (minimum 10 caractères)
                       </span>
                     </label>
-                    <Textarea
-                      id="needs"
-                      name="needs"
-                      placeholder="Décrivez brièvement vos processus à automatiser (minimum 10 caractères)..."
-                      className="min-h-[100px] bg-background/50"
-                      required
-                      minLength={10}
-                      maxLength={5000}
-                      aria-required="true"
+                    <div className="relative">
+                      <Textarea
+                        id="demo-needs"
+                        name="needs"
+                        placeholder="Décrivez brièvement vos processus à automatiser (minimum 10 caractères)..."
+                        className={`min-h-[100px] bg-background/50 ${
+                          demoValidation.needs.message ? 'border-red-500' : ''
+                        }`}
+                        required
+                        minLength={10}
+                        maxLength={5000}
+                        aria-required="true"
+                        aria-invalid={
+                          demoValidation.needs.message ? 'true' : 'false'
+                        }
+                        aria-describedby={
+                          demoValidation.needs.message
+                            ? 'demo-needs-error'
+                            : undefined
+                        }
+                        onChange={e => {
+                          const validation = validateMessage(e.target.value, 10)
+                          setDemoValidation(prev => ({
+                            ...prev,
+                            needs: validation,
+                          }))
+                        }}
+                      />
+                      <div className="absolute right-3 top-3">
+                        <ValidationIcon valid={demoValidation.needs.valid} />
+                      </div>
+                    </div>
+                    <ValidationMessage
+                      id="demo-needs-error"
+                      message={demoValidation.needs.message}
+                      valid={demoValidation.needs.valid}
                     />
+                    <div className="mt-1 flex justify-between text-xs text-muted-foreground">
+                      <span>
+                        {demoValidation.needs.valid
+                          ? 'Validé ✓'
+                          : 'En cours de validation...'}
+                      </span>
+                      <span aria-live="polite">
+                        {document.getElementById('demo-needs')?.value?.length ||
+                          0}
+                        /5000 caractères
+                      </span>
+                    </div>
                   </div>
 
                   <Captcha
@@ -447,13 +714,23 @@ const Contact = () => {
                   }`}
                 >
                   {demoForm.response.message}
-                  {demoForm.response.errors && (
-                    <ul className="mt-2 text-sm">
-                      {demoForm.response.errors.map((error, index) => (
-                        <li key={index}>• {error}</li>
-                      ))}
-                    </ul>
-                  )}
+                  {demoForm.response.errors &&
+                    demoForm.response.errors.filter(
+                      e => e !== demoForm.response?.message
+                    ).length > 0 && (
+                      <ul className="mt-2 text-sm">
+                        {demoForm.response.errors
+                          .filter(e => e !== demoForm.response?.message)
+                          .map((error, index) => (
+                            <li key={index} className="flex items-start">
+                              <span className="mr-2" aria-hidden="true">
+                                •
+                              </span>
+                              {error}
+                            </li>
+                          ))}
+                      </ul>
+                    )}
                 </div>
               )}
 
@@ -587,19 +864,65 @@ const Contact = () => {
               <CardContent className="space-y-4">
                 <form
                   className="space-y-4"
+                  noValidate
                   onSubmit={async e => {
                     e.preventDefault()
                     if (contactForm.isSubmitting) return
+
+                    // Validate before submission
                     const form = e.currentTarget
                     const formData = new FormData(form)
+                    const firstName = formData.get('firstName') as string
+                    const lastName = formData.get('lastName') as string
                     const email = formData.get('email') as string
+                    const message = formData.get('message') as string
+
+                    const firstNameValidation = validateName(firstName)
+                    const lastNameValidation = validateName(lastName)
+                    const emailValidation = validateEmail(email)
+                    const messageValidation = validateMessage(message, 10)
+
+                    setContactValidation({
+                      firstName: firstNameValidation,
+                      lastName: lastNameValidation,
+                      email: emailValidation,
+                      message: messageValidation,
+                    })
+
+                    // Check if all validations pass
+                    const allValid =
+                      firstNameValidation.valid &&
+                      lastNameValidation.valid &&
+                      emailValidation.valid &&
+                      messageValidation.valid
+
+                    if (!allValid) {
+                      // Focus on first invalid field
+                      const firstInvalidField = Object.entries(
+                        contactValidation
+                      ).find(([_, validation]) => !validation.valid)
+
+                      if (firstInvalidField) {
+                        const fieldId = `contact-${firstInvalidField[0]}`
+                        const fieldElement = document.getElementById(fieldId)
+                        if (fieldElement) {
+                          fieldElement.focus()
+                          fieldElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center',
+                          })
+                        }
+                      }
+                      return
+                    }
+
                     const company = formData.get('company') as string
                     const data = {
-                      name: `${formData.get('firstName')} ${formData.get('lastName')}`.trim(),
+                      name: `${firstName} ${lastName}`.trim(),
                       email,
                       phone: formData.get('phone') as string,
                       company,
-                      message: formData.get('message') as string,
+                      message,
                       captchaToken: contactCaptchaToken,
                     }
 
@@ -610,12 +933,19 @@ const Contact = () => {
                       setContactUserData({ email, company })
                       setShowContactFeedback(true)
                       setContactCaptchaToken(undefined)
+                      setContactValidation({
+                        firstName: { valid: false, message: '' },
+                        lastName: { valid: false, message: '' },
+                        email: { valid: false, message: '' },
+                        message: { valid: false, message: '' },
+                      })
                       contactCaptchaRef.current?.reset()
                       setTimeout(() => contactForm.clearResponse(), 5000)
                       if (hasMarketingConsent) {
                         trackContactSubmission()
                       }
                     }
+                    // On failure, contactForm.response is already set by useFormSubmit
                   }}
                 >
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -626,14 +956,47 @@ const Contact = () => {
                       >
                         Prénom *
                       </label>
-                      <Input
-                        id="contact-firstName"
-                        name="firstName"
-                        placeholder="Prénom"
-                        className="bg-background/50"
-                        required
-                        aria-required="true"
-                        onFocus={handleContactFormStart}
+                      <div className="relative">
+                        <Input
+                          id="contact-firstName"
+                          name="firstName"
+                          placeholder="Prénom"
+                          className={`bg-background/50 ${
+                            contactValidation.firstName.message
+                              ? 'border-red-500'
+                              : ''
+                          }`}
+                          required
+                          aria-required="true"
+                          aria-invalid={
+                            contactValidation.firstName.message
+                              ? 'true'
+                              : 'false'
+                          }
+                          aria-describedby={
+                            contactValidation.firstName.message
+                              ? 'contact-firstName-error'
+                              : undefined
+                          }
+                          onFocus={handleContactFormStart}
+                          onChange={e => {
+                            const validation = validateName(e.target.value)
+                            setContactValidation(prev => ({
+                              ...prev,
+                              firstName: validation,
+                            }))
+                          }}
+                        />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <ValidationIcon
+                            valid={contactValidation.firstName.valid}
+                          />
+                        </div>
+                      </div>
+                      <ValidationMessage
+                        id="contact-firstName-error"
+                        message={contactValidation.firstName.message}
+                        valid={contactValidation.firstName.valid}
                       />
                     </div>
                     <div>
@@ -643,13 +1006,46 @@ const Contact = () => {
                       >
                         Nom *
                       </label>
-                      <Input
-                        id="contact-lastName"
-                        name="lastName"
-                        placeholder="Nom"
-                        className="bg-background/50"
-                        required
-                        aria-required="true"
+                      <div className="relative">
+                        <Input
+                          id="contact-lastName"
+                          name="lastName"
+                          placeholder="Nom"
+                          className={`bg-background/50 ${
+                            contactValidation.lastName.message
+                              ? 'border-red-500'
+                              : ''
+                          }`}
+                          required
+                          aria-required="true"
+                          aria-invalid={
+                            contactValidation.lastName.message
+                              ? 'true'
+                              : 'false'
+                          }
+                          aria-describedby={
+                            contactValidation.lastName.message
+                              ? 'contact-lastName-error'
+                              : undefined
+                          }
+                          onChange={e => {
+                            const validation = validateName(e.target.value)
+                            setContactValidation(prev => ({
+                              ...prev,
+                              lastName: validation,
+                            }))
+                          }}
+                        />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <ValidationIcon
+                            valid={contactValidation.lastName.valid}
+                          />
+                        </div>
+                      </div>
+                      <ValidationMessage
+                        id="contact-lastName-error"
+                        message={contactValidation.lastName.message}
+                        valid={contactValidation.lastName.valid}
                       />
                     </div>
                   </div>
@@ -661,14 +1057,43 @@ const Contact = () => {
                     >
                       Email *
                     </label>
-                    <Input
-                      id="contact-email"
-                      name="email"
-                      type="email"
-                      placeholder="votre@email.fr"
-                      className="bg-background/50"
-                      required
-                      aria-required="true"
+                    <div className="relative">
+                      <Input
+                        id="contact-email"
+                        name="email"
+                        type="email"
+                        placeholder="votre@email.fr"
+                        className={`bg-background/50 ${
+                          contactValidation.email.message
+                            ? 'border-red-500'
+                            : ''
+                        }`}
+                        required
+                        aria-required="true"
+                        aria-invalid={
+                          contactValidation.email.message ? 'true' : 'false'
+                        }
+                        aria-describedby={
+                          contactValidation.email.message
+                            ? 'contact-email-error'
+                            : undefined
+                        }
+                        onChange={e => {
+                          const validation = validateEmail(e.target.value)
+                          setContactValidation(prev => ({
+                            ...prev,
+                            email: validation,
+                          }))
+                        }}
+                      />
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <ValidationIcon valid={contactValidation.email.valid} />
+                      </div>
+                    </div>
+                    <ValidationMessage
+                      id="contact-email-error"
+                      message={contactValidation.email.message}
+                      valid={contactValidation.email.valid}
                     />
                   </div>
 
@@ -713,16 +1138,59 @@ const Contact = () => {
                         (minimum 10 caractères)
                       </span>
                     </label>
-                    <Textarea
-                      id="contact-message"
-                      name="message"
-                      placeholder="Décrivez votre demande (minimum 10 caractères)..."
-                      className="min-h-[120px] bg-background/50"
-                      required
-                      minLength={10}
-                      maxLength={5000}
-                      aria-required="true"
+                    <div className="relative">
+                      <Textarea
+                        id="contact-message"
+                        name="message"
+                        placeholder="Décrivez votre demande (minimum 10 caractères)..."
+                        className={`min-h-[120px] bg-background/50 ${
+                          contactValidation.message.message
+                            ? 'border-red-500'
+                            : ''
+                        }`}
+                        required
+                        minLength={10}
+                        maxLength={5000}
+                        aria-required="true"
+                        aria-invalid={
+                          contactValidation.message.message ? 'true' : 'false'
+                        }
+                        aria-describedby={
+                          contactValidation.message.message
+                            ? 'contact-message-error'
+                            : undefined
+                        }
+                        onChange={e => {
+                          const validation = validateMessage(e.target.value, 10)
+                          setContactValidation(prev => ({
+                            ...prev,
+                            message: validation,
+                          }))
+                        }}
+                      />
+                      <div className="absolute right-3 top-3">
+                        <ValidationIcon
+                          valid={contactValidation.message.valid}
+                        />
+                      </div>
+                    </div>
+                    <ValidationMessage
+                      id="contact-message-error"
+                      message={contactValidation.message.message}
+                      valid={contactValidation.message.valid}
                     />
+                    <div className="mt-1 flex justify-between text-xs text-muted-foreground">
+                      <span>
+                        {contactValidation.message.valid
+                          ? 'Validé ✓'
+                          : 'En cours de validation...'}
+                      </span>
+                      <span aria-live="polite">
+                        {document.getElementById('contact-message')?.value
+                          ?.length || 0}
+                        /5000 caractères
+                      </span>
+                    </div>
                   </div>
 
                   <Captcha
@@ -750,6 +1218,7 @@ const Contact = () => {
 
                 {contactForm.response && (
                   <div
+                    role="alert"
                     className={`mt-4 rounded-lg p-4 ${
                       contactForm.response.success
                         ? 'border border-primary/20 bg-primary/10 text-primary'
@@ -757,13 +1226,23 @@ const Contact = () => {
                     }`}
                   >
                     {contactForm.response.message}
-                    {contactForm.response.errors && (
-                      <ul className="mt-2 text-sm">
-                        {contactForm.response.errors.map((error, index) => (
-                          <li key={index}>• {error}</li>
-                        ))}
-                      </ul>
-                    )}
+                    {contactForm.response.errors &&
+                      contactForm.response.errors.filter(
+                        e => e !== contactForm.response?.message
+                      ).length > 0 && (
+                        <ul className="mt-2 text-sm">
+                          {contactForm.response.errors
+                            .filter(e => e !== contactForm.response?.message)
+                            .map((error, index) => (
+                              <li key={index} className="flex items-start">
+                                <span className="mr-2" aria-hidden="true">
+                                  •
+                                </span>
+                                {error}
+                              </li>
+                            ))}
+                        </ul>
+                      )}
                   </div>
                 )}
               </CardContent>

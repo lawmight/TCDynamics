@@ -33,10 +33,11 @@ export const apiRequest = async <T>(
     })
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({
-        message: response.statusText,
-      }))
-      throw new Error(errorData.message || 'Une erreur est survenue')
+      const errorData = await response.json().catch(() => ({}))
+      const message =
+        (errorData?.message ?? errorData?.error ?? response.statusText) ||
+        'Une erreur est survenue'
+      throw new Error(message)
     }
 
     return response.json()

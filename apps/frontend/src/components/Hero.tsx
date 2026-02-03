@@ -387,7 +387,7 @@ const Hero = () => {
                       </Button>
                     </div>
                     <div
-                      className={`absolute bottom-4 left-4 rounded-lg border border-border/60 bg-background/70 px-4 py-3 shadow-lg backdrop-blur transition-opacity duration-200 ${
+                      className={`absolute left-4 top-4 z-20 rounded-lg border border-border/60 bg-background/70 px-4 py-3 shadow-lg backdrop-blur transition-opacity duration-200 ${
                         isVideoHovered || !isPlaying || isVideoEnded
                           ? 'pointer-events-none opacity-0'
                           : 'opacity-100'
