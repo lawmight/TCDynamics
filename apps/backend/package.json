@@ -33,7 +33,7 @@
     "joi": "^17.13.3",
     "morgan": "^1.10.1",
     "nodemailer": "^7.0.13",
-    "pg": "^8.17.2",
+    "pg": "^8.18.0",
     "pino": "^8.19.0",
     "pino-http": "^8.6.1",
     "swagger-jsdoc": "^6.2.8",
@@ -42,7 +42,7 @@
     "winston": "^3.19.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.58.0",
+    "@playwright/test": "^1.58.1",
     "@types/compression": "^1.8.1",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
