@@ -69,9 +69,7 @@ describe('Contact Component', () => {
       </ContactWrapper>
     )
 
-    expect(
-      screen.getByText(/Montigny-le-Bretonneux/i)
-    ).toBeInTheDocument()
+    expect(screen.getByText(/Montigny-le-Bretonneux/i)).toBeInTheDocument()
   })
 
   it('should show business hours', () => {
