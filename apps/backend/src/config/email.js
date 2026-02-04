@@ -1,21 +1,22 @@
 const nodemailer = require('nodemailer')
 
 // Configuration du transporteur email
-const createTransporter = () => nodemailer.createTransporter({
-  host: process.env.EMAIL_HOST,
-  port: process.env.EMAIL_PORT,
-  secure: process.env.EMAIL_SECURE === 'true',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-  // Configuration spécifique pour Zoho Mail
-  connectionTimeout: 60000,
-  greetingTimeout: 30000,
-})
+const createTransporter = () =>
+  nodemailer.createTransporter({
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    secure: process.env.EMAIL_SECURE === 'true',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+    // Configuration spécifique pour Zoho Mail
+    connectionTimeout: 60000,
+    greetingTimeout: 30000,
+  })
 
 // Templates d'emails
 const emailTemplates = {

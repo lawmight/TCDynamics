@@ -32,9 +32,7 @@ const customFormat = winston.format.combine(
   winston.format.errors({ stack: true }),
   winston.format.json(),
   winston.format.printf(info => {
-    const {
-      timestamp, level, message, ...meta
-    } = info
+    const { timestamp, level, message, ...meta } = info
 
     // Structure du log
     const logEntry = {
@@ -65,21 +63,19 @@ transports.push(
     format:
       process.env.NODE_ENV === 'production'
         ? winston.format.combine(
-          winston.format.timestamp(),
-          winston.format.json(),
-        )
+            winston.format.timestamp(),
+            winston.format.json(),
+          )
         : winston.format.combine(
-          winston.format.colorize(),
-          winston.format.simple(),
-          winston.format.printf(({
-            level, message, timestamp, ...meta
-          }) => {
-            const metaStr = Object.keys(meta).length
-              ? `\n${JSON.stringify(meta, null, 2)}`
-              : ''
-            return `${timestamp} [${level}]: ${message}${metaStr}`
-          }),
-        ),
+            winston.format.colorize(),
+            winston.format.simple(),
+            winston.format.printf(({ level, message, timestamp, ...meta }) => {
+              const metaStr = Object.keys(meta).length
+                ? `\n${JSON.stringify(meta, null, 2)}`
+                : ''
+              return `${timestamp} [${level}]: ${message}${metaStr}`
+            }),
+          ),
   }),
 )
 
@@ -213,8 +209,9 @@ const logError = (error, context = {}) => {
 
 // Middleware pour ajouter un ID de requête
 const addRequestId = (req, res, next) => {
-  req.headers['x-request-id'] = req.headers['x-request-id']
-    || `req-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
+  req.headers['x-request-id'] =
+    req.headers['x-request-id'] ||
+    `req-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
   res.setHeader('X-Request-ID', req.headers['x-request-id'])
   next()
 }

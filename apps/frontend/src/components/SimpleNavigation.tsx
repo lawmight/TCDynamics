@@ -112,8 +112,15 @@ const SimpleNavigation = () => {
         <div className="container mx-auto p-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
+            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- Link renders as <a> with native keyboard support */}
             <Link
               to={location.pathname === '/' ? '/#hero' : '/'}
+              onClick={e => {
+                if (location.pathname === '/') {
+                  e.preventDefault()
+                  handleNavClick({ label: 'Accueil', scrollId: 'hero' })
+                }
+              }}
               className="text-2xl font-bold text-primary transition-colors hover:text-primary-glow focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               TCDynamics

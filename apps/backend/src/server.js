@@ -30,8 +30,9 @@ const morgan = require('morgan')
 console.log('✅ Morgan loaded')
 
 console.log('🔧 Loading security middleware...')
-let helmetConfig; let validateIP; let
-  sanitizeInput
+let helmetConfig
+let validateIP
+let sanitizeInput
 try {
   const securityModule = require('./middleware/security')
   helmetConfig = securityModule.helmetConfig
@@ -100,8 +101,9 @@ try {
 
 // Import de la documentation Swagger
 console.log('🔧 Loading Swagger documentation...')
-let swaggerUi; let swaggerSpec; let
-  swaggerUiOptions
+let swaggerUi
+let swaggerSpec
+let swaggerUiOptions
 try {
   const swaggerModule = require('./swagger')
   swaggerUi = swaggerModule.swaggerUi
@@ -116,8 +118,8 @@ try {
 
 // Import du système de logging
 console.log('🔧 Loading logging system...')
-let logger; let
-  addRequestId
+let logger
+let addRequestId
 try {
   const loggerModule = require('./utils/logger')
   logger = loggerModule.logger
@@ -131,8 +133,8 @@ try {
 
 // Import des middlewares d'erreur
 console.log('🔧 Loading error handlers...')
-let errorHandler; let
-  notFoundHandler
+let errorHandler
+let notFoundHandler
 try {
   const errorModule = require('./middleware/errorHandler')
   errorHandler = errorModule.errorHandler
@@ -159,8 +161,8 @@ try {
 
 // Import du middleware CSRF
 console.log('🔧 Loading CSRF middleware...')
-let csrfToken; let
-  csrfProtection
+let csrfToken
+let csrfProtection
 try {
   const csrfModule = require('./middleware/csrf')
   csrfToken = csrfModule.csrfToken
@@ -197,10 +199,10 @@ const corsOptions = {
     const allowedOrigins = process.env.ALLOWED_ORIGINS
       ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
       : [
-        'https://tcdynamics.fr',
-        'https://www.tcdynamics.fr',
-        process.env.FRONTEND_URL || 'http://localhost:8080',
-      ].filter(Boolean)
+          'https://tcdynamics.fr',
+          'https://www.tcdynamics.fr',
+          process.env.FRONTEND_URL || 'http://localhost:8080',
+        ].filter(Boolean)
 
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true)

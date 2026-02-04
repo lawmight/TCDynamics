@@ -1,9 +1,9 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getWithMigration } from '@/utils/storageMigration'
-
 import PerformanceMonitor from '../PerformanceMonitor'
+
+import { getWithMigration } from '@/utils/storageMigration'
 
 // Mock performance API (re-applied in beforeEach so global setup does not override)
 const mockPerformance = {

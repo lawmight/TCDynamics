@@ -119,7 +119,9 @@ export async function sendEmail(
   from?: string,
 ): Promise<void> {
   if (!transporter) {
-    throw new Error('Email service not initialized. Call initializeEmailService first.')
+    throw new Error(
+      'Email service not initialized. Call initializeEmailService first.',
+    )
   }
 
   await transporter.sendMail({

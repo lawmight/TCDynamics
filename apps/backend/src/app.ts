@@ -113,7 +113,7 @@ export function createApp(): Express {
   app.use(
     '/api-docs',
     swaggerUi.serve,
-    swaggerUi.setup(swaggerSpec, swaggerUiOptions)
+    swaggerUi.setup(swaggerSpec, swaggerUiOptions),
   )
   app.get('/api-docs.json', (_req, res) => {
     res.setHeader('Content-Type', 'application/json')

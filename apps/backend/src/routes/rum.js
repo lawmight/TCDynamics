@@ -36,8 +36,7 @@ const eventSchema = Joi.object({
   url: Joi.string().uri({ allowRelative: true }).allow('').optional(),
   path: Joi.string().max(2048).required(),
   referrer: Joi.string().allow('', null).optional(),
-  country: Joi.string().uppercase().length(2).allow(null)
-    .optional(),
+  country: Joi.string().uppercase().length(2).allow(null).optional(),
   device: Joi.string()
     .valid('desktop', 'mobile', 'tablet')
     .allow(null)
@@ -53,8 +52,7 @@ const eventSchema = Joi.object({
 
 const collectSchema = Joi.object({
   projectId: Joi.string().max(64).optional(),
-  events: Joi.array().items(eventSchema).min(1).max(100)
-    .required(),
+  events: Joi.array().items(eventSchema).min(1).max(100).required(),
 })
 
 const hashIp = ip => {
@@ -79,12 +77,13 @@ router.post(
   '/rum/collect',
   ingestLimiter,
   asyncHandler(async (req, res) => {
-    const writeKey = req.header('x-write-key')
-      || req.header('X-Write-Key')
-      || req.query.key
-      || req.query.k
-      || req.body?.key
-      || req.body?.writeKey
+    const writeKey =
+      req.header('x-write-key') ||
+      req.header('X-Write-Key') ||
+      req.query.key ||
+      req.query.k ||
+      req.body?.key ||
+      req.body?.writeKey
     if (!writeKey) {
       throw new ValidationError('Missing X-Write-Key header')
     }
@@ -187,7 +186,10 @@ router.get(
     }
 
     res.json({
-      success: true, projectId, windowDays: days, results,
+      success: true,
+      projectId,
+      windowDays: days,
+      results,
     })
   }),
 )

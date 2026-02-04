@@ -11,7 +11,11 @@ function createInitialMetrics() {
     startTime: Date.now(),
     requests: { total: 0, byMethod: {}, byStatus: {}, byEndpoint: {} },
     errors: { total: 0, byType: {}, recent: [] },
-    performance: { averageResponseTime: 0, slowestEndpoints: [], memoryUsage: {} },
+    performance: {
+      averageResponseTime: 0,
+      slowestEndpoints: [],
+      memoryUsage: {},
+    },
   }
 }
 
@@ -35,15 +39,19 @@ const collectMetrics = (req, res, next) => {
     const duration = Date.now() - start
 
     metrics.requests.total++
-    metrics.requests.byMethod[req.method] = (metrics.requests.byMethod[req.method] || 0) + 1
-    metrics.requests.byStatus[res.statusCode] = (metrics.requests.byStatus[res.statusCode] || 0) + 1
+    metrics.requests.byMethod[req.method] =
+      (metrics.requests.byMethod[req.method] || 0) + 1
+    metrics.requests.byStatus[res.statusCode] =
+      (metrics.requests.byStatus[res.statusCode] || 0) + 1
 
     const endpoint = `${req.method} ${req.route?.path || req.path}`
-    metrics.requests.byEndpoint[endpoint] = (metrics.requests.byEndpoint[endpoint] || 0) + 1
+    metrics.requests.byEndpoint[endpoint] =
+      (metrics.requests.byEndpoint[endpoint] || 0) + 1
 
     const currentAvg = metrics.performance.averageResponseTime
     const totalRequests = metrics.requests.total
-    metrics.performance.averageResponseTime = (currentAvg * (totalRequests - 1) + duration) / totalRequests
+    metrics.performance.averageResponseTime =
+      (currentAvg * (totalRequests - 1) + duration) / totalRequests
 
     updateSlowestEndpoints(endpoint, duration)
     originalSend.call(this, body)
@@ -270,9 +278,10 @@ router.get(
     }
 
     // Check memory usage
-    const memUsagePercent = (metrics.performance.memoryUsage.heapUsed
-        / metrics.performance.memoryUsage.heapTotal)
-      * 100
+    const memUsagePercent =
+      (metrics.performance.memoryUsage.heapUsed /
+        metrics.performance.memoryUsage.heapTotal) *
+      100
     if (memUsagePercent > 90 && Number.isFinite(memUsagePercent)) {
       health.status = 'warning'
       health.memoryWarning = `High memory usage: ${memUsagePercent.toFixed(1)}%`

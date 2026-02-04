@@ -38,9 +38,8 @@ const router = express.Router()
 // Add the route handler manually for testing - avec validation basique
 router.post('/demo', async (req, res) => {
   try {
-    const {
-      firstName, lastName, email, phone, company, employees, needs,
-    } = req.body
+    const { firstName, lastName, email, phone, company, employees, needs } =
+      req.body
 
     // Validation basique des champs requis
     if (!firstName || !lastName || !email || !company || !employees || !needs) {

@@ -21,8 +21,9 @@ const { createTransporter } = require('../../config/email')
 const { logger } = require('../logger')
 
 describe('routeFactory', () => {
-  let req; let res; let
-    mockTransporter
+  let req
+  let res
+  let mockTransporter
 
   beforeEach(() => {
     // Reset all mocks

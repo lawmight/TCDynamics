@@ -24,7 +24,7 @@ const monitoringModule = require('../routes/monitoring')
  */
 export function configureMiddleware(
   app: Express,
-  config: EnvironmentConfig
+  config: EnvironmentConfig,
 ): void {
   const { addRequestId } = loggerModule
   const { helmetConfig, validateIP, sanitizeInput } = securityModule
@@ -48,14 +48,15 @@ export function configureMiddleware(
         }
         return compression.filter(req, res)
       },
-    })
+    },
+    ),
   )
 
   // CORS configuration
   const corsOptions: CorsOptions = {
     origin: (
       origin: string | undefined,
-      callback: (err: Error | null, allow?: boolean) => void
+      callback: (err: Error | null, allow?: boolean) => void,
     ) => {
       // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true)
@@ -80,7 +81,8 @@ export function configureMiddleware(
         // Store raw body for webhook verification if needed
         ;(req as Request & { rawBody?: Buffer }).rawBody = buf
       },
-    })
+    },
+    ),
   )
   app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 

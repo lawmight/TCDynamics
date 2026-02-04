@@ -24,7 +24,7 @@ process.on(
   (reason: unknown, promise: Promise<unknown>) => {
     console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason)
     process.exit(1)
-  }
+  },
 )
 
 // Load environment variables
@@ -72,14 +72,15 @@ function startServer(): void {
           openApiUrl: `http://localhost:${PORT}/api-docs.json`,
         })
       }
-    })
+    },
+    )
 
     // Server error handler
     server.on('error', (error: NodeJS.ErrnoException) => {
       console.error('❌ Server failed to start:', error)
       if (error.code === 'EADDRINUSE') {
         console.error(
-          `❌ Port ${PORT} is already in use. Please use a different port or kill the process using this port.`
+          `❌ Port ${PORT} is already in use. Please use a different port or kill the process using this port.`,
         )
       }
       process.exit(1)

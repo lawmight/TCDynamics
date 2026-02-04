@@ -1,7 +1,8 @@
 const { Pool } = require('pg')
 
-const DEFAULT_DATABASE_URL = process.env.DATABASE_URL
-  || 'postgresql://tcdynamics:changeme@postgres:5432/tcdynamics'
+const DEFAULT_DATABASE_URL =
+  process.env.DATABASE_URL ||
+  'postgresql://tcdynamics:changeme@postgres:5432/tcdynamics'
 
 const pool = new Pool({
   connectionString: DEFAULT_DATABASE_URL,

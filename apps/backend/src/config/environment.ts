@@ -39,10 +39,10 @@ export function loadEnvironment(): EnvironmentConfig {
   const allowedOrigins = process.env.ALLOWED_ORIGINS
     ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
     : [
-      'https://tcdynamics.fr',
-      'https://www.tcdynamics.fr',
-      process.env.FRONTEND_URL || 'http://localhost:8080',
-    ].filter(Boolean)
+        'https://tcdynamics.fr',
+        'https://www.tcdynamics.fr',
+        process.env.FRONTEND_URL || 'http://localhost:8080',
+      ].filter(Boolean)
 
   return {
     nodeEnv,
@@ -51,17 +51,15 @@ export function loadEnvironment(): EnvironmentConfig {
     allowedOrigins,
     database: {
       url:
-        process.env.DATABASE_URL
-        || 'postgresql://tcdynamics:changeme@postgres:5432/tcdynamics',
+        process.env.DATABASE_URL ||
+        'postgresql://tcdynamics:changeme@postgres:5432/tcdynamics',
       poolMax: parseInt(process.env.PG_POOL_MAX || '10'),
       idleTimeoutMs: parseInt(process.env.PG_IDLE_TIMEOUT_MS || '30000'),
       connectionTimeoutMs: parseInt(
         process.env.PG_CONNECTION_TIMEOUT_MS || '10000',
       ),
       ssl:
-        process.env.PG_SSL === 'true'
-          ? { rejectUnauthorized: false }
-          : false,
+        process.env.PG_SSL === 'true' ? { rejectUnauthorized: false } : false,
     },
     email: {
       host: process.env.EMAIL_HOST || 'smtp.zoho.eu',

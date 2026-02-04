@@ -11,7 +11,9 @@ let pool: Pool | null = null
 /** Throws if pool not initialized; returns the pool otherwise. */
 function assertPool(): Pool {
   if (!pool) {
-    throw new Error('Database pool not initialized. Call initializeDatabase first.')
+    throw new Error(
+      'Database pool not initialized. Call initializeDatabase first.',
+    )
   }
   return pool
 }
@@ -19,7 +21,9 @@ function assertPool(): Pool {
 /**
  * Initialize database connection pool
  */
-export function initializeDatabase(config: EnvironmentConfig['database']): Pool {
+export function initializeDatabase(
+  config: EnvironmentConfig['database'],
+): Pool {
   if (pool) {
     return pool
   }

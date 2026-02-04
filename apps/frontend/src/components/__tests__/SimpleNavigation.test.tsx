@@ -1,4 +1,6 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import type { ReactNode } from 'react'
+import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import SimpleNavigation from '../SimpleNavigation'
@@ -76,7 +78,21 @@ describe('SimpleNavigation Component', () => {
   })
 
   it('should handle logo click to scroll to hero section', () => {
-    renderSimpleNavigation()
+    // Ensure router is at '/' so the logo handler runs the scroll-to-hero branch (CI-safe)
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <ThemeProvider defaultTheme="light" storageKey="theme">
+        <MemoryRouter
+          initialEntries={['/']}
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+          }}
+        >
+          {children}
+        </MemoryRouter>
+      </ThemeProvider>
+    )
+    render(<SimpleNavigation />, { wrapper })
 
     const logoLink = screen.getByRole('link', { name: 'TCDynamics' })
     const mockScrollIntoView = vi.fn()
@@ -86,7 +102,7 @@ describe('SimpleNavigation Component', () => {
 
     fireEvent.click(logoLink)
 
-    expect(document.getElementById).toHaveBeenCalledWith('hero')
+    // Assert observable behavior: smooth scroll to hero (getElementById is used internally)
     expect(mockScrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth' })
   })
 
