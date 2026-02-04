@@ -35,6 +35,7 @@ jobs:
         with:
           node-version: '20'
 
+      # Official installer: always gets latest Cursor CLI (https://cursor.com/install)
       - name: Install Cursor CLI
         run: |
           curl -fsSL https://cursor.com/install | bash
@@ -58,7 +59,7 @@ jobs:
           npm ci
           npm run lint -ws
           npm run type-check -ws
-          npm run test -ws
+          npm run test -ws --if-present
 
       - name: Commit and push (only if verify passed)
         if: success()

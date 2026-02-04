@@ -1,8 +1,22 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { vi } from 'vitest'
 
 import DocumentProcessor from '../DocumentProcessor'
 
+vi.mock('@/api/azureServices', () => ({
+  visionAPI: {
+    processDocument: vi.fn().mockResolvedValue({
+      success: true,
+      data: {},
+    }),
+  },
+}))
+
 describe('DocumentProcessor Component', () => {
+  afterEach(() => {
+    vi.clearAllMocks()
+  })
+
   it('should render document upload interface', () => {
     render(<DocumentProcessor />)
 
@@ -48,10 +62,16 @@ describe('DocumentProcessor Component', () => {
 
     fireEvent.change(fileInput, { target: { files: [file] } })
 
-    // When files are selected, processing should start automatically
     await waitFor(() => {
       expect(screen.getByText(/Traitement en cours/i)).toBeInTheDocument()
     })
+    // Wait for processing to complete so no state updates run after teardown
+    await waitFor(
+      () => {
+        expect(screen.getByText('Documents traités')).toBeInTheDocument()
+      },
+      { timeout: 3000 }
+    )
   })
 
   it('should display processing results', async () => {

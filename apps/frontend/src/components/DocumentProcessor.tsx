@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { visionAPI } from '@/api/azureServices'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -63,6 +63,11 @@ const DocumentProcessor = () => {
   const [documents, setDocuments] = useState<ProcessedDocument[]>([])
   const [isProcessing, setIsProcessing] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const isMountedRef = useRef(true)
+
+  useEffect(() => () => {
+    isMountedRef.current = false
+  }, [])
 
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -100,8 +105,12 @@ const DocumentProcessor = () => {
           reader.readAsDataURL(file)
         })
 
+        if (!isMountedRef.current) return
+
         // Appeler l'API Vision
         const result = await visionAPI.processDocument(base64)
+
+        if (!isMountedRef.current) return
 
         if (!result.success) {
           throw new Error(result.message || 'Erreur lors du traitement')
@@ -141,6 +150,8 @@ const DocumentProcessor = () => {
           confidence = 0.7
         }
 
+        if (!isMountedRef.current) return
+
         // Mettre à jour le document avec le résultat
         setDocuments(prev =>
           prev.map(doc =>
@@ -150,7 +161,7 @@ const DocumentProcessor = () => {
           )
         )
       } catch (error) {
-        // Utiliser le système de logging approprié
+        if (!isMountedRef.current) return
         logger.error('Error processing document', error)
 
         setDocuments(prev =>
@@ -167,6 +178,7 @@ const DocumentProcessor = () => {
       }
     }
 
+    if (!isMountedRef.current) return
     setIsProcessing(false)
   }
 
