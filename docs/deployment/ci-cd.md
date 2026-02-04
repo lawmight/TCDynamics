@@ -68,12 +68,13 @@ sequenceDiagram
 
 ### Summary
 
-You have **4 workflows** showing in GitHub Actions:
+You have **5 workflows** (4 active):
 
 1. ✅ **Dependabot Updates** - Auto-generated from `.github/dependabot.yml`
 2. ✅ **Deploy MVP to Vercel** - Active (`.github/workflows/deploy-mvp.yml`)
 3. ✅ **Quality Gate** - Active (`.github/workflows/quality-gate.yml`)
-4. ⚠️ **Tests Complete Suite** - **DELETED** but still showing in GitHub UI (was `.github/workflows/tests.yml`)
+4. ✅ **Bump dev dependencies (Cursor headless)** - Active (`.github/workflows/bump-dev-deps.yml`); runs daily and on manual dispatch; requires `CURSOR_API_KEY` secret.
+5. ⚠️ **Tests Complete Suite** - **DELETED** but still showing in GitHub UI (was `.github/workflows/tests.yml`)
 
 ---
 
@@ -116,7 +117,30 @@ Automatically creates pull requests to update dependencies across your project.
 
 ---
 
-## Workflow 2: Deploy MVP to Vercel
+## Workflow 2: Bump dev dependencies (Cursor headless)
+
+**Source**: `.github/workflows/bump-dev-deps.yml`
+
+### Purpose
+
+Automatically bump devDependencies in the monorepo (root and `apps/*`, `api`) using the Cursor CLI agent in headless mode, then verify and push only when lint, type-check, and tests pass.
+
+### Required secret
+
+- **CURSOR_API_KEY** – Create at [Cursor dashboard](https://cursor.com) → Integrations → User API Keys. Add in the repo: **Settings → Secrets and variables → Actions → New repository secret** named `CURSOR_API_KEY`. Do not commit the key; revoke any key that was ever pasted in chat or logs.
+
+### Safety (follow-up job)
+
+Verify runs in the same job before any push: we only commit and push when `npm run lint -ws`, `npm run type-check -ws`, and `npm run test -ws` succeed. If the bump breaks anything, the job fails and nothing is pushed, so main never gets a broken state from this workflow.
+
+### Schedule and trigger
+
+- **Schedule**: Daily at 06:00 UTC.
+- **Manual**: **Actions → Bump dev dependencies (Cursor headless) → Run workflow**.
+
+---
+
+## Workflow 3: Deploy MVP to Vercel
 
 **File**: `.github/workflows/deploy-mvp.yml`
 **Status**: ✅ **ACTIVE**
@@ -158,7 +182,7 @@ Deploys the frontend application to Vercel (production or staging environments).
 
 ---
 
-## Workflow 3: Quality Gate
+## Workflow 4: Quality Gate
 
 **File**: `.github/workflows/quality-gate.yml`
 **Status**: ✅ **ACTIVE**
@@ -208,7 +232,7 @@ Runs comprehensive quality checks before deployment (linting, testing, type chec
 
 ---
 
-## Workflow 4: Tests Complete Suite (Historical)
+## Workflow 5: Tests Complete Suite (Historical)
 
 **File**: `.github/workflows/tests.yml`
 **Status**: ⚠️ **DELETED** (moved to archive on commit `2b5a683`, Nov 2025)
