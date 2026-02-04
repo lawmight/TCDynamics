@@ -1,5 +1,7 @@
 module.exports = {
   testEnvironment: 'node',
+  // Disable coverage in CI to avoid babel-plugin-istanbul/test-exclude + Node compat (see fix_bump_workflow_jest_failure plan)
+  collectCoverage: process.env.CI !== 'true',
   // Restrict Jest to only search within this backend directory
   roots: ['<rootDir>/src'],
   // Only match test files within this backend directory
