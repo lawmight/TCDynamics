@@ -1,13 +1,17 @@
-import Contact from '@/components/Contact'
-import FAQ from '@/components/FAQ'
+import { lazy, Suspense } from 'react'
+
 import Features from '@/components/Features'
 import Hero from '@/components/Hero'
 import HowItWorks from '@/components/HowItWorks'
-import LocalAdvantages from '@/components/LocalAdvantages'
-import Pricing from '@/components/Pricing'
 import SectionIndicators from '@/components/SectionIndicators'
-import SocialProof from '@/components/SocialProof'
 import { useScrollSpy } from '@/hooks/useScrollSpy'
+
+// Below-the-fold sections: lazy-loaded to reduce initial "/" chunk (bundle-dynamic-imports)
+const FAQ = lazy(() => import('@/components/FAQ'))
+const LocalAdvantages = lazy(() => import('@/components/LocalAdvantages'))
+const Pricing = lazy(() => import('@/components/Pricing'))
+const SocialProof = lazy(() => import('@/components/SocialProof'))
+const LazyContact = lazy(() => import('@/components/Contact'))
 
 // Scroll offset to account for fixed navigation header
 const scrollMarginStyle = { scrollMarginTop: '5rem' }
@@ -54,23 +58,33 @@ const Index = () => {
         aria-label="Avantages locaux"
         style={scrollMarginStyle}
       >
-        <LocalAdvantages />
+        <Suspense fallback={null}>
+          <LocalAdvantages />
+        </Suspense>
       </section>
       <section
         id="social-proof"
         aria-label="Preuves sociales"
         style={scrollMarginStyle}
       >
-        <SocialProof />
+        <Suspense fallback={null}>
+          <SocialProof />
+        </Suspense>
       </section>
       <section id="pricing" aria-label="Tarifs" style={scrollMarginStyle}>
-        <Pricing />
+        <Suspense fallback={null}>
+          <Pricing />
+        </Suspense>
       </section>
       <section id="faq" aria-label="FAQ" style={scrollMarginStyle}>
-        <FAQ />
+        <Suspense fallback={null}>
+          <FAQ />
+        </Suspense>
       </section>
       <section id="contact" aria-label="Contact" style={scrollMarginStyle}>
-        <Contact />
+        <Suspense fallback={null}>
+          <LazyContact />
+        </Suspense>
       </section>
     </main>
   )

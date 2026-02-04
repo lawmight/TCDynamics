@@ -83,16 +83,6 @@ const SimpleNavigation = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleLogoClick = () => {
-    if (location.pathname === '/') {
-      // If on home page, scroll to hero section
-      handleNavClick({ label: 'Accueil', scrollId: 'hero' })
-    } else {
-      // If on any other page, navigate to home
-      navigate('/')
-    }
-  }
-
   const navigationItems = [
     { label: 'Accueil', scrollId: 'hero' },
     { label: 'Fonctionnalités', scrollId: 'features' },
@@ -113,7 +103,7 @@ const SimpleNavigation = () => {
 
       {/* Simple Header */}
       <header
-        className={`fixed inset-x-0 top-0 z-40 transition-all duration-300 ${
+        className={`fixed inset-x-0 top-0 z-40 transition-[background-color,border-color] duration-300 ${
           isScrolled
             ? 'border-b border-border bg-background/95 backdrop-blur-sm'
             : 'bg-transparent'
@@ -122,31 +112,64 @@ const SimpleNavigation = () => {
         <div className="container mx-auto p-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <button
-              onClick={handleLogoClick}
-              className="text-2xl font-bold text-primary transition-colors hover:text-primary-glow"
+            <Link
+              to={location.pathname === '/' ? '/#hero' : '/'}
+              className="text-2xl font-bold text-primary transition-colors hover:text-primary-glow focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               TCDynamics
-            </button>
+            </Link>
 
             {/* Desktop Navigation */}
             <nav className="hidden items-center space-x-4 lg:flex">
               {shouldShowDesktopNav ? (
                 <>
-                  {navigationItems.map(item => (
-                    <button
-                      key={item.label}
-                      onClick={() => handleNavClick(item)}
-                      className="px-0 py-2.5 text-foreground/80 transition-colors hover:text-primary"
-                      onMouseEnter={() => prefetchRoute(item.path)}
-                    >
-                      {item.label}
-                    </button>
-                  ))}
+                  {navigationItems.map(item =>
+                    item.path ? (
+                      /* eslint-disable-next-line jsx-a11y/no-static-element-interactions -- Link renders as focusable <a> with native keyboard support */
+                      <Link
+                        key={item.label}
+                        to={item.path}
+                        onClick={() => handleNavClick(item)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            handleNavClick(item)
+                          }
+                        }}
+                        className="px-0 py-2.5 text-foreground/80 transition-colors hover:text-primary focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        onMouseEnter={() => prefetchRoute(item.path)}
+                      >
+                        {item.label}
+                      </Link>
+                    ) : (
+                      <a
+                        key={item.label}
+                        href={`/#${item.scrollId}`}
+                        onClick={e => {
+                          if (location.pathname === '/') {
+                            e.preventDefault()
+                            handleNavClick(item)
+                          }
+                        }}
+                        onKeyDown={e => {
+                          if (
+                            location.pathname === '/' &&
+                            (e.key === 'Enter' || e.key === ' ')
+                          ) {
+                            e.preventDefault()
+                            handleNavClick(item)
+                          }
+                        }}
+                        className="px-0 py-2.5 text-foreground/80 transition-colors hover:text-primary focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        onMouseEnter={() => prefetchRoute(item.path)}
+                      >
+                        {item.label}
+                      </a>
+                    )
+                  )}
                   <button
                     onClick={goToApp}
                     onMouseEnter={() => !isExternalApp && prefetchRoute('/app')}
-                    className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                   >
                     Accéder à l'app
                   </button>
@@ -176,7 +199,7 @@ const SimpleNavigation = () => {
                   <button
                     onClick={goToApp}
                     onMouseEnter={() => !isExternalApp && prefetchRoute('/app')}
-                    className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                   >
                     Accéder à l'app
                   </button>
@@ -201,16 +224,44 @@ const SimpleNavigation = () => {
             <div className="container mx-auto p-4">
               <nav className="flex flex-col space-y-3">
                 {location.pathname === '/' ? (
-                  navigationItems.map(item => (
-                    <button
-                      key={item.label}
-                      onClick={() => handleNavClick(item)}
-                      className="py-2 text-left text-foreground/80 transition-colors hover:text-primary"
-                      onMouseEnter={() => prefetchRoute(item.path)}
-                    >
-                      {item.label}
-                    </button>
-                  ))
+                  navigationItems.map(item =>
+                    item.path ? (
+                      /* eslint-disable-next-line jsx-a11y/no-static-element-interactions -- Link renders as focusable <a> with native keyboard support */
+                      <Link
+                        key={item.label}
+                        to={item.path}
+                        onClick={() => handleNavClick(item)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            handleNavClick(item)
+                          }
+                        }}
+                        className="py-2 text-left text-foreground/80 transition-colors hover:text-primary focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        onMouseEnter={() => prefetchRoute(item.path)}
+                      >
+                        {item.label}
+                      </Link>
+                    ) : (
+                      <a
+                        key={item.label}
+                        href={`/#${item.scrollId}`}
+                        onClick={e => {
+                          e.preventDefault()
+                          handleNavClick(item)
+                        }}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault()
+                            handleNavClick(item)
+                          }
+                        }}
+                        className="py-2 text-left text-foreground/80 transition-colors hover:text-primary focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        onMouseEnter={() => prefetchRoute(item.path)}
+                      >
+                        {item.label}
+                      </a>
+                    )
+                  )
                 ) : (
                   /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
                   <Link
@@ -228,7 +279,7 @@ const SimpleNavigation = () => {
                 )}
                 <button
                   onClick={goToApp}
-                  className="mt-2 rounded-full bg-primary px-4 py-2 text-left text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="mt-2 rounded-full bg-primary px-4 py-2 text-left text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                   onMouseEnter={() => !isExternalApp && prefetchRoute('/app')}
                 >
                   Accéder à l'app
@@ -258,7 +309,7 @@ const SimpleNavigation = () => {
       {showBackToTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-6 left-6 z-50 rounded-full bg-primary p-3 text-primary-foreground shadow-lg transition-all duration-300 hover:bg-primary-glow"
+          className="fixed bottom-6 left-6 z-50 rounded-full bg-primary p-3 text-primary-foreground shadow-lg transition-[background-color,border-color] duration-300 hover:bg-primary-glow"
           aria-label="Back to top"
         >
           <ArrowUp size={20} />

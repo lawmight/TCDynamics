@@ -15,6 +15,82 @@ The database uses MongoDB Atlas with Mongoose schemas defined in `api/_lib/model
 - **Connection**: Serverless singleton in `api/_lib/mongodb.js`
 - **Multi-tenancy**: Models linked via `clerkId` (Clerk user ID)
 
+### Entity Relationships
+
+```mermaid
+erDiagram
+  User ||--o{ ApiKey : "clerkId"
+  User ||--o{ ChatConversation : "clerkId"
+  User ||--o{ KnowledgeFile : "clerkId"
+  User ||--o{ AnalyticsEvent : "clerkId"
+  User ||--o{ UsageLog : "clerkId"
+  User ||--o{ Contact : "clerkId optional"
+  User ||--o{ DemoRequest : "clerkId optional"
+  User ||--o{ Feedback : "clerkId optional"
+
+  User {
+    ObjectId _id PK
+    string clerkId UK
+    string email
+    string plan
+    string subscriptionStatus
+  }
+
+  Contact {
+    ObjectId _id PK
+    string email UK
+    string name
+    string clerkId FK
+  }
+
+  ApiKey {
+    ObjectId _id PK
+    string clerkId FK
+    string name
+  }
+
+  PolarEvent {
+    ObjectId _id PK
+    string polarSubscriptionId
+  }
+```
+
+### Model Dependency Flow
+
+```mermaid
+flowchart TB
+  subgraph External["External Systems"]
+    Clerk[Clerk Auth]
+    Polar[Polar Payments]
+  end
+
+  subgraph Core["Core Models"]
+    User[User]
+  end
+
+  subgraph UserLinked["User-linked Collections"]
+    ApiKey[ApiKey]
+    ChatConv[ChatConversation]
+    KnowledgeFile[KnowledgeFile]
+    AnalyticsEvent[AnalyticsEvent]
+    UsageLog[UsageLog]
+    Contact[Contact]
+    DemoRequest[DemoRequest]
+    Feedback[Feedback]
+  end
+
+  Clerk -->|"webhook sync"| User
+  Polar -->|"webhook"| PolarEvent
+  User --> ApiKey
+  User --> ChatConv
+  User --> KnowledgeFile
+  User --> AnalyticsEvent
+  User --> UsageLog
+  User --> Contact
+  User --> DemoRequest
+  User --> Feedback
+```
+
 ---
 
 ## Models

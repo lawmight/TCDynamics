@@ -124,7 +124,7 @@ const HowItWorks = () => {
                     : hiddenClass
                 }`}
               >
-                <Card className="group h-full border-primary/20 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-primary/40">
+                <Card className="group h-full border-primary/20 bg-card/50 backdrop-blur-sm transition-[transform,border-color] duration-300 hover:scale-105 hover:border-primary/40">
                   <CardContent className="p-8">
                     {/* Step Number */}
                     <div className="mb-6 flex items-center justify-between">

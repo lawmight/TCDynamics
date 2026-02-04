@@ -1,0 +1,13 @@
+# Align with root .prettierignore so format from apps/frontend skips generated dirs
+node_modules
+dist
+build
+*.log
+.env
+coverage
+.nyc_output
+**/coverage
+**/dist
+**/playwright-report
+**/test-results
+**/lcov-report

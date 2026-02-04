@@ -1,3 +1,4 @@
+import { motion, useReducedMotion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
@@ -103,8 +104,18 @@ const supportInfo = [
   },
 ]
 
+const sectionReveal = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (reduce: boolean) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: reduce ? 0 : 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+  }),
+}
+
 const Pricing = () => {
   const navigate = useNavigate()
+  const reduceMotion = useReducedMotion()
   const demoLink = import.meta.env.VITE_DEMO_URL || '/demo'
 
   const goToDemo = (planName?: string) => {
@@ -134,7 +145,14 @@ const Pricing = () => {
         <div className="absolute right-0 top-1/3 h-px w-24 bg-gradient-to-l from-accent/20 to-transparent"></div>
       </div>
 
-      <div className="container relative z-10 mx-auto px-4">
+      <motion.div
+        className="container relative z-10 mx-auto px-4"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-60px 0px -60px 0px', amount: 0.1 }}
+        variants={sectionReveal}
+        custom={!!reduceMotion}
+      >
         {/* Header */}
         <div className="mb-16 text-center">
           <div className="mb-16 text-center">
@@ -199,7 +217,7 @@ const Pricing = () => {
               </div>
 
               {/* New Way - Prominent, Larger Card */}
-              <div className="relative overflow-hidden rounded-lg border-2 border-primary/40 bg-gradient-to-br from-primary/10 via-primary/5 to-background p-8 shadow-lg shadow-primary/20 backdrop-blur-sm transition-all duration-300 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/30 md:col-span-2 lg:col-span-2">
+              <div className="relative overflow-hidden rounded-lg border-2 border-primary/40 bg-gradient-to-br from-primary/10 via-primary/5 to-background p-8 shadow-lg shadow-primary/20 backdrop-blur-sm transition-[border-color,box-shadow] duration-300 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/30 md:col-span-2 lg:col-span-2">
                 <div className="mb-6 inline-flex items-center gap-2 rounded-lg border border-primary/50 bg-primary/20 px-4 py-2 font-mono text-sm font-semibold text-primary">
                   <Check size={16} className="text-primary" />
                   AVEC TCDYNAMICS
@@ -228,7 +246,7 @@ const Pricing = () => {
               </div>
 
               {/* Step 1 - Onboard */}
-              <div className="relative overflow-hidden rounded-lg border border-border/50 bg-card/30 p-6 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-card/50 md:col-span-1 lg:col-span-1">
+              <div className="relative overflow-hidden rounded-lg border border-border/50 bg-card/30 p-6 backdrop-blur-sm transition-[border-color,box-shadow] duration-300 hover:border-primary/30 hover:bg-card/50 md:col-span-1 lg:col-span-1">
                 <div className="mb-4 flex items-center gap-3">
                   <div className="flex size-8 items-center justify-center rounded-full border-2 border-primary bg-primary/10 font-mono text-sm font-bold text-primary">
                     1
@@ -248,7 +266,7 @@ const Pricing = () => {
               </div>
 
               {/* Step 2 - Super-powers */}
-              <div className="relative overflow-hidden rounded-lg border border-border/50 bg-card/30 p-6 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-card/50 md:col-span-1 lg:col-span-1">
+              <div className="relative overflow-hidden rounded-lg border border-border/50 bg-card/30 p-6 backdrop-blur-sm transition-[border-color,box-shadow] duration-300 hover:border-primary/30 hover:bg-card/50 md:col-span-1 lg:col-span-1">
                 <div className="mb-4 flex items-center gap-3">
                   <div className="flex size-8 items-center justify-center rounded-full border-2 border-primary bg-primary/10 font-mono text-sm font-bold text-primary">
                     2
@@ -266,7 +284,7 @@ const Pricing = () => {
               </div>
 
               {/* Step 3 - Goals */}
-              <div className="relative overflow-hidden rounded-lg border border-border/50 bg-card/30 p-6 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-card/50 md:col-span-1 lg:col-span-1">
+              <div className="relative overflow-hidden rounded-lg border border-border/50 bg-card/30 p-6 backdrop-blur-sm transition-[border-color,box-shadow] duration-300 hover:border-primary/30 hover:bg-card/50 md:col-span-1 lg:col-span-1">
                 <div className="mb-4 flex items-center gap-3">
                   <div className="flex size-8 items-center justify-center rounded-full border-2 border-primary bg-primary/10 font-mono text-sm font-bold text-primary">
                     3
@@ -295,7 +313,7 @@ const Pricing = () => {
           {pricingPlans.map((plan, index) => (
             <Card
               key={index}
-              className={`fade-in-up relative flex h-full flex-col border-primary/20 bg-card/30 backdrop-blur-sm transition-all duration-300 hover:border-primary/40 ${
+              className={`fade-in-up relative flex h-full flex-col border-primary/20 bg-card/30 backdrop-blur-sm transition-[border-color,box-shadow] duration-300 hover:border-primary/40 ${
                 plan.popular
                   ? 'relative z-10 border-2 border-primary shadow-2xl'
                   : ''
@@ -394,7 +412,7 @@ const Pricing = () => {
             {supportInfo.map((info, index) => (
               <Card
                 key={index}
-                className="border-primary/20 bg-card/20 backdrop-blur-sm transition-all duration-300 hover:border-primary/40"
+                className="border-primary/20 bg-card/20 backdrop-blur-sm transition-[border-color,box-shadow] duration-300 hover:border-primary/40"
               >
                 <CardContent className="p-6 text-center">
                   <div className="mx-auto mb-4 w-fit rounded-lg bg-primary/10 p-3">
@@ -432,7 +450,7 @@ const Pricing = () => {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </motion.div>
     </section>
   )
 }

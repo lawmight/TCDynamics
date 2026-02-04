@@ -5,6 +5,54 @@
 
 This document explains the worktree setup for parallel development without breaking things.
 
+### Worktree Overview
+
+```mermaid
+flowchart TB
+  Main[Main repo: main branch] --> Worktrees[Worktrees]
+
+  subgraph Core["Core Development"]
+    WT_Frontend[tcdynamics-frontend]
+    WT_API[tcdynamics-api]
+    WT_Backend[tcdynamics-backend]
+    WT_Tests[tcdynamics-tests]
+  end
+
+  subgraph Features["Features"]
+    WT_UI[tcdynamics-ui]
+    WT_Payments[tcdynamics-payments]
+    WT_AI[tcdynamics-ai]
+    WT_Auth[tcdynamics-auth]
+  end
+
+  subgraph Maintenance["Maintenance"]
+    WT_Docs[tcdynamics-docs]
+    WT_CICD[tcdynamics-cicd]
+    WT_Deps[tcdynamics-deps]
+    WT_Refactor[tcdynamics-refactor]
+  end
+
+  Worktrees --> Core
+  Worktrees --> Features
+  Worktrees --> Maintenance
+```
+
+### Worktree Lifecycle
+
+```mermaid
+sequenceDiagram
+  participant Dev
+  participant Main
+  participant Worktree
+  participant PR
+
+  Dev->>Main: setup-worktrees.ps1
+  Main->>Worktree: Add worktree
+  Dev->>Worktree: cd + branch + code
+  Dev->>Main: Merge via PR
+  Dev->>Main: cleanup-worktrees.ps1
+```
+
 ## Current Status
 
 ✅ **Cleaned up**: All old AI-generated worktrees (glx, luf, mqb, ora, utr, uuq) have been removed.

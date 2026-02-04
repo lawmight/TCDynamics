@@ -1,22 +1,39 @@
+import { motion, useReducedMotion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
 import { featureModules } from '@/data/productHighlights'
-import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 import ArrowRight from '~icons/lucide/arrow-right'
 import Brain from '~icons/lucide/brain'
 import Lock from '~icons/lucide/lock'
 import Zap from '~icons/lucide/zap'
 
+const sectionReveal = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (reduce: boolean) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: reduce ? 0 : 0.5,
+      ease: [0.25, 0.46, 0.45, 0.94],
+      staggerChildren: reduce ? 0 : 0.08,
+      delayChildren: reduce ? 0 : 0.04,
+    },
+  }),
+}
+
+const itemReveal = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (reduce: boolean) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: reduce ? 0 : 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
+  }),
+}
+
 const Features = () => {
   const navigate = useNavigate()
-  const { ref: sectionRef, hasIntersected } = useIntersectionObserver({
-    threshold: 0.15,
-    rootMargin: '0px 0px -50px 0px',
-  })
-
-  // Hidden state before scroll reveal
-  const hiddenClass = 'opacity-0 translate-y-6'
+  const reduceMotion = useReducedMotion()
 
   const scrollToContact = () => {
     const contactSection = document.getElementById('contact')
@@ -43,19 +60,8 @@ const Features = () => {
     },
   } as const
 
-  // Delay class mappings
-  const delayClasses = {
-    '0s': 'fade-delay-00',
-    '0.1s': 'fade-delay-01',
-    '0.2s': 'fade-delay-02',
-    '0.3s': 'fade-delay-03',
-  } as const
-
   return (
-    <section
-      ref={sectionRef}
-      className="relative overflow-hidden bg-background py-20 lg:py-32"
-    >
+    <section className="relative overflow-hidden bg-background pb-20 pt-24 lg:pb-32 lg:pt-32">
       {/* Background Network Patterns */}
       <div className="absolute inset-0 opacity-40">
         <div className="top-1/6 left-1/5 absolute size-1 animate-pulse rounded-full bg-primary"></div>
@@ -98,25 +104,38 @@ const Features = () => {
         </svg>
       </div>
 
-      <div className="container relative z-10 mx-auto px-6">
+      <motion.div
+        className="container relative z-10 mx-auto px-6"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-80px 0px -80px 0px', amount: 0.15 }}
+        variants={sectionReveal}
+        custom={!!reduceMotion}
+      >
         {/* Section Header */}
         <div className="mb-16 space-y-6 text-center">
-          <div
-            className={`inline-flex items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-2 font-mono text-xs text-muted-foreground backdrop-blur-sm ${hasIntersected ? 'fade-in-up' : hiddenClass}`}
+          <motion.div
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-2 font-mono text-xs text-muted-foreground backdrop-blur-sm"
+            variants={itemReveal}
+            custom={!!reduceMotion}
           >
             <Brain size={14} aria-hidden="true" />
             INTELLIGENCE MODULES
-          </div>
+          </motion.div>
 
-          <h2
-            className={`text-4xl font-bold leading-tight tracking-tight text-foreground lg:text-6xl ${hasIntersected ? 'fade-in-up fade-delay-01' : hiddenClass}`}
+          <motion.h2
+            className="text-4xl font-bold leading-tight tracking-tight text-foreground lg:text-6xl"
+            variants={itemReveal}
+            custom={!!reduceMotion}
           >
             Modules IA pour{' '}
             <span className="text-gradient">Entreprises Françaises</span>
-          </h2>
+          </motion.h2>
 
-          <p
-            className={`mx-auto max-w-3xl text-xl text-muted-foreground ${hasIntersected ? 'fade-in-up fade-delay-02' : hiddenClass}`}
+          <motion.p
+            className="mx-auto max-w-3xl text-xl text-muted-foreground"
+            variants={itemReveal}
+            custom={!!reduceMotion}
           >
             Solutions d'automatisation conçues spécifiquement pour les TPE/PME
             françaises.
@@ -125,7 +144,7 @@ const Features = () => {
               WorkFlowAI - Des workflows visuels pour gagner du temps chaque
               jour.
             </span>
-          </p>
+          </motion.p>
         </div>
 
         {/* Features Grid */}
@@ -133,13 +152,13 @@ const Features = () => {
           {featureModules.map((feature, index) => {
             const colors =
               colorVariants[feature.color as keyof typeof colorVariants]
-            const delayClass =
-              delayClasses[feature.delay as keyof typeof delayClasses]
 
             return (
-              <div
+              <motion.div
                 key={index}
-                className={`group relative rounded-lg border border-border bg-card/30 p-8 backdrop-blur-sm transition-all duration-500 hover:border-primary/30 hover:bg-card/50 ${hasIntersected ? `fade-in-up ${delayClass}` : hiddenClass}`}
+                className="group relative rounded-lg border border-border bg-card/30 p-8 backdrop-blur-sm transition-[border-color,background-color] duration-500 hover:border-primary/30 hover:bg-card/50"
+                variants={itemReveal}
+                custom={!!reduceMotion}
               >
                 {/* Icon Header */}
                 <div className="mb-6 flex items-center gap-4">
@@ -197,14 +216,16 @@ const Features = () => {
                 <div
                   className={`absolute inset-0 bg-gradient-to-br ${colors.gradient} -z-10 rounded-lg to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100`}
                 ></div>
-              </div>
+              </motion.div>
             )
           })}
         </div>
 
         {/* Bottom CTA Section */}
-        <div
-          className={`rounded-lg border border-border bg-card/20 p-8 text-center backdrop-blur-sm ${hasIntersected ? 'fade-in-up fade-delay-04' : hiddenClass}`}
+        <motion.div
+          className="rounded-lg border border-border bg-card/20 p-8 text-center backdrop-blur-sm"
+          variants={itemReveal}
+          custom={!!reduceMotion}
         >
           <div className="mb-4 flex items-center justify-center gap-2">
             <Lock size={16} className="text-primary-glow" aria-hidden="true" />
@@ -240,8 +261,8 @@ const Features = () => {
               PARLER À UN EXPERT
             </Button>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </section>
   )
 }

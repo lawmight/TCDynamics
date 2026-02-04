@@ -40,7 +40,7 @@ vi.mock('@/components/Contact', () => ({
 }))
 
 describe('Index Page', () => {
-  it('should render all main sections', () => {
+  it('should render all main sections', async () => {
     render(
       <MemoryRouter>
         <Index />
@@ -50,14 +50,15 @@ describe('Index Page', () => {
     expect(screen.getByTestId('hero')).toBeInTheDocument()
     expect(screen.getByTestId('features')).toBeInTheDocument()
     expect(screen.getByTestId('how-it-works')).toBeInTheDocument()
-    expect(screen.getByTestId('local-advantages')).toBeInTheDocument()
-    expect(screen.getByTestId('social-proof')).toBeInTheDocument()
-    expect(screen.getByTestId('pricing')).toBeInTheDocument()
-    expect(screen.getByTestId('faq')).toBeInTheDocument()
-    expect(screen.getByTestId('contact')).toBeInTheDocument()
+    // Lazy-loaded sections: wait for Suspense to resolve
+    expect(await screen.findByTestId('local-advantages')).toBeInTheDocument()
+    expect(await screen.findByTestId('social-proof')).toBeInTheDocument()
+    expect(await screen.findByTestId('pricing')).toBeInTheDocument()
+    expect(await screen.findByTestId('faq')).toBeInTheDocument()
+    expect(await screen.findByTestId('contact')).toBeInTheDocument()
   })
 
-  it('should render with correct semantic structure', () => {
+  it('should render with correct semantic structure', async () => {
     render(
       <MemoryRouter>
         <Index />
@@ -67,6 +68,9 @@ describe('Index Page', () => {
     const main = screen.getByRole('main')
     expect(main).toBeInTheDocument()
     expect(main).toHaveAttribute('id', 'main')
+
+    // Wait for lazy sections so getAllByRole('region') includes them
+    await screen.findByTestId('contact')
 
     const sections = screen.getAllByRole('region')
     expect(sections).toHaveLength(8) // All section components
@@ -103,7 +107,7 @@ describe('Index Page', () => {
     )
   })
 
-  it('should have proper accessibility labels', () => {
+  it('should have proper accessibility labels', async () => {
     render(
       <MemoryRouter>
         <Index />
@@ -112,5 +116,7 @@ describe('Index Page', () => {
 
     const heroSection = screen.getByTestId('hero').closest('section')
     expect(heroSection).toHaveAttribute('aria-label', 'Présentation TCDynamics')
+    // Ensure lazy sections have loaded for consistent test state
+    await screen.findByTestId('contact')
   })
 })

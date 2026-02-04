@@ -1,5 +1,3 @@
-import { useMemo } from 'react'
-
 /** Default label mapping for section IDs */
 const DEFAULT_LABELS: Record<string, string> = {
   hero: 'Présentation',
@@ -30,14 +28,10 @@ const SectionIndicators = ({
   sectionIds,
   labels = DEFAULT_LABELS,
 }: SectionIndicatorsProps) => {
-  const indicators = useMemo(
-    () =>
-      sectionIds.map(id => ({
-        id,
-        label: labels[id] || id,
-      })),
-    [sectionIds, labels]
-  )
+  const indicators = sectionIds.map(id => ({
+    id,
+    label: labels[id] || id,
+  }))
 
   const handleClick = (id: string) => {
     const element = document.getElementById(id)

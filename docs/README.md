@@ -6,6 +6,34 @@
 
 Welcome to the TCDynamics WorkFlowAI documentation. This index provides navigation to all project documentation organized by category.
 
+### Documentation Map
+
+```mermaid
+flowchart TB
+  Index[README: Index] --> Arch[Architecture]
+  Index --> Dev[Development]
+  Index --> Deploy[Deployment]
+  Index --> Security[Security]
+  Index --> Testing[Testing]
+  Index --> Integrations[Integrations]
+  Index --> Migrations[Migrations]
+
+  Arch --> Repo[repository-structure]
+  Arch --> API[api-endpoints]
+  Arch --> Data[data-models]
+
+  Dev --> Onboard[onboarding]
+  Dev --> Git[git-workflow]
+  Dev --> Env[environment-setup]
+
+  Deploy --> CICD[ci-cd]
+  Deploy --> Monitoring[monitoring]
+
+  Security --> Headers[headers]
+  Security --> Auth[authentication]
+  Security --> COEP[coep-config]
+```
+
 ## Getting Started
 
 New to the project? Start here:

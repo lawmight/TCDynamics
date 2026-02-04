@@ -156,7 +156,7 @@ const SocialProof = () => {
             {logos.map(logo => (
               <div
                 key={logo.name}
-                className="rounded-lg border border-primary/10 bg-card/40 p-4 text-center backdrop-blur-sm transition-all duration-300 hover:border-primary/30"
+                className="rounded-lg border border-primary/10 bg-card/40 p-4 text-center backdrop-blur-sm transition-[border-color] duration-300 hover:border-primary/30"
               >
                 <div className="text-sm font-semibold text-foreground">
                   {logo.name}
@@ -176,7 +176,7 @@ const SocialProof = () => {
           {testimonials.map((testimonial, index) => (
             <Card
               key={index}
-              className="card-hover group border-primary/20 bg-card/60 backdrop-blur-sm transition-all duration-500 hover:border-primary/40"
+              className="card-hover group border-primary/20 bg-card/60 backdrop-blur-sm transition-[border-color,box-shadow] duration-500 hover:border-primary/40"
               role="article"
               aria-labelledby={`testimonial-${index}-author`}
             >
@@ -197,6 +197,7 @@ const SocialProof = () => {
                 </blockquote>
                 <div className="flex flex-wrap items-center gap-3">
                   {}
+                  {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- onError is for fallback image, not user interaction */}
                   <img
                     src={testimonial.image}
                     alt={`${testimonial.author}, ${testimonial.position} chez ${testimonial.company}`}
@@ -238,7 +239,7 @@ const SocialProof = () => {
             return (
               <Card
                 key={index}
-                className="group border-primary/20 bg-gradient-to-r from-primary/10 to-primary/5 transition-all duration-300 hover:from-primary/15 hover:to-primary/10"
+                className="group border-primary/20 bg-gradient-to-r from-primary/10 to-primary/5 transition-[background] duration-300 hover:from-primary/15 hover:to-primary/10"
               >
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">

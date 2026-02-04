@@ -169,7 +169,7 @@ const LocalAdvantages = () => {
                               : ''
                 }`}
               >
-                <Card className="h-full border-primary/20 bg-card/60 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10">
+                <Card className="h-full border-primary/20 bg-card/60 backdrop-blur-sm transition-[transform,border-color,box-shadow] duration-300 hover:scale-105 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10">
                   <CardContent className="p-6">
                     {/* Icon and Badge */}
                     <div className="mb-4 flex items-start justify-between">

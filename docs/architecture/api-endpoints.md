@@ -37,6 +37,61 @@ All endpoints follow consistent error response format:
 
 All endpoints support CORS with appropriate headers set.
 
+### Endpoint Overview
+
+```mermaid
+flowchart LR
+  subgraph Public["Public / Optional Auth"]
+    Analytics[/api/analytics]
+    Forms[/api/forms]
+    Health["GET /api/analytics?health=true"]
+  end
+
+  subgraph Protected["Clerk JWT or API Key"]
+    AI[/api/ai]
+    Files[/api/files]
+    User[/api/user]
+    APIKeys[/api/app/api-keys]
+  end
+
+  subgraph Polar["Payment"]
+    Checkout[/api/polar/checkout]
+    PolarWebhook[/api/polar/webhook]
+  end
+
+  subgraph Webhooks["Webhooks"]
+    ClerkWebhook[/api/webhooks/clerk]
+  end
+
+  Client[Client] --> Public
+  Client --> Protected
+  Polar --> Protected
+  External[Polar / Clerk] --> PolarWebhook
+  External --> ClerkWebhook
+```
+
+### Request Flow
+
+```mermaid
+sequenceDiagram
+  participant Client
+  participant Vercel as Vercel Edge
+  participant Function as Serverless Function
+  participant Auth as auth.js
+  participant DB as MongoDB
+  participant Ext as External Service
+
+  Client->>Vercel: GET/POST /api/*
+  Vercel->>Function: Invoke handler
+  Function->>Auth: verifyClerkAuth or API key
+  Auth-->>Function: clerkId or 401
+  Function->>DB: Query/update (if needed)
+  Function->>Ext: Resend, Vertex, Polar (if needed)
+  Ext-->>Function: Response
+  DB-->>Function: Result
+  Function-->>Client: JSON 200/4xx/5xx
+```
+
 ---
 
 ## Core Endpoints

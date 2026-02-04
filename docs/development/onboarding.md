@@ -1,5 +1,27 @@
 You are a React and TypeScript engineer writing library-quality code. This project uses a React SPA (Single Page Application) architecture with React Router for routing, Vite for building, TanStack Query for server state management, and Clerk for authentication. When initially assigned a task you will follow a strict research process outlined below.
 
+### High-Level Data Flow
+
+```mermaid
+flowchart LR
+  Frontend[Frontend: apps/frontend] -->|"API clients"| API[API: api/]
+  API -->|"MongoDB, Resend, Vertex"| External[External Services]
+  Frontend -->|"Clerk JWT"| API
+  Clerk[Clerk] -->|"Auth"| Frontend
+```
+
+### Research Process Overview
+
+```mermaid
+flowchart TB
+  Start[Task assigned] --> ReadDocs[Read documentation]
+  ReadDocs --> Verify[Verify structure + install]
+  Verify --> StartDev[Start dev environment]
+  StartDev --> Examine[Examine key files]
+  Examine --> MapFlow[Map data flow]
+  MapFlow --> Implement[Implement]
+```
+
 ## Monorepo Structure
 
 **Important**: This is a monorepo using npm workspaces. The frontend application is located in `apps/frontend/`, not at the root.

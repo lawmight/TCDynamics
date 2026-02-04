@@ -1,5 +1,6 @@
 import { track } from '@vercel/analytics'
-import { useEffect, useRef, useState } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import Captcha, { type CaptchaHandle } from '@/components/Captcha'
 import { PostSubmissionFeedback } from '@/components/PostSubmissionFeedback'
@@ -24,9 +25,19 @@ import MapPin from '~icons/lucide/map-pin'
 import Phone from '~icons/lucide/phone'
 import XCircle from '~icons/lucide/x-circle'
 
+const sectionReveal = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (reduce: boolean) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: reduce ? 0 : 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+  }),
+}
+
 const Contact = () => {
   const demoForm = useDemoForm()
   const contactForm = useContactForm()
+  const reduceMotion = useReducedMotion()
   const { hasAnalyticsConsent, hasMarketingConsent } = useCookieConsent()
   const [showDemoFeedback, setShowDemoFeedback] = useState(false)
   const [showContactFeedback, setShowContactFeedback] = useState(false)
@@ -54,6 +65,8 @@ const Contact = () => {
     email: { valid: false, message: '' },
     message: { valid: false, message: '' },
   })
+  const [demoNeedsLength, setDemoNeedsLength] = useState(0)
+  const [contactMessageLength, setContactMessageLength] = useState(0)
   const demoCaptchaRef = useRef<CaptchaHandle | null>(null)
   const contactCaptchaRef = useRef<CaptchaHandle | null>(null)
 
@@ -65,17 +78,17 @@ const Contact = () => {
   const demoFormStartTracked = useRef(false)
   const contactFormStartTracked = useRef(false)
 
-  const trackWithConsent = (
-    eventName: string,
-    data: Record<string, unknown>
-  ) => {
-    if (!hasAnalyticsConsent) return
-    try {
-      track(eventName, data)
-    } catch {
-      // Ignore analytics failures
-    }
-  }
+  const trackWithConsent = useCallback(
+    (eventName: string, data: Record<string, unknown>) => {
+      if (!hasAnalyticsConsent) return
+      try {
+        track(eventName, data)
+      } catch {
+        // Ignore analytics failures
+      }
+    },
+    [hasAnalyticsConsent]
+  )
 
   // Track demo form start
   const handleDemoFormStart = () => {
@@ -124,6 +137,7 @@ const Contact = () => {
     contactFormStarted,
     contactFormSubmitted,
     hasAnalyticsConsent,
+    trackWithConsent,
   ])
 
   // Validation helpers
@@ -275,9 +289,16 @@ const Contact = () => {
         </svg>
       </div>
 
-      <div className="container relative z-10 mx-auto px-4">
+      <motion.div
+        className="container relative z-10 mx-auto px-4"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-60px 0px -60px 0px', amount: 0.1 }}
+        variants={sectionReveal}
+        custom={!!reduceMotion}
+      >
         {/* Header */}
-        <div className="fade-in-up mb-16 text-center">
+        <div className="mb-16 text-center">
           <Badge
             variant="outline"
             className="mb-6 border-primary/40 font-mono text-primary"
@@ -296,7 +317,7 @@ const Contact = () => {
         <div className="mx-auto max-w-6xl">
           <div className="grid items-start gap-6 md:grid-cols-3 lg:grid-cols-3">
             {/* Hero Card - Demo Request Form (Full Width) */}
-            <div className="fade-in-up fade-delay-02 relative overflow-hidden rounded-lg border-2 border-primary/40 bg-gradient-to-br from-primary/10 via-primary/5 to-background p-8 shadow-lg shadow-primary/20 backdrop-blur-sm transition-all duration-300 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/30 md:col-span-3 lg:col-span-3">
+            <div className="fade-in-up fade-delay-02 relative overflow-hidden rounded-lg border-2 border-primary/40 bg-gradient-to-br from-primary/10 via-primary/5 to-background p-8 shadow-lg shadow-primary/20 backdrop-blur-sm transition-[border-color,box-shadow] duration-300 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/30 md:col-span-3 lg:col-span-3">
               <div className="mb-6 flex items-center gap-3">
                 <div className="rounded-full bg-primary/20 p-2">
                   <Calendar className="size-6 text-primary" />
@@ -368,21 +389,26 @@ const Contact = () => {
                       needsValidation.valid
 
                     if (!allValid) {
-                      // Focus on first invalid field
-                      const firstInvalidField = Object.entries(
-                        demoValidation
-                      ).find(([_, validation]) => !validation.valid)
-
-                      if (firstInvalidField) {
-                        const fieldId = `demo-${firstInvalidField[0]}`
-                        const fieldElement = document.getElementById(fieldId)
-                        if (fieldElement) {
-                          fieldElement.focus()
-                          fieldElement.scrollIntoView({
+                      // Focus on first invalid field (use local validation result)
+                      const validations = [
+                        ['firstName', firstNameValidation],
+                        ['lastName', lastNameValidation],
+                        ['email', emailValidation],
+                        ['needs', needsValidation],
+                      ] as const
+                      const firstInvalid = validations.find(
+                        ([_, v]) => !v.valid
+                      )
+                      if (firstInvalid) {
+                        const fieldId = `demo-${firstInvalid[0]}`
+                        requestAnimationFrame(() => {
+                          const fieldElement = document.getElementById(fieldId)
+                          fieldElement?.focus()
+                          fieldElement?.scrollIntoView({
                             behavior: 'smooth',
                             block: 'center',
                           })
-                        }
+                        })
                       }
                       return
                     }
@@ -402,6 +428,7 @@ const Contact = () => {
                     if (result.success) {
                       setDemoFormSubmitted(true)
                       form.reset()
+                      setDemoNeedsLength(0)
                       setDemoUserData({ email, company })
                       setShowDemoFeedback(true)
                       setDemoCaptchaToken(undefined)
@@ -530,6 +557,8 @@ const Contact = () => {
                         id="demo-email"
                         name="email"
                         type="email"
+                        autoComplete="email"
+                        spellCheck={false}
                         placeholder="jean.dupont@entreprise.fr"
                         className={`bg-background/50 ${
                           demoValidation.email.message ? 'border-red-500' : ''
@@ -627,7 +656,7 @@ const Contact = () => {
                       <Textarea
                         id="demo-needs"
                         name="needs"
-                        placeholder="Décrivez brièvement vos processus à automatiser (minimum 10 caractères)..."
+                        placeholder="Décrivez brièvement vos processus à automatiser (minimum 10 caractères)…"
                         className={`min-h-[100px] bg-background/50 ${
                           demoValidation.needs.message ? 'border-red-500' : ''
                         }`}
@@ -644,7 +673,9 @@ const Contact = () => {
                             : undefined
                         }
                         onChange={e => {
-                          const validation = validateMessage(e.target.value, 10)
+                          const value = e.target.value
+                          setDemoNeedsLength(value.length)
+                          const validation = validateMessage(value, 10)
                           setDemoValidation(prev => ({
                             ...prev,
                             needs: validation,
@@ -664,12 +695,10 @@ const Contact = () => {
                       <span>
                         {demoValidation.needs.valid
                           ? 'Validé ✓'
-                          : 'En cours de validation...'}
+                          : 'En cours de validation…'}
                       </span>
                       <span aria-live="polite">
-                        {document.getElementById('demo-needs')?.value?.length ||
-                          0}
-                        /5000 caractères
+                        {demoNeedsLength}/5000 caractères
                       </span>
                     </div>
                   </div>
@@ -693,7 +722,7 @@ const Contact = () => {
                     }
                   >
                     {demoForm.isSubmitting ? (
-                      'Envoi en cours...'
+                      'Envoi en cours…'
                     ) : (
                       <>
                         <Calendar className="mr-2 size-4" />
@@ -740,7 +769,7 @@ const Contact = () => {
             </div>
 
             {/* Supporting Card 1 - Contact Info (Combined) */}
-            <div className="fade-in-up fade-delay-04 relative overflow-hidden rounded-lg border border-border/50 bg-card/30 p-4 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-card/50 md:col-span-1 lg:col-span-1">
+            <div className="fade-in-up fade-delay-04 relative overflow-hidden rounded-lg border border-border/50 bg-card/30 p-4 backdrop-blur-sm transition-[border-color,box-shadow] duration-300 hover:border-primary/30 hover:bg-card/50 md:col-span-1 lg:col-span-1">
               <div className="mb-3 flex items-center gap-2">
                 <div className="rounded-full bg-primary/10 p-1.5">
                   <Building className="size-4 text-primary" />
@@ -773,7 +802,7 @@ const Contact = () => {
             </div>
 
             {/* Supporting Card 2 - More Contact Info */}
-            <div className="fade-in-up fade-delay-06 relative overflow-hidden rounded-lg border border-border/50 bg-card/30 p-4 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-card/50 md:col-span-1 lg:col-span-1">
+            <div className="fade-in-up fade-delay-06 relative overflow-hidden rounded-lg border border-border/50 bg-card/30 p-4 backdrop-blur-sm transition-[border-color,box-shadow] duration-300 hover:border-primary/30 hover:bg-card/50 md:col-span-1 lg:col-span-1">
               <div className="mb-3 flex items-center gap-2">
                 <div className="rounded-full bg-primary/10 p-1.5">
                   <Mail className="size-4 text-primary" />
@@ -806,7 +835,7 @@ const Contact = () => {
             </div>
 
             {/* Supporting Card 3 - Local Office Highlight */}
-            <div className="fade-in-up fade-delay-08 relative overflow-hidden rounded-lg border border-primary/20 bg-gradient-to-br from-primary/10 to-primary/5 p-4 backdrop-blur-sm transition-all duration-300 hover:border-primary/40 hover:bg-gradient-to-br hover:from-primary/15 hover:to-primary/10 md:col-span-1 lg:col-span-1">
+            <div className="fade-in-up fade-delay-08 relative overflow-hidden rounded-lg border border-primary/20 bg-gradient-to-br from-primary/10 to-primary/5 p-4 backdrop-blur-sm transition-[border-color,box-shadow] duration-300 hover:border-primary/40 hover:bg-gradient-to-br hover:from-primary/15 hover:to-primary/10 md:col-span-1 lg:col-span-1">
               <div className="mb-3 flex items-center gap-2">
                 <div className="rounded-full bg-primary/20 p-1.5">
                   <MapPin className="size-4 text-primary" />
@@ -864,6 +893,7 @@ const Contact = () => {
               <CardContent className="space-y-4">
                 <form
                   className="space-y-4"
+                  aria-label="Formulaire de contact"
                   noValidate
                   onSubmit={async e => {
                     e.preventDefault()
@@ -897,21 +927,26 @@ const Contact = () => {
                       messageValidation.valid
 
                     if (!allValid) {
-                      // Focus on first invalid field
-                      const firstInvalidField = Object.entries(
-                        contactValidation
-                      ).find(([_, validation]) => !validation.valid)
-
-                      if (firstInvalidField) {
-                        const fieldId = `contact-${firstInvalidField[0]}`
-                        const fieldElement = document.getElementById(fieldId)
-                        if (fieldElement) {
-                          fieldElement.focus()
-                          fieldElement.scrollIntoView({
+                      // Focus on first invalid field (use local validation result)
+                      const validations = [
+                        ['firstName', firstNameValidation],
+                        ['lastName', lastNameValidation],
+                        ['email', emailValidation],
+                        ['message', messageValidation],
+                      ] as const
+                      const firstInvalid = validations.find(
+                        ([_, v]) => !v.valid
+                      )
+                      if (firstInvalid) {
+                        const fieldId = `contact-${firstInvalid[0]}`
+                        requestAnimationFrame(() => {
+                          const fieldElement = document.getElementById(fieldId)
+                          fieldElement?.focus()
+                          fieldElement?.scrollIntoView({
                             behavior: 'smooth',
                             block: 'center',
                           })
-                        }
+                        })
                       }
                       return
                     }
@@ -930,6 +965,7 @@ const Contact = () => {
                     if (result.success) {
                       setContactFormSubmitted(true)
                       form.reset()
+                      setContactMessageLength(0)
                       setContactUserData({ email, company })
                       setShowContactFeedback(true)
                       setContactCaptchaToken(undefined)
@@ -1062,6 +1098,8 @@ const Contact = () => {
                         id="contact-email"
                         name="email"
                         type="email"
+                        autoComplete="email"
+                        spellCheck={false}
                         placeholder="votre@email.fr"
                         className={`bg-background/50 ${
                           contactValidation.email.message
@@ -1142,7 +1180,7 @@ const Contact = () => {
                       <Textarea
                         id="contact-message"
                         name="message"
-                        placeholder="Décrivez votre demande (minimum 10 caractères)..."
+                        placeholder="Décrivez votre demande (minimum 10 caractères)…"
                         className={`min-h-[120px] bg-background/50 ${
                           contactValidation.message.message
                             ? 'border-red-500'
@@ -1161,7 +1199,9 @@ const Contact = () => {
                             : undefined
                         }
                         onChange={e => {
-                          const validation = validateMessage(e.target.value, 10)
+                          const value = e.target.value
+                          setContactMessageLength(value.length)
+                          const validation = validateMessage(value, 10)
                           setContactValidation(prev => ({
                             ...prev,
                             message: validation,
@@ -1183,12 +1223,10 @@ const Contact = () => {
                       <span>
                         {contactValidation.message.valid
                           ? 'Validé ✓'
-                          : 'En cours de validation...'}
+                          : 'En cours de validation…'}
                       </span>
                       <span aria-live="polite">
-                        {document.getElementById('contact-message')?.value
-                          ?.length || 0}
-                        /5000 caractères
+                        {contactMessageLength}/5000 caractères
                       </span>
                     </div>
                   </div>
@@ -1204,9 +1242,14 @@ const Contact = () => {
                     className="w-full"
                     variant="outline"
                     disabled={contactForm.isSubmitting}
+                    aria-label={
+                      contactForm.isSubmitting
+                        ? 'Envoi du message en cours'
+                        : 'Envoyer le message'
+                    }
                   >
                     {contactForm.isSubmitting ? (
-                      'Envoi en cours...'
+                      'Envoi en cours…'
                     ) : (
                       <>
                         <Mail className="mr-2 size-4" />
@@ -1249,7 +1292,7 @@ const Contact = () => {
             </Card>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Demo Form Feedback Dialog */}
       {showDemoFeedback && (

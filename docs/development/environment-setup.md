@@ -9,6 +9,41 @@ Complete guide for setting up your development environment for the TCDynamics Wo
 
 This guide covers all required and optional environment variables for both frontend and backend development, as well as service account setup instructions.
 
+### Setup Flow
+
+```mermaid
+flowchart LR
+  Clone[Clone repo] --> Install[Install deps]
+  Install --> Env[Create .env]
+  Env --> Config[Configure variables]
+  Config --> Start[Start dev servers]
+```
+
+### Environment Variable Scope
+
+```mermaid
+flowchart TB
+  subgraph Frontend["Frontend (VITE_*)"]
+    ViteClerk[VITE_CLERK_PUBLISHABLE_KEY]
+    ViteSentry[VITE_SENTRY_DSN]
+    ViteAPI[VITE_API_URL]
+  end
+
+  subgraph API["API / Serverless"]
+    ClerkSecret[CLERK_SECRET_KEY]
+    Mongo[MONGODB_URI]
+    Sentry[SENTRY_DSN]
+  end
+
+  subgraph Backend["Backend (local)"]
+    NodeEnv[NODE_ENV]
+    BackendMongo[Mongo connection]
+  end
+
+  Frontend --> API
+  API --> Backend
+```
+
 ---
 
 ## Quick Start

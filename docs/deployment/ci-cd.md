@@ -2,6 +2,66 @@
 
 This document covers GitHub Actions workflows, Vercel deployment configuration, and deployment troubleshooting.
 
+## Workflow Overview
+
+```mermaid
+flowchart TB
+  subgraph Triggers["Triggers"]
+    PushMain["Push to main"]
+    PR["PR to main"]
+    Manual["Manual dispatch"]
+  end
+
+  subgraph DeployMVP["Deploy MVP to Vercel"]
+    QG[quality-gate reusable]
+    ValidateForce[validate-production-force]
+    Approval[production-force-approval]
+    Deploy[deploy job]
+    QG --> ValidateForce
+    ValidateForce --> Approval
+    Approval --> Deploy
+  end
+
+  subgraph QualityGate["Quality Gate"]
+    Checkout[Checkout]
+    Setup[Setup Node + cache]
+    Install[Install deps]
+    TypeCheck[Type check]
+    Lint[Lint]
+    Tests[Unit tests + coverage]
+    Build[Build check]
+    ValidateAPI[Validate API]
+    Audit[Audit API deps]
+    Checkout --> Setup --> Install --> TypeCheck --> Lint --> Tests --> Build --> ValidateAPI --> Audit
+  end
+
+  PushMain --> DeployMVP
+  PR --> QualityGate
+  Manual --> DeployMVP
+  DeployMVP --> QualityGate
+```
+
+### Pipeline Flow
+
+```mermaid
+sequenceDiagram
+  participant Dev
+  participant GitHub
+  participant QualityGate as Quality Gate
+  participant Vercel
+
+  Dev->>GitHub: Push to main / Open PR
+  GitHub->>QualityGate: Trigger (path filter)
+  QualityGate->>QualityGate: type-check, lint, test, build
+  alt PR or deploy without force
+    QualityGate-->>GitHub: Pass / Fail
+  end
+  alt Deploy MVP (push to main)
+    QualityGate->>Vercel: Build + deploy
+    Vercel-->>GitHub: Deployment URL
+  end
+```
+
 ---
 
 ## GitHub Actions Workflows
@@ -179,18 +239,26 @@ GitHub Actions UI continues to show deleted workflows if they have run history. 
 
 ## Workflow Relationships
 
-```
-Current Active Workflows:
-├── Dependabot Updates (auto-generated from dependabot.yml)
-├── Deploy MVP to Vercel (deploy-mvp.yml)
-│   └── calls → Quality Gate (reusable workflow)
-└── Quality Gate (quality-gate.yml)
-    ├── standalone (runs on PRs and pushes)
-    └── reusable (called by deploy-mvp.yml)
+```mermaid
+flowchart LR
+  subgraph Active["Active Workflows"]
+    Dependabot[Dependabot Updates]
+    DeployMVP[Deploy MVP to Vercel]
+    QualityGate[Quality Gate]
+  end
 
-Historical Workflow (Deleted):
-└── Tests Complete Suite (tests.yml) - Archived/Deleted
+  DeployMVP -->|"calls"| QualityGate
+  QualityGate -->|"runs on PR + push"| QualityGate
+
+  subgraph Historical["Historical"]
+    TestsSuite["Tests Complete Suite (deleted)"]
+  end
 ```
+
+- **Dependabot Updates**: Auto-generated from `dependabot.yml`
+- **Deploy MVP**: `deploy-mvp.yml` — calls Quality Gate, then deploys to Vercel
+- **Quality Gate**: `quality-gate.yml` — standalone on PRs/pushes, or reusable by Deploy MVP
+- **Tests Complete Suite**: Deleted (archived); still visible in GitHub UI
 
 ---
 

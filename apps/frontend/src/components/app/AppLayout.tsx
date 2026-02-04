@@ -1,5 +1,4 @@
 import { UserButton, useUser } from '@clerk/clerk-react'
-import { useMemo } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 
 import { useTheme } from '@/components/ThemeProvider'
@@ -29,13 +28,11 @@ export const AppLayout = () => {
   const { signOut } = useAuth()
   const { user } = useUser()
 
-  const initials = useMemo(() => {
-    const email =
-      user?.primaryEmailAddress?.emailAddress ||
-      user?.emailAddresses[0]?.emailAddress ||
-      'user'
-    return email.slice(0, 2).toUpperCase()
-  }, [user])
+  const email =
+    user?.primaryEmailAddress?.emailAddress ||
+    user?.emailAddresses[0]?.emailAddress ||
+    'user'
+  const initials = email.slice(0, 2).toUpperCase()
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -103,7 +100,7 @@ export const AppLayout = () => {
           </div>
         </aside>
 
-        <main className="flex min-h-screen flex-1 flex-col">
+        <main id="main" className="flex min-h-screen flex-1 flex-col">
           <header className="flex items-center justify-between border-b border-border p-4 md:hidden">
             <Link to="/app/chat" className="flex items-center gap-2">
               {/* eslint-disable-next-line tailwindcss/classnames-order */}

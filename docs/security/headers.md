@@ -6,6 +6,44 @@ This document describes the security headers configuration for the TCDynamics pr
 
 The project implements strict security headers to protect against XSS attacks, enforce secure cross-origin resource loading, and maintain a secure browsing environment.
 
+### Header Application Flow
+
+```mermaid
+flowchart TB
+  Request[Request] --> Vercel[Vercel / vercel.json]
+  Vercel --> CSP["Content-Security-Policy"]
+  Vercel --> COEP["Cross-Origin-Embedder-Policy"]
+  Vercel --> Other["Other security headers"]
+
+  subgraph CSPDirectives["CSP Directives"]
+    scriptSrc["script-src: self, hash, allowlist"]
+    defaultSrc["default-src: self"]
+    frameSrc["frame-src: allowlist"]
+    connectSrc["connect-src: self, APIs"]
+  end
+
+  CSP --> CSPDirectives
+```
+
+### CSP Source Allowlist (Production)
+
+```mermaid
+flowchart LR
+  subgraph ScriptSources["script-src"]
+    Self["'self'"]
+    Hash["sha256-... theme-init"]
+    Facebook["https://connect.facebook.net"]
+    Cloudflare["https://challenges.cloudflare.com"]
+  end
+
+  subgraph Default["default-src"]
+    SelfOnly["'self'"]
+  end
+
+  Browser[Browser] --> ScriptSources
+  Browser --> Default
+```
+
 ---
 
 ## Content Security Policy (CSP) Hardening

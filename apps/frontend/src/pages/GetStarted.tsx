@@ -411,7 +411,7 @@ const GetStarted = () => {
                           {isSubmitting ? (
                             <>
                               <div className="mr-2 size-4 animate-spin rounded-full border-b-2 border-white"></div>
-                              Redirection vers la démo...
+                              Redirection vers la démo…
                             </>
                           ) : (
                             <>

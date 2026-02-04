@@ -1,5 +1,3 @@
-import { useMemo } from 'react'
-
 import { Button } from '@/components/ui/button'
 import { useCookieConsent } from '@/hooks/useCookieConsent'
 import type { ConsentPreferences } from '@/utils/consent'
@@ -19,8 +17,7 @@ const buildConsent = (
 const CookieConsent = () => {
   const { consent, isReady, saveConsent } = useCookieConsent()
 
-  const shouldShow = useMemo(() => isReady && !consent, [consent, isReady])
-
+  const shouldShow = isReady && !consent
   if (!shouldShow) return null
 
   return (

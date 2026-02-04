@@ -45,9 +45,14 @@ class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error }
   }
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate(prevProps: Props, prevState: State) {
     const { resetKeys, resetOnPropsChange } = this.props
     const { hasError } = this.state
+
+    // Start auto-reset timeout when we transition to error state (not in render)
+    if (!prevState.hasError && hasError && !this.props.fallback) {
+      this.handleResetWithDelay()
+    }
 
     // Reset error state if resetKeys changed
     if (hasError && resetKeys && resetOnPropsChange !== false) {
@@ -137,9 +142,7 @@ class ErrorBoundary extends Component<Props, State> {
         return this.props.fallback
       }
 
-      // Auto-reset after 5 seconds
-      this.handleResetWithDelay()
-
+      // Auto-reset is scheduled in componentDidUpdate to avoid setState during render
       // Default error UI
       return (
         <div className="flex min-h-screen items-center justify-center bg-background p-4">
@@ -160,7 +163,7 @@ class ErrorBoundary extends Component<Props, State> {
             </p>
 
             <p className="mb-6 text-sm text-muted-foreground">
-              Tentative de récupération automatique dans 5 secondes...
+              Tentative de récupération automatique dans 5 secondes…
             </p>
 
             <div className="space-y-3">

@@ -1,14 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
 
-interface OptimizedImageProps {
+/**
+ * Lazy-loading image with optional priority loading.
+ * For above-the-fold images, pass `priority={true}` and explicit `width` and
+ * `height` to prevent layout shift (CLS).
+ */
+type OptimizedImageProps = {
   src: string
   alt: string
   className?: string
-  width?: number
-  height?: number
-  priority?: boolean
   onLoad?: () => void
-}
+} & (
+  | { priority?: false; width?: number; height?: number }
+  | { priority: true; width: number; height: number }
+)
 
 export const OptimizedImage = ({
   src,
@@ -64,7 +69,9 @@ export const OptimizedImage = ({
         />
       )}
       {inView && (
-        <img
+        <>
+          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- onLoad is a resource load event, not user interaction */}
+          <img
           src={src}
           alt={alt}
           width={width}
@@ -76,6 +83,7 @@ export const OptimizedImage = ({
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
         />
+        </>
       )}
     </div>
   )

@@ -50,7 +50,9 @@ describe('Contact Component - Enhanced Validation', () => {
         fireEvent.click(submitButton)
       })
 
-      expect(screen.getAllByText(/Ce champ est requis/i).length).toBeGreaterThan(0)
+      expect(
+        screen.getAllByText(/Ce champ est requis/i).length
+      ).toBeGreaterThan(0)
     })
 
     it('should validate name length in demo form', async () => {
@@ -97,7 +99,8 @@ describe('Contact Component - Enhanced Validation', () => {
       )
 
       const demoForm = getDemoForm()
-      const messageInput = within(demoForm).getByLabelText(/Besoins spécifiques/i)
+      const messageInput =
+        within(demoForm).getByLabelText(/Besoins spécifiques/i)
       await act(async () => {
         fireEvent.change(messageInput, { target: { value: 'short' } })
       })
@@ -118,7 +121,8 @@ describe('Contact Component - Enhanced Validation', () => {
       const firstNameInput = within(demoForm).getByLabelText(/^Prénom \*/)
       const lastNameInput = within(demoForm).getByLabelText(/^Nom \*/)
       const emailInput = within(demoForm).getByLabelText(/Email professionnel/i)
-      const messageInput = within(demoForm).getByLabelText(/Besoins spécifiques/i)
+      const messageInput =
+        within(demoForm).getByLabelText(/Besoins spécifiques/i)
 
       await act(async () => {
         fireEvent.change(firstNameInput, { target: { value: 'Jean' } })
@@ -151,7 +155,8 @@ describe('Contact Component - Enhanced Validation', () => {
       const firstNameInput = within(demoForm).getByLabelText(/^Prénom \*/)
       const lastNameInput = within(demoForm).getByLabelText(/^Nom \*/)
       const emailInput = within(demoForm).getByLabelText(/Email professionnel/i)
-      const messageInput = within(demoForm).getByLabelText(/Besoins spécifiques/i)
+      const messageInput =
+        within(demoForm).getByLabelText(/Besoins spécifiques/i)
 
       await act(async () => {
         fireEvent.change(firstNameInput, { target: { value: 'Jean' } })
@@ -185,7 +190,9 @@ describe('Contact Component - Enhanced Validation', () => {
         fireEvent.click(submitButton)
       })
 
-      expect(screen.getAllByText(/Ce champ est requis/i).length).toBeGreaterThan(0)
+      expect(
+        screen.getAllByText(/Ce champ est requis/i).length
+      ).toBeGreaterThan(0)
     })
 
     it('should validate email format in contact form', async () => {
@@ -325,7 +332,9 @@ describe('Contact Component - Enhanced Validation', () => {
           Promise.resolve({ success: true, message: 'Form submitted' }),
       }
 
-      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(mockResponse)
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
+        mockResponse
+      )
 
       render(
         <ContactWrapper>
@@ -337,7 +346,8 @@ describe('Contact Component - Enhanced Validation', () => {
       const firstNameInput = within(demoForm).getByLabelText(/^Prénom \*/)
       const lastNameInput = within(demoForm).getByLabelText(/^Nom \*/)
       const emailInput = within(demoForm).getByLabelText(/Email professionnel/i)
-      const messageInput = within(demoForm).getByLabelText(/Besoins spécifiques/i)
+      const messageInput =
+        within(demoForm).getByLabelText(/Besoins spécifiques/i)
 
       await act(async () => {
         fireEvent.change(firstNameInput, { target: { value: 'Jean' } })

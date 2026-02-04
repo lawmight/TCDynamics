@@ -8,6 +8,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import type { HelpResource, StruggleContext } from '@/components/app/HelpBubble'
 import { analytics } from '@/utils/analytics'
+import { getCached, removeCached, setCached } from '@/utils/storageMigration'
 
 interface UseProactiveSupportOptions {
   /** User ID to monitor */
@@ -51,10 +52,10 @@ export function useProactiveSupport({
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const lastEventRef = useRef<string[]>([])
 
-  // Check cooldown on mount
+  // Check cooldown on mount (uses cached localStorage reads)
   useEffect(() => {
     try {
-      const cooldownUntil = localStorage.getItem(COOLDOWN_KEY)
+      const cooldownUntil = getCached(COOLDOWN_KEY)
       if (cooldownUntil) {
         const until = parseInt(cooldownUntil, 10)
         if (Date.now() < until) {
@@ -62,11 +63,11 @@ export function useProactiveSupport({
           // Set timer to clear cooldown
           const timeout = setTimeout(() => {
             setOnCooldown(false)
-            localStorage.removeItem(COOLDOWN_KEY)
+            removeCached(COOLDOWN_KEY)
           }, until - Date.now())
           return () => clearTimeout(timeout)
         } else {
-          localStorage.removeItem(COOLDOWN_KEY)
+          removeCached(COOLDOWN_KEY)
         }
       }
     } catch {
@@ -213,9 +214,9 @@ export function useProactiveSupport({
     setStruggle(null)
     setOnCooldown(true)
 
-    // Set cooldown in localStorage
+    // Set cooldown in localStorage (cache updated via setCached)
     try {
-      localStorage.setItem(COOLDOWN_KEY, String(Date.now() + dismissCooldown))
+      setCached(COOLDOWN_KEY, String(Date.now() + dismissCooldown))
     } catch {
       // Ignore localStorage errors
     }
@@ -223,7 +224,7 @@ export function useProactiveSupport({
     // Clear cooldown after timeout
     setTimeout(() => {
       setOnCooldown(false)
-      localStorage.removeItem(COOLDOWN_KEY)
+      removeCached(COOLDOWN_KEY)
     }, dismissCooldown)
   }, [dismissCooldown])
 
@@ -239,15 +240,20 @@ export function useProactiveSupport({
 
   const handleFeedback = useCallback(
     (helpful: boolean) => {
-      // Store feedback for analytics
+      // Store feedback for analytics (cached read/write)
       try {
-        const feedback = JSON.parse(localStorage.getItem(FEEDBACK_KEY) || '[]')
+        const raw = getCached(FEEDBACK_KEY)
+        const feedback = JSON.parse(raw || '[]') as Array<{
+          stepId?: string
+          helpful: boolean
+          timestamp: string
+        }>
         feedback.push({
           stepId: struggle?.stepId,
           helpful,
           timestamp: new Date().toISOString(),
         })
-        localStorage.setItem(FEEDBACK_KEY, JSON.stringify(feedback.slice(-50)))
+        setCached(FEEDBACK_KEY, JSON.stringify(feedback.slice(-50)))
       } catch {
         // Ignore localStorage errors
       }

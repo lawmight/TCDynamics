@@ -9,6 +9,42 @@ End-to-end testing guide for TCDynamics WorkFlowAI using Playwright.
 
 E2E tests verify complete user workflows across the entire application, from frontend to backend to external services. Tests run in real browsers to catch integration issues that unit tests might miss.
 
+### E2E Test Flow
+
+```mermaid
+sequenceDiagram
+  participant Runner as Playwright
+  participant Browser
+  participant App as Frontend
+  participant API
+
+  Runner->>Browser: Launch Chromium/Firefox/WebKit
+  Runner->>App: page.goto baseURL
+  App->>API: Fetch (if needed)
+  API-->>App: Response
+  Runner->>Browser: Interact (click, fill)
+  Browser->>App: User action
+  Runner->>Runner: expect assertions
+  Runner->>Runner: Trace / screenshot on failure
+```
+
+### Test Structure
+
+```mermaid
+flowchart TB
+  tests["tests/e2e/"] --> Navigation[navigation.spec.ts]
+  tests --> Contact[contact-flow.spec.ts]
+  tests --> ThirdParty[third-party-resources.spec.ts]
+  tests --> GlobalSetup[global-setup.ts]
+  tests --> GlobalTeardown[global-teardown.ts]
+
+  subgraph Config["playwright.config.ts"]
+    BaseURL["baseURL: localhost:8080"]
+    Browsers["Chromium, Firefox, WebKit"]
+    Retries["Retries: 2 on CI"]
+  end
+```
+
 ## Playwright Setup
 
 ### Installation

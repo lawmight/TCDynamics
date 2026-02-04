@@ -87,7 +87,7 @@ flowchart TB
     API --> Webhooks[webhooks/]
     API --> Endpoints[Endpoints]
 
-    Lib --> LibFiles[auth.js<br/>mongodb.js<br/>email.js<br/>vertex.js]
+    Lib --> LibFiles[auth.js<br/>mongodb.js<br/>validation.js<br/>email.js<br/>vertex.js]
     Lib --> Models[models/<br/>10 Mongoose schemas]
 
     Models --> ModelFiles[User.js<br/>Contact.js<br/>ApiKey.js<br/>ChatConversation.js]

@@ -1,8 +1,8 @@
+import { motion, useReducedMotion } from 'framer-motion'
 import React, { createContext, useContext, useId, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
-import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 import CheckCircle from '~icons/lucide/check-circle'
 import Clock from '~icons/lucide/clock'
 import Gift from '~icons/lucide/gift'
@@ -70,7 +70,7 @@ const Accordion = ({
   return (
     <AccordionContext.Provider value={{ openItems, toggleItem }}>
       <div
-        className="space-y-4"
+        className="content-visibility-auto space-y-4"
         role="region"
         aria-label="Questions fréquentes"
       >
@@ -122,7 +122,7 @@ const AccordionTrigger = ({
   return (
     <button
       id={triggerId}
-      className={`${className} flex w-full items-center justify-between rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2`}
+      className={`${className} flex w-full items-center justify-between rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2`}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       aria-expanded={isOpen}
@@ -164,7 +164,7 @@ const AccordionContent = ({
   return (
     <div
       id={contentId}
-      className={`${className} overflow-hidden transition-all duration-300 ${
+      className={`${className} overflow-hidden transition-[max-height,opacity] duration-300 ${
         isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
       }`}
       role="region"
@@ -175,14 +175,31 @@ const AccordionContent = ({
   )
 }
 
-const FAQ = () => {
-  const { ref: sectionRef, hasIntersected } = useIntersectionObserver({
-    threshold: 0.15,
-    rootMargin: '0px 0px -50px 0px',
-  })
+const sectionReveal = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (reduce: boolean) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: reduce ? 0 : 0.5,
+      ease: [0.25, 0.46, 0.45, 0.94],
+      staggerChildren: reduce ? 0 : 0.06,
+      delayChildren: reduce ? 0 : 0.04,
+    },
+  }),
+}
 
-  // Hidden state before scroll reveal
-  const hiddenClass = 'opacity-0 translate-y-6'
+const itemReveal = {
+  hidden: { opacity: 0, y: 16 },
+  visible: (reduce: boolean) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: reduce ? 0 : 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
+  }),
+}
+
+const FAQ = () => {
+  const reduceMotion = useReducedMotion()
 
   const faqs = [
     {
@@ -286,10 +303,7 @@ const FAQ = () => {
   const allFaqs = [...faqs, ...additionalFaqs]
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative overflow-hidden bg-gradient-to-b from-background/50 to-background py-24"
-    >
+    <section className="relative overflow-hidden bg-gradient-to-b from-background/50 to-background py-24">
       {/* Network Background */}
       <div className="absolute inset-0 opacity-5">
         <svg
@@ -322,10 +336,19 @@ const FAQ = () => {
         </svg>
       </div>
 
-      <div className="container relative z-10 mx-auto px-4">
+      <motion.div
+        className="container relative z-10 mx-auto px-4"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-60px 0px -60px 0px', amount: 0.1 }}
+        variants={sectionReveal}
+        custom={!!reduceMotion}
+      >
         {/* Header */}
-        <div
-          className={`mb-16 text-center ${hasIntersected ? 'fade-in-up' : hiddenClass}`}
+        <motion.div
+          className="mb-16 text-center"
+          variants={itemReveal}
+          custom={!!reduceMotion}
         >
           <Badge
             variant="outline"
@@ -339,92 +362,94 @@ const FAQ = () => {
           <p className="mx-auto max-w-3xl font-mono text-xl text-muted-foreground">
             Tout ce que vous devez savoir sur TCDynamics avant de commencer
           </p>
-        </div>
+        </motion.div>
 
         {/* FAQ Accordion */}
         <div className="mx-auto max-w-4xl">
-          <Card
-            className={`border-primary/20 bg-card/60 p-8 backdrop-blur-sm ${hasIntersected ? 'fade-in-up fade-delay-02' : hiddenClass}`}
-          >
-            <Accordion type="single" collapsible className="space-y-4">
-              {allFaqs.map(faq => {
-                const IconComponent = faq.icon
-                return (
-                  <AccordionItem
-                    key={faq.id}
-                    value={faq.id}
-                    className="rounded-lg border border-primary/10 px-6 py-2 transition-colors hover:border-primary/30"
-                  >
-                    <AccordionTrigger
+          <motion.div variants={itemReveal} custom={!!reduceMotion}>
+            <Card className="border-primary/20 bg-card/60 p-8 backdrop-blur-sm">
+              <Accordion type="single" collapsible className="space-y-4">
+                {allFaqs.map(faq => {
+                  const IconComponent = faq.icon
+                  return (
+                    <AccordionItem
+                      key={faq.id}
                       value={faq.id}
-                      className="group py-6 text-left hover:no-underline"
+                      className="rounded-lg border border-primary/10 px-6 py-2 transition-colors hover:border-primary/30"
                     >
-                      <div className="flex flex-1 items-center gap-4">
-                        <div className="shrink-0 rounded-full bg-primary/10 p-2 transition-colors group-hover:bg-primary/20">
-                          <IconComponent className="size-5 text-primary" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="mb-1 flex items-center gap-3">
-                            <h3 className="text-lg font-semibold transition-colors group-hover:text-primary">
-                              {faq.question}
-                            </h3>
-                            <Badge
-                              variant="secondary"
-                              className="border-primary/20 bg-primary/10 font-mono text-xs text-primary"
-                            >
-                              {faq.badge}
-                            </Badge>
+                      <AccordionTrigger
+                        value={faq.id}
+                        className="group py-6 text-left hover:no-underline"
+                      >
+                        <div className="flex flex-1 items-center gap-4">
+                          <div className="shrink-0 rounded-full bg-primary/10 p-2 transition-colors group-hover:bg-primary/20">
+                            <IconComponent className="size-5 text-primary" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="mb-1 flex items-center gap-3">
+                              <h3 className="text-lg font-semibold transition-colors group-hover:text-primary">
+                                {faq.question}
+                              </h3>
+                              <Badge
+                                variant="secondary"
+                                className="border-primary/20 bg-primary/10 font-mono text-xs text-primary"
+                              >
+                                {faq.badge}
+                              </Badge>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent value={faq.id} className="pb-6 pt-2">
-                      <div className="ml-14 space-y-3">
-                        {faq.answer.map((line, lineIndex) => {
-                          if (line.includes('**')) {
-                            // Handle bold text
-                            const parts = line.split('**')
+                      </AccordionTrigger>
+                      <AccordionContent value={faq.id} className="pb-6 pt-2">
+                        <div className="ml-14 space-y-3">
+                          {faq.answer.map((line, lineIndex) => {
+                            if (line.includes('**')) {
+                              // Handle bold text
+                              const parts = line.split('**')
+                              return (
+                                <p
+                                  key={lineIndex}
+                                  className="leading-relaxed text-muted-foreground"
+                                >
+                                  {parts.map((part, partIndex) =>
+                                    partIndex % 2 === 1 ? (
+                                      <strong
+                                        key={partIndex}
+                                        className="font-semibold text-foreground"
+                                      >
+                                        {part}
+                                      </strong>
+                                    ) : (
+                                      part
+                                    )
+                                  )}
+                                </p>
+                              )
+                            }
                             return (
                               <p
                                 key={lineIndex}
                                 className="leading-relaxed text-muted-foreground"
                               >
-                                {parts.map((part, partIndex) =>
-                                  partIndex % 2 === 1 ? (
-                                    <strong
-                                      key={partIndex}
-                                      className="font-semibold text-foreground"
-                                    >
-                                      {part}
-                                    </strong>
-                                  ) : (
-                                    part
-                                  )
-                                )}
+                                {line}
                               </p>
                             )
-                          }
-                          return (
-                            <p
-                              key={lineIndex}
-                              className="leading-relaxed text-muted-foreground"
-                            >
-                              {line}
-                            </p>
-                          )
-                        })}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                )
-              })}
-            </Accordion>
-          </Card>
+                          })}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  )
+                })}
+              </Accordion>
+            </Card>
+          </motion.div>
         </div>
 
         {/* Contact CTA */}
-        <div
-          className={`mt-12 text-center ${hasIntersected ? 'fade-in-up fade-delay-04' : hiddenClass}`}
+        <motion.div
+          className="mt-12 text-center"
+          variants={itemReveal}
+          custom={!!reduceMotion}
         >
           <div className="mx-auto max-w-2xl rounded-2xl border border-primary/20 bg-card/30 p-8 backdrop-blur-sm">
             <div className="mb-4 flex items-center justify-center gap-3">
@@ -449,8 +474,8 @@ const FAQ = () => {
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </section>
   )
 }

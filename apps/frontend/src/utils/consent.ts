@@ -1,4 +1,4 @@
-import { getWithMigration, LS } from '@/utils/storageMigration'
+import { getWithMigration, LS, setCached } from '@/utils/storageMigration'
 
 export const CONSENT_UPDATED_EVENT = 'consentUpdated'
 
@@ -45,7 +45,7 @@ export const readConsent = (): ConsentPreferences | null => {
 export const writeConsent = (preferences: ConsentPreferences) => {
   if (typeof window === 'undefined') return
   try {
-    localStorage.setItem(LS.COOKIE_CONSENT, JSON.stringify(preferences))
+    setCached(LS.COOKIE_CONSENT, JSON.stringify(preferences))
     window.dispatchEvent(
       new CustomEvent<ConsentPreferences>(CONSENT_UPDATED_EVENT, {
         detail: preferences,

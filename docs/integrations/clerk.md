@@ -9,6 +9,43 @@ This document outlines how Clerk authentication components are customized to mat
 
 ## Architecture
 
+### Theme Integration Flow
+
+```mermaid
+flowchart LR
+  ThemeProvider[ThemeProvider] --> ResolvedTheme["resolvedTheme: light | dark"]
+  ResolvedTheme --> GetAppearance[getClerkAppearance]
+  GetAppearance --> ClerkLight[clerkAppearance]
+  GetAppearance --> ClerkDark[clerkDarkAppearance]
+  ClerkLight --> ClerkProvider[ClerkProvider]
+  ClerkDark --> ClerkProvider
+  ClerkProvider --> SignIn[SignIn / SignUp / UserButton]
+```
+
+### Design System Mapping
+
+```mermaid
+flowchart TB
+  subgraph Tailwind["Tailwind / CSS Variables"]
+    Primary["--primary"]
+    Background["--background"]
+    Foreground["--foreground"]
+    Radius["--radius"]
+  end
+
+  subgraph ClerkConfig["Clerk Appearance"]
+    colorPrimary["colorPrimary: hsl(var(--primary))"]
+    colorBackground["colorBackground: hsl(var(--background))"]
+    colorForeground["colorForeground: hsl(var(--foreground))"]
+    borderRadius["borderRadius: 0.75rem"]
+  end
+
+  Primary --> colorPrimary
+  Background --> colorBackground
+  Foreground --> colorForeground
+  Radius --> borderRadius
+```
+
 ### Theme Integration
 
 Clerk components automatically switch between light and dark themes based on the app's theme state:

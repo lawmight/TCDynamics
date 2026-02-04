@@ -113,7 +113,7 @@ const Demo = () => {
             {demoFeatures.map((feature, index) => (
               <Card
                 key={index}
-                className="border-primary/20 bg-card/60 backdrop-blur-sm transition-all hover:border-primary/40"
+                className="border-primary/20 bg-card/60 backdrop-blur-sm transition-[border-color] hover:border-primary/40"
               >
                 <CardContent className="p-6 text-center">
                   <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-lg bg-primary/20">
@@ -325,7 +325,7 @@ const Demo = () => {
                         <Textarea
                           id="demo-needs"
                           name="needs"
-                          placeholder="Décrivez brièvement vos processus à automatiser..."
+                          placeholder="Décrivez brièvement vos processus à automatiser…"
                           className="min-h-[100px] bg-background/50"
                         />
                       </div>
@@ -337,7 +337,7 @@ const Demo = () => {
                         disabled={demoForm.isSubmitting}
                       >
                         {demoForm.isSubmitting ? (
-                          'Envoi en cours...'
+                          'Envoi en cours…'
                         ) : (
                           <>
                             <Calendar className="mr-2 size-4" />

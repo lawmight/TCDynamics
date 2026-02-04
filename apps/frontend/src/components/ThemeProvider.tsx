@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 
-import { getWithMigration, LS } from '@/utils/storageMigration'
+import { getWithMigration, LS, setCached } from '@/utils/storageMigration'
 
 type Theme = 'light' | 'dark' | 'system'
 
@@ -70,9 +70,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     root.classList.remove('light', 'dark')
     root.classList.add(resolved)
 
-    // Persist to localStorage
+    // Persist to localStorage (cache updated for same-tab reads)
     try {
-      localStorage.setItem(LS.THEME, theme)
+      setCached(LS.THEME, theme)
     } catch (error) {
       console.error('Failed to save theme preference:', error)
     }
@@ -111,10 +111,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }
 
+const defaultThemeContext: ThemeContextType = {
+  theme: 'system',
+  setTheme: () => {},
+  resolvedTheme: 'light',
+}
+
 /**
  * Hook to access theme context
  *
- * @throws {Error} If used outside of ThemeProvider
+ * Returns a default theme when used outside ThemeProvider (e.g. duplicate React
+ * instances) so the app does not crash; behavior is unchanged when context exists.
  *
  * @example
  * ```tsx
@@ -129,11 +136,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
  * }
  * ```
  */
-export const useTheme = () => {
+export const useTheme = (): ThemeContextType => {
   const context = useContext(ThemeContext)
 
   if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider')
+    if (import.meta.env.DEV) {
+      console.warn(
+        'useTheme: no ThemeProvider context (e.g. duplicate React). Using default theme.'
+      )
+    }
+    return defaultThemeContext
   }
 
   return context

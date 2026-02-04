@@ -126,7 +126,7 @@ const stats = [
 const About = () => {
   return (
     <main
-      id="about-page"
+      id="main"
       aria-labelledby="about-title"
       className="bg-background text-foreground"
     >

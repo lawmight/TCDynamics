@@ -30,14 +30,14 @@ const Login = () => {
         </div>
         <SignedOut>
           <SignInButton mode="redirect" redirectUrl="/app/chat">
-            <button className="w-full rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50">
+            <button className="w-full rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">
               Sign In
             </button>
           </SignInButton>
         </SignedOut>
         <SignedIn>
           <div className="text-center text-sm text-muted-foreground">
-            Redirecting...
+            Redirecting…
           </div>
         </SignedIn>
         <p className="text-center text-xs text-muted-foreground">

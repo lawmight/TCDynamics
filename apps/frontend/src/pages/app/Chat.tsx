@@ -88,7 +88,7 @@ const Chat = () => {
       </div>
 
       <Card className="h-[60vh] overflow-y-auto border-border bg-card/70 p-4 shadow-sm">
-        <div className="space-y-4">
+        <div className="content-visibility-auto space-y-4">
           {messages.map((msg, index) => (
             <div
               key={`${msg.role}-${index}`}

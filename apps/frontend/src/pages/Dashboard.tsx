@@ -102,7 +102,7 @@ const Dashboard = () => {
   }
 
   return (
-    <>
+    <main id="main">
       {/* Milestone Celebration Modal */}
       {activeMilestone && (
         <CelebrationModal
@@ -139,7 +139,7 @@ const Dashboard = () => {
           Window: last {days} days • Project: {projectId}
         </p>
       </div>
-    </>
+    </main>
   )
 }
 

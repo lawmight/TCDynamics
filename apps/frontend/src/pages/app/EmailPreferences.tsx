@@ -148,7 +148,7 @@ const EmailPreferences = () => {
             Choisissez les emails que vous souhaitez recevoir
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="content-visibility-auto space-y-4">
           {preferences.map(pref => (
             <div
               key={pref.id}
@@ -190,7 +190,7 @@ const EmailPreferences = () => {
           {isSaving ? (
             <>
               <div className="mr-2 size-4 animate-spin rounded-full border-b-2 border-white"></div>
-              Enregistrement...
+              Enregistrement…
             </>
           ) : (
             <>

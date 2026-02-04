@@ -11,19 +11,28 @@ The project uses a testing pyramid approach with unit tests, component tests, in
 
 ## Testing Pyramid
 
+```mermaid
+flowchart TB
+  subgraph Pyramid["Testing Pyramid"]
+    E2E["E2E Tests (Playwright)"]
+    Integration["Integration Tests"]
+    Unit["Unit Tests (Vitest / Jest)"]
+  end
+
+  E2E --> E2EDesc["Full user workflows, critical journeys"]
+  Integration --> IntDesc["API endpoint tests, serverless"]
+  Unit --> UnitDesc["Components, hooks, utilities"]
+
+  Unit -.->|"many"| Unit
+  Integration -.->|"some"| Integration
+  E2E -.->|"few"| E2E
 ```
-        /\
-       /  \     E2E Tests (Playwright)
-      /____\     - Full user workflows
-     /      \    - Critical user journeys
-    /________\
-   /          \  Integration Tests
-  /____________\ - API endpoint tests
- /              \
-/________________\ Unit Tests (Vitest/Jest)
-                  - Component tests
-                  - Hook tests
-                  - Utility tests
+
+```mermaid
+pie title Test Distribution (by count)
+  "Unit" : 70
+  "Integration" : 20
+  "E2E" : 10
 ```
 
 ## Testing Frameworks

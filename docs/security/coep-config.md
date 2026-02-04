@@ -4,6 +4,36 @@
 
 We use `Cross-Origin-Embedder-Policy: credentialless` to enable high-performance browser features like `SharedArrayBuffer` while maintaining compatibility with third-party resources.
 
+### COEP Options Compared
+
+```mermaid
+flowchart LR
+  subgraph RequireCorp["require-corp"]
+    RC_Strict[Strict: CORP required]
+    RC_Block[Blocks 3rd party without CORP]
+  end
+
+  subgraph Credentialless["credentialless"]
+    CL_Isolate[Cross-origin isolated]
+    CL_Load[Load 3rd party without CORP]
+    CL_SAB[SharedArrayBuffer OK]
+  end
+
+  RequireCorp --> Credentialless
+```
+
+### Isolation Outcome
+
+```mermaid
+flowchart TB
+  COEP["COEP: credentialless"]
+  COOP["COOP: same-origin"]
+  COEP --> Isolated[Cross-Origin Isolated]
+  COOP --> Isolated
+  Isolated --> SAB[SharedArrayBuffer available]
+  Isolated --> NoCORP["3rd party resources still load"]
+```
+
 ### The Problem
 
 - Modern browser features (like `SharedArrayBuffer`, used by WASM libraries) require a "Cross-Origin Isolated" environment.

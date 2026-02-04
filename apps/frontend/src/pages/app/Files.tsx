@@ -175,7 +175,7 @@ const Files = () => {
             </span>
           </div>
 
-          <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+          <div className="content-visibility-auto mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
             {files.map(file => (
               <Card key={file.id} className="border-border/70 bg-muted/40 p-3">
                 <div className="flex items-center justify-between">

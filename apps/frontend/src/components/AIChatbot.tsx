@@ -243,7 +243,7 @@ const AIChatbot = () => {
         <Button
           onClick={toggle}
           size="lg"
-          className="size-16 rounded-full bg-primary shadow-lg transition-all duration-300 hover:bg-primary/90 hover:shadow-xl"
+          className="size-16 rounded-full bg-primary shadow-lg transition-[background-color,box-shadow] duration-300 hover:bg-primary/90 hover:shadow-xl"
           aria-expanded={isOpen}
           aria-controls={chatbotId}
           aria-label={isOpen ? 'Fermer le chatbot IA' : 'Ouvrir le chatbot IA'}
@@ -355,7 +355,7 @@ const AIChatbot = () => {
                           <div className="flex items-center gap-2">
                             <Loader2 className="size-4 animate-spin" />
                             <span className="font-mono text-xs text-muted-foreground">
-                              Connexion...
+                              Connexion…
                             </span>
                           </div>
                         </div>
@@ -370,7 +370,7 @@ const AIChatbot = () => {
                           <div className="flex items-center gap-2">
                             <Loader2 className="size-4 animate-spin" />
                             <span className="font-mono text-xs text-muted-foreground">
-                              Réflexion...
+                              Réflexion…
                             </span>
                           </div>
                         </div>
@@ -388,7 +388,7 @@ const AIChatbot = () => {
                     value={input}
                     onChange={e => setInput(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder="Posez votre question..."
+                    placeholder="Posez votre question…"
                     className="flex-1 font-mono text-sm"
                     disabled={isLoading}
                     aria-label="Message input"

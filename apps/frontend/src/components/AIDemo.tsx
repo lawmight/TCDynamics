@@ -236,7 +236,7 @@ const AIDemo = () => {
                           <div className="mb-1 text-primary">IA:</div>
                           <div>
                             "Je peux vous guider à travers les étapes de
-                            configuration..."
+                            configuration…"
                           </div>
                         </div>
                       </div>

@@ -101,7 +101,7 @@ export const PostSubmissionFeedback = ({
             <button
               type="button"
               onClick={onClose}
-              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               aria-label="Close dialog"
             >
               <X className="size-4" />
@@ -131,7 +131,7 @@ export const PostSubmissionFeedback = ({
                     key={value}
                     type="button"
                     onClick={() => setRating(value)}
-                    className={`rounded-lg border-2 py-3 text-sm font-semibold transition-all ${
+                    className={`rounded-lg border-2 py-3 text-sm font-semibold transition-[border-color,box-shadow] ${
                       rating === value
                         ? 'border-primary bg-primary/10 text-primary'
                         : 'border-border hover:border-primary/50'
@@ -157,7 +157,7 @@ export const PostSubmissionFeedback = ({
               </label>
               <Textarea
                 id="feedback"
-                placeholder="Décrivez votre besoin ou ce que vous trouviez manquant..."
+                placeholder="Décrivez votre besoin ou ce que vous trouviez manquant…"
                 value={feedback}
                 onChange={e => setFeedback(e.target.value)}
                 maxLength={500}
@@ -199,7 +199,7 @@ export const PostSubmissionFeedback = ({
                 className="flex-1"
                 variant="hero"
               >
-                {isSubmitting ? 'Envoi...' : 'Envoyer'}
+                {isSubmitting ? 'Envoi…' : 'Envoyer'}
               </Button>
             </div>
           </form>

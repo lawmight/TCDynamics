@@ -1,10 +1,9 @@
-import Moon from '~icons/lucide/moon'
-import Sun from '~icons/lucide/sun'
+import { Button } from './button'
 
 import { useTheme } from '@/components/ThemeProvider'
 import { cn } from '@/lib/utils'
-
-import { Button } from './button'
+import Moon from '~icons/lucide/moon'
+import Sun from '~icons/lucide/sun'
 
 export interface ThemeToggleProps {
   className?: string
@@ -84,7 +83,10 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       aria-label={getAriaLabel()}
       aria-checked={resolvedTheme === 'dark'}
       role="switch"
-      className={cn('transition-all duration-200 hover:shadow-sm', className)}
+      className={cn(
+        'transition-colors duration-200 hover:shadow-sm',
+        className
+      )}
       type="button"
     >
       {getIcon()}

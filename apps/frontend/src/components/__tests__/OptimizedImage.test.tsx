@@ -20,7 +20,15 @@ describe('OptimizedImage Component', () => {
   })
 
   it('should support priority loading', () => {
-    render(<OptimizedImage src="/test.jpg" alt="Test image" priority />)
+    render(
+      <OptimizedImage
+        src="/test.jpg"
+        alt="Test image"
+        priority
+        width={100}
+        height={100}
+      />
+    )
 
     // With priority, should render immediately
     const container = screen.getByText('', { selector: 'div.relative' })

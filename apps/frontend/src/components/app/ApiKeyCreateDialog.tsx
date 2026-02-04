@@ -272,7 +272,7 @@ export function ApiKeyCreateDialog({
                 {isCreating ? (
                   <>
                     <Loader2 className="mr-2 size-4 animate-spin" />
-                    Creating...
+                    Creating…
                   </>
                 ) : (
                   'Create Key'

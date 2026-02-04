@@ -13,6 +13,59 @@ The platform uses multiple authentication methods:
 - **API Key Authentication** - Server-to-server authentication
 - **Webhook Authentication** - Event verification (Clerk, Polar)
 
+### Authentication Methods Overview
+
+```mermaid
+flowchart LR
+  subgraph Client["Client"]
+    Browser[Browser / SPA]
+    ServerClient[Server-to-server]
+  end
+
+  subgraph AuthMethods["Auth Methods"]
+    ClerkJWT["Clerk JWT"]
+    APIKey["API Key"]
+    WebhookSig["Webhook signature"]
+  end
+
+  Browser -->|"Authorization: Bearer JWT"| ClerkJWT
+  ServerClient -->|"Authorization: Bearer tc_live_..."| APIKey
+  Clerk[Clerk] -->|"Svix signature"| WebhookSig
+  Polar[Polar] -->|"Signature"| WebhookSig
+```
+
+### Clerk + API Flow
+
+```mermaid
+sequenceDiagram
+  participant User
+  participant Frontend
+  participant Clerk
+  participant API
+  participant MongoDB
+
+  User->>Frontend: Sign in
+  Frontend->>Clerk: Authenticate
+  Clerk-->>Frontend: JWT
+  User->>Frontend: Request (e.g. API key)
+  Frontend->>API: Request + Authorization: Bearer JWT
+  API->>API: verifyClerkAuth
+  API->>MongoDB: Query by clerkId
+  MongoDB-->>API: User data
+  API-->>Frontend: 200 + data
+```
+
+### User Sync (Clerk Webhook)
+
+```mermaid
+flowchart LR
+  Clerk[Clerk] -->|"user.created"| Webhook[/api/webhooks/clerk]
+  Clerk -->|"user.updated"| Webhook
+  Clerk -->|"user.deleted"| Webhook
+  Webhook -->|"Svix verify"| Verify[Verify signature]
+  Verify -->|"Upsert / soft-delete"| MongoDB[(User collection)]
+```
+
 ## Clerk Authentication
 
 ### Frontend Integration

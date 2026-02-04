@@ -1,5 +1,6 @@
+import { motion, useReducedMotion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import heroAutomationVideo from '@/assets/hero-automation-video.mp4'
 import heroPosterImage from '@/assets/hero-network.jpg'
@@ -7,6 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { useCookieConsent } from '@/hooks/useCookieConsent'
 import { trackContactClick, trackDemoClick } from '@/utils/facebookEvents'
+import { logger } from '@/utils/logger'
 import AlertCircle from '~icons/lucide/alert-circle'
 import ArrowRight from '~icons/lucide/arrow-right'
 import CheckCircle from '~icons/lucide/check-circle'
@@ -18,8 +20,23 @@ import Play from '~icons/lucide/play'
 import RefreshCw from '~icons/lucide/refresh-cw'
 import Shield from '~icons/lucide/shield'
 
+const stagger = {
+  animate: {
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.08,
+    },
+  },
+}
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 24 },
+  animate: { opacity: 1, y: 0 },
+}
+
 const Hero = () => {
   const navigate = useNavigate()
+  const reduceMotion = useReducedMotion()
   const demoLink = import.meta.env.VITE_DEMO_URL || '/demo'
   const contactLink = '/#contact'
   const securityLink = '/security'
@@ -72,7 +89,7 @@ const Hero = () => {
           await videoRef.current.play()
           setIsPlaying(true)
         } catch (error) {
-          console.error('Playback failed:', error)
+          logger.error('Playback failed', error)
           // Keep isPlaying as false since play failed
         }
       }
@@ -138,13 +155,29 @@ const Hero = () => {
         </svg>
       </div>
 
-      {/* Main Content */}
-      <div className="container relative z-10 mx-auto px-6 py-20 lg:py-32">
-        <div className="grid items-center gap-16 lg:grid-cols-2">
-          {/* Left Column - Content */}
-          <div className="space-y-8">
+      {/* Subtle grain for depth */}
+      <div className="grain-overlay" aria-hidden="true" />
+
+      {/* Main Content - asymmetric spacing: more bottom padding so video card can overlap next section */}
+      <div className="container relative z-10 mx-auto px-6 py-20 pb-28 lg:py-32 lg:pb-40">
+        <div className="grid items-center gap-16 lg:grid-cols-2 lg:gap-20">
+          {/* Left Column - Content (orchestrated stagger) */}
+          <motion.div
+            className="space-y-8"
+            variants={stagger}
+            initial="initial"
+            animate="animate"
+            transition={{ duration: reduceMotion ? 0 : undefined }}
+          >
             {/* Overline */}
-            <div className="fade-in-up inline-flex items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-2 font-mono text-xs text-muted-foreground backdrop-blur-sm">
+            <motion.div
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-2 font-mono text-xs text-muted-foreground backdrop-blur-sm"
+              variants={fadeInUp}
+              transition={{
+                duration: reduceMotion ? 0 : 0.5,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
+            >
               <Network size={14} aria-hidden="true" />
               <span>WORKFLOW INTELLECT</span>
               <span className="text-border">·</span>
@@ -154,10 +187,17 @@ const Hero = () => {
               >
                 MCP
               </abbr>
-            </div>
+            </motion.div>
 
             {/* Main Headline */}
-            <div className="fade-in-up space-y-4">
+            <motion.div
+              className="space-y-4"
+              variants={fadeInUp}
+              transition={{
+                duration: reduceMotion ? 0 : 0.5,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
+            >
               <h1 className="text-5xl font-bold leading-[0.9] tracking-tight text-foreground lg:text-7xl">
                 Automatisez Votre{' '}
                 <span className="text-gradient">Entreprise avec l'IA</span>
@@ -166,17 +206,31 @@ const Hero = () => {
                 WorkFlowAI - L'automatisation intelligente de vos processus
                 métier
               </p>
-            </div>
+            </motion.div>
 
             {/* Subheading */}
-            <p className="fade-in-up-delay max-w-lg text-xl leading-relaxed text-muted-foreground lg:text-2xl">
+            <motion.p
+              className="max-w-lg text-xl leading-relaxed text-muted-foreground lg:text-2xl"
+              variants={fadeInUp}
+              transition={{
+                duration: reduceMotion ? 0 : 0.5,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
+            >
               Finies les heures perdues en process manuels. Gagnez{' '}
               <span className="text-gradient font-bold">10h</span> par semaine
               avec l'IA — spécialement conçu pour les entreprises françaises.
-            </p>
+            </motion.p>
 
             {/* Value Proposition Box */}
-            <div className="fade-in-up-delay rounded-lg border border-border bg-card/30 p-6 backdrop-blur-sm">
+            <motion.div
+              className="rounded-lg border border-border bg-card/30 p-6 backdrop-blur-sm"
+              variants={fadeInUp}
+              transition={{
+                duration: reduceMotion ? 0 : 0.5,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
+            >
               <div className="flex items-center gap-3">
                 <div className="flex size-8 items-center justify-center rounded-md bg-primary/20">
                   <Cpu size={16} className="text-primary" aria-hidden="true" />
@@ -186,10 +240,17 @@ const Hero = () => {
                   <span className="text-gradient">3 clics</span>
                 </span>
               </div>
-            </div>
+            </motion.div>
 
             {/* CTA Buttons */}
-            <div className="fade-in-up-delay-2 flex flex-col gap-4 sm:flex-row">
+            <motion.div
+              className="flex flex-col gap-4 sm:flex-row"
+              variants={fadeInUp}
+              transition={{
+                duration: reduceMotion ? 0 : 0.5,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
+            >
               <Button
                 variant="default"
                 size="xl"
@@ -226,10 +287,17 @@ const Hero = () => {
                 />
                 PARLER À UN EXPERT
               </Button>
-            </div>
+            </motion.div>
 
             {/* Trust Indicators */}
-            <div className="fade-in-up-delay-2 flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
+            <motion.div
+              className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground"
+              variants={fadeInUp}
+              transition={{
+                duration: reduceMotion ? 0 : 0.5,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
+            >
               <div className="flex items-center gap-2">
                 <Database size={14} aria-hidden="true" />
                 <span className="font-mono">Données hébergées en France</span>
@@ -246,18 +314,27 @@ const Hero = () => {
                 />
                 <span className="font-mono">Disponibilité 99.9% (SLA)</span>
               </div>
-              <button
-                onClick={() => goTo(securityLink)}
-                className="font-mono text-xs uppercase tracking-wide text-primary underline-offset-4 hover:underline"
+              <Link
+                to={securityLink}
+                className="font-mono text-xs uppercase tracking-wide text-primary underline-offset-4 hover:underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
                 Security & Availability
-              </button>
-            </div>
-          </div>
+              </Link>
+            </motion.div>
+          </motion.div>
 
-          {/* Right Column - Hero Visualization */}
-          <div className="fade-in-up-delay-2 relative">
-            <div className="relative z-10 overflow-hidden rounded-xl border border-border bg-card/60 shadow-xl shadow-primary/10 backdrop-blur">
+          {/* Right Column - Hero Visualization (overlaps bottom for asymmetric layout) */}
+          <motion.div
+            className="relative lg:-mb-16"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: reduceMotion ? 0 : 0.6,
+              delay: reduceMotion ? 0 : 0.35,
+              ease: [0.25, 0.46, 0.45, 0.94],
+            }}
+          >
+            <div className="relative z-10 overflow-hidden rounded-xl border border-border bg-card/60 shadow-xl shadow-primary/10 backdrop-blur lg:shadow-elegant">
               <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
                 <div className="flex items-center gap-2">
                   <span className="size-2 animate-pulse rounded-full bg-primary"></span>
@@ -408,7 +485,7 @@ const Hero = () => {
 
             {/* Background Glow Effect */}
             <div className="bg-gradient-network absolute inset-0 -z-10 rounded-lg"></div>
-          </div>
+          </motion.div>
         </div>
       </div>
 

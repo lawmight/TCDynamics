@@ -13,6 +13,52 @@ The platform uses multiple monitoring solutions:
 - **Vercel Analytics** - Web analytics and performance metrics
 - **Performance Monitor** - Custom in-app performance monitoring component
 
+### Monitoring Stack
+
+```mermaid
+flowchart TB
+  subgraph Frontend["Frontend"]
+    App[React App]
+    SentryBrowser["Sentry Browser SDK"]
+    VercelAnalytics["Vercel Analytics"]
+    PerfMonitor["Performance Monitor component"]
+    App --> SentryBrowser
+    App --> VercelAnalytics
+    App --> PerfMonitor
+  end
+
+  subgraph API["API / Serverless"]
+    Functions[Vercel Functions]
+    SentryNode["Sentry Node SDK"]
+    Functions --> SentryNode
+  end
+
+  subgraph External["External Services"]
+    SentryIO[Sentry.io]
+    VercelDash[Vercel Dashboard]
+  end
+
+  SentryBrowser --> SentryIO
+  SentryNode --> SentryIO
+  VercelAnalytics --> VercelDash
+```
+
+### Data Flow
+
+```mermaid
+sequenceDiagram
+  participant User
+  participant App
+  participant Sentry as Sentry
+  participant Vercel as Vercel Analytics
+
+  User->>App: Use app
+  App->>Sentry: Errors + transactions (sample)
+  App->>Vercel: Page views, Web Vitals
+  Sentry->>Sentry: Alerts, issues, performance
+  Vercel->>Vercel: Analytics, speed insights
+```
+
 ## Sentry Error Tracking
 
 ### Frontend Setup

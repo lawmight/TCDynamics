@@ -159,6 +159,14 @@ const AppRouter = () => {
 
   return (
     <>
+      {!hideMarketingChrome && (
+        <a
+          href="#main"
+          className="sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-4 focus-visible:z-[100] focus-visible:m-0 focus-visible:w-auto focus-visible:overflow-visible focus-visible:whitespace-normal focus-visible:rounded-md focus-visible:border focus-visible:border-primary focus-visible:bg-background focus-visible:p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          Passer au contenu principal
+        </a>
+      )}
       {!hideMarketingChrome && <SimpleNavigation />}
       <ScrollToTop />
       <Suspense fallback={<PageSkeleton />}>
