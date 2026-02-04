@@ -1,0 +1,79 @@
+# Bump devDependencies using Cursor headless CLI, then verify before pushing.
+#
+# Safety (follow-up): Verify runs in the same job before any push. We only commit and
+# push when lint, type-check, and tests all pass. If the bump breaks anything, the
+# job fails and nothing is pushed. No separate "follow-up" job is needed.
+#
+# Required secret: CURSOR_API_KEY (Cursor dashboard → Integrations → User API Keys).
+# Add at: repo Settings → Secrets and variables → Actions → New repository secret.
+# Do not commit the key; revoke any key that was ever pasted in chat or logs.
+
+name: Bump dev dependencies (Cursor headless)
+
+on:
+  schedule:
+    # Daily at 06:00 UTC (align with Dependabot)
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bump-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main
+
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node-cache
+        with:
+          node-version: '20'
+
+      - name: Install Cursor CLI
+        run: |
+          curl -fsSL https://cursor.com/install | bash
+          echo "$HOME/.cursor/bin" >> $GITHUB_PATH
+          echo "$HOME/.cursor/bin" >> $GITHUB_ENV
+          "$HOME/.cursor/bin/agent" --version || true
+
+      - name: Bump devDependencies (Cursor agent)
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+        run: |
+          export PATH="$HOME/.cursor/bin:$PATH"
+          agent -p --force --output-format text \
+            "You are in a CI workflow. Your task is to update only devDependencies (not dependencies).
+             Scope: root package.json and every package.json under apps/* (e.g. apps/frontend, apps/backend).
+             For each of these files: bump every devDependency to the latest version that respects existing semver ranges (e.g. ^1.0.0 -> latest 1.x). Prefer minor and patch updates only; do not switch to a new major unless the range already allows it.
+             After editing all relevant package.json files, run 'npm install' once at the repository root (so package-lock.json and workspace lockfiles stay in sync).
+             Do NOT run any git commands (no git add, commit, push, checkout, branch). Only modify package.json files and run npm install."
+
+      - name: Verify (install + lint + type-check + tests)
+        run: |
+          npm ci
+          npm run lint -ws
+          npm run type-check -ws
+          npm run test -ws
+
+      - name: Commit and push (only if verify passed)
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json \
+            apps/frontend/package.json apps/frontend/package-lock.json \
+            apps/backend/package.json apps/backend/package-lock.json \
+            api/package.json api/package-lock.json 2>/dev/null || true
+          git add -u -- package.json package-lock.json apps/ api/
+          if git diff --staged --quiet; then
+            echo "No dependency changes to commit."
+            exit 0
+          fi
+          git commit -m "chore(deps): bump dev dependencies [cursor-headless]"
+          git push origin main
