@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(**/*.json)",
+      "Read(**/package.json)",
+      "Write(**/package.json)",
+      "Write(**/package-lock.json)",
+      "Shell(npm)"
+    ],
+    "deny": [
+      "Shell(git)",
+      "Write(.env*)",
+      "Write(**/.env*)"
+    ]
+  }
+}
