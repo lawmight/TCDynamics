@@ -18,7 +18,7 @@
     "bcryptjs": "^2.4.3",
     "google-auth-library": "^9.14.1",
     "lru-cache": "^11.0.1",
-    "mongodb": "^7.0.0",
+    "mongodb": "^7.1.0",
     "mongoose": "^9.1.1",
     "resend": "^6.9.1",
     "svix": "^1.84.1"
