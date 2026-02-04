@@ -78,14 +78,13 @@ describe('SimpleNavigation Component', () => {
   it('should handle logo click to scroll to hero section', () => {
     renderSimpleNavigation()
 
-    const logoButton = screen.getByText('TCDynamics')
+    const logoLink = screen.getByRole('link', { name: 'TCDynamics' })
     const mockScrollIntoView = vi.fn()
 
-    // Mock getElementById and scrollIntoView
     const mockElement = { scrollIntoView: mockScrollIntoView } as HTMLElement
     vi.spyOn(document, 'getElementById').mockReturnValue(mockElement)
 
-    fireEvent.click(logoButton)
+    fireEvent.click(logoLink)
 
     expect(document.getElementById).toHaveBeenCalledWith('hero')
     expect(mockScrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth' })

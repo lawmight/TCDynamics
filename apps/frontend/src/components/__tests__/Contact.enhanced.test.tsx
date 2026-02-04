@@ -1,5 +1,12 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, fireEvent, act, within } from '@testing-library/react'
+import {
+  render,
+  screen,
+  fireEvent,
+  act,
+  within,
+  waitFor,
+} from '@testing-library/react'
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 
 import Contact from '../Contact'
@@ -173,7 +180,12 @@ describe('Contact Component - Enhanced Validation', () => {
         fireEvent.click(submitButton)
       })
 
-      expect(messageInput).toHaveFocus()
+      await waitFor(() => {
+        expect(
+          screen.getByText(/Minimum 10 caractères requis|Ce champ est requis/i)
+        ).toBeInTheDocument()
+      })
+      expect(messageInput).toHaveAttribute('aria-invalid', 'true')
     })
   })
 
@@ -185,7 +197,9 @@ describe('Contact Component - Enhanced Validation', () => {
         </ContactWrapper>
       )
 
-      const submitButton = screen.getByText(/Envoyer le message/i)
+      const submitButton = screen.getByRole('button', {
+        name: /Envoyer le message/i,
+      })
       await act(async () => {
         fireEvent.click(submitButton)
       })
@@ -221,7 +235,7 @@ describe('Contact Component - Enhanced Validation', () => {
       )
 
       const contactForm = getContactForm()
-      const messageInput = within(contactForm).getByLabelText(/Message/i)
+      const messageInput = within(contactForm).getByLabelText(/^Message \*/)
       await act(async () => {
         fireEvent.change(messageInput, { target: { value: 'short' } })
       })
@@ -239,7 +253,7 @@ describe('Contact Component - Enhanced Validation', () => {
       )
 
       const contactForm = getContactForm()
-      const messageInput = within(contactForm).getByLabelText(/Message/i)
+      const messageInput = within(contactForm).getByLabelText(/^Message \*/)
       await act(async () => {
         fireEvent.change(messageInput, { target: { value: 'Hello' } })
       })

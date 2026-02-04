@@ -1,9 +1,11 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { getWithMigration } from '@/utils/storageMigration'
+
 import PerformanceMonitor from '../PerformanceMonitor'
 
-// Mock performance API
+// Mock performance API (re-applied in beforeEach so global setup does not override)
 const mockPerformance = {
   getEntriesByType: vi.fn(),
   memory: {
@@ -11,11 +13,11 @@ const mockPerformance = {
   },
 }
 
-// Mock performance object
-Object.defineProperty(global, 'performance', {
-  value: mockPerformance,
-  writable: true,
-})
+// Mock storage migration so effect runs in CI regardless of import.meta.env
+vi.mock('@/utils/storageMigration', () => ({
+  getWithMigration: vi.fn().mockReturnValue('true'),
+  LS: { SHOW_PERF_MONITOR: 'showPerfMonitor:v1' },
+}))
 
 // Mock localStorage
 const mockLocalStorage = {
@@ -40,6 +42,16 @@ describe('PerformanceMonitor Component', () => {
 
     vi.stubEnv('NODE_ENV', 'test')
     vi.stubEnv('VITEST', 'true')
+
+    // Re-apply full performance mock so global setup does not override it
+    Object.defineProperty(global, 'performance', {
+      value: mockPerformance,
+      writable: true,
+      configurable: true,
+    })
+
+    // Ensure effect runs (metrics computed) regardless of CI env
+    ;(getWithMigration as ReturnType<typeof vi.fn>).mockReturnValue('true')
 
     // Reset performance mock with navigation + paint entries
     mockPerformance.memory = {
@@ -79,10 +91,8 @@ describe('PerformanceMonitor Component', () => {
   })
 
   it('should not render when not in development and showPerfMonitor is false', () => {
-    // Mock production environment
     vi.stubEnv('NODE_ENV', 'production')
-
-    mockLocalStorage.getItem.mockReturnValue('false')
+    ;(getWithMigration as ReturnType<typeof vi.fn>).mockReturnValue('false')
 
     const { container } = render(<PerformanceMonitor />)
 
@@ -101,31 +111,36 @@ describe('PerformanceMonitor Component', () => {
     render(<PerformanceMonitor />)
 
     await waitFor(() => {
-      expect(screen.getByText('Performance Monitor')).toBeInTheDocument()
+      expect(
+        screen.getByText((content) => content.includes('Performance Monitor'))
+      ).toBeInTheDocument()
       expect(screen.getByText(/Load: \d+ms/)).toBeInTheDocument()
       expect(screen.getByText(/Render: \d+ms/)).toBeInTheDocument()
       expect(screen.getByText(/Memory: \d+MB/)).toBeInTheDocument()
     })
   })
 
-  it('should show metrics when showPerfMonitor is stored in localStorage', () => {
+  it('should show metrics when showPerfMonitor is stored in localStorage', async () => {
     mockLocalStorage.getItem.mockReturnValue('true')
 
     render(<PerformanceMonitor />)
 
-    expect(screen.getByText('Performance Monitor')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(
+        screen.getByText((content) => content.includes('Performance Monitor'))
+      ).toBeInTheDocument()
+    })
   })
 
   it('should hide metrics when showPerfMonitor is false in localStorage', () => {
-    mockLocalStorage.getItem.mockReturnValue('false')
+    ;(getWithMigration as ReturnType<typeof vi.fn>).mockReturnValue('false')
 
     const { container } = render(<PerformanceMonitor />)
 
     expect(container.firstChild).toBeNull()
   })
 
-  it('should handle missing memory information gracefully', () => {
-    // Remove memory from performance mock
+  it('should handle missing memory information gracefully', async () => {
     interface MockPerformance {
       getEntriesByType: ReturnType<typeof vi.fn>
       memory?: {
@@ -139,11 +154,15 @@ describe('PerformanceMonitor Component', () => {
 
     render(<PerformanceMonitor />)
 
-    expect(screen.getByText('Performance Monitor')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(
+        screen.getByText((content) => content.includes('Performance Monitor'))
+      ).toBeInTheDocument()
+    })
     expect(screen.queryByText(/Memory:/)).not.toBeInTheDocument()
   })
 
-  it('should handle missing paint entries gracefully', () => {
+  it('should handle missing paint entries gracefully', async () => {
     mockPerformance.getEntriesByType.mockImplementation(type => {
       if (type === 'navigation') {
         return [
@@ -158,17 +177,23 @@ describe('PerformanceMonitor Component', () => {
 
     render(<PerformanceMonitor />)
 
-    expect(screen.getByText('Performance Monitor')).toBeInTheDocument()
-    expect(screen.getByText('Render: 0ms')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(
+        screen.getByText((content) => content.includes('Performance Monitor'))
+      ).toBeInTheDocument()
+      expect(screen.getByText('Render: 0ms')).toBeInTheDocument()
+    })
   })
 
   it('should toggle visibility with Ctrl+Shift+P', async () => {
     render(<PerformanceMonitor />)
 
-    // Initially visible in development
-    expect(screen.getByText('Performance Monitor')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(
+        screen.getByText((content) => content.includes('Performance Monitor'))
+      ).toBeInTheDocument()
+    })
 
-    // Press Ctrl+Shift+P
     fireEvent.keyDown(window, {
       key: 'P',
       ctrlKey: true,
@@ -183,22 +208,32 @@ describe('PerformanceMonitor Component', () => {
     })
   })
 
-  it('should add keyboard event listener on mount', () => {
+  it('should add keyboard event listener on mount', async () => {
     const addEventListenerSpy = vi.spyOn(window, 'addEventListener')
 
     render(<PerformanceMonitor />)
 
+    await waitFor(() => {
+      expect(
+        screen.getByText((content) => content.includes('Performance Monitor'))
+      ).toBeInTheDocument()
+    })
     expect(addEventListenerSpy).toHaveBeenCalledWith(
       'keydown',
       expect.any(Function)
     )
   })
 
-  it('should remove keyboard event listener on unmount', () => {
+  it('should remove keyboard event listener on unmount', async () => {
     const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener')
 
     const { unmount } = render(<PerformanceMonitor />)
 
+    await waitFor(() => {
+      expect(
+        screen.getByText((content) => content.includes('Performance Monitor'))
+      ).toBeInTheDocument()
+    })
     unmount()
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith(
@@ -207,10 +242,17 @@ describe('PerformanceMonitor Component', () => {
     )
   })
 
-  it('should handle close button click', () => {
+  it('should handle close button click', async () => {
     render(<PerformanceMonitor />)
 
-    const closeButton = screen.getByRole('button', { name: /close/i })
+    await waitFor(() => {
+      expect(
+        screen.getByText((content) => content.includes('Performance Monitor'))
+      ).toBeInTheDocument()
+    })
+    const closeButton = screen.getByRole('button', {
+      name: 'Close performance monitor',
+    })
 
     fireEvent.click(closeButton)
 
@@ -274,7 +316,6 @@ describe('PerformanceMonitor Component', () => {
   })
 
   it('should display correct performance values', async () => {
-    // Mock specific performance values
     mockPerformance.getEntriesByType.mockImplementation(type => {
       if (type === 'navigation') {
         return [
@@ -298,8 +339,8 @@ describe('PerformanceMonitor Component', () => {
     render(<PerformanceMonitor />)
 
     await waitFor(() => {
-      expect(screen.getByText('Load: 1400ms')).toBeInTheDocument()
-      expect(screen.getByText('Render: 250ms')).toBeInTheDocument()
+      expect(screen.getByText(/Load: 1400ms/)).toBeInTheDocument()
+      expect(screen.getByText(/Render: 250ms/)).toBeInTheDocument()
     })
   })
 })

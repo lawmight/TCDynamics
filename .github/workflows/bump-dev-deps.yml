@@ -38,15 +38,14 @@ jobs:
       - name: Install Cursor CLI
         run: |
           curl -fsSL https://cursor.com/install | bash
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
           echo "$HOME/.cursor/bin" >> $GITHUB_PATH
-          echo "$HOME/.cursor/bin" >> $GITHUB_ENV
-          "$HOME/.cursor/bin/agent" --version || true
 
       - name: Bump devDependencies (Cursor agent)
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
         run: |
-          export PATH="$HOME/.cursor/bin:$PATH"
+          export PATH="$HOME/.local/bin:$HOME/.cursor/bin:$PATH"
           agent -p --force --output-format text \
             "You are in a CI workflow. Your task is to update only devDependencies (not dependencies).
              Scope: root package.json and every package.json under apps/* (e.g. apps/frontend, apps/backend).
