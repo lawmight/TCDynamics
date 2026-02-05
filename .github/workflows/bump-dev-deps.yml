@@ -47,7 +47,7 @@ jobs:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
         run: |
           export PATH="$HOME/.local/bin:$HOME/.cursor/bin:$PATH"
-          agent -p --force --output-format text \
+          agent -p --force --model auto --output-format text \
             "You are in a CI workflow. Your task is to update only devDependencies (not dependencies).
              Scope: root package.json and every package.json under apps/* (e.g. apps/frontend, apps/backend).
              For each of these files: bump every devDependency to the latest version that respects existing semver ranges (e.g. ^1.0.0 -> latest 1.x). Prefer minor and patch updates only; do not switch to a new major unless the range already allows it.
