@@ -128,13 +128,13 @@ describe('SimpleNavigation Component', () => {
       name: /Toggle menu/i,
     })
 
-    // Initially closed: one "Accéder à l'app" (desktop only)
-    expect(screen.getAllByText(/Accéder à l'app/i)).toHaveLength(1)
+    // Initially closed: one "Automatiser" (desktop only)
+    expect(screen.getAllByText(/Automatiser/i)).toHaveLength(1)
 
-    // Open mobile menu: mobile panel adds a second "Accéder à l'app"
+    // Open mobile menu: mobile panel adds a second "Automatiser"
     fireEvent.click(mobileMenuButton)
 
-    expect(screen.getAllByText(/Accéder à l'app/i)).toHaveLength(2)
+    expect(screen.getAllByText(/Automatiser/i)).toHaveLength(2)
   })
 
   it('should render mobile menu when open', () => {
@@ -164,8 +164,8 @@ describe('SimpleNavigation Component', () => {
     const featuresButton = screen.getByText('Fonctionnalités')
     fireEvent.click(featuresButton)
 
-    // Menu should close: back to one "Accéder à l'app" (desktop only)
-    expect(screen.getAllByText(/Accéder à l'app/i)).toHaveLength(1)
+    // Menu should close: back to one "Automatiser" (desktop only)
+    expect(screen.getAllByText(/Automatiser/i)).toHaveLength(1)
   })
 
   it('should update scrolled state on scroll', async () => {

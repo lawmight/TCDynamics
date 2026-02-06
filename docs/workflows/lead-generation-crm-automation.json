@@ -1,0 +1,631 @@
+{
+  "name": "Lead Generation & CRM Automation - French SME",
+  "description": "Automatically capture leads from LinkedIn, website forms, and trade shows, enrich with French company data, and manage follow-up sequences",
+  "version": "1.0.0",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "leads/webhook",
+        "method": "POST",
+        "responseMode": "onReceived",
+        "responseData": "firstItemJson",
+        "responseCode": 200,
+        "responseHeaders": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "name": "Webhook - Lead Capture",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "lead-capture-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json[\"leadSource\"] }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "name": "Filter - Valid Lead",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const leadData = $json;\n\n// Normalize lead data based on source\nlet normalizedLead = {};\n\nswitch (leadData.leadSource) {\n  case 'linkedin':\n    normalizedLead = {\n      name: leadData.full_name || `${leadData.first_name || ''} ${leadData.last_name || ''}`.trim(),\n      email: leadData.email,\n      phone: leadData.phone,\n      company: leadData.company_name,\n      companySize: leadData.company_size,\n      position: leadData.position,\n      linkedinUrl: leadData.linkedin_url,\n      source: 'LinkedIn',\n      sector: leadData.sector,\n      budget: leadData.budget_estimate,\n      consent: leadData.consent_given || false,\n      consentDate: leadData.consent_date || new Date().toISOString(),\n      consentSource: leadData.consent_source || 'LinkedIn scraping'\n    };\n    break;\n  case 'website':\n    normalizedLead = {\n      name: `${leadData.firstName || ''} ${leadData.lastName || ''}`.trim(),\n      email: leadData.email,\n      phone: leadData.phone,\n      company: leadData.company,\n      companySize: leadData.companySize,\n      position: leadData.position,\n      source: 'Website Form',\n      sector: leadData.sector,\n      budget: leadData.budget,\n      consent: leadData.consent_given || false,\n      consentDate: leadData.consent_date || new Date().toISOString(),\n      consentSource: 'Website Form',\n      formType: leadData.formType\n    };\n    break;\n  case 'trade_show':\n    normalizedLead = {\n      name: `${leadData.firstName || ''} ${leadData.lastName || ''}`.trim(),\n      email: leadData.email,\n      phone: leadData.phone,\n      company: leadData.company,\n      companySize: leadData.companySize,\n      position: leadData.position,\n      source: 'Trade Show',\n      event: leadData.eventName,\n      sector: leadData.sector,\n      budget: leadData.budget,\n      consent: leadData.consent_given || false,\n      consentDate: leadData.consent_date || new Date().toISOString(),\n      consentSource: 'Trade Show Scan'\n    };\n    break;\n  default:\n    normalizedLead = leadData;\n}\n\n// Calculate lead score\nconst score = calculateLeadScore(normalizedLead);\n\nreturn [{\n  json: {\n    ...normalizedLead,\n    leadScore: score,\n    isQualified: score >= 50,\n    timestamp: new Date().toISOString(),\n    assignedTo: 'sales-team'\n  }\n}];\n\nfunction calculateLeadScore(lead) {\n  let score = 0;\n  \n  // Company size scoring\n  if (lead.companySize) {\n    if (lead.companySize >= 50) score += 20;\n    else if (lead.companySize >= 10) score += 10;\n    else score += 5;\n  }\n  \n  // Budget scoring\n  if (lead.budget) {\n    if (lead.budget >= 5000) score += 20;\n    else if (lead.budget >= 1000) score += 10;\n    else score += 5;\n  }\n  \n  // Source quality scoring\n  if (lead.source === 'LinkedIn') score += 10;\n  else if (lead.source === 'Website Form') score += 5;\n  else if (lead.source === 'Trade Show') score += 15;\n  \n  // Position relevance scoring\n  if (lead.position && lead.position.toLowerCase().includes('director')) score += 15;\n  else if (lead.position && lead.position.toLowerCase().includes('manager')) score += 10;\n  else if (lead.position) score += 5;\n  \n  return score;\n}"
+      },
+      "name": "Normalize & Score Lead",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "get",
+        "filters": {
+          "search": "={{ $json.email }}",
+          "searchField": "email"
+        }
+      },
+      "name": "Check Existing Contact",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [850, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $node[\"Check Existing Contact\"].json[\"data\"]?.[\"id\"] }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "name": "Contact Exists?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "update",
+        "contactId": "={{ $node[\"Check Existing Contact\"].json[\"data\"]?.[\"id\"] }}",
+        "updateFields": {
+          "email": "={{ $json.email }}",
+          "name": "={{ $json.name }}",
+          "phone": "={{ $json.phone }}",
+          "org_id": "={{ $json.companyId }}",
+          "position": "={{ $json.position }}",
+          "lead_score": "={{ $json.leadScore }}",
+          "source": "={{ $json.source }}",
+          "last_contacted": "={{ $json.timestamp }}",
+          "custom_fields": {
+            "consent_given": "={{ $json.consent }}",
+            "consent_date": "={{ $json.consentDate }}",
+            "consent_source": "={{ $json.consentSource }}",
+            "budget_estimate": "={{ $json.budget }}",
+            "sector": "={{ $json.sector }}"
+          }
+        }
+      },
+      "name": "Update Existing Contact",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [1250, 150]
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "create",
+        "name": "={{ $json.name }}",
+        "email": "={{ $json.email }}",
+        "phone": "={{ $json.phone }}",
+        "position": "={{ $json.position }}",
+        "org_name": "={{ $json.company }}",
+        "addFields": {
+          "lead_score": "={{ $json.leadScore }}",
+          "source": "={{ $json.source }}",
+          "last_contacted": "={{ $json.timestamp }}",
+          "custom_fields": {
+            "consent_given": "={{ $json.consent }}",
+            "consent_date": "={{ $json.consentDate }}",
+            "consent_source": "={{ $json.consentSource }}",
+            "budget_estimate": "={{ $json.budget }}",
+            "sector": "={{ $json.sector }}",
+            "assigned_to": "={{ $json.assignedTo }}"
+          }
+        }
+      },
+      "name": "Create New Contact",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [1250, 250]
+    },
+    {
+      "parameters": {
+        "resource": "company",
+        "operation": "get",
+        "filters": {
+          "name": "={{ $json.company }}"
+        }
+      },
+      "name": "Get Company in CRM",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [1450, 200]
+    },
+    {
+      "parameters": {
+        "resource": "company",
+        "operation": "create",
+        "name": "={{ $json.company }}",
+        "addFields": {
+          "size": "={{ $json.companySize }}",
+          "industry": "={{ $json.sector }}",
+          "website": "={{ $json.companyWebsite }}",
+          "custom_fields": {
+            "siren": "={{ $json.siren }}",
+            "tva_intracommunautaire": "={{ $json.tvaIntracommunautaire }}",
+            "naaf_code": "={{ $json.naafCode }}",
+            "legal_form": "={{ $json.legalForm }}"
+          }
+        }
+      },
+      "name": "Create Company in CRM",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [1650, 200]
+    },
+    {
+      "parameters": {
+        "url": "https://api.pappers.fr/v2/recherche_entreprise",
+        "options": {
+          "query": {
+            "q": "={{ $json.company }}",
+            "api_token": "={{ $env.PAPPERS_API_TOKEN }}"
+          },
+          "headers": {
+            "Accept": "application/json"
+          }
+        },
+        "responseFormat": "json"
+      },
+      "name": "Enrich with Pappers API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1850, 150]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.isQualified }}",
+              "operation": "equals",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "Is Qualified Lead?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1450, 400]
+    },
+    {
+      "parameters": {
+        "resource": "deal",
+        "operation": "create",
+        "title": "={{ `Lead: ${$json.name} - ${$json.company}` }}",
+        "value": "={{ $json.budget || 0 }}",
+        "currency": "EUR",
+        "status": "open",
+        "personId": "={{ $json.crmContactId }}",
+        "orgId": "={{ $json.crmCompanyId }}",
+        "pipelineId": "={{ $env.PIPELINE_ID }}",
+        "stageId": "={{ $env.STAGE_ID }}",
+        "addFields": {
+          "lead_source": "={{ $json.source }}",
+          "lead_score": "={{ $json.leadScore }}",
+          "sector": "={{ $json.sector }}",
+          "budget": "={{ $json.budget }}",
+          "assigned_to": "={{ $json.assignedTo }}"
+        }
+      },
+      "name": "Create Deal",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [1650, 400]
+    },
+    {
+      "parameters": {
+        "resource": "activity",
+        "operation": "create",
+        "type": "email",
+        "subject": "Lead captured: {{ $json.name }} from {{ $json.company }}",
+        "note": "New lead captured via {{ $json.source }}. Lead score: {{ $json.leadScore }}. Budget: {{ $json.budget || 'Not specified' }}",
+        "dueDate": "={{ new Date().toISOString() }}",
+        "duration": "00:30",
+        "personId": "={{ $json.crmContactId }}",
+        "orgId": "={{ $json.crmCompanyId }}",
+        "userId": "={{ $env.SALES_USER_ID }}"
+      },
+      "name": "Create Follow-up Activity",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [1850, 400]
+    },
+    {
+      "parameters": {
+        "fromEmail": "noreply@tcdynamics.fr",
+        "toEmail": "={{ $json.email }}",
+        "subject": "Merci pour votre intérêt, {{ $json.name }} !",
+        "html": "<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Merci pour votre demande</title>\n  <style>\n    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }\n    .container { max-width: 600px; margin: 0 auto; padding: 20px; }\n    .header { background: #f8f9fa; padding: 20px; text-align: center; border-radius: 8px; }\n    .content { margin: 20px 0; }\n    .cta-button { background: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; display: inline-block; }\n    .footer { font-size: 12px; color: #666; text-align: center; margin-top: 30px; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h1>Merci pour votre intérêt !</h1>\n      <p>Nous avons bien reçu votre demande.</p>\n    </div>\n    <div class=\"content\">\n      <p>Bonjour <strong>{{ $json.name }}</strong>,</p>\n      <p>Nous vous remercions pour l'intérêt que vous portez à TCDynamics. Notre équipe va étudier votre demande et reviendra vers vous sous 48 heures.</p>\n      <p><strong>Détails de votre demande :</strong></p>\n      <ul>\n        <li>Société : {{ $json.company }}</li>\n        <li>Secteur : {{ $json.sector || 'Non spécifié' }}</li>\n        <li>Budget estimé : {{ $json.budget ? `${$json.budget} €` : 'Non spécifié' }}</li>\n        <li>Source : {{ $json.source }}</li>\n      </ul>\n      <p>Nous vous contacterons très prochainement pour échanger ensemble.</p>\n    </div>\n    <div style=\"text-align: center; margin: 30px 0;\">\n      <a href=\"https://tcdcynamics.fr\" class=\"cta-button\">Découvrir TCDynamics</a>\n    </div>\n    <div class=\"footer\">\n      <p>TCDynamics - Votre partenaire automatisation pour TPE/PME</p>\n      <p>Conformément au RGPD, vous pouvez exercer votre droit d'accès, de rectification ou de suppression de vos données en nous contactant.</p>\n    </div>\n  </div>\n</body>\n</html>"
+      },
+      "name": "Send Welcome Email (Brevo)",
+      "type": "n8n-nodes-base.brevo",
+      "typeVersion": 2,
+      "position": [2050, 400]
+    },
+    {
+      "parameters": {
+        "channel": "sales-team",
+        "message": "*Nouveau lead capturé !*\n\n*Nom :* {{ $json.name }}\n*Société :* {{ $json.company }}\n*Source :* {{ $json.source }}\n*Score :* {{ $json.leadScore }} / 100\n*Budget :* {{ $json.budget ? `${$json.budget} €` : 'Non spécifié' }}\n\n*Contact :* {{ $json.email }}\n*Téléphone :* {{ $json.phone || 'Non spécifié' }}\n\n[Accéder au lead dans Pipedrive](https://{{ $env.PIPEDRIVE_SUBDOMAIN }}.pipedrive.com/person/{{ $json.crmContactId }})"
+      },
+      "name": "Notify Sales Team (Slack)",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [2250, 400]
+    },
+    {
+      "parameters": {
+        "spreadsheetId": "={{ $env.LEAD_TRACKING_SHEET_ID }}",
+        "range": "Leads!A1",
+        "options": {
+          "valueInputMode": "USER_ENTERED"
+        },
+        "values": [
+          [
+            "{{ $json.timestamp }}",
+            "{{ $json.name }}",
+            "{{ $json.email }}",
+            "{{ $json.phone }}",
+            "{{ $json.company }}",
+            "{{ $json.companySize }}",
+            "{{ $json.position }}",
+            "{{ $json.sector }}",
+            "{{ $json.source }}",
+            "{{ $json.budget }}",
+            "{{ $json.leadScore }}",
+            "{{ $json.isQualified ? 'QUALIFIED' : 'COLD' }}",
+            "{{ $json.consent ? 'YES' : 'NO' }}",
+            "{{ $json.consentDate }}",
+            "{{ $json.consentSource }}"
+          ]
+        ]
+      },
+      "name": "Log to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 2,
+      "position": [2450, 400]
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{\n  json: {\n    message: 'Lead processing completed successfully',\n    leadId: $json.id,\n    contactId: $json.crmContactId,\n    companyId: $json.crmCompanyId,\n    dealId: $json.dealId,\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "name": "Success Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [2650, 400]
+    },
+    {
+      "parameters": {
+        "path": "leads/enrich-company",
+        "method": "POST",
+        "responseMode": "onReceived",
+        "responseData": "firstItemJson",
+        "responseCode": 200,
+        "responseHeaders": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "name": "Webhook - Company Enrichment",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 600],
+      "webhookId": "company-enrichment-webhook"
+    },
+    {
+      "parameters": {
+        "url": "https://api.pappers.fr/v2/recherche_entreprise",
+        "options": {
+          "query": {
+            "q": "={{ $json.siret || $json.siren || $json.company }}",
+            "api_token": "={{ $env.PAPPERS_API_TOKEN }}"
+          },
+          "headers": {
+            "Accept": "application/json"
+          }
+        },
+        "responseFormat": "json"
+      },
+      "name": "Enrich Company Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [450, 600]
+    },
+    {
+      "parameters": {
+        "functionCode": "const apiResponse = $json;\nconst companyData = apiResponse.etablissement_actuel || {};\n\nconst enrichedData = {\n  siret: companyData.siret,\n  siren: companyData.siren,\n  tvaIntracommunautaire: companyData.numero_tva_intra,\n  nomCommercial: companyData.nom_commercial,\n  raisonSociale: companyData.raison_sociale,\n  formeJuridique: companyData.forme_juridique,\n  codeNAF: companyData.code_naf,\n  libelleNAF: companyData.libelle_naf,\n  capital: companyData.capital,\n  effectif: companyData.effectif,\n  dateCreation: companyData.date_creation,\n  dateMiseAJour: companyData.date_mise_a_jour,\n  adresseComplete: `${companyData.adresse_ligne_1 || ''} ${companyData.adresse_ligne_2 || ''}`.trim(),\n  codePostal: companyData.code_postal,\n  ville: companyData.ville,\n  pays: companyData.pays,\n  telephone: companyData.telephone,\n  email: companyData.email,\n  siteWeb: companyData.site_web,\n  statut: companyData.statut,\n  activite: companyData.activite_principale,\n  libelleActivite: companyData.libelle_activite_principale\n};\n\nreturn [{ json: enrichedData }];"
+      },
+      "name": "Extract Company Info",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [650, 600]
+    },
+    {
+      "parameters": {
+        "resource": "company",
+        "operation": "update",
+        "companyId": "={{ $json.crmCompanyId }}",
+        "updateFields": {
+          "custom_fields": {
+            "siren": "={{ $json.siren }}",
+            "siret": "={{ $json.siret }}",
+            "tva_intracommunautaire": "={{ $json.tvaIntracommunautaire }}",
+            "naaf_code": "={{ $json.codeNAF }}",
+            "legal_form": "={{ $json.formeJuridique }}",
+            "capital": "={{ $json.capital }}",
+            "employee_count": "={{ $json.effectif }}",
+            "address": "={{ $json.adresseComplete }}",
+            "postal_code": "={{ $json.codePostal }}",
+            "city": "={{ $json.ville }}",
+            "country": "={{ $json.pays }}",
+            "phone": "={{ $json.telephone }}",
+            "email": "={{ $json.email }}",
+            "website": "={{ $json.siteWeb }}",
+            "business_activity": "={{ $json.activite }}",
+            "activity_description": "={{ $json.libelleActivite }}"
+          }
+        }
+      },
+      "name": "Update Company in CRM",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [850, 600]
+    }
+  ],
+  "connections": {
+    "Webhook - Lead Capture": {
+      "main": [
+        [
+          {
+            "node": "Filter - Valid Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter - Valid Lead": {
+      "main": [
+        [
+          {
+            "node": "Normalize & Score Lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize & Score Lead": {
+      "main": [
+        [
+          {
+            "node": "Check Existing Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Existing Contact": {
+      "main": [
+        [
+          {
+            "node": "Contact Exists?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contact Exists?": {
+      "main": [
+        [
+          {
+            "node": "Update Existing Contact",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create New Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Existing Contact": {
+      "main": [
+        [
+          {
+            "node": "Get Company in CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create New Contact": {
+      "main": [
+        [
+          {
+            "node": "Get Company in CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Company in CRM": {
+      "main": [
+        [
+          {
+            "node": "Create Company in CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Company in CRM": {
+      "main": [
+        [
+          {
+            "node": "Enrich with Pappers API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrich with Pappers API": {
+      "main": [
+        [
+          {
+            "node": "Is Qualified Lead?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Qualified Lead?": {
+      "main": [
+        [
+          {
+            "node": "Create Deal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Deal": {
+      "main": [
+        [
+          {
+            "node": "Create Follow-up Activity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Follow-up Activity": {
+      "main": [
+        [
+          {
+            "node": "Send Welcome Email (Brevo)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Welcome Email (Brevo)": {
+      "main": [
+        [
+          {
+            "node": "Notify Sales Team (Slack)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Sales Team (Slack)": {
+      "main": [
+        [
+          {
+            "node": "Log to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Company Enrichment": {
+      "main": [
+        [
+          {
+            "node": "Enrich Company Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrich Company Data": {
+      "main": [
+        [
+          {
+            "node": "Extract Company Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Company Info": {
+      "main": [
+        [
+          {
+            "node": "Update Company in CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "lead-generation-crm-automation"
+}

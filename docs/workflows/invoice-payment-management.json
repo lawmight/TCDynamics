@@ -1,0 +1,728 @@
+{
+  "name": "Invoice Generation & Payment Management - French Compliance",
+  "description": "Automatically generate compliant French invoices, send to clients, track payments, and manage collections with RGPD compliance",
+  "version": "1.0.0",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "invoices/generate",
+        "method": "POST",
+        "responseMode": "onReceived",
+        "responseData": "firstItemJson",
+        "responseCode": 200,
+        "responseHeaders": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "name": "Webhook - Invoice Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "invoice-generation-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.clientId }}",
+              "operation": "isNotEmpty"
+            },
+            {
+              "value1": "={{ $json.amount }}",
+              "operation": "isNotEmpty"
+            },
+            {
+              "value1": "={{ $json.description }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "name": "Validate Invoice Data",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "resource": "company",
+        "operation": "get",
+        "companyId": "={{ $json.clientId }}"
+      },
+      "name": "Get Client Details",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [650, 200]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Calculate invoice amounts and taxes\nconst amount = parseFloat($json.amount);\nconst tvaRate = parseFloat($json.tvaRate || 20);\nconst discount = parseFloat($json.discount || 0);\n\n// Apply discount\nconst amountAfterDiscount = amount - (amount * discount / 100);\n\n// Calculate TVA\nconst tvaAmount = amountAfterDiscount * tvaRate / 100;\n\n// Total amount\nconst totalAmount = amountAfterDiscount + tvaAmount;\n\n// Generate invoice number\nconst date = new Date();\nconst year = date.getFullYear();\nconst month = String(date.getMonth() + 1).padStart(2, '0');\nconst day = String(date.getDate()).padStart(2, '0');\nconst randomSuffix = Math.floor(Math.random() * 1000).toString().padStart(3, '0');\nconst invoiceNumber = `FACT-${year}${month}${day}-${randomSuffix}`;\n\n// Payment terms\nconst paymentDueDate = new Date();\npaymentDueDate.setDate(paymentDueDate.getDate() + 30); // 30 days payment terms\n\nreturn [{\n  json: {\n    ...$json,\n    invoiceNumber: invoiceNumber,\n    invoiceDate: date.toISOString(),\n    dueDate: paymentDueDate.toISOString(),\n    amountHT: amountAfterDiscount,\n    tvaRate: tvaRate,\n    tvaAmount: tvaAmount,\n    amountTTC: totalAmount,\n    discount: discount,\n    clientId: $json.clientId,\n    clientDetails: $node[\"Get Client Details\"].json.data,\n    status: 'pending',\n    invoiceItems: $json.items || [{\n      description: $json.description,\n      quantity: 1,\n      unitPrice: amountAfterDiscount,\n      tvaRate: tvaRate\n    }]\n  }\n}];"
+      },
+      "name": "Calculate Invoice Details",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.pennylane.com/v1/invoices",
+        "options": {
+          "body": {
+            "invoice": {
+              "number": "={{ $json.invoiceNumber }}",
+              "date": "={{ $json.invoiceDate }}",
+              "due_date": "={{ $json.dueDate }}",
+              "customer_id": "={{ $json.clientId }}",
+              "currency": "EUR",
+              "status": "draft",
+              "items": "={{ $json.invoiceItems }}",
+              "discount": "={{ $json.discount }}",
+              "vat_rate": "={{ $json.tvaRate }}",
+              "notes": "={{ $json.notes || 'Merci de votre confiance.' }}",
+              "customer_reference": "={{ $json.clientReference }}",
+              "custom_fields": {
+                "siren": "={{ $json.clientDetails.custom_fields?.siren }}",
+                "tva_intracommunautaire": "={{ $json.clientDetails.custom_fields?.tva_intracommunautaire }}",
+                "legal_form": "={{ $json.clientDetails.custom_fields?.legal_form }}",
+                "rgpd_consent": "={{ $json.rgpdConsent || true }}",
+                "rgpd_consent_date": "={{ $json.rgpdConsentDate || new Date().toISOString() }}"
+              }
+            }
+          },
+          "headers": {
+            "Authorization": "Bearer {{ $env.PENNYLANE_API_TOKEN }}",
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          "jsonParameters": true
+        },
+        "responseFormat": "json"
+      },
+      "name": "Create Invoice in Pennylane",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.pennylane.com/v1/invoices/{{ $json.invoiceId }}/pdf",
+        "options": {
+          "headers": {
+            "Authorization": "Bearer {{ $env.PENNYLANE_API_TOKEN }}",
+            "Accept": "application/pdf"
+          }
+        },
+        "responseFormat": "file"
+      },
+      "name": "Download Invoice PDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "facturation@tcdynamics.fr",
+        "fromName": "TCDynamics - Service Facturation",
+        "toEmail": "={{ $json.clientDetails.email }}",
+        "toName": "={{ $json.clientDetails.name }}",
+        "subject": "Facture {{ $json.invoiceNumber }} - TCDynamics",
+        "html": "<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Facture {{ $json.invoiceNumber }}</title>\n  <style>\n    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; }\n    .container { max-width: 800px; margin: 0 auto; background: #fff; border: 1px solid #ddd; border-radius: 8px; }\n    .header { background: #f8f9fa; padding: 20px; border-bottom: 2px solid #007bff; }\n    .content { padding: 20px; }\n    .invoice-info { display: flex; justify-content: space-between; margin-bottom: 30px; }\n    .client-info, .company-info { width: 48%; }\n    table { width: 100%; border-collapse: collapse; margin: 20px 0; }\n    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }\n    th { background-color: #f8f9fa; }\n    .totals { margin-left: auto; width: 300px; }\n    .total-row { font-weight: bold; font-size: 18px; color: #007bff; }\n    .footer { background: #f8f9fa; padding: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }\n    .payment-info { margin-top: 20px; padding: 15px; background: #e9ecef; border-radius: 5px; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h1 style=\"margin: 0; color: #007bff;\">FACTURE</h1>\n      <p style=\"margin: 5px 0 0 0;\">Numéro: {{ $json.invoiceNumber }}</p>\n      <p style=\"margin: 0;\">Date: {{ $json.invoiceDate | date:\"DD/MM/YYYY\" }}</p>\n    </div>\n    \n    <div class=\"content\">\n      <div class=\"invoice-info\">\n        <div class=\"company-info\">\n          <h3>Émetteur</h3>\n          <p><strong>TCDynamics</strong><br>\n          SIREN: 123 456 789<br>\n          TVA Intracommunautaire: FR123456789<br>\n          123 Avenue des Champs-Élysées<br>\n          75008 Paris, France<br>\n          facturation@tcdynamics.fr</p>\n        </div>\n        <div class=\"client-info\">\n          <h3>Client</h3>\n          <p><strong>{{ $json.clientDetails.name }}</strong><br>\n          {{ $json.clientDetails.custom_fields?.siren ? `SIREN: ${$json.clientDetails.custom_fields.siren}` : '' }}<br>\n          {{ $json.clientDetails.custom_fields?.tva_intracommunautaire ? `TVA: ${$json.clientDetails.custom_fields.tva_intracommunautaire}` : '' }}<br>\n          {{ $json.clientDetails.address }}<br>\n          {{ $json.clientDetails.postal_code }} {{ $json.clientDetails.city }}, {{ $json.clientDetails.country }}</p>\n        </div>\n      </div>\n      \n      <h3>Détails de la facture</h3>\n      <p><strong>Description:</strong> {{ $json.description }}</p>\n      <p><strong>Conditions de paiement:</strong> {{ $json.paymentTerms || '30 jours fin de mois' }}</p>\n      <p><strong>Échéance:</strong> {{ $json.dueDate | date:\"DD/MM/YYYY\" }}</p>\n      \n      <table>\n        <thead>\n          <tr>\n            <th>Description</th>\n            <th>Quantité</th>\n            <th>Prix unitaire</th>\n            <th>TVA</th>\n            <th>Montant HT</th>\n          </tr>\n        </thead>\n        <tbody>\n          {{#each $json.invoiceItems}}\n          <tr>\n            <td>{{this.description}}</td>\n            <td>{{this.quantity}}</td>\n            <td>{{this.unitPrice}} €</td>\n            <td>{{this.tvaRate}} %</td>\n            <td>{{this.amountHT}} €</td>\n          </tr>\n          {{/each}}\n        </tbody>\n        <tfoot>\n          <tr style=\"background-color: #f8f9fa; font-weight: bold;\">\n            <td colspan=\"4\" style=\"text-align: right;\">Total HT:</td>\n            <td>{{ $json.amountHT }} €</td>\n          </tr>\n          <tr style=\"background-color: #f8f9fa; font-weight: bold;\">\n            <td colspan=\"4\" style=\"text-align: right;\">TVA ({{ $json.tvaRate }}%):</td>\n            <td>{{ $json.tvaAmount }} €</td>\n          </tr>\n          <tr class=\"total-row\">\n            <td colspan=\"4\" style=\"text-align: right;\">Total TTC:</td>\n            <td>{{ $json.amountTTC }} €</td>\n          </tr>\n        </tfoot>\n      </table>\n      \n      <div class=\"payment-info\">\n        <h4>Informations de paiement</h4>\n        <p><strong>RIB:</strong> FR76 1234 5678 9012 3456 7890 123</p>\n        <p><strong>IBAN:</strong> FR7612345678901234567890123</p>\n        <p><strong>BIC/SWIFT:</strong> AGRIFRPP882</p>\n        <p><strong>Code client:</strong> {{ $json.clientId }}</p>\n      </div>\n      \n      <div class=\"footer\">\n        <p><strong>Mentions légales:</strong></p>\n        <ul style=\"margin: 5px 0 0 20px;\">\n          <li>Conformément à l'article 282-1 du Code Général des Impôts, cette facture est établie conformément aux obligations légales françaises.</li>\n          <li>En cas de retard de paiement, une pénalité de 10% du montant TTC sera appliquée conformément à l'article L. 441-6 du Code de Commerce.</li>\n          <li>Conformément au RGPD, vos données sont traitées dans le cadre de la relation commerciale et ne seront pas transmises à des tiers.</li>\n          <li>Pour toute question concernant cette facture, contactez-nous par email à facturation@tcdynamics.fr</li>\n        </ul>\n      </div>\n    </div>\n  </div>\n</body>\n</html>",
+        "attachments": [
+          {
+            "fileName": "={{ `Facture_${$json.invoiceNumber}.pdf` }}",
+            "binaryPropertyName": "data"
+          }
+        ],
+        "headers": {
+          "Reply-To": "facturation@tcdynamics.fr",
+          "X-Priority": "1"
+        }
+      },
+      "name": "Send Invoice Email (Brevo)",
+      "type": "n8n-nodes-base.brevo",
+      "typeVersion": 2,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "resource": "activity",
+        "operation": "create",
+        "type": "invoice_sent",
+        "subject": "Facture {{ $json.invoiceNumber }} envoyée",
+        "note": "Facture {{ $json.invoiceNumber }} pour {{ $json.amountTTC }} € envoyée à {{ $json.clientDetails.name }} le {{ $json.invoiceDate | date:\"DD/MM/YYYY\" }}",
+        "dueDate": "={{ new Date($json.invoiceDate).toISOString() }}",
+        "personId": "={{ $json.clientId }}",
+        "orgId": "={{ $json.clientId }}",
+        "userId": "={{ $env.ACCOUNTING_USER_ID }}"
+      },
+      "name": "Log Invoice Activity",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [1650, 300]
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "create",
+        "dataTableName": "invoices",
+        "columns": {
+          "invoice_number": "={{ $json.invoiceNumber }}",
+          "client_id": "={{ $json.clientId }}",
+          "client_name": "={{ $json.clientDetails.name }}",
+          "amount_ht": "={{ $json.amountHT }}",
+          "tva_amount": "={{ $json.tvaAmount }}",
+          "amount_ttc": "={{ $json.amountTTC }}",
+          "invoice_date": "={{ $json.invoiceDate }}",
+          "due_date": "={{ $json.dueDate }}",
+          "status": "sent",
+          "payment_method": "={{ $json.paymentMethod || 'Virement' }}",
+          "rgpd_consent": "={{ $json.rgpdConsent }}",
+          "rgpd_consent_date": "={{ $json.rgpdConsentDate }}",
+          "created_at": "={{ new Date().toISOString() }}",
+          "updated_at": "={{ new Date().toISOString() }}"
+        }
+      },
+      "name": "Save Invoice to Data Table",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 2,
+      "position": [1850, 300]
+    },
+    {
+      "parameters": {
+        "channel": "finance-team",
+        "message": "*Nouvelle facture émise !*\n\n*Facture:* {{ $json.invoiceNumber }}\n*Client:* {{ $json.clientDetails.name }}\n*Montant:* {{ $json.amountTTC }} € (TTC)\n*Échéance:* {{ $json.dueDate | date:\"DD/MM/YYYY\" }}\n\n[Accéder à la facture dans Pennylane](https://app.pennylane.com/invoices/{{ $json.invoiceId }})"
+      },
+      "name": "Notify Finance Team (Slack)",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [2050, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{\n  json: {\n    message: 'Invoice sent successfully',\n    invoiceId: $json.invoiceId,\n    invoiceNumber: $json.invoiceNumber,\n    clientId: $json.clientId,\n    amountTTC: $json.amountTTC,\n    dueDate: $json.dueDate,\n    status: 'sent',\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "name": "Success Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [2250, 300]
+    },
+    {
+      "parameters": {
+        "path": "invoices/payment-reminder",
+        "method": "POST",
+        "responseMode": "onReceived",
+        "responseData": "firstItemJson",
+        "responseCode": 200,
+        "responseHeaders": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "name": "Webhook - Payment Reminder",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 600],
+      "webhookId": "payment-reminder-webhook"
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableName": "invoices",
+        "rowId": "={{ $json.invoiceId }}"
+      },
+      "name": "Get Invoice Status",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 2,
+      "position": [450, 600]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.status }}",
+              "operation": "equals",
+              "value2": "sent"
+            },
+            {
+              "value1": "={{ new Date($json.dueDate) < new Date() }}",
+              "operation": "equals",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "Check Payment Overdue",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [650, 600]
+    },
+    {
+      "parameters": {
+        "resource": "company",
+        "operation": "get",
+        "companyId": "={{ $json.client_id }}"
+      },
+      "name": "Get Client for Reminder",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [850, 500]
+    },
+    {
+      "parameters": {
+        "fromEmail": "relance@tcdynamics.fr",
+        "fromName": "TCDynamics - Service Relance",
+        "toEmail": "={{ $json.client_email }}",
+        "toName": "={{ $json.client_name }}",
+        "subject": "RELANCE: Facture {{ $json.invoice_number }} - En retard de paiement",
+        "html": "<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Relance de paiement</title>\n  <style>\n    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; }\n    .container { max-width: 800px; margin: 0 auto; background: #fff; border: 2px solid #dc3545; border-radius: 8px; }\n    .header { background: #dc3545; color: white; padding: 20px; text-align: center; }\n    .content { padding: 20px; }\n    .warning-box { background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; margin: 20px 0; border-radius: 5px; }\n    .amount-box { background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; margin: 20px 0; border-radius: 5px; }\n    .footer { background: #f8f9fa; padding: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h1 style=\"margin: 0;\">RELANCE DE PAIEMENT</h1>\n      <p style=\"margin: 5px 0 0 0;\">FACTURE EN RETARD</p>\n    </div>\n    \n    <div class=\"content\">\n      <h3>Informations de facturation</h3>\n      <p><strong>Facture:</strong> {{ $json.invoice_number }}</p>\n      <p><strong>Client:</strong> {{ $json.client_name }}</p>\n      <p><strong>Montant TTC:</strong> {{ $json.amount_ttc }} €</p>\n      <p><strong>Date d'échéance:</strong> {{ $json.due_date | date:\"DD/MM/YYYY\" }}</p>\n      <p><strong>Retard:</strong> {{ Math.ceil((new Date() - new Date($json.due_date)) / (1000 * 60 * 60 * 24)) }} jours</p>\n      \n      <div class=\"warning-box\">\n        <h4>⚠️ Avis de retard de paiement</h4>\n        <p>Nous constatons que la facture ci-dessus n'a pas été réglée à sa date d'échéance. Nous vous prions de bien vouloir procéder au paiement dans les plus brefs délais.</p>\n      </div>\n      \n      <div class=\"amount-box\">\n        <h4>Montant à régler: <span style=\"color: #dc3545; font-weight: bold;\">{{ $json.amount_ttc }} €</span></h4>\n        <p>En cas de non-paiement dans un délai de 7 jours, des pénalités de retard de 10% du montant TTC seront appliquées conformément à l'article L. 441-6 du Code de Commerce.</p>\n      </div>\n      \n      <h4>Coordonnées bancaires pour le paiement:</h4>\n      <p><strong>RIB:</strong> FR76 1234 5678 9012 3456 7890 123</p>\n      <p><strong>IBAN:</strong> FR7612345678901234567890123</p>\n      <p><strong>BIC/SWIFT:</strong> AGRIFRPP882</p>\n      <p><strong>Objet du virement:</strong> {{ $json.invoice_number }}</p>\n      \n      <div class=\"footer\">\n        <p><strong>Informations légales:</strong></p>\n        <ul style=\"margin: 5px 0 0 20px;\">\n          <li>Conformément à l'article L. 441-6 du Code de Commerce, des pénalités de retard seront automatiquement appliquées en cas de non-paiement.</li>\n          <li>En cas de litige, les tribunaux de Paris seront seuls compétents.</li>\n          <li>Pour toute information complémentaire, contactez-nous par email à relance@tcdynamics.fr</li>\n        </ul>\n      </div>\n    </div>\n  </div>\n</body>\n</html>"
+      },
+      "name": "Send Payment Reminder Email",
+      "type": "n8n-nodes-base.brevo",
+      "typeVersion": 2,
+      "position": [1050, 600]
+    },
+    {
+      "parameters": {
+        "resource": "activity",
+        "operation": "create",
+        "type": "payment_reminder",
+        "subject": "Relance facture {{ $json.invoice_number }}",
+        "note": "Relance envoyée pour facture {{ $json.invoice_number }} - {{ $json.amount_ttc }} € - {{ Math.ceil((new Date() - new Date($json.due_date)) / (1000 * 60 * 60 * 24)) }} jours de retard",
+        "dueDate": "={{ new Date().toISOString() }}",
+        "personId": "={{ $json.client_id }}",
+        "orgId": "={{ $json.client_id }}",
+        "userId": "={{ $env.ACCOUNTING_USER_ID }}"
+      },
+      "name": "Log Reminder Activity",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [1250, 600]
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "dataTableName": "invoices",
+        "rowId": "={{ $json.invoice_id }}",
+        "update": {
+          "reminder_count": "={{ ($json.reminder_count || 0) + 1 }}",
+          "last_reminder_date": "={{ new Date().toISOString() }}",
+          "status": "reminder_sent"
+        }
+      },
+      "name": "Update Invoice Reminder",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 2,
+      "position": [1450, 600]
+    },
+    {
+      "parameters": {
+        "path": "invoices/payment-tracking",
+        "method": "POST",
+        "responseMode": "onReceived",
+        "responseData": "firstItemJson",
+        "responseCode": 200,
+        "responseHeaders": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "name": "Webhook - Payment Tracking",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 900],
+      "webhookId": "payment-tracking-webhook"
+    },
+    {
+      "parameters": {
+        "url": "https://api.qonto.com/api/v3/transactions",
+        "options": {
+          "query": {
+            "iban": "={{ $env.QONTO_IBAN }}",
+            "from": "={{ $json.paymentDate ? new Date(new Date($json.paymentDate).getTime() - 86400000).toISOString() : '' }}",
+            "to": "={{ $json.paymentDate ? new Date(new Date($json.paymentDate).getTime() + 86400000).toISOString() : '' }}",
+            "amount": "={{ $json.amountTTC }}",
+            "status": "succeeded"
+          },
+          "headers": {
+            "Authorization": "Basic {{ $env.QONTO_API_KEY }}",
+            "Accept": "application/json"
+          }
+        },
+        "responseFormat": "json"
+      },
+      "name": "Check Payment in Qonto",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [450, 900]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.transactions?.length > 0 }}",
+              "operation": "equals",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "Payment Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [650, 900]
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "update",
+        "dataTableName": "invoices",
+        "rowId": "={{ $json.invoiceId }}",
+        "update": {
+          "status": "paid",
+          "payment_date": "={{ new Date().toISOString() }}",
+          "payment_method": "virement",
+          "payment_transaction_id": "={{ $json.transactions[0].transaction_id }}",
+          "updated_at": "={{ new Date().toISOString() }}"
+        }
+      },
+      "name": "Mark Invoice as Paid",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 2,
+      "position": [850, 850]
+    },
+    {
+      "parameters": {
+        "resource": "activity",
+        "operation": "create",
+        "type": "payment_received",
+        "subject": "Paiement reçu - {{ $json.invoiceNumber }}",
+        "note": "Paiement de {{ $json.amountTTC }} € reçu pour la facture {{ $json.invoiceNumber }}",
+        "dueDate": "={{ new Date().toISOString() }}",
+        "personId": "={{ $json.clientId }}",
+        "orgId": "={{ $json.clientId }}",
+        "userId": "={{ $env.ACCOUNTING_USER_ID }}"
+      },
+      "name": "Log Payment Activity",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [1050, 850]
+    },
+    {
+      "parameters": {
+        "channel": "finance-team",
+        "message": "*Paiement reçu !*\n\n*Facture:* {{ $json.invoiceNumber }}\n*Client:* {{ $json.clientDetails.name }}\n*Montant:* {{ $json.amountTTC }} €\n*Date:* {{ new Date() | date:\"DD/MM/YYYY\" }}\n\n[Accéder à la facture](https://app.pennylane.com/invoices/{{ $json.invoiceId }})"
+      },
+      "name": "Notify Payment Received (Slack)",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [1250, 850]
+    },
+    {
+      "parameters": {
+        "fromEmail": "compta@tcdynamics.fr",
+        "fromName": "TCDynamics - Service Comptabilité",
+        "toEmail": "={{ $json.clientDetails.email }}",
+        "toName": "={{ $json.clientDetails.name }}",
+        "subject": "Reçu : Paiement de la facture {{ $json.invoiceNumber }}",
+        "html": "<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Paiement reçu</title>\n  <style>\n    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; }\n    .container { max-width: 800px; margin: 0 auto; background: #fff; border: 2px solid #28a745; border-radius: 8px; }\n    .header { background: #28a745; color: white; padding: 20px; text-align: center; }\n    .content { padding: 20px; }\n    .success-box { background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; margin: 20px 0; border-radius: 5px; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h1 style=\"margin: 0;\">PAIEMENT REÇU</h1>\n      <p style=\"margin: 5px 0 0 0;\">MERCI !</p>\n    </div>\n    \n    <div class=\"content\">\n      <h3>Informations de paiement</h3>\n      <p><strong>Facture:</strong> {{ $json.invoiceNumber }}</p>\n      <p><strong>Client:</strong> {{ $json.clientDetails.name }}</p>\n      <p><strong>Montant réglé:</strong> {{ $json.amountTTC }} €</p>\n      <p><strong>Date de paiement:</strong> {{ new Date() | date:\"DD/MM/YYYY\" }}</p>\n      <p><strong>Moyen de paiement:</strong> Virement bancaire</p>\n      \n      <div class=\"success-box\">\n        <h4>✅ Paiement enregistré avec succès</h4>\n        <p>Nous vous remercions pour votre paiement. Votre compte est maintenant à jour.</p>\n      </div>\n      \n      <p>Pour toute question concernant ce paiement, contactez-nous par email à compta@tcdynamics.fr</p>\n    </div>\n  </div>\n</body>\n</html>"
+      },
+      "name": "Send Payment Confirmation Email",
+      "type": "n8n-nodes-base.brevo",
+      "typeVersion": 2,
+      "position": [1450, 850]
+    }
+  ],
+  "connections": {
+    "Webhook - Invoice Request": {
+      "main": [
+        [
+          {
+            "node": "Validate Invoice Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Invoice Data": {
+      "main": [
+        [
+          {
+            "node": "Get Client Details",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Client Details": {
+      "main": [
+        [
+          {
+            "node": "Calculate Invoice Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Invoice Details": {
+      "main": [
+        [
+          {
+            "node": "Create Invoice in Pennylane",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Invoice in Pennylane": {
+      "main": [
+        [
+          {
+            "node": "Download Invoice PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Invoice PDF": {
+      "main": [
+        [
+          {
+            "node": "Send Invoice Email (Brevo)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Invoice Email (Brevo)": {
+      "main": [
+        [
+          {
+            "node": "Log Invoice Activity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Invoice Activity": {
+      "main": [
+        [
+          {
+            "node": "Save Invoice to Data Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Invoice to Data Table": {
+      "main": [
+        [
+          {
+            "node": "Notify Finance Team (Slack)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Finance Team (Slack)": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Payment Reminder": {
+      "main": [
+        [
+          {
+            "node": "Get Invoice Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Invoice Status": {
+      "main": [
+        [
+          {
+            "node": "Check Payment Overdue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Payment Overdue": {
+      "main": [
+        [
+          {
+            "node": "Get Client for Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Client for Reminder": {
+      "main": [
+        [
+          {
+            "node": "Send Payment Reminder Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Payment Reminder Email": {
+      "main": [
+        [
+          {
+            "node": "Log Reminder Activity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Reminder Activity": {
+      "main": [
+        [
+          {
+            "node": "Update Invoice Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Invoice Reminder": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Payment Tracking": {
+      "main": [
+        [
+          {
+            "node": "Check Payment in Qonto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Payment in Qonto": {
+      "main": [
+        [
+          {
+            "node": "Payment Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payment Found?": {
+      "main": [
+        [
+          {
+            "node": "Mark Invoice as Paid",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Invoice as Paid": {
+      "main": [
+        [
+          {
+            "node": "Log Payment Activity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Payment Activity": {
+      "main": [
+        [
+          {
+            "node": "Notify Payment Received (Slack)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Payment Received (Slack)": {
+      "main": [
+        [
+          {
+            "node": "Send Payment Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "invoice-payment-management"
+}

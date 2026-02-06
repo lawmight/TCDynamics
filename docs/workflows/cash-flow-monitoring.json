@@ -1,0 +1,576 @@
+{
+  "name": "Cash Flow Monitoring & Financial Alerts",
+  "description": "Daily cash flow monitoring with expense categorization, automated alerts, and financial dashboard updates for French SMEs",
+  "version": "1.0.0",
+  "nodes": [
+    {
+      "parameters": {
+        "schedule": "0 8 * * 1-5",
+        "timezone": "Europe/Paris"
+      },
+      "name": "Daily Cash Flow Check",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 2,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.qonto.com/api/v3/transactions",
+        "options": {
+          "query": {
+            "iban": "={{ $env.QONTO_IBAN }}",
+            "from": "={{ new Date(new Date().getTime() - 24 * 60 * 60 * 1000).toISOString() }}",
+            "to": "={{ new Date().toISOString() }}",
+            "status": "succeeded"
+          },
+          "headers": {
+            "Authorization": "Basic {{ $env.QONTO_API_KEY }}",
+            "Accept": "application/json"
+          }
+        },
+        "responseFormat": "json"
+      },
+      "name": "Fetch Qonto Transactions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [450, 200]
+    },
+    {
+      "parameters": {
+        "url": "https://api.pennylane.com/v1/invoices",
+        "options": {
+          "query": {
+            "status": "pending",
+            "due_date_from": "={{ new Date().toISOString() }}",
+            "due_date_to": "={{ new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000).toISOString() }}"
+          },
+          "headers": {
+            "Authorization": "Bearer {{ $env.PENNYLANE_API_TOKEN }}",
+            "Accept": "application/json"
+          }
+        },
+        "responseFormat": "json"
+      },
+      "name": "Get Upcoming Invoices",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [450, 400]
+    },
+    {
+      "parameters": {
+        "url": "https://api.pennylane.com/v1/companies/{{ $env.PENNYLANE_COMPANY_ID }}/balance",
+        "options": {
+          "query": {
+            "date": "={{ new Date().toISOString() }}"
+          },
+          "headers": {
+            "Authorization": "Bearer {{ $env.PENNYLANE_API_TOKEN }}",
+            "Accept": "application/json"
+          }
+        },
+        "responseFormat": "json"
+      },
+      "name": "Get Current Balance",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [450, 600]
+    },
+    {
+      "parameters": {
+        "functionCode": "const transactions = $json.transactions || [];\nconst categorizedTransactions = [];\n\n// Categorize transactions using AI\nfor (const transaction of transactions) {\n  const category = categorizeTransaction(transaction);\n  categorizedTransactions.push({\n    ...transaction,\n    category: category.category,\n    tvaRate: category.tvaRate,\n    deductible: category.deductible,\n    processedAt: new Date().toISOString()\n  });\n}\n\nreturn [{\n  json: {\n    date: new Date().toISOString(),\n    transactions: categorizedTransactions,\n    totalIncoming: transactions.filter(t => t.side === 'debit').reduce((sum, t) => sum + parseFloat(t.amount), 0),\n    totalOutgoing: transactions.filter(t => t.side === 'credit').reduce((sum, t) => sum + parseFloat(t.amount), 0),\n    netFlow: transactions.reduce((sum, t) => sum + (t.side === 'debit' ? parseFloat(t.amount) : -parseFloat(t.amount)), 0)\n  }\n}];\n\nfunction categorizeTransaction(transaction) {\n  const description = (transaction.label || '').toLowerCase();\n  const amount = Math.abs(parseFloat(transaction.amount));\n  \n  // French expense categories\n  const categories = {\n    'frais bancaires': { keywords: ['commission', 'frais', 'bank fee'], tvaRate: 20, deductible: true },\n    'loyer': { keywords: ['loyer', 'location', 'bail'], tvaRate: 20, deductible: true },\n    'salaire': { keywords: ['salaire', 'paie', 'payroll'], tvaRate: 0, deductible: true },\n    'fournitures': { keywords: ['fourniture', 'papeterie', 'supplies'], tvaRate: 20, deductible: true },\n    'logiciel': { keywords: ['software', 'logiciel', 'abonnement', 'subscription'], tvaRate: 20, deductible: true },\n    'marketing': { keywords: ['marketing', 'pub', 'publicité', 'ad'], tvaRate: 20, deductible: true },\n    'déplacement': { keywords: ['carburant', 'essence', 'train', 'transport', 'déplacement'], tvaRate: 10, deductible: true },\n    'repas': { keywords: ['restaurant', 'repas', 'restaurant d\\'affaire'], tvaRate: 10, deductible: 0.5 }, // 50% deductible\n    'tva': { keywords: ['tva', 'taxe'], tvaRate: 0, deductible: true },\n    'divers': { keywords: [], tvaRate: 20, deductible: false }\n  };\n  \n  for (const [category, config] of Object.entries(categories)) {\n    for (const keyword of config.keywords) {\n      if (description.includes(keyword)) {\n        return {\n          category: category,\n          tvaRate: config.tvaRate,\n          deductible: config.deductible\n        };\n      }\n    }\n  }\n  \n  // Default category\n  return {\n    category: 'divers',\n    tvaRate: 20,\n    deductible: false\n  };\n}"
+      },
+      "name": "Categorize Transactions",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const balance = $json.data || {};\nconst upcomingInvoices = $json2.data || [];\n\n// Calculate projections\nconst currentBalance = parseFloat(balance.current || 0);\nconst incomingInvoices = upcomingInvoices.filter(inv => inv.status === 'pending').reduce((sum, inv) => sum + parseFloat(inv.amount_ttc || 0), 0);\nconst outgoingPayments = upcomingInvoices.filter(inv => inv.status === 'paid').reduce((sum, inv) => sum + parseFloat(inv.amount_ttc || 0), 0);\n\n// Projected balance in 7, 14, and 30 days\nconst projectedBalance7Days = currentBalance + incomingInvoices - (outgoingPayments * 0.5); // Assume 50% paid in 7 days\nconst projectedBalance14Days = currentBalance + incomingInvoices - (outgoingPayments * 0.8); // Assume 80% paid in 14 days\nconst projectedBalance30Days = currentBalance + incomingInvoices - outgoingPayments;\n\n// Safety threshold (3 months of operating expenses)\nconst monthlyExpenses = $json.totalOutgoing / 30 * 30; // Simplified calculation\nconst safetyThreshold = monthlyExpenses * 3;\n\nconst cashFlowData = {\n  date: new Date().toISOString(),\n  currentBalance: currentBalance,\n  incomingInvoices: incomingInvoices,\n  outgoingPayments: outgoingPayments,\n  projectedBalance: {\n    day7: projectedBalance7Days,\n    day14: projectedBalance14Days,\n    day30: projectedBalance30Days\n  },\n  safetyThreshold: safetyThreshold,\n  riskLevel: projectedBalance30Days < safetyThreshold ? 'HIGH' : projectedBalance30Days < (safetyThreshold * 1.5) ? 'MEDIUM' : 'LOW',\n  recommendations: generateRecommendations(projectedBalance30Days, safetyThreshold, incomingInvoices, outgoingPayments)\n};\n\nreturn [{ json: cashFlowData }];\n\nfunction generateRecommendations(balance, threshold, incoming, outgoing) {\n  const recommendations = [];\n  \n  if (balance < threshold) {\n    recommendations.push('Urgent: Solde insuffisant. Considérez accélérer le recouvrement des factures ou reporter les dépenses non essentielles.');\n  }\n  \n  if (incoming < outgoing * 0.8) {\n    recommendations.push('Avertissement: Recettes inférieures aux dépenses. Vérifiez vos tarifs ou augmentez votre activité.');\n  }\n  \n  if (balance > threshold * 2) {\n    recommendations.push('Conseil: Solde confortable. Vous pourriez envisager des investissements ou rembourser des dettes.');\n  }\n  \n  return recommendations;\n}"
+      },
+      "name": "Calculate Cash Flow Projections",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.projectedBalance.day30 < $json.safetyThreshold }}",
+              "operation": "equals",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "Is Cash Flow Risk High?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.projectedBalance.day30 < ($json.safetyThreshold * 1.5) }}",
+              "operation": "equals",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "Is Cash Flow Risk Medium?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1050, 400]
+    },
+    {
+      "parameters": {
+        "channel": "finance-team",
+        "message": "*🚨 ALERTE TRESORERIE URGENTE*\n\n*Date :* {{ new Date() | date:\"DD/MM/YYYY\" }}\n*Solde actuel :* {{ $json.currentBalance | currency:\"€\" }}\n*Projection 30j :* {{ $json.projectedBalance.day30 | currency:\"€\" }}\n*Seuil de sécurité :* {{ $json.safetyThreshold | currency:\"€\" }}\n\n*Risque :* SOLDE INSUFFISANT\n\n*Recommandations :*\n{{#each $json.recommendations}}\n• {{this}}\n{{/each}}\n\n[Accéder au tableau de bord financier](https://app.pennylane.com/dashboard)"
+      },
+      "name": "Send High Risk Alert (Slack)",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [1250, 150]
+    },
+    {
+      "parameters": {
+        "channel": "management",
+        "message": "*⚠️ AVERTISSEMENT TRESORERIE*\n\n*Date :* {{ new Date() | date:\"DD/MM/YYYY\" }}\n*Solde actuel :* {{ $json.currentBalance | currency:\"€\" }}\n*Projection 30j :* {{ $json.projectedBalance.day30 | currency:\"€\" }}\n\n*Recommandations :*\n{{#each $json.recommendations}}\n• {{this}}\n{{/each}}\n\n[Accéder au tableau de bord financier](https://app.pennylane.com/dashboard)"
+      },
+      "name": "Send Medium Risk Alert (Slack)",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [1250, 400]
+    },
+    {
+      "parameters": {
+        "fromEmail": "finance@tcdynamics.fr",
+        "fromName": "TCDynamics - Monitoring Financier",
+        "toEmail": "management@tcdynamics.fr",
+        "subject": "Rapport de Trésorerie - {{ new Date() | date:\"DD/MM/YYYY\" }}",
+        "html": "<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Rapport de Trésorerie</title>\n  <style>\n    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; }\n    .container { max-width: 800px; margin: 0 auto; background: #fff; border: 1px solid #ddd; border-radius: 8px; }\n    .header { background: {{ $json.riskLevel === 'HIGH' ? '#dc3545' : $json.riskLevel === 'MEDIUM' ? '#ffc107' : '#28a745' }}; color: white; padding: 20px; text-align: center; }\n    .content { padding: 20px; }\n    .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0; }\n    .metric-card { background: #f8f9fa; padding: 15px; border-radius: 5px; text-align: center; }\n    .metric-value { font-size: 24px; font-weight: bold; color: {{ $json.riskLevel === 'HIGH' ? '#dc3545' : $json.riskLevel === 'MEDIUM' ? '#ffc107' : '#28a745' }}; }\n    .metric-label { font-size: 12px; color: #666; text-transform: uppercase; }\n    .section { margin: 30px 0; }\n    .section h3 { border-bottom: 2px solid #007bff; padding-bottom: 10px; }\n    ul { margin: 10px 0 0 20px; }\n    .recommendation { background: #e9f7ef; padding: 15px; border-radius: 5px; border-left: 4px solid #28a745; margin: 15px 0; }\n    .warning { background: #fff3cd; padding: 15px; border-radius: 5px; border-left: 4px solid #ffc107; margin: 15px 0; }\n    .danger { background: #f8d7da; padding: 15px; border-radius: 5px; border-left: 4px solid #dc3545; margin: 15px 0; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h1 style=\"margin: 0;\">RAPPORT DE TRESORERIE</h1>\n      <p style=\"margin: 5px 0 0 0;\">{{ new Date() | date:\"DD/MM/YYYY\" }} - Niveau de risque : {{ $json.riskLevel }}</p>\n    </div>\n    \n    <div class=\"content\">\n      <div class=\"metrics-grid\">\n        <div class=\"metric-card\">\n          <div class=\"metric-value\">{{ $json.currentBalance | currency:\"€\" }}</div>\n          <div class=\"metric-label\">Solde Actuel</div>\n        </div>\n        <div class=\"metric-card\">\n          <div class=\"metric-value\">{{ $json.projectedBalance.day30 | currency:\"€\" }}</div>\n          <div class=\"metric-label\">Projection 30j</div>\n        </div>\n        <div class=\"metric-card\">\n          <div class=\"metric-value\">{{ $json.safetyThreshold | currency:\"€\" }}</div>\n          <div class=\"metric-label\">Seuil de Sécurité</div>\n        </div>\n      </div>\n      \n      <div class=\"section\">\n        <h3>Projections de Trésorerie</h3>\n        <ul>\n          <li><strong>7 jours :</strong> {{ $json.projectedBalance.day7 | currency:\"€\" }}</li>\n          <li><strong>14 jours :</strong> {{ $json.projectedBalance.day14 | currency:\"€\" }}</li>\n          <li><strong>30 jours :</strong> {{ $json.projectedBalance.day30 | currency:\"€\" }}</li>\n        </ul>\n      </div>\n      \n      <div class=\"section\">\n        <h3>Recommandations</h3>\n        {{#if $json.recommendations.length}}\n          <div class=\"{{ $json.riskLevel === 'HIGH' ? 'danger' : $json.riskLevel === 'MEDIUM' ? 'warning' : 'recommendation' }}\">\n            <ul>\n              {{#each $json.recommendations}}\n              <li>{{this}}</li>\n              {{/each}}\n            </ul>\n          </div>\n        {{else}}\n          <div class=\"recommendation\">\n            <p>Trésorerie saine. Continuez à surveiller les entrées et sorties de trésorerie.</p>\n          </div>\n        {{/if}}\n      </div>\n      \n      <div class=\"section\">\n        <h3>Transactions Récentes</h3>\n        <p><strong>Entrées :</strong> {{ $json.incomingInvoices | currency:\"€\" }}</p>\n        <p><strong>Sorties :</strong> {{ $json.outgoingPayments | currency:\"€\" }}</p>\n        <p><strong>Flux Net :</strong> {{ $json.incomingInvoices - $json.outgoingPayments | currency:\"€\" }}</p>\n      </div>\n    </div>\n  </div>\n</body>\n</html>"
+      },
+      "name": "Send Cash Flow Report Email",
+      "type": "n8n-nodes-base.brevo",
+      "typeVersion": 2,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "create",
+        "dataTableName": "cash_flow_reports",
+        "columns": {
+          "report_date": "={{ $json.date }}",
+          "current_balance": "={{ $json.currentBalance }}",
+          "projected_balance_7d": "={{ $json.projectedBalance.day7 }}",
+          "projected_balance_14d": "={{ $json.projectedBalance.day14 }}",
+          "projected_balance_30d": "={{ $json.projectedBalance.day30 }}",
+          "incoming_invoices": "={{ $json.incomingInvoices }}",
+          "outgoing_payments": "={{ $json.outgoingPayments }}",
+          "safety_threshold": "={{ $json.safetyThreshold }}",
+          "risk_level": "={{ $json.riskLevel }}",
+          "recommendations": "={{ JSON.stringify($json.recommendations) }}",
+          "created_at": "={{ new Date().toISOString() }}",
+          "updated_at": "={{ new Date().toISOString() }}"
+        }
+      },
+      "name": "Log Cash Flow Report",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 2,
+      "position": [1650, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{\n  json: {\n    message: 'Cash flow monitoring completed',\n    date: $json.date,\n    riskLevel: $json.riskLevel,\n    currentBalance: $json.currentBalance,\n    reportSent: true,\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "name": "Success Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [1850, 300]
+    },
+    {
+      "parameters": {
+        "schedule": "0 9 * * 1",
+        "timezone": "Europe/Paris"
+      },
+      "name": "Weekly Expense Analysis",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 2,
+      "position": [250, 700]
+    },
+    {
+      "parameters": {
+        "url": "https://api.qonto.com/api/v3/transactions",
+        "options": {
+          "query": {
+            "iban": "={{ $env.QONTO_IBAN }}",
+            "from": "={{ new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000).toISOString() }}",
+            "to": "={{ new Date().toISOString() }}",
+            "status": "succeeded"
+          },
+          "headers": {
+            "Authorization": "Basic {{ $env.QONTO_API_KEY }}",
+            "Accept": "application/json"
+          }
+        },
+        "responseFormat": "json"
+      },
+      "name": "Fetch Weekly Transactions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [450, 700]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Tu es un expert en analyse financière pour TPE/PME françaises. Analyse les transactions bancaires suivantes et génère un rapport d'analyse hebdomadaire.\n\nInstructions :\n1. Catégorise les dépenses par type (frais bancaires, loyer, salaire, fournitures, logiciel, marketing, déplacement, repas, TVA, divers)\n2. Identifie les dépenses récurrentes vs ponctuelles\n3. Calcule les taux de TVA et vérifie la déductibilité\n4. Identifie les anomalies ou dépenses inhabituelles\n5. Propose des optimisations de coûts\n6. Génère un rapport clair et structuré\n\nFormat de réponse :\n- Analyse des dépenses par catégorie\n- Tendances de dépenses\n- Anomalies détectées\n- Recommandations d'optimisation\n- Comparaison avec la semaine précédente\n\nRetourne uniquement le JSON structuré suivant :\n{\n  \"expense_analysis\": \"Analyse détaillée\",\n  \"spending_trends\": \"Tendances de dépenses\",\n  \"anomalies\": [\"anomalie 1\", \"anomalie 2\"],\n  \"optimization_recommendations\": [\"recommandation 1\", \"recommandation 2\"],\n  \"week_comparison\": \"Comparaison avec semaine précédente\"\n}"
+          },
+          {
+            "role": "user",
+            "content": "Transactions : {{ JSON.stringify($json.transactions) }}\\nPériode : {{ $json.from }} au {{ $json.to }}"
+          }
+        ],
+        "options": {
+          "responseFormat": {
+            "type": "json_schema",
+            "json_schema": {
+              "name": "expense_analysis",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expense_analysis": { "type": "string" },
+                  "spending_trends": { "type": "string" },
+                  "anomalies": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "optimization_recommendations": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "week_comparison": { "type": "string" }
+                },
+                "required": ["expense_analysis", "spending_trends", "anomalies", "optimization_recommendations", "week_comparison"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      },
+      "name": "AI: Analyze Weekly Expenses",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 2,
+      "position": [650, 700]
+    },
+    {
+      "parameters": {
+        "fromEmail": "finance@tcdynamics.fr",
+        "fromName": "TCDynamics - Analyse Financière",
+        "toEmail": "finance-team@tcdynamics.fr",
+        "subject": "Analyse Hebdomadaire des Dépenses - {{ new Date() | date:\"DD/MM/YYYY\" }}",
+        "html": "<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Analyse Hebdomadaire des Dépenses</title>\n  <style>\n    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; }\n    .container { max-width: 800px; margin: 0 auto; background: #fff; border: 1px solid #ddd; border-radius: 8px; }\n    .header { background: #007bff; color: white; padding: 20px; text-align: center; }\n    .content { padding: 20px; }\n    .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0; }\n    .metric-card { background: #f8f9fa; padding: 15px; border-radius: 5px; text-align: center; }\n    .metric-value { font-size: 24px; font-weight: bold; color: #007bff; }\n    .metric-label { font-size: 12px; color: #666; text-transform: uppercase; }\n    .section { margin: 30px 0; }\n    .section h3 { border-bottom: 2px solid #007bff; padding-bottom: 10px; }\n    ul { margin: 10px 0 0 20px; }\n    .anomaly { background: #f8d7da; padding: 15px; border-radius: 5px; border-left: 4px solid #dc3545; margin: 15px 0; }\n    .recommendation { background: #e9f7ef; padding: 15px; border-radius: 5px; border-left: 4px solid #28a745; margin: 15px 0; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h1 style=\"margin: 0;\">ANALYSE DEPENSES</h1>\n      <p style=\"margin: 5px 0 0 0;\">Semaine du {{ $json.from | date:\"DD/MM/YYYY\" }} au {{ $json.to | date:\"DD/MM/YYYY\" }}</p>\n    </div>\n    \n    <div class=\"content\">\n      <div class=\"section\">\n        <h3>Analyse des Dépenses</h3>\n        <p>{{ $json.ai_analysis.expense_analysis }}</p>\n      </div>\n      \n      <div class=\"section\">\n        <h3>Tendances de Dépenses</h3>\n        <p>{{ $json.ai_analysis.spending_trends }}</p>\n      </div>\n      \n      <div class=\"section\">\n        <h3>Anomalies Détectées</h3>\n        {{#if $json.ai_analysis.anomalies.length}}\n          <div class=\"anomaly\">\n            <ul>\n              {{#each $json.ai_analysis.anomalies}}\n              <li>{{this}}</li>\n              {{/each}}\n            </ul>\n          </div>\n        {{else}}\n          <p>Aucune anomalie détectée cette semaine.</p>\n        {{/if}}\n      </div>\n      \n      <div class=\"section\">\n        <h3>Recommandations d'Optimisation</h3>\n        <div class=\"recommendation\">\n          <ul>\n            {{#each $json.ai_analysis.optimization_recommendations}}\n            <li>{{this}}</li>\n            {{/each}}\n          </ul>\n        </div>\n      </div>\n      \n      <div class=\"section\">\n        <h3>Comparaison avec la Semaine Précédente</h3>\n        <p>{{ $json.ai_analysis.week_comparison }}</p>\n      </div>\n    </div>\n  </div>\n</body>\n</html>"
+      },
+      "name": "Send Weekly Expense Report",
+      "type": "n8n-nodes-base.brevo",
+      "typeVersion": 2,
+      "position": [850, 700]
+    },
+    {
+      "parameters": {
+        "path": "finance/payment-tracking",
+        "method": "POST",
+        "responseMode": "onReceived",
+        "responseData": "firstItemJson",
+        "responseCode": 200,
+        "responseHeaders": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "name": "Webhook - Payment Tracking",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 1000],
+      "webhookId": "payment-tracking-webhook"
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "create",
+        "dataTableName": "payment_tracking",
+        "columns": {
+          "transaction_id": "={{ $json.transactionId }}",
+          "amount": "={{ $json.amount }}",
+          "category": "={{ $json.category }}",
+          "description": "={{ $json.description }}",
+          "date": "={{ $json.date }}",
+          "status": "tracked",
+          "created_at": "={{ new Date().toISOString() }}",
+          "updated_at": "={{ new Date().toISOString() }}"
+        }
+      },
+      "name": "Log Payment Tracking",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 2,
+      "position": [450, 1000]
+    }
+  ],
+  "connections": {
+    "Daily Cash Flow Check": {
+      "main": [
+        [
+          {
+            "node": "Fetch Qonto Transactions",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Upcoming Invoices",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Current Balance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Qonto Transactions": {
+      "main": [
+        [
+          {
+            "node": "Categorize Transactions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Upcoming Invoices": {
+      "main": [
+        [
+          {
+            "node": "Calculate Cash Flow Projections",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Current Balance": {
+      "main": [
+        [
+          {
+            "node": "Calculate Cash Flow Projections",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categorize Transactions": {
+      "main": [
+        [
+          {
+            "node": "Calculate Cash Flow Projections",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Cash Flow Projections": {
+      "main": [
+        [
+          {
+            "node": "Is Cash Flow Risk High?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Cash Flow Risk Medium?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Cash Flow Report Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Cash Flow Risk High?": {
+      "main": [
+        [
+          {
+            "node": "Send High Risk Alert (Slack)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Cash Flow Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Cash Flow Risk Medium?": {
+      "main": [
+        [
+          {
+            "node": "Send Medium Risk Alert (Slack)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Cash Flow Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send High Risk Alert (Slack)": {
+      "main": [
+        [
+          {
+            "node": "Log Cash Flow Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Medium Risk Alert (Slack)": {
+      "main": [
+        [
+          {
+            "node": "Log Cash Flow Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Cash Flow Report Email": {
+      "main": [
+        [
+          {
+            "node": "Log Cash Flow Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Cash Flow Report": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weekly Expense Analysis": {
+      "main": [
+        [
+          {
+            "node": "Fetch Weekly Transactions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Weekly Transactions": {
+      "main": [
+        [
+          {
+            "node": "AI: Analyze Weekly Expenses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI: Analyze Weekly Expenses": {
+      "main": [
+        [
+          {
+            "node": "Send Weekly Expense Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Weekly Expense Report": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Payment Tracking": {
+      "main": [
+        [
+          {
+            "node": "Log Payment Tracking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Payment Tracking": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "cash-flow-monitoring"
+}

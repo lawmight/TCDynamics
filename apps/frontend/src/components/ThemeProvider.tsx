@@ -33,25 +33,25 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
  * ```
  */
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // Initialize theme from localStorage or default to 'system'
+  // Initialize theme from localStorage or default to 'dark'
   const [theme, setTheme] = useState<Theme>(() => {
     try {
       const stored = getWithMigration(LS.THEME, 'theme') as Theme
-      return stored || 'system'
+      return stored || 'dark'
     } catch {
-      return 'system'
+      return 'dark'
     }
   })
 
   // Track the actual resolved theme (light or dark)
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light')
+  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('dark')
 
   // Resolve theme and apply to document
   useEffect(() => {
     const root = window.document.documentElement
 
     // Determine the actual theme to apply
-    let resolved: 'light' | 'dark' = 'light'
+    let resolved: 'light' | 'dark' = 'dark'
 
     if (theme === 'system') {
       // Use system preference
@@ -112,9 +112,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 }
 
 const defaultThemeContext: ThemeContextType = {
-  theme: 'system',
+  theme: 'dark',
   setTheme: () => {},
-  resolvedTheme: 'light',
+  resolvedTheme: 'dark',
 }
 
 /**

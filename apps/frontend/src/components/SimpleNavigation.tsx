@@ -110,7 +110,7 @@ const SimpleNavigation = () => {
         }`}
       >
         <div className="container mx-auto p-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:gap-4">
             {/* Logo */}
             {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- Link renders as <a> with native keyboard support */}
             <Link
@@ -121,13 +121,13 @@ const SimpleNavigation = () => {
                   handleNavClick({ label: 'Accueil', scrollId: 'hero' })
                 }
               }}
-              className="text-2xl font-bold text-primary transition-colors hover:text-primary-glow focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="justify-self-start text-2xl font-bold text-primary transition-colors hover:text-primary-glow focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               TCDynamics
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden items-center space-x-4 lg:flex">
+            {/* Desktop Navigation - centered */}
+            <nav className="hidden items-center justify-center space-x-4 lg:flex">
               {shouldShowDesktopNav ? (
                 <>
                   {navigationItems.map(item =>
@@ -173,27 +173,6 @@ const SimpleNavigation = () => {
                       </a>
                     )
                   )}
-                  <button
-                    onClick={goToApp}
-                    onMouseEnter={() => !isExternalApp && prefetchRoute('/app')}
-                    className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-                  >
-                    Accéder à l'app
-                  </button>
-                  {/* Theme Toggle - Desktop */}
-                  <button
-                    className="theme-toggle p-2 md:p-0"
-                    onClick={() =>
-                      setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
-                    }
-                    title="Toggle theme"
-                    aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
-                  >
-                    <div className="sun-moon">
-                      <div className="sun" />
-                      <div className="moon" />
-                    </div>
-                  </button>
                 </>
               ) : (
                 <>
@@ -203,25 +182,54 @@ const SimpleNavigation = () => {
                   >
                     Home
                   </Link>
+                </>
+              )}
+            </nav>
+
+            {/* Desktop actions + Mobile menu button - right column */}
+            <div className="flex items-center justify-end gap-2 justify-self-end">
+              <div className="hidden items-center gap-2 lg:flex">
+                {shouldShowDesktopNav ? (
+                  <>
+                    <button
+                      onClick={goToApp}
+                      onMouseEnter={() => !isExternalApp && prefetchRoute('/app')}
+                      className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                    >
+                      Automatiser
+                    </button>
+                    <button
+                      className="theme-toggle p-2 md:p-0"
+                      onClick={() =>
+                        setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
+                      }
+                      title="Toggle theme"
+                      aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+                    >
+                      <div className="sun-moon">
+                        <div className="sun" />
+                        <div className="moon" />
+                      </div>
+                    </button>
+                  </>
+                ) : (
                   <button
                     onClick={goToApp}
                     onMouseEnter={() => !isExternalApp && prefetchRoute('/app')}
                     className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                   >
-                    Accéder à l'app
+                    Automatiser
                   </button>
-                </>
-              )}
-            </nav>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 text-foreground transition-colors hover:text-primary lg:hidden"
-              aria-label="Toggle menu"
-            >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+                )}
+              </div>
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 text-foreground transition-colors hover:text-primary lg:hidden"
+                aria-label="Toggle menu"
+              >
+                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -289,7 +297,7 @@ const SimpleNavigation = () => {
                   className="mt-2 rounded-full bg-primary px-4 py-2 text-left text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                   onMouseEnter={() => !isExternalApp && prefetchRoute('/app')}
                 >
-                  Accéder à l'app
+                  Automatiser
                 </button>
                 {/* Theme Toggle - Mobile */}
                 <button

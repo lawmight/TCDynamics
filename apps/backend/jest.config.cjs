@@ -36,7 +36,4 @@ module.exports = {
     },
   },
   setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup.js'],
-  verbose: true,
-  forceExit: true,
-  detectOpenHandles: true,
 }

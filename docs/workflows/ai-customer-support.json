@@ -1,0 +1,786 @@
+{
+  "name": "AI-Powered Customer Support - French Language",
+  "description": "Multi-channel AI customer support with automatic classification, French language processing, and escalation to human agents",
+  "version": "1.0.0",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "support/webhook",
+        "method": "POST",
+        "responseMode": "onReceived",
+        "responseData": "firstItemJson",
+        "responseCode": 200,
+        "responseHeaders": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "name": "Webhook - Support Input",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "support-input-webhook"
+    },
+    {
+      "parameters": {
+        "path": "support/crisp-webhook",
+        "method": "POST",
+        "responseMode": "onReceived",
+        "responseData": "firstItemJson",
+        "responseCode": 200,
+        "responseHeaders": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "name": "Webhook - Crisp Chat",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 600],
+      "webhookId": "crisp-chat-webhook"
+    },
+    {
+      "parameters": {
+        "path": "support/email-webhook",
+        "method": "POST",
+        "responseMode": "onReceived",
+        "responseData": "firstItemJson",
+        "responseCode": 200,
+        "responseHeaders": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "name": "Webhook - Email Support",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 900],
+      "webhookId": "email-support-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.message }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "name": "Validate Support Request",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Normalize support request data based on source\nlet normalizedRequest = {};\n\nswitch ($json.source) {\n  case 'crisp':\n    normalizedRequest = {\n      source: 'Crisp Chat',\n      customerId: $json.user_id,\n      customerEmail: $json.user_email,\n      customerName: $json.user_name,\n      message: $json.message,\n      timestamp: $json.timestamp,\n      conversationId: $json.conversation_id,\n      messageType: $json.message_type\n    };\n    break;\n  case 'email':\n    normalizedRequest = {\n      source: 'Email',\n      customerId: $json.from_email,\n      customerEmail: $json.from_email,\n      customerName: $json.from_name,\n      message: $json.body_text,\n      timestamp: $json.timestamp,\n      subject: $json.subject,\n      attachments: $json.attachments\n    };\n    break;\n  case 'form':\n  default:\n    normalizedRequest = {\n      source: $json.source || 'Web Form',\n      customerId: $json.customer_id || $json.email,\n      customerEmail: $json.email,\n      customerName: `${$json.first_name || ''} ${$json.last_name || ''}`.trim(),\n      message: $json.message,\n      timestamp: new Date().toISOString(),\n      subject: $json.subject,\n      priority: $json.priority || 'normal',\n      category: $json.category\n    };\n}\n\n// Add metadata for processing\nnormalizedRequest.requestId = `REQ-${Date.now()}-${Math.floor(Math.random() * 1000)}`;\nnormalizedRequest.processingAt = new Date().toISOString();\n\nreturn [{ json: normalizedRequest }];"
+      },
+      "name": "Normalize Support Request",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Tu es un expert en support client pour TCDynamics, une plateforme d'automatisation pour TPE/PME françaises. Analyse le message suivant et réponds avec un JSON structuré contenant uniquement les champs demandés, sans aucun texte supplémentaire.\n\nAnalyse le message pour :\n1. Intent (string) : Classifie l'intention principale parmi [\"technical_issue\", \"billing_question\", \"feature_request\", \"account_management\", \"general_inquiry\", \"complaint\"]\n2. Urgency (string) : Évalue l'urgence parmi [\"high\", \"medium\", \"low\"]\n3. Language (string) : \"french\" ou \"english\"\n4. Sentiment (string) : \"positive\", \"neutral\", ou \"negative\"\n5. Keywords (array) : 3-5 mots-clés pertinents\n6. Summary (string) : Résumé en 1-2 phrases\n\nExemple de réponse attendue :\n{\"intent\": \"technical_issue\", \"urgency\": \"high\", \"language\": \"french\", \"sentiment\": \"neutral\", \"keywords\": [\"connexion\", \"mot de passe\", \"problème\"], \"summary\": \"Le client signale un problème de connexion à son compte.\"}"
+          },
+          {
+            "role": "user",
+            "content": "Message: {{ $json.message }}\nSujet: {{ $json.subject || 'Non spécifié' }}\nSource: {{ $json.source }}"
+          }
+        ],
+        "options": {
+          "responseFormat": {
+            "type": "json_schema",
+            "json_schema": {
+              "name": "support_analysis",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "intent": {
+                    "type": "string",
+                    "enum": ["technical_issue", "billing_question", "feature_request", "account_management", "general_inquiry", "complaint"]
+                  },
+                  "urgency": {
+                    "type": "string",
+                    "enum": ["high", "medium", "low"]
+                  },
+                  "language": {
+                    "type": "string",
+                    "enum": ["french", "english"]
+                  },
+                  "sentiment": {
+                    "type": "string",
+                    "enum": ["positive", "neutral", "negative"]
+                  },
+                  "keywords": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 3,
+                    "maxItems": 5
+                  },
+                  "summary": {
+                    "type": "string"
+                  }
+                },
+                "required": ["intent", "urgency", "language", "sentiment", "keywords", "summary"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      },
+      "name": "AI: Classify & Analyze Request",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Tu es un agent de support client pour TCDynamics. En fonction du contexte suivant, rédige une réponse en français :\n\nContexte :\n- Analyse : {{ $json.intent }} ({{ $json.urgency }})\n- Sentiment : {{ $json.sentiment }}\n- Langue du client : {{ $json.language }}\n- Message original : {{ $json.originalMessage }}\n- Résumé : {{ $json.summary }}\n\nInstructions :\n1. Si la langue du client est l'anglais, rédige la réponse en anglais\n2. Sinon, rédige en français\n3. Adapte le ton au sentiment (positif/neutre/négatif)\n4. Si l'intention est \"technical_issue\" et l'urgence est \"high\", propose une solution immédiate ou une prise en charge urgente\n5. Si l'intention est \"billing_question\", fournis des informations précises sur la facturation\n6. Si l'intention est \"feature_request\", remercie et indique la procédure\n7. Si l'intention est \"complaint\", utilise un ton empathique et propose une solution\n8. Termine toujours par une formule de politesse adaptée\n\nRéponds uniquement avec le texte de la réponse, sans JSON ni explications supplémentaires."
+          },
+          {
+            "role": "user",
+            "content": "Message original : {{ $json.originalMessage }}\nAnalyse : {{ $json.intent }}, {{ $json.urgency }}, {{ $json.sentiment }}"
+          }
+        ],
+        "options": {
+          "maxTokens": 800,
+          "temperature": 0.3
+        }
+      },
+      "name": "AI: Generate Response",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 2,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.intent }}",
+              "operation": "equals",
+              "value2": "technical_issue"
+            },
+            {
+              "value1": "={{ $json.urgency }}",
+              "operation": "equals",
+              "value2": "high"
+            }
+          ]
+        }
+      },
+      "name": "High Priority Technical Issue?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1250, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.intent }}",
+              "operation": "equals",
+              "value2": "technical_issue"
+            },
+            {
+              "value1": "={{ $json.urgency }}",
+              "operation": "equals",
+              "value2": "medium"
+            }
+          ]
+        }
+      },
+      "name": "Medium Priority Technical Issue?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1250, 400]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.intent }}",
+              "operation": "equals",
+              "value2": "complaint"
+            }
+          ]
+        }
+      },
+      "name": "Is Complaint?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1250, 600]
+    },
+    {
+      "parameters": {
+        "resource": "activity",
+        "operation": "create",
+        "type": "support_request",
+        "subject": "URGENT - {{ $json.subject || $json.intent }}",
+        "note": "Requête support urgente : {{ $json.summary }}\nSource : {{ $json.source }}\nClient : {{ $json.customerName }} ({{ $json.customerEmail }})\nMessage : {{ $json.originalMessage }}",
+        "dueDate": "={{ new Date().toISOString() }}",
+        "personId": "={{ $json.customerId }}",
+        "orgId": null,
+        "userId": "={{ $env.SUPPORT_MANAGER_ID }}",
+        "priority": "high"
+      },
+      "name": "Create Urgent Support Activity",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [1450, 150]
+    },
+    {
+      "parameters": {
+        "channel": "urgent-support",
+        "message": "*🚨 REQUÊTE SUPPORT URGENTE*\n\n*Client :* {{ $json.customerName }}\n*Email :* {{ $json.customerEmail }}\n*Source :* {{ $json.source }}\n*Type :* {{ $json.intent }} ({{ $json.urgency }})\n*Message :* {{ $json.summary }}\n\n*ID Requête :* {{ $json.requestId }}\n\n[Accéder au client dans Pipedrive](https://{{ $env.PIPEDRIVE_SUBDOMAIN }}.pipedrive.com/person/{{ $json.customerId }})"
+      },
+      "name": "Notify Urgent Support (Slack)",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [1650, 150]
+    },
+    {
+      "parameters": {
+        "resource": "activity",
+        "operation": "create",
+        "type": "support_request",
+        "subject": "Support - {{ $json.subject || $json.intent }}",
+        "note": "Requête support : {{ $json.summary }}\nSource : {{ $json.source }}\nClient : {{ $json.customerName }} ({{ $json.customerEmail }})\nUrgence : {{ $json.urgency }}\nMessage : {{ $json.originalMessage }}",
+        "dueDate": "={{ new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString() }}",
+        "personId": "={{ $json.customerId }}",
+        "orgId": null,
+        "userId": "={{ $env.SUPPORT_TEAM_ID }}",
+        "priority": "normal"
+      },
+      "name": "Create Standard Support Activity",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [1450, 400]
+    },
+    {
+      "parameters": {
+        "fromEmail": "support@tcdynamics.fr",
+        "fromName": "TCDynamics - Support Client",
+        "toEmail": "={{ $json.customerEmail }}",
+        "toName": "={{ $json.customerName }}",
+        "subject": "{{ $json.language === 'french' ? 'Votre demande de support a été prise en compte' : 'Your support request has been received' }}",
+        "html": "<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>{{ $json.language === 'french' ? 'Support TCDynamics' : 'TCDynamics Support' }}</title>\n  <style>\n    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; }\n    .container { max-width: 600px; margin: 0 auto; background: #fff; border: 1px solid #ddd; border-radius: 8px; }\n    .header { background: #007bff; color: white; padding: 20px; text-align: center; }\n    .content { padding: 20px; }\n    .response-box { background: #f8f9fa; padding: 20px; margin: 20px 0; border-radius: 5px; border-left: 4px solid #007bff; }\n    .footer { background: #f8f9fa; padding: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h1 style=\"margin: 0;\">{{ $json.language === 'french' ? 'SUPPORT CLIENT' : 'CUSTOMER SUPPORT' }}</h1>\n      <p style=\"margin: 5px 0 0 0;\">{{ $json.language === 'french' ? 'TCDynamics' : 'TCDynamics' }}</p>\n    </div>\n    \n    <div class=\"content\">\n      <h3>{{ $json.language === 'french' ? 'Bonjour' : 'Hello' }} {{ $json.customerName }},</h3>\n      \n      <p>{{ $json.language === 'french' ? 'Nous avons bien reçu votre demande de support.' : 'We have received your support request.' }}</p>\n      \n      <div class=\"response-box\">\n        <h4>{{ $json.language === 'french' ? 'Votre message :' : 'Your message :' }}</h4>\n        <p>{{ $json.summary }}</p>\n        \n        <h4>{{ $json.language === 'french' ? 'Prochaine étape :' : 'Next step :' }}</h4>\n        <p>{{ $json.language === 'french' ? 'Notre équipe va étudier votre demande et reviendra vers vous sous 24 heures.' : 'Our team will review your request and get back to you within 24 hours.' }}</p>\n        \n        {{#if $json.aiResponse}}\n        <h4>{{ $json.language === 'french' ? 'Réponse automatique :' : 'Automatic response :' }}</h4>\n        <p>{{ $json.aiResponse }}</p>\n        {{/if}}\n      </div>\n      \n      <p><strong>{{ $json.language === 'french' ? 'ID de votre demande :' : 'Your request ID :' }}</strong> {{ $json.requestId }}</p>\n      <p><strong>{{ $json.language === 'french' ? 'Date :' : 'Date :' }}</strong> {{ $json.processingAt | date:\"DD/MM/YYYY HH:mm\" }}</p>\n      \n      <p>{{ $json.language === 'french' ? 'Pour toute question complémentaire, merci de répondre directement à cet email.' : 'For any additional questions, please reply directly to this email.' }}</p>\n    </div>\n    \n    <div class=\"footer\">\n      <p><strong>{{ $json.language === 'french' ? 'Informations de contact :' : 'Contact information :' }}</strong></p>\n      <ul style=\"margin: 5px 0 0 20px;\">\n        <li>{{ $json.language === 'french' ? 'Email : support@tcdynamics.fr' : 'Email: support@tcdynamics.fr' }}</li>\n        <li>{{ $json.language === 'french' ? 'Heures d\'ouverture : Lundi au Vendredi, 9h-18h' : 'Opening hours: Monday to Friday, 9AM-6PM' }}</li>\n        <li>{{ $json.language === 'french' ? 'Urgences : 24/7 via notre chat en ligne' : 'Urgencies: 24/7 via our online chat' }}</li>\n      </ul>\n    </div>\n  </div>\n</body>\n</html>"
+      },
+      "name": "Send Support Response Email",
+      "type": "n8n-nodes-base.brevo",
+      "typeVersion": 2,
+      "position": [1850, 400]
+    },
+    {
+      "parameters": {
+        "resource": "activity",
+        "operation": "create",
+        "type": "support_request",
+        "subject": "COMPLAINT - {{ $json.subject || $json.intent }}",
+        "note": "RECLAMATION CLIENT : {{ $json.summary }}\nSource : {{ $json.source }}\nClient : {{ $json.customerName }} ({{ $json.customerEmail }})\nSentiment : {{ $json.sentiment }}\nMessage : {{ $json.originalMessage }}",
+        "dueDate": "={{ new Date().toISOString() }}",
+        "personId": "={{ $json.customerId }}",
+        "orgId": null,
+        "userId": "={{ $env.CUSTOMER_SUCCESS_MANAGER_ID }}",
+        "priority": "high"
+      },
+      "name": "Create Complaint Activity",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 2,
+      "position": [1450, 600]
+    },
+    {
+      "parameters": {
+        "channel": "customer-success",
+        "message": "*⚠️ RECLAMATION CLIENT*\n\n*Client :* {{ $json.customerName }}\n*Email :* {{ $json.customerEmail }}\n*Source :* {{ $json.source }}\n*Sentiment :* {{ $json.sentiment }}\n*Message :* {{ $json.summary }}\n\n[Accéder au client dans Pipedrive](https://{{ $env.PIPEDRIVE_SUBDOMAIN }}.pipedrive.com/person/{{ $json.customerId }})"
+      },
+      "name": "Notify Customer Success (Slack)",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [1650, 600]
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "create",
+        "dataTableName": "support_requests",
+        "columns": {
+          "request_id": "={{ $json.requestId }}",
+          "customer_id": "={{ $json.customerId }}",
+          "customer_name": "={{ $json.customerName }}",
+          "customer_email": "={{ $json.customerEmail }}",
+          "source": "={{ $json.source }}",
+          "message": "={{ $json.originalMessage }}",
+          "intent": "={{ $json.intent }}",
+          "urgency": "={{ $json.urgency }}",
+          "language": "={{ $json.language }}",
+          "sentiment": "={{ $json.sentiment }}",
+          "ai_response": "={{ $json.aiResponse }}",
+          "status": "processed",
+          "created_at": "={{ $json.processingAt }}",
+          "updated_at": "={{ new Date().toISOString() }}"
+        }
+      },
+      "name": "Log Support Request",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 2,
+      "position": [2050, 400]
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{\n  json: {\n    message: 'Support request processed',\n    requestId: $json.requestId,\n    customerId: $json.customerId,\n    intent: $json.intent,\n    urgency: $json.urgency,\n    responseSent: true,\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "name": "Success Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [2250, 400]
+    },
+    {
+      "parameters": {
+        "path": "support/knowledge-base",
+        "method": "POST",
+        "responseMode": "onReceived",
+        "responseData": "firstItemJson",
+        "responseCode": 200,
+        "responseHeaders": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "name": "Webhook - Knowledge Base Query",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 1200],
+      "webhookId": "knowledge-base-webhook"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Tu es un expert en support client pour TCDynamics. En fonction de la question suivante, recherche dans notre base de connaissances et fournis une réponse détaillée en français.\n\nBase de connaissances :\n- Installation : \"Pour installer TCDynamics, rendez-vous sur notre site et suivez le guide d'installation étape par étape.\"\n- Connexion : \"Si vous avez des problèmes de connexion, vérifiez votre mot de passe et assurez-vous d'utiliser la dernière version de votre navigateur.\"\n- Facturation : \"Pour toute question relative à la facturation, consultez votre espace client ou contactez notre service comptabilité.\"\n- API : \"Notre API est documentée dans notre centre d'aide. Vous y trouverez des exemples de code et des tutoriels.\"\n\nInstructions :\n1. Analyse la question du client\n2. Identifie le sujet correspondant dans la base de connaissances\n3. Rédige une réponse claire et détaillée en français\n4. Si la question ne correspond à aucun sujet, propose de contacter le support\n\nRéponds uniquement avec le texte de la réponse, sans JSON ni explications supplémentaires."
+          },
+          {
+            "role": "user",
+            "content": "Question : {{ $json.question }}\nContexte : {{ $json.context || 'Non spécifié' }}"
+          }
+        ],
+        "options": {
+          "maxTokens": 1000,
+          "temperature": 0.2
+        }
+      },
+      "name": "AI: Knowledge Base Response",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 2,
+      "position": [450, 1200]
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "create",
+        "dataTableName": "knowledge_base_queries",
+        "columns": {
+          "query": "={{ $json.question }}",
+          "response": "={{ $json.ai_response }}",
+          "timestamp": "={{ new Date().toISOString() }}",
+          "source": "knowledge_base_webhook"
+        }
+      },
+      "name": "Log Knowledge Base Query",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 2,
+      "position": [650, 1200]
+    },
+    {
+      "parameters": {
+        "path": "support/faq-generator",
+        "method": "POST",
+        "responseMode": "onReceived",
+        "responseData": "firstItemJson",
+        "responseCode": 200,
+        "responseHeaders": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "name": "Webhook - FAQ Generator",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 1500],
+      "webhookId": "faq-generator-webhook"
+    },
+    {
+      "parameters": {
+        "url": "https://{{ $env.PIPEDRIVE_SUBDOMAIN }}.pipedrive.com/api/v1/activities",
+        "options": {
+          "query": {
+            "type": "support_request",
+            "start": "={{ $json.startDate || new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000).toISOString() }}",
+            "end": "={{ new Date().toISOString() }}",
+            "api_token": "={{ $env.PIPEDRIVE_API_TOKEN }}"
+          },
+          "headers": {
+            "Accept": "application/json"
+          }
+        },
+        "responseFormat": "json"
+      },
+      "name": "Get Support Activities",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [450, 1500]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Tu es un expert en analyse de données pour TCDynamics. Analyse les activités de support suivantes et génère un rapport hebdomadaire en français.\n\nInstructions :\n1. Compte le nombre total de requêtes par type d'intention\n2. Identifie les sujets les plus fréquents\n3. Calcule le temps de réponse moyen\n4. Identifie les tendances et problèmes récurrents\n5. Propose des améliorations pour la FAQ\n\nFormat de réponse :\n- Résumé exécutif (3-4 phrases)\n- Statistiques clés (nombres et pourcentages)\n- Problèmes récurrents (liste)\n- Recommandations (liste)\n\nRéponds uniquement avec le texte du rapport, sans JSON ni explications supplémentaires."
+          },
+          {
+            "role": "user",
+            "content": "Activités de support : {{ JSON.stringify($json.activities) }}\nPériode : {{ $json.startDate }} au {{ new Date().toISOString() }}"
+          }
+        ],
+        "options": {
+          "maxTokens": 1500,
+          "temperature": 0.3
+        }
+      },
+      "name": "AI: Generate Support Report",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 2,
+      "position": [650, 1500]
+    },
+    {
+      "parameters": {
+        "fromEmail": "support@tcdynamics.fr",
+        "fromName": "TCDynamics - Support Client",
+        "toEmail": "support-team@tcdynamics.fr",
+        "subject": "Rapport Hebdomadaire d'Activité Support - {{ new Date() | date:\"DD/MM/YYYY\" }}",
+        "html": "<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Rapport Support Hebdomadaire</title>\n  <style>\n    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; }\n    .container { max-width: 800px; margin: 0 auto; background: #fff; border: 1px solid #ddd; border-radius: 8px; }\n    .header { background: #007bff; color: white; padding: 20px; text-align: center; }\n    .content { padding: 20px; }\n    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }\n    .stat-card { background: #f8f9fa; padding: 15px; border-radius: 5px; text-align: center; }\n    .stat-value { font-size: 24px; font-weight: bold; color: #007bff; }\n    .stat-label { font-size: 12px; color: #666; text-transform: uppercase; }\n    .section { margin: 30px 0; }\n    .section h3 { border-bottom: 2px solid #007bff; padding-bottom: 10px; }\n    ul { margin: 10px 0 0 20px; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h1 style=\"margin: 0;\">RAPPORT SUPPORT CLIENT</h1>\n      <p style=\"margin: 5px 0 0 0;\">Semaine du {{ $json.startDate | date:\"DD/MM/YYYY\" }} au {{ new Date() | date:\"DD/MM/YYYY\" }}</p>\n    </div>\n    \n    <div class=\"content\">\n      <div class=\"section\">\n        <h3>Résumé Exécutif</h3>\n        <p>{{ $json.aiReport }}</p>\n      </div>\n      \n      <div class=\"stats-grid\">\n        <div class=\"stat-card\">\n          <div class=\"stat-value\">{{ $json.totalRequests }}</div>\n          <div class=\"stat-label\">Total Requêtes</div>\n        </div>\n        <div class=\"stat-card\">\n          <div class=\"stat-value\">{{ $json.avgResponseTime }}</div>\n          <div class=\"stat-label\">Temps Réponse Moyen</div>\n        </div>\n        <div class=\"stat-card\">\n          <div class=\"stat-value\">{{ $json.satisfactionRate }}%</div>\n          <div class=\"stat-label\">Taux Satisfaction</div>\n        </div>\n        <div class=\"stat-card\">\n          <div class=\"stat-value\">{{ $json.resolutionRate }}%</div>\n          <div class=\"stat-label\">Taux Résolution</div>\n        </div>\n      </div>\n      \n      <div class=\"section\">\n        <h3>Sujets les plus fréquents</h3>\n        <ul>\n          {{#each $json.frequentTopics}}\n          <li>{{this.topic}} - {{this.count}} cas ({{this.percentage}}%)</li>\n          {{/each}}\n        </ul>\n      </div>\n      \n      <div class=\"section\">\n        <h3>Problèmes récurrents</h3>\n        <ul>\n          {{#each $json.recurringIssues}}\n          <li>{{this.issue}} - {{this.frequency}} occurrences</li>\n          {{/each}}\n        </ul>\n      </div>\n      \n      <div class=\"section\">\n        <h3>Recommandations</h3>\n        <ul>\n          {{#each $json.recommendations}}\n          <li>{{this}}</li>\n          {{/each}}\n        </ul>\n      </div>\n    </div>\n  </div>\n</body>\n</html>"
+      },
+      "name": "Send Support Report Email",
+      "type": "n8n-nodes-base.brevo",
+      "typeVersion": 2,
+      "position": [850, 1500]
+    }
+  ],
+  "connections": {
+    "Webhook - Support Input": {
+      "main": [
+        [
+          {
+            "node": "Validate Support Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Crisp Chat": {
+      "main": [
+        [
+          {
+            "node": "Validate Support Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Email Support": {
+      "main": [
+        [
+          {
+            "node": "Validate Support Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Support Request": {
+      "main": [
+        [
+          {
+            "node": "Normalize Support Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Support Request": {
+      "main": [
+        [
+          {
+            "node": "AI: Classify & Analyze Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI: Classify & Analyze Request": {
+      "main": [
+        [
+          {
+            "node": "AI: Generate Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI: Generate Response": {
+      "main": [
+        [
+          {
+            "node": "High Priority Technical Issue?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "High Priority Technical Issue?": {
+      "main": [
+        [
+          {
+            "node": "Create Urgent Support Activity",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Medium Priority Technical Issue?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Medium Priority Technical Issue?": {
+      "main": [
+        [
+          {
+            "node": "Create Standard Support Activity",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Complaint?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Complaint?": {
+      "main": [
+        [
+          {
+            "node": "Create Complaint Activity",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Support Response Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Urgent Support Activity": {
+      "main": [
+        [
+          {
+            "node": "Notify Urgent Support (Slack)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Urgent Support (Slack)": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Standard Support Activity": {
+      "main": [
+        [
+          {
+            "node": "Send Support Response Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Support Response Email": {
+      "main": [
+        [
+          {
+            "node": "Log Support Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Support Request": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Complaint Activity": {
+      "main": [
+        [
+          {
+            "node": "Notify Customer Success (Slack)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Customer Success (Slack)": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Knowledge Base Query": {
+      "main": [
+        [
+          {
+            "node": "AI: Knowledge Base Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI: Knowledge Base Response": {
+      "main": [
+        [
+          {
+            "node": "Log Knowledge Base Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Knowledge Base Query": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - FAQ Generator": {
+      "main": [
+        [
+          {
+            "node": "Get Support Activities",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Support Activities": {
+      "main": [
+        [
+          {
+            "node": "AI: Generate Support Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI: Generate Support Report": {
+      "main": [
+        [
+          {
+            "node": "Send Support Report Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "ai-customer-support"
+}

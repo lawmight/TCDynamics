@@ -21,4 +21,7 @@ module.exports = {
   projects: ['<rootDir>/apps/backend/jest.config.cjs'],
   // Don't collect coverage at root
   collectCoverage: false,
+  verbose: true,
+  forceExit: true,
+  detectOpenHandles: true,
 }

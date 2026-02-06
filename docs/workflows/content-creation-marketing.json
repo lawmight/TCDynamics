@@ -1,0 +1,875 @@
+{
+  "name": "Content Creation & Marketing Automation",
+  "description": "AI-powered content creation pipeline with multi-platform distribution, newsletter automation, and performance tracking",
+  "version": "1.0.0",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "content/create",
+        "method": "POST",
+        "responseMode": "onReceived",
+        "responseData": "firstItemJson",
+        "responseCode": 200,
+        "responseHeaders": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "name": "Webhook - Content Brief",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "content-brief-webhook"
+    },
+    {
+      "parameters": {
+        "path": "content/newsletter",
+        "method": "POST",
+        "responseMode": "onReceived",
+        "responseData": "firstItemJson",
+        "responseCode": 200,
+        "responseHeaders": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "name": "Webhook - Newsletter Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 600],
+      "webhookId": "newsletter-trigger-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.title }}",
+              "operation": "isNotEmpty"
+            },
+            {
+              "value1": "={{ $json.topic }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "name": "Validate Content Brief",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Normalize content brief data\nconst contentBrief = {\n  title: $json.title,\n  topic: $json.topic,\n  targetAudience: $json.target_audience || \"TPE/PME françaises\",\n  tone: $json.tone || \"professionnel et accessible\",\n  length: $json.length || \"1500 mots\",\n  keywords: $json.keywords || [],\n  targetPlatform: $json.platform || \"blog\",\n  publishDate: $json.publish_date || new Date().toISOString(),\n  author: $json.author || \"TCDynamics Team\",\n  category: $json.category || \"automatisation\",\n  brief: $json.brief || \"\",\n  competitorAnalysis: $json.competitor_analysis || [],\n  seoRequirements: $json.seo_requirements || {},\n  multimedia: $json.multimedia || { images: true, videos: false, infographics: false }\n};\n\n// Generate content outline\nconst outline = generateContentOutline(contentBrief);\n\nreturn [{\n  json: {\n    ...contentBrief,\n    outline: outline,\n    contentId: `content-${Date.now()}-${Math.floor(Math.random() * 1000)}`,\n    status: \"outline_created\",\n    createdAt: new Date().toISOString()\n  }\n}];\n\nfunction generateContentOutline(brief) {\n  return [\n    {\n      section: \"Introduction\",\n      title: `Pourquoi ${brief.topic} est crucial pour les TPE/PME en 2024\",\n      wordCount: 200,\n      keywords: [brief.topic, \"TPE/PME\", \"automatisation\"]\n    },\n    {\n      section: \"Problématique\",\n      title: `Les défis auxquels font face les entrepreneurs français\",\n      wordCount: 400,\n      keywords: [\"défis\", \"entrepreneurs\", \"gestion\"]\n    },\n    {\n      section: \"Solution\",\n      title: `Comment ${brief.topic} peut transformer votre activité\",\n      wordCount: 600,\n      keywords: [\"solution\", \"transformation\", brief.topic]\n    },\n    {\n      section: \"Étude de cas\",\n      title: `Exemple concret de mise en œuvre\",\n      wordCount: 300,\n      keywords: [\"étude de cas\", \"exemple\", \"mise en œuvre\"]\n    },\n    {\n      section: \"Conclusion\",\n      title: `Les prochaines étapes pour votre entreprise\",\n      wordCount: 200,\n      keywords: [\"conclusion\", \"étapes\", \"entreprise\"]\n    }\n  ];\n}"
+      },
+      "name": "Generate Content Outline",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Tu es un expert en rédaction de contenu marketing pour le marché français. En fonction du brief suivant, rédige un article complet en français de {{ $json.length }} mots.\n\nInstructions :\n1. Respecte la structure de plan fournie\n2. Utilise un ton {{ $json.tone }}\n3. Cible les {{ $json.targetAudience }}\n4. Intègre les mots-clés SEO de manière naturelle\n5. Rédige pour un public francophone\n6. Respecte les normes de qualité rédactionnelle\n7. Ajoute des sous-titres pertinents\n8. Termine par un appel à l'action\n\nFormat de réponse :\n- Article complet avec structure HTML\n- Inclure les balises meta (title, description)\n- Générer un slug d'URL\n- Proposer des tags pertinents\n- Suggérer des images/visuels\n\nRetourne uniquement le JSON structuré suivant :\n{\n  \"title\": \"Titre de l'article\",\n  \"slug\": \"slug-url\",\n  \"meta_title\": \"Meta title\",\n  \"meta_description\": \"Meta description\",\n  \"content\": \"<html>...</html>\",\n  \"tags\": [\"tag1\", \"tag2\"],\n  \"estimated_reading_time\": \"X minutes\",\n  \"suggested_images\": [\"description image 1\", \"description image 2\"]\n}"
+          },
+          {
+            "role": "user",
+            "content": "Brief : {{ $json.topic }}\\nSujet : {{ $json.title }}\\nPublic cible : {{ $json.targetAudience }}\\nTon : {{ $json.tone }}\\nLongueur : {{ $json.length }}\\nMots-clés : {{ $json.keywords.join(\", \") }}\\nPlan : {{ JSON.stringify($json.outline) }}"
+          }
+        ],
+        "options": {
+          "responseFormat": {
+            "type": "json_schema",
+            "json_schema": {
+              "name": "content_article",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "slug": { "type": "string" },
+                  "meta_title": { "type": "string" },
+                  "meta_description": { "type": "string" },
+                  "content": { "type": "string" },
+                  "tags": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "estimated_reading_time": { "type": "string" },
+                  "suggested_images": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                },
+                "required": ["title", "slug", "meta_title", "meta_description", "content", "tags"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      },
+      "name": "AI: Generate Full Article",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://{{ $env.WORDPRESS_URL }}/wp-json/wp/v2/posts",
+        "options": {
+          "body": {
+            "title": "={{ $json.title }}",
+            "content": "={{ $json.content }}",
+            "status": "publish",
+            "slug": "={{ $json.slug }}",
+            "tags": "={{ $json.tags }}",
+            "meta": {
+              "meta_title": "={{ $json.meta_title }}",
+              "meta_description": "={{ $json.meta_description }}",
+              "reading_time": "={{ $json.estimated_reading_time }}",
+              "target_audience": "={{ $json.target_audience }}",
+              "content_type": "blog_post"
+            }
+          },
+          "headers": {
+            "Authorization": "Basic {{ $env.WORDPRESS_API_CREDENTIALS }}",
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          "jsonParameters": true
+        },
+        "responseFormat": "json"
+      },
+      "name": "Publish to WordPress",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Tu es un expert en marketing digital pour le marché français. En fonction de l'article suivant, crée des posts pour les réseaux sociaux.\n\nInstructions :\n1. Crée 3 versions de post pour LinkedIn (professionnel)\n2. Crée 3 versions de post pour Twitter/X (concis et percutant)\n3. Crée 3 versions de post pour Instagram (visuel et accrocheur)\n4. Adapte le ton et le format à chaque plateforme\n5. Propose des hashtags pertinents pour chaque réseau\n6. Rédige en français\n\nFormat de réponse :\n{\n  \"linkedin_posts\": [\n    {\n      \"text\": \"Texte du post\",\n      \"hashtags\": [\"#hashtag1\", \"#hashtag2\"]\n    }\n  ],\n  \"twitter_posts\": [\n    {\n      \"text\": \"Texte du post\",\n      \"hashtags\": [\"#hashtag1\", \"#hashtag2\"]\n    }\n  ],\n  \"instagram_posts\": [\n    {\n      \"caption\": \"Légende du post\",\n      \"hashtags\": [\"#hashtag1\", \"#hashtag2\"]\n    }\n  ]\n}\n\nRetourne uniquement le JSON structuré."
+          },
+          {
+            "role": "user",
+            "content": "Article : {{ $json.title }}\\nContenu : {{ $json.content | truncate:500 }}\\nTags : {{ $json.tags.join(\", \") }}\\nPublic cible : {{ $json.target_audience }}"
+          }
+        ],
+        "options": {
+          "responseFormat": {
+            "type": "json_schema",
+            "json_schema": {
+              "name": "social_media_posts",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "linkedin_posts": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "text": { "type": "string" },
+                        "hashtags": {
+                          "type": "array",
+                          "items": { "type": "string" }
+                        }
+                      },
+                      "required": ["text", "hashtags"],
+                      "additionalProperties": false
+                    }
+                  },
+                  "twitter_posts": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "text": { "type": "string" },
+                        "hashtags": {
+                          "type": "array",
+                          "items": { "type": "string" }
+                        }
+                      },
+                      "required": ["text", "hashtags"],
+                      "additionalProperties": false
+                    }
+                  },
+                  "instagram_posts": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "caption": { "type": "string" },
+                        "hashtags": {
+                          "type": "array",
+                          "items": { "type": "string" }
+                        }
+                      },
+                      "required": ["caption", "hashtags"],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": ["linkedin_posts", "twitter_posts", "instagram_posts"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      },
+      "name": "AI: Generate Social Media Posts",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 2,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v19.0/{{ $env.FACEBOOK_PAGE_ID }}/feed",
+        "options": {
+          "body": {
+            "message": "={{ $json.linkedin_posts[0].text }} {{ $json.linkedin_posts[0].hashtags.join(' ') }}",
+            "link": "={{ $json.article_url }}",
+            "published": true
+          },
+          "headers": {
+            "Authorization": "Bearer {{ $env.FACEBOOK_ACCESS_TOKEN }}",
+            "Content-Type": "application/json"
+          },
+          "jsonParameters": true
+        },
+        "responseFormat": "json"
+      },
+      "name": "Post to Facebook",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1450, 200]
+    },
+    {
+      "parameters": {
+        "url": "https://api.linkedin.com/v2/ugcPosts",
+        "options": {
+          "body": {
+            "author": "urn:li:person:{{ $env.LINKEDIN_PERSON_URN }}",
+            "lifecycleState": "PUBLISHED",
+            "specificContent": {
+              "com.linkedin.ugc.ShareContent": {
+                "shareCommentary": {
+                  "text": "{{ $json.linkedin_posts[0].text }}\\n\\n{{ $json.linkedin_posts[0].hashtags.join(' ') }}\\n\\nLire l'article complet : {{ $json.article_url }}"
+                },
+                "shareMediaCategory": "NONE"
+              }
+            },
+            "visibility": {
+              "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
+            }
+          },
+          "headers": {
+            "Authorization": "Bearer {{ $env.LINKEDIN_ACCESS_TOKEN }}",
+            "Content-Type": "application/json",
+            "X-Restli-Protocol-Version": "2.0.0"
+          },
+          "jsonParameters": true
+        },
+        "responseFormat": "json"
+      },
+      "name": "Post to LinkedIn",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.twitter.com/2/tweets",
+        "options": {
+          "body": {
+            "text": "{{ $json.twitter_posts[0].text }}\\n\\n{{ $json.twitter_posts[0].hashtags.join(' ') }}\\n\\n{{ $json.article_url }}"
+          },
+          "headers": {
+            "Authorization": "Bearer {{ $env.TWITTER_BEARER_TOKEN }}",
+            "Content-Type": "application/json"
+          },
+          "jsonParameters": true
+        },
+        "responseFormat": "json"
+      },
+      "name": "Post to Twitter/X",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1450, 400]
+    },
+    {
+      "parameters": {
+        "fromEmail": "newsletter@tcdynamics.fr",
+        "fromName": "TCDynamics - Newsletter",
+        "subject": "Nouvel article : {{ $json.title }}",
+        "html": "<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Nouvel article TCDynamics</title>\n  <style>\n    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; }\n    .container { max-width: 600px; margin: 0 auto; background: #fff; border: 1px solid #ddd; border-radius: 8px; }\n    .header { background: #007bff; color: white; padding: 20px; text-align: center; }\n    .content { padding: 20px; }\n    .article-card { background: #f8f9fa; padding: 20px; margin: 20px 0; border-radius: 5px; border-left: 4px solid #007bff; }\n    .cta-button { background: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 20px 0; }\n    .social-links { text-align: center; margin: 30px 0; }\n    .social-links a { display: inline-block; margin: 0 10px; padding: 10px 20px; background: #f8f9fa; color: #333; text-decoration: none; border-radius: 5px; }\n    .footer { background: #f8f9fa; padding: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; text-align: center; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h1 style=\"margin: 0;\">Nouvel Article</h1>\n      <p style=\"margin: 5px 0 0 0;\">TCDynamics - Votre partenaire automatisation</p>\n    </div>\n    \n    <div class=\"content\">\n      <h3>Bonjour,</h3>\n      \n      <p>Nous sommes heureux de vous annoncer la publication d'un nouvel article sur notre blog :</p>\n      \n      <div class=\"article-card\">\n        <h3>{{ $json.title }}</h3>\n        <p><strong>{{ $json.meta_description }}</strong></p>\n        <p><em>Temps de lecture estimé : {{ $json.estimated_reading_time }}</em></p>\n      </div>\n      \n      <div style=\"text-align: center; margin: 30px 0;\">\n        <a href=\"{{ $json.article_url }}\" class=\"cta-button\">Lire l'article complet</a>\n      </div>\n      \n      <div class=\"social-links\">\n        <p>Partagez cet article :</p>\n        <a href=\"https://linkedin.com/shareArticle?mini=true&url={{ $json.article_url }}&title={{ $json.title }}\" target=\"_blank\">LinkedIn</a>\n        <a href=\"https://twitter.com/intent/tweet?text={{ $json.title }}&url={{ $json.article_url }}\" target=\"_blank\">Twitter</a>\n        <a href=\"https://facebook.com/sharer/sharer.php?u={{ $json.article_url }}\" target=\"_blank\">Facebook</a>\n      </div>\n      \n      <p>{{ $json.meta_description }}</p>\n      \n      <p>N'hésitez pas à nous faire part de vos retours ou suggestions d'articles pour les prochaines éditions.</p>\n    </div>\n    \n    <div class=\"footer\">\n      <p><strong>TCDynamics</strong> - Votre partenaire automatisation pour TPE/PME</p>\n      <p>Vous recevez cet email car vous êtes abonné à notre newsletter. <a href=\"{{ $json.unsubscribe_url }}\">Se désabonner</a></p>\n    </div>\n  </div>\n</body>\n</html>"
+      },
+      "name": "Send Article Announcement Email",
+      "type": "n8n-nodes-base.brevo",
+      "typeVersion": 2,
+      "position": [1650, 300]
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "create",
+        "dataTableName": "content_publications",
+        "columns": {
+          "content_id": "={{ $json.contentId }}",
+          "title": "={{ $json.title }}",
+          "slug": "={{ $json.slug }}",
+          "platform": "={{ $json.targetPlatform }}",
+          "status": "published",
+          "publish_date": "={{ $json.publishDate }}",
+          "author": "={{ $json.author }}",
+          "category": "={{ $json.category }}",
+          "word_count": "={{ $json.content.split(' ').length }}",
+          "estimated_reading_time": "={{ $json.estimated_reading_time }}",
+          "tags": "={{ $json.tags.join(',') }}",
+          "article_url": "={{ $json.article_url }}",
+          "social_posts": "={{ JSON.stringify($json.socialPosts) }}",
+          "created_at": "={{ new Date().toISOString() }}",
+          "updated_at": "={{ new Date().toISOString() }}"
+        }
+      },
+      "name": "Log Content Publication",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 2,
+      "position": [1850, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{\n  json: {\n    message: 'Content published successfully',\n    contentId: $json.contentId,\n    title: $json.title,\n    platforms: ['WordPress', 'LinkedIn', 'Twitter', 'Facebook'],\n    status: 'completed',\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "name": "Success Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [2050, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.newsletter_type }}",
+              "operation": "equals",
+              "value2": "weekly"
+            }
+          ]
+        }
+      },
+      "name": "Is Weekly Newsletter?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [450, 600]
+    },
+    {
+      "parameters": {
+        "url": "https://{{ $env.WORDPRESS_URL }}/wp-json/wp/v2/posts",
+        "options": {
+          "query": {
+            "per_page": 5,
+            "orderby": "date",
+            "order": "desc",
+            "after": "={{ new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000).toISOString() }}",
+            "categories": "={{ $json.categories ? $json.categories.join(',') : '' }}",
+            "_embed": true
+          },
+          "headers": {
+            "Accept": "application/json"
+          }
+        },
+        "responseFormat": "json"
+      },
+      "name": "Get Recent Blog Posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [650, 500]
+    },
+    {
+      "parameters": {
+        "url": "https://newsapi.org/v2/top-headlines",
+        "options": {
+          "query": {
+            "country": "fr",
+            "category": "business",
+            "apiKey": "={{ $env.NEWSAPI_API_KEY }}",
+            "pageSize": 3
+          },
+          "headers": {
+            "Accept": "application/json"
+          }
+        },
+        "responseFormat": "json"
+      },
+      "name": "Get Industry News",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [650, 700]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Tu es un expert en rédaction de newsletter pour le marché français. Crée une newsletter hebdomadaire pour TCDynamics.\n\nDonnées fournies :\n- Articles récents du blog\n- Actualités sectorielles\n- Événements à venir\n\nInstructions :\n1. Rédige un sommaire accrocheur\n2. Crée une introduction engageante\n3. Présente chaque article avec un résumé de 2-3 phrases\n4. Ajoute les actualités sectorielles pertinentes\n5. Mentionne les événements à venir\n6. Termine par un appel à l'action\n7. Rédige en français, ton professionnel et chaleureux\n\nFormat de réponse :\n- Sujet de la newsletter\n- HTML complet de la newsletter\n- Titres accrocheurs pour chaque section\n- Suggestions de CTA (Call To Action)\n\nRetourne uniquement le JSON structuré suivant :\n{\n  \"subject\": \"Sujet de la newsletter\",\n  \"preview_text\": \"Texte d'aperçu\",\n  \"html_content\": \"<html>...</html>\",\n  \"call_to_actions\": [\"CTA 1\", \"CTA 2\"]\n}"
+          },
+          {
+            "role": "user",
+            "content": "Articles récents : {{ JSON.stringify($json.blogPosts) }}\\nActualités : {{ JSON.stringify($json.industryNews) }}\\nPublic cible : TPE/PME françaises\\nObjectif : Générer du trafic et des leads"
+          }
+        ],
+        "options": {
+          "responseFormat": {
+            "type": "json_schema",
+            "json_schema": {
+              "name": "newsletter_content",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "subject": { "type": "string" },
+                  "preview_text": { "type": "string" },
+                  "html_content": { "type": "string" },
+                  "call_to_actions": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                },
+                "required": ["subject", "preview_text", "html_content", "call_to_actions"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      },
+      "name": "AI: Generate Newsletter Content",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 2,
+      "position": [850, 600]
+    },
+    {
+      "parameters": {
+        "fromEmail": "newsletter@tcdynamics.fr",
+        "fromName": "TCDynamics - Newsletter Hebdomadaire",
+        "subject": "={{ $json.subject }}",
+        "html": "={{ $json.html_content }}",
+        "tags": ["newsletter", "weekly", "france"],
+        "headers": {
+          "Precedence": "bulk",
+          "List-Unsubscribe": "<{{ $json.unsubscribe_url }}>",
+          "X-Mailer": "TCDynamics Newsletter System"
+        }
+      },
+      "name": "Send Newsletter Email",
+      "type": "n8n-nodes-base.brevo",
+      "typeVersion": 2,
+      "position": [1050, 600]
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "create",
+        "dataTableName": "newsletters",
+        "columns": {
+          "newsletter_id": "={{ `newsletter-${Date.now()}` }}",
+          "type": "={{ $json.newsletter_type }}",
+          "subject": "={{ $json.subject }}",
+          "sent_date": "={{ new Date().toISOString() }}",
+          "blog_posts_count": "={{ $json.blogPosts ? $json.blogPosts.length : 0 }}",
+          "industry_news_count": "={{ $json.industryNews ? $json.industryNews.length : 0 }}",
+          "status": "sent",
+          "created_at": "={{ new Date().toISOString() }}",
+          "updated_at": "={{ new Date().toISOString() }}"
+        }
+      },
+      "name": "Log Newsletter Sent",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 2,
+      "position": [1250, 600]
+    },
+    {
+      "parameters": {
+        "path": "content/social-scheduler",
+        "method": "POST",
+        "responseMode": "onReceived",
+        "responseData": "firstItemJson",
+        "responseCode": 200,
+        "responseHeaders": [
+          {
+            "name": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "name": "Webhook - Social Scheduler",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 900],
+      "webhookId": "social-scheduler-webhook"
+    },
+    {
+      "parameters": {
+        "schedule": "0 9 * * 1-5",
+        "timezone": "Europe/Paris"
+      },
+      "name": "Schedule Daily Social Posts",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 2,
+      "position": [250, 1200]
+    },
+    {
+      "parameters": {
+        "url": "https://{{ $env.BREVO_API_URL }}/v3/contacts/list/newsletter-subscribers",
+        "options": {
+          "headers": {
+            "Accept": "application/json",
+            "api-key": "{{ $env.BREVO_API_KEY }}"
+          }
+        },
+        "responseFormat": "json"
+      },
+      "name": "Get Newsletter Subscribers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [450, 1200]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "messages": [
+          {
+            "role": "system",
+            "content": "Tu es un expert en analyse de contenu pour TCDynamics. Analyse les performances des publications suivantes et génère un rapport d'analyse.\n\nDonnées fournies :\n- Publications récentes\n- Statistiques d'engagement\n- Taux de conversion\n- Trafic généré\n\nInstructions :\n1. Identifie les contenus les plus performants\n2. Analyse les tendances de publication\n3. Évalue l'efficacité des différents canaux\n4. Propose des améliorations pour la stratégie de contenu\n5. Génère des recommandations concrètes\n\nFormat de réponse :\n- Analyse des performances\n- Recommandations de contenu\n- Optimisation des canaux\n- Calendrier de publication suggéré\n\nRetourne uniquement le JSON structuré suivant :\n{\n  \"performance_analysis\": \"Analyse détaillée\",\n  \"content_recommendations\": [\"recommandation 1\", \"recommandation 2\"],\n  \"channel_optimization\": \"Optimisation des canaux\",\n  \"publication_calendar\": \"Calendrier suggéré\"\n}"
+          },
+          {
+            "role": "user",
+            "content": "Publications : {{ JSON.stringify($json.publications) }}\\nStatistiques : {{ JSON.stringify($json.statistics) }}\\nPériode : {{ $json.period }}"
+          }
+        ],
+        "options": {
+          "responseFormat": {
+            "type": "json_schema",
+            "json_schema": {
+              "name": "content_analysis",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "performance_analysis": { "type": "string" },
+                  "content_recommendations": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "channel_optimization": { "type": "string" },
+                  "publication_calendar": { "type": "string" }
+                },
+                "required": ["performance_analysis", "content_recommendations", "channel_optimization", "publication_calendar"],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      },
+      "name": "AI: Analyze Content Performance",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 2,
+      "position": [650, 1200]
+    },
+    {
+      "parameters": {
+        "fromEmail": "marketing@tcdynamics.fr",
+        "fromName": "TCDynamics - Marketing Analytics",
+        "toEmail": "marketing-team@tcdynamics.fr",
+        "subject": "Rapport d'Analyse de Contenu - {{ new Date() | date:\"DD/MM/YYYY\" }}",
+        "html": "<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Rapport d'Analyse de Contenu</title>\n  <style>\n    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; }\n    .container { max-width: 800px; margin: 0 auto; background: #fff; border: 1px solid #ddd; border-radius: 8px; }\n    .header { background: #007bff; color: white; padding: 20px; text-align: center; }\n    .content { padding: 20px; }\n    .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }\n    .metric-card { background: #f8f9fa; padding: 15px; border-radius: 5px; text-align: center; }\n    .metric-value { font-size: 24px; font-weight: bold; color: #007bff; }\n    .metric-label { font-size: 12px; color: #666; text-transform: uppercase; }\n    .section { margin: 30px 0; }\n    .section h3 { border-bottom: 2px solid #007bff; padding-bottom: 10px; }\n    ul { margin: 10px 0 0 20px; }\n    .recommendation { background: #e9f7ef; padding: 15px; border-radius: 5px; border-left: 4px solid #28a745; margin: 15px 0; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h1 style=\"margin: 0;\">ANALYSE DE CONTENU</h1>\n      <p style=\"margin: 5px 0 0 0;\">Période : {{ $json.period }}</p>\n    </div>\n    \n    <div class=\"content\">\n      <div class=\"section\">\n        <h3>Performance Analysis</h3>\n        <p>{{ $json.ai_analysis.performance_analysis }}</p>\n      </div>\n      \n      <div class=\"section\">\n        <h3>Recommandations de Contenu</h3>\n        <ul>\n          {{#each $json.ai_analysis.content_recommendations}}\n          <li>{{this}}</li>\n          {{/each}}\n        </ul>\n      </div>\n      \n      <div class=\"section\">\n        <h3>Optimisation des Canaux</h3>\n        <p>{{ $json.ai_analysis.channel_optimization }}</p>\n      </div>\n      \n      <div class=\"section\">\n        <h3>Calendrier de Publication Suggéré</h3>\n        <div class=\"recommendation\">\n          <p>{{ $json.ai_analysis.publication_calendar }}</p>\n        </div>\n      </div>\n    </div>\n  </div>\n</body>\n</html>"
+      },
+      "name": "Send Content Analysis Report",
+      "type": "n8n-nodes-base.brevo",
+      "typeVersion": 2,
+      "position": [850, 1200]
+    }
+  ],
+  "connections": {
+    "Webhook - Content Brief": {
+      "main": [
+        [
+          {
+            "node": "Validate Content Brief",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Newsletter Trigger": {
+      "main": [
+        [
+          {
+            "node": "Is Weekly Newsletter?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Content Brief": {
+      "main": [
+        [
+          {
+            "node": "Generate Content Outline",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Content Outline": {
+      "main": [
+        [
+          {
+            "node": "AI: Generate Full Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI: Generate Full Article": {
+      "main": [
+        [
+          {
+            "node": "Publish to WordPress",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish to WordPress": {
+      "main": [
+        [
+          {
+            "node": "AI: Generate Social Media Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI: Generate Social Media Posts": {
+      "main": [
+        [
+          {
+            "node": "Post to Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Post to LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Post to Twitter/X",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Article Announcement Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Facebook": {
+      "main": [
+        [
+          {
+            "node": "Log Content Publication",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Log Content Publication",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Twitter/X": {
+      "main": [
+        [
+          {
+            "node": "Log Content Publication",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Article Announcement Email": {
+      "main": [
+        [
+          {
+            "node": "Log Content Publication",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Content Publication": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Weekly Newsletter?": {
+      "main": [
+        [
+          {
+            "node": "Get Recent Blog Posts",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Recent Blog Posts": {
+      "main": [
+        [
+          {
+            "node": "Get Industry News",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Industry News": {
+      "main": [
+        [
+          {
+            "node": "AI: Generate Newsletter Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI: Generate Newsletter Content": {
+      "main": [
+        [
+          {
+            "node": "Send Newsletter Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Newsletter Email": {
+      "main": [
+        [
+          {
+            "node": "Log Newsletter Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Newsletter Sent": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Social Scheduler": {},
+    "Schedule Daily Social Posts": {
+      "main": [
+        [
+          {
+            "node": "Get Newsletter Subscribers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Newsletter Subscribers": {
+      "main": [
+        [
+          {
+            "node": "AI: Analyze Content Performance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI: Analyze Content Performance": {
+      "main": [
+        [
+          {
+            "node": "Send Content Analysis Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "content-creation-marketing"
+}

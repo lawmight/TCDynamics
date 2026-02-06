@@ -5,7 +5,10 @@
  */
 ;(function () {
   try {
-    const theme = localStorage.getItem('theme') || 'system'
+    const theme =
+      localStorage.getItem('theme:v1') ||
+      localStorage.getItem('theme') ||
+      'dark'
     const resolved =
       theme === 'system'
         ? window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -14,7 +17,7 @@
         : theme
     document.documentElement.classList.add(resolved)
   } catch (e) {
-    // Fallback to light mode if localStorage is unavailable
-    document.documentElement.classList.add('light')
+    // Fallback to dark mode if localStorage is unavailable
+    document.documentElement.classList.add('dark')
   }
 })()
