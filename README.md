@@ -52,13 +52,24 @@ npm run type-check
 
 ### ESLint Configuration
 
-The project uses a unified ESLint configuration with flat config format across all apps:
+The project uses a hierarchical ESLint configuration with flat config format:
 
-- **Root**: `eslint.config.js` - Shared configuration for the entire monorepo
-- **Frontend**: Extends root config with React/TSX specific rules
-- **Backend**: `apps/backend/eslint.config.js` - Node.js/Express specific rules
+- **Root**: `eslint.config.js` - Shared configuration extending frontend config for tests/e2e
+- **Frontend**: `apps/frontend/eslint.config.js` - Main configuration with React/TSX rules, accessibility (WCAG 2.1 AA), Tailwind CSS, and import organization
+- **Backend**: `apps/backend/eslint.config.js` - Node.js/Express specific rules with relaxed frontend restrictions
 
-Both frontend and backend now use ESLint v9 with consistent TypeScript ESLint versions for unified code quality standards.
+Both frontend and backend use ESLint v9 with consistent TypeScript ESLint versions for unified code quality standards. The root config provides special handling for e2e tests with `allowDefaultProject` enabled.
+
+### Shared Configuration Files
+
+Common configuration files are centralized in `tools/configs/` for consistency across workspaces:
+
+- **Prettier**: `.prettierrc`, `.prettierignore` - Code formatting rules
+- **CommitLint**: `commitlint.config.cjs` - Commit message validation
+- **Jest**: `jest.config.cjs` - Root-level Jest configuration (backend only)
+- **Components**: `components.json` - ShadCN UI component configuration
+
+Workspace scripts reference these configs using relative paths (e.g., `--config ../../tools/configs/.prettierrc`).
 
 ## Deployment
 

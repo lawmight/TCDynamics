@@ -68,13 +68,14 @@ sequenceDiagram
 
 ### Summary
 
-You have **5 workflows** (4 active):
+You have **4 workflows** (4 active):
 
 1. ✅ **Dependabot Updates** - Auto-generated from `.github/dependabot.yml`
 2. ✅ **Deploy MVP to Vercel** - Active (`.github/workflows/deploy-mvp.yml`)
 3. ✅ **Quality Gate** - Active (`.github/workflows/quality-gate.yml`)
 4. ✅ **Bump dev dependencies (Cursor headless)** - Active (`.github/workflows/bump-dev-deps.yml`); runs daily and on manual dispatch; requires `CURSOR_API_KEY` secret.
-5. ⚠️ **Tests Complete Suite** - **DELETED** but still showing in GitHub UI (was `.github/workflows/tests.yml`)
+
+**Note**: The "Tests Complete Suite" workflow was previously archived and no longer exists.
 
 ---
 
@@ -129,14 +130,23 @@ Automatically bump devDependencies in the monorepo (root and `apps/*`, `api`) us
 
 - **CURSOR_API_KEY** – Create at [Cursor dashboard](https://cursor.com) → Integrations → User API Keys. Add in the repo: **Settings → Secrets and variables → Actions → New repository secret** named `CURSOR_API_KEY`. Do not commit the key; revoke any key that was ever pasted in chat or logs.
 
-### Safety (follow-up job)
+### Safety (verification before push)
 
-Verify runs in the same job before any push: we only commit and push when `npm run lint -ws`, `npm run type-check -ws`, and `npm run test -ws` succeed. If the bump breaks anything, the job fails and nothing is pushed, so main never gets a broken state from this workflow.
+Verification runs in the same job before any push: we only commit and push when `npm run lint -ws`, `npm run type-check -ws`, and `npm run test -ws` succeed. If the bump breaks anything, the job fails and nothing is pushed, so main never gets a broken state from this workflow.
 
 ### Schedule and trigger
 
 - **Schedule**: Daily at 06:00 UTC.
 - **Manual**: **Actions → Bump dev dependencies (Cursor headless) → Run workflow**.
+
+### Process
+
+1. **Checkout**: Gets latest code from main branch
+2. **Setup**: Node.js with caching
+3. **Install Cursor CLI**: Downloads and installs the latest Cursor CLI
+4. **Bump Dependencies**: Uses Cursor agent to update devDependencies to latest compatible versions
+5. **Verify**: Runs `npm ci`, `npm run lint -ws`, `npm run type-check -ws`, and `npm run test -ws`
+6. **Commit & Push**: Only if all verification steps pass successfully
 
 ---
 
@@ -257,7 +267,7 @@ GitHub Actions UI continues to show deleted workflows if they have run history. 
 | Docker Build   | ✅                             | ❌                    | Docker verification removed            |
 | Staging Deploy | ✅                             | ❌                    | Moved to manual dispatch in Deploy MVP |
 | Node Versions  | 18 only                        | 20, 22 (matrix)       | Updated to current LTS                 |
-| Coverage       | ✅                             | ✅ (60% threshold)    | Threshold added in Quality Gate        |
+| Coverage       | ✅                             | ✅ (45% threshold)    | Threshold updated to 45% in Quality Gate        |
 
 ---
 
@@ -288,13 +298,44 @@ flowchart LR
 
 ## Summary Statistics
 
-- **Active Workflows**: 2 (Deploy MVP, Quality Gate)
+- **Active Workflows**: 3 (Deploy MVP, Quality Gate, Bump dev dependencies)
 - **Configuration-based**: 1 (Dependabot Updates)
 - **Deleted Workflows**: 1 (Tests Complete Suite - still visible in UI)
 - **Custom Actions**: 3 (setup-node-cache, install-dependencies, validate-api)
 - **Matrix Strategies**:
   - Quality Gate: Node.js 20, 22
-- **Coverage Threshold**: 60% (enforced in Quality Gate)
+- **Coverage Threshold**: 45% (enforced in Quality Gate)
+
+## Manual Deployment Scripts
+
+The project includes PowerShell scripts for manual Vercel deployments:
+
+### Available Scripts
+
+- **`scripts/deploy-vercel.ps1`** - Full deployment (frontend + API serverless functions)
+- **`scripts/deploy-vercel-frontend-only.ps1`** - Frontend-only deployment (static files only, avoids 12-function limit)
+- **`scripts/deploy-vercel-preview.ps1`** - Preview deployment
+- **`scripts/monitor-deployments.ps1`** - Real-time monitoring of GitHub Actions and Vercel deployments
+
+### Usage
+
+```bash
+# Deploy frontend + API (full deployment)
+npm run deploy:vercel
+
+# Deploy frontend only (static build, avoids function limits)
+npm run deploy:vercel:frontend
+
+# Monitor deployment status
+.\scripts\monitor-deployments.ps1
+```
+
+### Script Features
+
+- **Function Management**: Automatically removes `apps/frontend/api` to avoid duplicate function detection
+- **Build Process**: Executes complete build pipeline before deployment
+- **Error Handling**: Proper exit codes and error reporting
+- **Environment Support**: Supports both production and preview environments
 
 ---
 

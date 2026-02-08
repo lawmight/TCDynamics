@@ -359,6 +359,58 @@ logger.warn('Rate limit warning', { ip })
 - Geographic data
 - Performance trends
 
+### Deployment Monitoring
+
+**Script**: `scripts/monitor-deployments.ps1`
+
+**Purpose**: PowerShell script that monitors GitHub Actions and Vercel deployments in real-time.
+
+**Features**:
+- Monitors GitHub Actions workflow runs
+- Checks Vercel deployment status
+- Provides real-time status updates
+- Saves logs to local files
+- Supports both automated and manual deployment tracking
+
+**Usage**:
+```powershell
+# Run deployment monitoring
+.\scripts\monitor-deployments.ps1
+
+# The script will:
+# 1. Check GitHub Actions for recent workflow runs
+# 2. Monitor the latest run until completion
+# 3. Check Vercel deployment status
+# 4. Display deployment URLs and status
+# 5. Save logs to gh-run-{runId}.log files
+```
+
+**Output Example**:
+```
+Starting deployment monitoring...
+
+Checking GitHub Actions...
+Found 3 workflow run(s)
+  - Deploy MVP to Vercel: in_progress
+  - Quality Gate: completed (success)
+  - Bump dev dependencies: completed (success)
+
+⏳ Monitoring GitHub Actions run: Deploy MVP to Vercel...
+  Status: in_progress
+  Status: completed:success
+  GitHub Actions completed!
+  Logs saved to: gh-run-1234567.log
+
+Checking Vercel deployments...
+✅ Vercel CLI is configured
+Latest deployments:
+  - https://tcdynamics.vercel.app : READY (created: 2026-02-07T10:30:00Z)
+  - https://tcdynamics-git-main-tcdynamics.vercel.app : READY (created: 2026-02-07T10:15:00Z)
+  - https://tcdynamics-git-feature-xyz-tcdynamics.vercel.app : READY (created: 2026-02-07T10:00:00Z)
+
+Monitoring complete!
+```
+
 ## Alerting Configuration
 
 ### Sentry Alerts
@@ -468,6 +520,8 @@ logger.warn('Rate limit warning', { ip })
 - [Environment Setup](../development/environment-setup.md) - Monitoring environment variables
 - [CI/CD Guide](./ci-cd.md) - Deployment and monitoring integration
 - [Security Headers](../security/headers.md) - Security configuration
+- [Vercel Deployment](./vercel.md) - Vercel configuration and deployment monitoring
+- [Deployment Monitoring Script](../../scripts/monitor-deployments.ps1) - PowerShell script for monitoring GitHub Actions and Vercel deployments
 
 ---
 
