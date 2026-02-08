@@ -11,13 +11,38 @@ module.exports = {
   testPathIgnorePatterns: [
     '/node_modules/',
     '/dist/',
+    '/build/',
+    '/coverage/',
     '/api/',
     '/apps/frontend/',
     '/tests/',
     '/apps/backend/api/',
     '/apps/backend/apps/',
+    '/.claude/',
+    '/.git/',
+    '/.vscode/',
+    '/.cursor/',
+    '/.pulse/',
+    '/tools/',
+    '/docs/',
+    '/scripts/',
     '.*\\.spec\\.ts$', // Exclude Playwright spec files
     '.*\\.e2e\\.ts$', // Exclude E2E test files
+    '.*\\.spec\\.tsx$',
+    '.*\\.e2e\\.tsx$',
+    '.*\\.ui\\.test\\.(js|ts)$', // Exclude UI test files
+    '/__snapshots__/', // Exclude snapshot files
+  ],
+  // Additional module path exclusions for sensitive directories
+  modulePathIgnorePatterns: [
+    '<rootDir>/.claude/',
+    '<rootDir>/.git/',
+    '<rootDir>/.vscode/',
+    '<rootDir>/.cursor/',
+    '<rootDir>/.pulse/',
+    '<rootDir>/tools/',
+    '<rootDir>/docs/',
+    '<rootDir>/scripts/',
   ],
   collectCoverageFrom: [
     'src/**/*.js',

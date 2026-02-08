@@ -17,8 +17,8 @@
     "test:coverage": "jest --coverage --verbose",
     "test:integration": "node test-integration.js",
     "type-check": "tsc --noEmit",
-    "format": "prettier --write \"src/**/*.{js,ts}\"",
-    "format:check": "prettier --check \"src/**/*.{js,ts}\""
+    "format": "prettier --write \"src/**/*.{js,ts}\" --config ../tools/configs/.prettierrc --ignore-path ../tools/configs/.prettierignore",
+    "format:check": "prettier --check \"src/**/*.{js,ts}\" --config ../tools/configs/.prettierrc --ignore-path ../tools/configs/.prettierignore"
   },
   "dependencies": {
     "compression": "^1.7.4",

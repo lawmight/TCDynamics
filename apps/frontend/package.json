@@ -22,8 +22,8 @@
     "lint": "npx eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 150",
     "type-check": "tsc --noEmit",
     "lint:fix": "npx eslint . --ext ts,tsx --fix",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format": "prettier --write . --config tools/configs/.prettierrc --ignore-path tools/configs/.prettierignore",
+    "format:check": "prettier --check . --config tools/configs/.prettierrc --ignore-path tools/configs/.prettierignore",
     "prepare": "husky",
     "bug-fix": "node scripts/auto-bug-fixer.js",
     "bug-fix:dry": "node scripts/auto-bug-fixer.js --dry-run",
@@ -38,10 +38,10 @@
   "lint-staged": {
     "*.{ts,tsx}": [
       "npx eslint --fix",
-      "prettier --write"
+      "prettier --write --config ../../tools/configs/.prettierrc --ignore-path ../../tools/configs/.prettierignore"
     ],
     "*.{json,md,css}": [
-      "prettier --write"
+      "prettier --write --config ../../tools/configs/.prettierrc --ignore-path ../../tools/configs/.prettierignore"
     ]
   },
   "dependencies": {
