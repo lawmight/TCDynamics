@@ -1,6 +1,6 @@
 # Environment Setup Guide
 
-**Last Updated**: 2026-01-09
+**Last Updated**: 2026-02-07
 **Status**: Active
 
 Complete guide for setting up your development environment for the TCDynamics WorkFlowAI project.
@@ -27,15 +27,20 @@ flowchart TB
     ViteClerk[VITE_CLERK_PUBLISHABLE_KEY]
     ViteSentry[VITE_SENTRY_DSN]
     ViteAPI[VITE_API_URL]
+    VitePolar[VITE_POLAR_*]
   end
 
-  subgraph API["API / Serverless"]
+  subgraph API["API / Serverless Functions"]
     ClerkSecret[CLERK_SECRET_KEY]
     Mongo[MONGODB_URI]
     Sentry[SENTRY_DSN]
+    Resend[RESEND_API_KEY]
+    Polar[POLAR_ACCESS_TOKEN]
+    Vertex[VERTEX_PROJECT_ID]
+    OpenAI[OPENAI_API_KEY]
   end
 
-  subgraph Backend["Backend (local)"]
+  subgraph Backend["Backend (local Express)"]
     NodeEnv[NODE_ENV]
     BackendMongo[Mongo connection]
   end
@@ -73,6 +78,8 @@ cp .env.example .env  # If example exists
 touch .env
 ```
 
+**Note**: The `.env.example` file is located at `apps/frontend/.env.example`. Copy it to the project root and update with your values.
+
 ### 4. Configure Required Variables
 
 Add required environment variables (see sections below).
@@ -94,7 +101,9 @@ npm run dev:vercel
 npm run dev:all
 ```
 
-**Note**: The main `npm run dev` command now automatically starts both the frontend (Vite) and the Vercel dev server (API functions) together. This ensures API endpoints are available when developing locally.
+**Important**: The main `npm run dev` command automatically starts both the frontend (Vite) and the Vercel dev server (API functions) together. This ensures API endpoints are available when developing locally.
+
+**Node.js Header Size Fix**: The development setup includes a fix for large Clerk JWT tokens by using `NODE_OPTIONS="--max-http-header-size=65536"` in the package.json scripts.
 
 ---
 
@@ -125,7 +134,7 @@ Frontend environment variables must be prefixed with `VITE_` to be exposed to th
 
 **API Configuration**:
 
-- `VITE_API_URL` (default: `/api`) - API base URL (relative for Vercel)
+- `VITE_API_URL` (default: `/api`) - **CRITICAL** for local development - API base URL (relative for Vercel)
 - `VITE_AZURE_FUNCTIONS_URL` - Azure Functions URL (if using Azure Functions)
 
 **Environment**:
@@ -204,11 +213,27 @@ API environment variables are used by Vercel serverless functions in the `api/` 
 
 **`MONGODB_URI`** (Required)
 
-- **Description**: MongoDB Atlas connection string
+- **Description**: MongoDB Atlas connection string for data persistence
 - **Format**: `mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority`
 - **Example**: `MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/db?retryWrites=true&w=majority`
 - **Usage**: Used by `api/_lib/mongodb.js` for database connection
 - **Where to get**: MongoDB Atlas → Connect → Drivers → Connection String
+
+**`RESEND_API_KEY`** (Required for Email)
+- **Description**: Resend API key for sending transactional emails
+- **Format**: `re_` prefixed API key
+- **Example**: `RESEND_API_KEY=re_ZSqttoZg_GHzVoHrtAd5hFxYc3srkqGHe`
+- **Usage**: Used by `api/_lib/email.js` for sending contact/demo emails
+- **Where to get**: Resend Dashboard → API Keys → Create API Key
+- **Domain**: Must verify your domain in Resend settings
+
+**`POLAR_ACCESS_TOKEN`** (Required for Payments)
+- **Description**: Polar API access token for payment processing
+- **Format**: `polar_oat_` prefixed token
+- **Example**: `POLAR_ACCESS_TOKEN=polar_oat_egOSwJWVOnenYxHFVRINhWKWWhTUZJqQO2SZk3BpB1C`
+- **Usage**: Used by `api/polar/` endpoints for payment processing
+- **Where to get**: Polar Dashboard → Settings → API → Create Access Token
+- **Server**: `POLAR_SERVER=production` or `POLAR_SERVER=sandbox` for testing
 
 #### Optional API Variables
 
@@ -254,7 +279,7 @@ API environment variables are used by Vercel serverless functions in the `api/` 
 - `ALLOW_VERCEL_CHAT` (default: `false`) - Enable Vercel chat endpoint (`/api/ai?provider=openai&action=chat`)
 - `INTERNAL_CHAT_TOKEN` (optional) - Internal token for chat endpoint security
   - Generate: `openssl rand -hex 32`
-- `ALLOWED_ORIGIN` (default: `https://tcdynamics.fr`) - Allowed origin for chat endpoint
+- `ALLOWED_ORIGIN` (default: `https://your-domain.com`) - Allowed origin for chat endpoint
 - `MAX_MESSAGE_LENGTH` (default: `2000`) - Maximum chat message length
 - `MAX_TOKENS` (default: `512`) - Maximum tokens for AI responses
 
@@ -271,7 +296,93 @@ API environment variables are used by Vercel serverless functions in the `api/` 
 
 - `NODE_ENV` (default: `development`) - Node environment: `development`, `production`, or `test`
 - `VERCEL_ENV` - Vercel environment (auto-set by Vercel)
-- `FRONTEND_URL` (default: `https://tcdynamics.fr`) - Frontend URL for CORS and links
+- `FRONTEND_URL` (default: `https://your-domain.com`) - Frontend URL for CORS and links
+
+## Husky Git Hooks Configuration
+
+The project includes Husky for git hooks to ensure code quality and prevent issues.
+
+### Current Hooks Setup
+
+**Pre-commit hook** (`.husky/pre-commit`):
+- Runs lint-staged (ESLint + Prettier)
+- Type checks TypeScript files
+- Validates commit message format using commitlint
+
+**Commit message hook** (`.husky/commit-msg`):
+- Validates commit message format using commitlint
+- Enforces conventional commit standards
+
+**Pre-push hook** (`.husky/pre-push`):
+- Runs linting and type checks
+- Ensures code quality before pushing
+
+### Commit Message Format
+
+The project uses commitlint with conventional commit format:
+
+**Allowed types**:
+- `build` - Build system changes
+- `chore` - Maintenance tasks
+- `ci` - CI/CD configuration
+- `docs` - Documentation changes
+- `feat` - New features
+- `fix` - Bug fixes
+- `perf` - Performance improvements
+- `refactor` - Code refactoring
+- `revert` - Reverting changes
+- `style` - Code style changes
+- `test` - Test changes
+
+**Format**: `<type>: <description>`
+
+**Examples**:
+- `feat: add user authentication`
+- `fix: resolve login error`
+- `docs: update API documentation`
+
+### Configuration Files
+
+**Shared Configuration** (located in `tools/configs/`):
+- Commitlint config: `tools/configs/commitlint.config.cjs`
+- Prettier config: `tools/configs/.prettierrc` and `tools/configs/.prettierignore`
+- Jest config: `tools/configs/jest.config.cjs` - Root-level configuration for backend only
+- Components config: `tools/configs/components.json` - ShadCN UI component library
+
+**Workspace-Specific Configuration**:
+- ESLint config: Root `eslint.config.js` (extends frontend config for e2e tests)
+- Frontend ESLint: `apps/frontend/eslint.config.js`
+- Backend ESLint: `apps/backend/eslint.config.js`
+- Frontend Prettier: `apps/frontend/.prettierignore`
+
+**Note**: Previous standalone configuration files (`.prettierignore`, `.prettierrc`, `commitlint.config.cjs`, `jest.config.cjs`) have been consolidated into the `tools/configs/` directory for better organization and consistency across the monorepo.
+
+### Troubleshooting
+
+If you encounter git hook errors:
+
+1. **Install Husky dependencies**:
+   ```bash
+   npm install
+   ```
+
+2. **Check hook permissions** (Linux/Mac):
+   ```bash
+   chmod +x .husky/pre-commit
+   chmod +x .husky/commit-msg
+   chmod +x .husky/pre-push
+   ```
+
+3. **Skip hooks temporarily** (use sparingly):
+   ```bash
+   git commit --no-verify -m "message"  # Skip pre-commit and commit-msg
+   git push --no-verify                  # Skip pre-push
+   ```
+
+4. **Reset hooks**:
+   ```bash
+   npx husky install
+   ```
 
 ---
 
@@ -482,10 +593,22 @@ CLERK_WEBHOOK_SIGNING_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 # ========== MONGODB (Required) ==========
 MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority
 
-# ========== SECURITY (Optional) ==========
-PII_HASH_SALT=your-secure-random-salt-here
-IP_HASH_SALT=your-secure-random-salt-here
-ENABLE_CLIENT_IP_LOGGING=false
+# ========== EMAIL - RESEND (Required) ==========
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+CONTACT_EMAIL=your-email@your-domain.com
+DEMO_EMAIL=your-email@your-domain.com
+
+# ========== PAYMENT - POLAR (Required) ==========
+POLAR_ACCESS_TOKEN=polar_oat_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+POLAR_SERVER=production
+POLAR_PRODUCT_STARTER=prod_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+POLAR_PRODUCT_PROFESSIONAL=prod_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+POLAR_PRODUCT_ENTERPRISE=prod_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+POLAR_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# ========== FRONTEND CONFIGURATION (Required) ==========
+VITE_API_URL=/api
+VITE_FRONTEND_URL=https://your-domain.com
 
 # ========== AI SERVICES (Optional) ==========
 OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -493,18 +616,10 @@ VERTEX_PROJECT_ID=your-project-id
 VERTEX_LOCATION=us-central1
 GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
 
-# ========== EMAIL (Optional) ==========
-RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-# ========== PAYMENT - POLAR (Optional) ==========
-POLAR_ACCESS_TOKEN=polar_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-POLAR_SERVER=production
-POLAR_PRODUCT_STARTER=prod_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-POLAR_PRODUCT_PROFESSIONAL=prod_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-POLAR_PRODUCT_ENTERPRISE=prod_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-POLAR_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-PUBLIC_CHECKOUT_SECRET=your-secure-random-token-here
-MIN_CHECKOUT_AMOUNT=216000
+# ========== SECURITY (Optional) ==========
+PII_HASH_SALT=your-secure-random-salt-here
+IP_HASH_SALT=your-secure-random-salt-here
+ENABLE_CLIENT_IP_LOGGING=false
 
 # ========== WEBHOOKS ==========
 # CLERK_WEBHOOK_SIGNING_SECRET (already above)
@@ -513,9 +628,12 @@ MIN_CHECKOUT_AMOUNT=216000
 # ========== CHAT (Optional) ==========
 ALLOW_VERCEL_CHAT=true
 INTERNAL_CHAT_TOKEN=your-secure-random-token-here
-ALLOWED_ORIGIN=https://tcdynamics.fr
+ALLOWED_ORIGIN=https://your-domain.com
 MAX_MESSAGE_LENGTH=2000
 MAX_TOKENS=512
+
+# ========== CURSOR HOOKS (Optional) ==========
+INTERNAL_HOOK_TOKEN=your-secure-random-token-here
 
 # ========== MONITORING (Optional) ==========
 VITE_SENTRY_DSN=https://...@sentry.io/...
@@ -529,7 +647,7 @@ TURNSTILE_SECRET_KEY=0x4AAAAAA...
 
 # ========== ENVIRONMENT ==========
 NODE_ENV=development
-FRONTEND_URL=https://tcdynamics.fr
+FRONTEND_URL=https://your-domain.com
 
 # ========== FEATURE FLAGS (Optional) ==========
 VITE_FEATURE_ENABLE_ANALYTICS=false
@@ -641,8 +759,179 @@ VITE_FEATURE_ENABLE_VERCEL_CHAT=true
 The fix is automatically applied in production via Vercel's serverless functions configuration. If deploying elsewhere, ensure Node.js is started with:
 
 ```bash
-NODE_OPTIONS="--max-http-header-size=32768" node server.js
+NODE_OPTIONS="--max-http-header-size=65536" node server.js
 ```
+
+---
+
+### Resend Email Configuration Issues
+
+**Error**: Email sending fails or domain not verified
+
+**Solution**:
+1. Verify your domain in Resend Dashboard
+2. Ensure `RESEND_API_KEY` is correctly configured
+3. Check that `CONTACT_EMAIL` and `DEMO_EMAIL` are valid email addresses
+4. Test email sending with the `/api/test-email` endpoint
+
+**Error**: Domain not verified
+**Solution**:
+1. Go to Resend Dashboard → Domains
+2. Add your domain
+3. Verify DNS records (TXT and MX records)
+4. Wait for DNS propagation (up to 24 hours)
+
+---
+
+### Polar Payment Integration Issues
+
+**Error**: Payment processing fails
+
+**Solution**:
+1. Verify `POLAR_ACCESS_TOKEN` is valid and has correct permissions
+2. Check `POLAR_SERVER` is set to `production` or `sandbox`
+3. Ensure product IDs (`POLAR_PRODUCT_STARTER`, etc.) are correct
+4. Verify webhook secret is configured in Polar dashboard
+
+**Error**: Webhook verification fails
+**Solution**:
+1. Ensure `POLAR_WEBHOOK_SECRET` matches Polar dashboard webhook settings
+2. Check that webhook endpoint URL is correct (`/api/polar/webhook`)
+3. Verify webhook events are properly subscribed
+
+---
+
+### Git Hook Issues
+
+**Error**: Pre-commit hook fails
+
+**Solution**:
+1. Install dependencies: `npm install`
+2. Check hook permissions: `chmod +x .husky/pre-commit`
+3. Run lint-staged manually: `npx lint-staged`
+4. Skip hooks temporarily: `git commit --no-verify -m "message"`
+
+**Error**: Commit message validation fails
+**Solution**:
+1. Follow conventional commit format: `<type>: <description>`
+2. Use allowed types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+3. Check commitlint config: `tools/configs/commitlint.config.cjs`
+
+---
+
+### Vercel Development Issues
+
+**Error**: Vercel dev server fails to start
+
+**Solution**:
+1. Ensure Node.js version is 20.x (check with `node --version`)
+2. Check that port 3001 is not in use
+3. Clear Vercel cache: `vercel --clear`
+4. Restart with header size fix: `npm run dev:vercel`
+
+**Error**: API routes not found
+**Solution**:
+1. Ensure `VITE_API_URL` is set to `/api` for Vercel serverless functions
+2. Check that API functions are in the `api/` directory
+3. Verify Vercel dev server is running on port 3001
+4. Check proxy configuration in `apps/frontend/vite.config.ts`
+
+---
+
+### Performance and Monitoring Issues
+
+**Error**: Sentry not tracking errors
+
+**Solution**:
+1. Verify `SENTRY_DSN` is correctly configured
+2. Check that `SENTRY_AUTH_TOKEN` is set for releases
+3. Ensure Sentry environment variables are not exposed to client
+4. Test error reporting with development builds
+
+**Error**: Performance monitoring not working
+
+**Solution**:
+1. Verify `VITE_PERFORMANCE_ENABLE_SAMPLING` is set to `true`
+2. Check that `VITE_PERFORMANCE_SAMPLE_RATE` is appropriate (0.1 = 10%)
+3. Ensure performance monitoring component is loaded in `App.tsx`
+4. Test performance metrics in development mode
+
+---
+
+### Node.js Header Size Issues (UPDATE)
+
+**Error**: `431 Request Header Fields Too Large` when accessing API endpoints
+
+**Cause**: This error occurs when request headers (primarily the Clerk JWT token in the Authorization header) exceed Node.js's default 16KB limit.
+
+**Solution**:
+
+1. Ensure you're running the development server with the correct command:
+   ```bash
+   npm run dev  # This includes the header size fix
+   ```
+
+2. If running Vercel dev manually, use the increased header size:
+   ```bash
+   NODE_OPTIONS="--max-http-header-size=65536" vercel dev --listen 3001
+   ```
+
+3. Try refreshing your Clerk session:
+   - Sign out of the application
+   - Sign back in
+   - This generates a new, potentially smaller token
+
+**Prevention**:
+
+- Keep Clerk user metadata lean (avoid storing large objects)
+- Use database references instead of embedding data in tokens
+- Consider using Clerk sessions with shorter expiration times
+- Avoid storing large arrays or objects in public/private metadata
+
+**Production Deployment**:
+The fix is automatically applied in production via Vercel's serverless functions configuration. If deploying elsewhere, ensure Node.js is started with:
+```bash
+NODE_OPTIONS="--max-http-header-size=65536" node server.js
+```
+
+---
+
+## Configuration Changes
+
+### Recent Configuration Migrations
+
+The project has undergone configuration consolidation to improve maintainability and consistency across the monorepo:
+
+**Moved to `tools/configs/` directory**:
+- `commitlint.config.cjs` - Commit message validation rules
+- `.prettierrc` - Prettier formatting configuration  
+- `.prettierignore` - Files to ignore during formatting
+- `jest.config.cjs` - Root-level Jest configuration for backend testing
+- `components.json` - ShadCN UI component library settings
+
+**Removed standalone files**:
+- `.prettierignore` (root)
+- `.prettierrc` (root) 
+- `commitlint.config.cjs` (root)
+- `jest.config.cjs` (root)
+
+**Updated workspace scripts** to reference new config locations using relative paths:
+```json
+{
+  "scripts": {
+    "format": "prettier --write . --config ../../tools/configs/.prettierrc --ignore-path ../../tools/configs/.prettierignore",
+    "lint:fix": "npx eslint --fix"
+  }
+}
+```
+
+**Benefits**:
+- Centralized configuration management
+- Consistent config sharing across workspaces
+- Easier maintenance and updates
+- Better separation of concerns
+
+All workspace scripts have been updated to reference the new configuration locations. The ESLint configuration remains hierarchical with root, frontend, and backend-specific configs as before.
 
 ---
 
