@@ -6,6 +6,8 @@ on:
     paths:
       - 'apps/frontend/**'
       - 'api/**'
+      - 'vercel.json'
+      - 'package.json'
       - '.github/workflows/deploy-mvp.yml'
   workflow_dispatch:
     inputs:

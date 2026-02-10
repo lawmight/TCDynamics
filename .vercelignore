@@ -47,3 +47,4 @@ oh-my-opencode/
 # Local/IDE files (OneDrive sync can cause EACCES on deploy)
 CLAUDE.md
 .codex/
+.claude/
