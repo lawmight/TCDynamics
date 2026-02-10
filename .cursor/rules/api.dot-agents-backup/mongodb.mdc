@@ -1,0 +1,87 @@
+---
+description: MongoDB/Mongoose patterns for serverless
+globs: ["api/**/*.js"]
+---
+
+# MongoDB/Mongoose Patterns
+
+## Serverless Connection
+
+Use the singleton pattern in `api/_lib/mongodb.js`:
+
+```javascript
+import { connectToDatabase } from './_lib/mongodb.js'
+
+export default async function handler(req, res) {
+  await connectToDatabase()
+  // Your handler logic
+}
+```
+
+The singleton caches the connection across warm serverless invocations.
+
+## Mongoose Schema Pattern
+
+Define schemas in `api/_lib/models/`:
+
+```javascript
+import mongoose from 'mongoose'
+
+const exampleSchema = new mongoose.Schema({
+  // Link to Clerk user for multi-tenancy
+  clerkId: { type: String, required: true, index: true },
+
+  // Your fields
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+
+  // Timestamps
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
+})
+
+// Prevent model recompilation in serverless
+export default mongoose.models.Example || mongoose.model('Example', exampleSchema)
+```
+
+## Model Export Pattern
+
+Always use the `mongoose.models.X ||` pattern to avoid OverwriteModelError:
+
+```javascript
+// ✅ Correct
+export default mongoose.models.User || mongoose.model('User', userSchema)
+
+// ❌ Wrong - will throw OverwriteModelError in serverless
+export default mongoose.model('User', userSchema)
+```
+
+## Multi-Tenant Queries
+
+Filter by `clerkId` for user-specific data:
+
+```javascript
+import { verifyClerkAuth } from './_lib/auth.js'
+import User from './_lib/models/User.js'
+import Contact from './_lib/models/Contact.js'
+
+const { userId: clerkId, error } = await verifyClerkAuth(authHeader)
+
+// Get user's contacts only
+const contacts = await Contact.find({ clerkId }).sort({ createdAt: -1 })
+```
+
+## Available Models
+
+See `api/_lib/models/` for the current list. Always index `clerkId` for multi-tenant queries.
+
+## Indexing Best Practices
+
+- Always index `clerkId` for multi-tenant queries
+- Use compound indexes for frequent query patterns
+- Add unique constraint where appropriate (e.g., `email` in Contact)
+
+```javascript
+// Compound index example
+contactSchema.index({ clerkId: 1, createdAt: -1 })
+```

@@ -1,0 +1,14 @@
+node_modules
+dist
+build
+*.log
+.env
+coverage
+.nyc_output
+
+# Generated / build artifacts (explicit for all workspaces)
+**/coverage
+**/dist
+**/playwright-report
+**/test-results
+**/lcov-report

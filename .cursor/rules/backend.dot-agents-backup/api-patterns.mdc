@@ -1,0 +1,65 @@
+---
+description: Express API route patterns and conventions
+globs: ["apps/backend/**/*.{ts,js}"]
+---
+
+# API Route Patterns
+
+## Error Class Hierarchy
+Use custom error classes for consistent error handling:
+
+```typescript
+class ValidationError extends Error {
+  constructor(message: string, field?: string) {
+    super(message)
+    this.name = 'ValidationError'
+    this.statusCode = 400
+    this.field = field
+  }
+}
+
+// Available error classes:
+// - ValidationError (400)
+// - AuthenticationError (401)
+// - AuthorizationError (403)
+// - NotFoundError (404)
+// - ConflictError (409)
+// - RateLimitError (429)
+```
+
+## Async Handler Pattern
+Wrap all async route handlers:
+
+```typescript
+const asyncHandler = (fn) => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next)
+}
+
+// Usage
+router.post('/contact', asyncHandler(async (req, res) => {
+  // async logic here
+}))
+```
+
+## Response Format
+Standardize all API responses:
+
+```typescript
+// Success
+{ success: true, message: "Operation completed", data: {...} }
+
+// Error
+{ success: false, message: "Error description", errors: [...] }
+```
+
+## Request Tracing
+Include request ID in all logs:
+
+```typescript
+logError(error, {
+  url: req.url,
+  method: req.method,
+  requestId: req.headers['x-request-id'],
+  ip: req.ip
+})
+```
