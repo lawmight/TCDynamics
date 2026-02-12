@@ -8,14 +8,12 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { useCookieConsent } from '@/hooks/useCookieConsent'
 import { trackContactClick, trackDemoClick } from '@/utils/facebookEvents'
-import { logger } from '@/utils/logger'
 import AlertCircle from '~icons/lucide/alert-circle'
 import ArrowRight from '~icons/lucide/arrow-right'
 import CheckCircle from '~icons/lucide/check-circle'
 import Cpu from '~icons/lucide/cpu'
 import Database from '~icons/lucide/database'
 import Network from '~icons/lucide/network'
-import Pause from '~icons/lucide/pause'
 import Play from '~icons/lucide/play'
 import RefreshCw from '~icons/lucide/refresh-cw'
 import Shield from '~icons/lucide/shield'
@@ -42,11 +40,8 @@ const Hero = () => {
   const securityLink = '/security'
   const { hasMarketingConsent } = useCookieConsent()
   const videoRef = useRef<HTMLVideoElement>(null)
-  const [isPlaying, setIsPlaying] = useState(true)
   const [videoError, setVideoError] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [isVideoHovered, setIsVideoHovered] = useState(false)
-  const [isVideoEnded, setIsVideoEnded] = useState(false)
   const [hasUserInteracted, setHasUserInteracted] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
 
@@ -77,23 +72,6 @@ const Hero = () => {
       return
     }
     navigate(target)
-  }
-
-  const togglePlayPause = async () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause()
-        setIsPlaying(false)
-      } else {
-        try {
-          await videoRef.current.play()
-          setIsPlaying(true)
-        } catch (error) {
-          logger.error('Playback failed', error)
-          // Keep isPlaying as false since play failed
-        }
-      }
-    }
   }
 
   const handleRetry = () => {
@@ -356,11 +334,7 @@ const Hero = () => {
                   Voir la démo
                 </Button>
               </div>
-              <div
-                className="relative"
-                onMouseEnter={() => setIsVideoHovered(true)}
-                onMouseLeave={() => setIsVideoHovered(false)}
-              >
+              <div className="relative">
                 {videoError ? (
                   <div className="flex min-h-[400px] items-center justify-center p-8">
                     <Alert
@@ -412,12 +386,6 @@ const Hero = () => {
                       autoPlay={hasUserInteracted && !isMobile}
                       muted
                       playsInline
-                      onPlay={() => {
-                        setIsPlaying(true)
-                        setIsVideoEnded(false)
-                      }}
-                      onPause={() => setIsPlaying(false)}
-                      onEnded={() => setIsVideoEnded(true)}
                       onError={e => {
                         const error = e.currentTarget.error
                         const message =
@@ -430,54 +398,6 @@ const Hero = () => {
                       Votre navigateur ne supporte pas la lecture de vidéos.
                     </video>
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-background/40 via-transparent to-background/10"></div>
-                    {/* Accessible Pause/Play Control Overlay */}
-                    <div className="absolute right-4 top-4 z-20">
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        onClick={togglePlayPause}
-                        onKeyDown={e => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault()
-                            togglePlayPause()
-                          }
-                        }}
-                        aria-label={
-                          isPlaying
-                            ? 'Mettre en pause la vidéo de démonstration'
-                            : 'Reprendre la lecture de la vidéo de démonstration'
-                        }
-                        className="flex items-center gap-2 bg-background/90 shadow-lg backdrop-blur-sm hover:bg-background/95 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                      >
-                        {isPlaying ? (
-                          <>
-                            <Pause size={16} aria-hidden="true" />
-                            <span className="font-mono text-xs">Pause</span>
-                          </>
-                        ) : (
-                          <>
-                            <Play size={16} aria-hidden="true" />
-                            <span className="font-mono text-xs">Play</span>
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                    <div
-                      className={`absolute left-4 top-4 z-20 rounded-lg border border-border/60 bg-background/70 px-4 py-3 shadow-lg backdrop-blur transition-opacity duration-200 ${
-                        isVideoHovered || !isPlaying || isVideoEnded
-                          ? 'pointer-events-none opacity-0'
-                          : 'opacity-100'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
-                        <Network size={14} />
-                        De manuel à automatisé — en direct
-                      </div>
-                      <p className="text-sm font-semibold text-foreground">
-                        La transformation en 3 clics
-                      </p>
-                    </div>
                   </>
                 )}
               </div>
