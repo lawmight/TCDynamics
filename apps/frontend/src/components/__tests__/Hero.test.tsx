@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
 import Hero from '../Hero'
@@ -83,94 +83,20 @@ describe('Hero Component', () => {
       expect(video).not.toHaveAttribute('loop')
     })
 
-    it('should render accessible pause/play control button', () => {
+    it('should not render custom pause/play control button', () => {
       renderWithRouter()
 
-      const pauseButton = screen.getByRole('button', {
-        name: /Mettre en pause la vidéo de démonstration/i,
-      })
-      expect(pauseButton).toBeInTheDocument()
-      expect(pauseButton).toHaveAttribute('type', 'button')
-    })
-
-    it('should toggle play/pause when button is clicked', async () => {
-      renderWithRouter()
-
-      const toggleButton = screen.getByRole('button', {
-        name: /Mettre en pause la vidéo de démonstration/i,
-      })
-
-      // Initially should show pause button
-      expect(toggleButton).toHaveTextContent('Pause')
-
-      // Click to pause
-      await act(async () => {
-        fireEvent.click(toggleButton)
-      })
-
-      // Should now show play button
-      await waitFor(() => {
-        const playButton = screen.getByRole('button', {
+      // Ensure no custom play/pause button exists
+      expect(
+        screen.queryByRole('button', {
+          name: /Mettre en pause la vidéo de démonstration/i,
+        })
+      ).not.toBeInTheDocument()
+      expect(
+        screen.queryByRole('button', {
           name: /Reprendre la lecture de la vidéo de démonstration/i,
         })
-        expect(playButton).toHaveTextContent('Play')
-      })
-
-      // Click to play again
-      const playButton = screen.getByRole('button', {
-        name: /Reprendre la lecture de la vidéo de démonstration/i,
-      })
-      await act(async () => {
-        fireEvent.click(playButton)
-      })
-
-      // Should show pause button again
-      await waitFor(() => {
-        expect(
-          screen.getByRole('button', {
-            name: /Mettre en pause la vidéo de démonstration/i,
-          })
-        ).toHaveTextContent('Pause')
-      })
-    })
-
-    it('should support keyboard interaction for pause/play control', async () => {
-      renderWithRouter()
-
-      const toggleButton = screen.getByRole('button', {
-        name: /Mettre en pause la vidéo de démonstration/i,
-      })
-
-      // Should be keyboard focusable
-      toggleButton.focus()
-      expect(toggleButton).toHaveFocus()
-
-      // Should toggle on Enter key
-      await act(async () => {
-        fireEvent.keyDown(toggleButton, { key: 'Enter', code: 'Enter' })
-      })
-      await waitFor(() => {
-        expect(
-          screen.getByRole('button', {
-            name: /Reprendre la lecture de la vidéo de démonstration/i,
-          })
-        ).toBeInTheDocument()
-      })
-
-      // Should toggle on Space key
-      const playButton = screen.getByRole('button', {
-        name: /Reprendre la lecture de la vidéo de démonstration/i,
-      })
-      await act(async () => {
-        fireEvent.keyDown(playButton, { key: ' ', code: 'Space' })
-      })
-      await waitFor(() => {
-        expect(
-          screen.getByRole('button', {
-            name: /Mettre en pause la vidéo de démonstration/i,
-          })
-        ).toBeInTheDocument()
-      })
+      ).not.toBeInTheDocument()
     })
   })
 })
