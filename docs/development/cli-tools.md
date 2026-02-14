@@ -1,10 +1,16 @@
-# Recommended CLI Tools for TCDynamics
+# CLI Tools for TCDynamics
 
 **Last Updated**: 2026-02-01
 **Status**: Active
 
-This document lists CLI tools that can streamline your development workflow.  
-**Full inventory**: See [cli-tools-list.md](./cli-tools-list.md) for every CLI used by scripts and where it’s referenced.
+This document provides comprehensive documentation for CLI tools used in the TCDynamics project, including recommended tools and a complete inventory of all CLI tools referenced by scripts and documentation.
+
+---
+
+## Recommended CLI Tools
+
+This section lists CLI tools that can streamline your development workflow.  
+**Full inventory**: See [Full inventory by script/docs](#full-inventory-by-scriptdocs) below for every CLI used by scripts and where it's referenced.
 
 ---
 
@@ -23,16 +29,16 @@ This document lists CLI tools that can streamline your development workflow.
 Based on project usage, common DX best practices, and **NIA research** (indexed Turborepo/Vercel/dotenv docs):
 
 1. **Pin Vercel CLI** – Add `vercel` to root `package.json` devDependencies (e.g. `^50.9.6`) so `npm run dev:vercel` and deploy scripts use a consistent version.
-2. **gh** – Already in use via `scripts/github-actions.ps1`. Install if you haven’t; needed for workflow list/trigger/status/watch.
+2. **gh** – Already in use via `scripts/github-actions.ps1`. Install if you haven't; needed for workflow list/trigger/status/watch.
 3. **mongosh** – For MongoDB Atlas; use `scripts/mongosh.sh` (or Windows equivalent) with `MONGODB_URI` from `vercel env pull`.
 4. **Turbo** (NIA-backed) – Task orchestration for monorepos: `turbo run lint test build`; parallel + cached. Eases running lint/test/build across workspaces. Add to root devDependencies or `npm i -g turbo`.
 5. **dotenv-cli** (NIA-backed) – Load `.env`/`.env.local` into commands (e.g. `dotenv -- vercel dev`, `dotenv -- turbo run build`). Add `dotenv-cli` to root devDependencies; use in scripts as `dotenv -- <command>`.
 6. **jq, HTTPie, bat, fd, ripgrep** – Optional but useful for JSON, API calls, and code search (see Optional section below).
-7. **pnpm** (optional) – Faster, disk-efficient installs. Only if you’re open to switching from npm; not required.
+7. **pnpm** (optional) – Faster, disk-efficient installs. Only if you're open to switching from npm; not required.
 8. **dotenvx** (optional) – Alternative to dotenv-cli; cross-platform env + optional encryption.
 9. **fnm / nvm** – If you need to match CI Node 20/22 locally.
 
-**Full “consider adding” list with install notes**: [cli-tools-list.md § Consider adding (NIA-backed)](./cli-tools-list.md#5-consider-adding-to-ease-use-nia-backed).
+**Full "consider adding" list with install notes**: See [Consider adding to ease use (NIA-backed)](#consider-adding-to-ease-use-nia-backed) below.
 
 ---
 
@@ -401,7 +407,7 @@ eza --tree      # Tree view
 
 ### 15. **pnpm** - Alternative package manager (optional)
 
-**Why**: Faster installs and less disk usage. Only consider if you’re open to switching from npm.
+**Why**: Faster installs and less disk usage. Only consider if you're open to switching from npm.
 
 **Install**: `npm install -g pnpm` or [pnpm.io/installation](https://pnpm.io/installation).
 
@@ -632,5 +638,99 @@ Since you're using zsh, consider these plugins:
 
 ---
 
-**Full CLI inventory**: [cli-tools-list.md](./cli-tools-list.md)  
+## Full inventory by script/docs
+
+**Generated**: 2026-02-01  
+**Purpose**: Single source of truth for all CLI tools referenced by scripts, docs, and tooling.
+
+---
+
+### 1. Essential (required by scripts)
+
+| CLI | Where used | Install |
+|-----|------------|--------|
+| **git** | `ship.ps1`, pre-push, husky hooks | System / [git-scm.com](https://git-scm.com/) |
+| **vercel** | `dev:vercel`, `deploy-vercel.ps1`, `deploy-vercel-preview.ps1`, `deploy-vercel-frontend-only.ps1`, `scripts/mongosh.sh`, `scripts/verify-cli-connections.sh` | `npm i -g vercel` or add to root `devDependencies` |
+| **gh** (GitHub CLI) | `scripts/github-actions.ps1` (list/trigger/status/watch workflows) | [cli.github.com](https://cli.github.com/) |
+| **npm** / **npx** | All `package.json` scripts, lint, build, test | Bundled with Node.js |
+| **node** | `pre-push-checks.js`, `fix-current.js`, `test-this.js`, tools | Bundled with Node.js |
+| **PowerShell** | `ship.ps1`, `deploy-vercel*.ps1`, `github-actions.ps1` | Windows built-in |
+
+---
+
+### 2. Used via npm (no global install needed)
+
+| Tool | Where used | Package |
+|------|------------|---------|
+| **eslint** | `lint`, `lint:fix`, lint-staged | `apps/frontend` devDependencies |
+| **prettier** | `format`, format:check, lint-staged | workspace devDependencies |
+| **vitest** | `test`, `test:ui`, `test:coverage` | `apps/frontend` devDependencies |
+| **playwright** | `test:e2e` | `apps/frontend` devDependencies |
+| **vite** | `dev`, `build` (frontend) | `apps/frontend` devDependencies |
+| **concurrently** | `dev`, `dev:all` | root devDependencies |
+| **cross-env** | `dev:vercel`, frontend dev | root / frontend devDependencies |
+| **rimraf** | `clean`, `clean:frontend`, `clean:backend` | root devDependencies |
+| **husky** | Git hooks (prepare) | `apps/frontend` devDependencies |
+| **commitlint** | Commit message lint (husky hook) | `apps/frontend` devDependencies |
+| **typescript** (tsc) | `type-check` | workspace devDependencies |
+
+---
+
+### 3. Optional (documented or in verify script)
+
+| CLI | Where referenced | Purpose |
+|-----|------------------|---------|
+| **mongosh** | `scripts/mongosh.sh`, `scripts/verify-cli-connections.sh` | MongoDB Atlas shell |
+| **jq** | `docs/development/cli-tools.md`, `verify-cli-connections.sh` | JSON parsing |
+| **http** (HTTPie) | `docs/development/cli-tools.md`, `verify-cli-connections.sh` | API testing |
+| **bat** | `docs/development/cli-tools.md`, `verify-cli-connections.sh` | Syntax-highlighted cat |
+| **fd** | `docs/development/cli-tools.md`, `verify-cli-connections.sh` | Fast find |
+| **rg** (ripgrep) | `docs/development/cli-tools.md`, `verify-cli-connections.sh` | Fast grep |
+
+---
+
+### 4. Optional (recommended, see docs/cli-tools.md)
+
+| CLI | Purpose | Install (Windows) |
+|-----|---------|------------------|
+| **fnm** / **nvm** | Node version switching (match CI Node 20/22) | winget: Schniz.fnm |
+| **direnv** | Auto-load `.env` per directory | winget: direnv.direnv |
+| **tldr** | Short man-page examples | winget: dbrgn.tealdeer |
+| **zoxide** | Smarter `cd` (jump by name) | winget: ajeetdsouza.zoxide |
+| **eza** | Modern `ls` with git status (exa successor) | winget: eza-community.eza |
+| **Sentry CLI** | Source maps, releases | `npm i -g @sentry/cli` |
+
+---
+
+### 5. Consider adding to ease use (NIA-backed)
+
+Research (indexed monorepo + Vercel/Turborepo docs) suggests these CLIs to add for a React + Vite + Vercel monorepo:
+
+| CLI | Why add | Install |
+|-----|---------|--------|
+| **Turbo** | Run `lint`, `test`, `build` across workspaces in parallel with caching. Eases `npm run lint -ws` / multi-step flows. | `npm i -g turbo` or add to root `devDependencies` |
+| **dotenv-cli** | Load `.env` / `.env.local` into commands (e.g. `dotenv -- vercel dev`, `dotenv -- turbo run build`). Fits Vercel + Turbo workflows. | `npm i -D dotenv-cli` (root) |
+| **pnpm** (optional) | Faster installs, less disk use. Only if you're open to switching from npm. | [pnpm.io/installation](https://pnpm.io/installation) |
+| **fnm** / **nvm** | Match CI Node 20/22 locally. | See [Node Version Manager](#6-node-version-manager-fnm-or-nvm---optional) section above |
+
+**Summary**: Pin **vercel** in root `devDependencies`; install **gh** and **mongosh** if not already. For smoother monorepo DX, add **Turbo** and **dotenv-cli**; optionally **pnpm** and **fnm**/nvm.
+
+---
+
+## Quick check (verify script)
+
+```bash
+# Bash (WSL/Git Bash)
+./scripts/verify-cli-connections.sh
+```
+
+On Windows you can check manually:
+
+- `git --version`
+- `vercel --version`
+- `gh auth status`
+- `mongosh --version` (optional)
+
+---
+
 **Last Updated**: 2026-02-01

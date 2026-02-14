@@ -1,6 +1,6 @@
 # TCDynamics Documentation Index
 
-**Last Updated**: 2026-01-09
+**Last Updated**: 2026-02-07
 **Status**: Active
 **Pulse**: Workflow verified 2026-01-25
 
@@ -46,6 +46,7 @@ New to the project? Start here:
 
 ### Architecture
 
+- **[Architecture Overview](architecture/architecture-overview.md)** - Comprehensive architecture documentation including project overview, full-stack graphs, and visualization guidance
 - **[Repository Structure](architecture/repository-structure.md)** - Monorepo structure, technology stack, and data flow diagrams
 - **[API Endpoints](architecture/api-endpoints.md)** - Complete catalog of Vercel serverless function endpoints
 - **[Data Models](architecture/data-models.md)** - MongoDB schema documentation and model relationships
@@ -55,6 +56,9 @@ New to the project? Start here:
 - **[Onboarding Guide](development/onboarding.md)** - React SPA patterns, Vite configuration, and development practices
 - **[Git Workflow](development/git-workflow.md)** - Git worktree setup for parallel development
 - **[Environment Setup](development/environment-setup.md)** - Environment variables and service configuration
+- **[CLI Tools](development/cli-tools.md)** - Recommended CLI tools and complete inventory of tools used by scripts
+- **[Scripts](development/scripts.md)** - Utility scripts documentation for deployment, monitoring, and development
+- **[Vercel React Best Practices](development/vercel-react-best-practices.md)** - Performance optimization guide and audit report
 - **[Quick Reference](AGENTS.md)** - Build, test, and lint commands
 
 ### Deployment
@@ -77,7 +81,8 @@ New to the project? Start here:
 
 ### Integrations
 
-- **[Clerk Customization](integrations/clerk.md)** - Clerk authentication component theming and customization
+- **[Clerk Customization](integrations/clerk.md)** - Clerk authentication component theming and customization  
+- **MCP**: TCDynamics MCP is configured via Cursor `mcp.json` (HTTP endpoint).
 
 ### Migrations
 
@@ -89,6 +94,14 @@ New to the project? Start here:
 
 - **[MCP Strategy](strategy/mcp-strategy.md)** - Model Context Protocol layer differentiation strategy
 - **[Workflow Research](strategy/workflow-research.md)** - Workflow automation platform research and foundational patterns
+- **[n8n Workflows Research](strategy/n8n-workflows-research.md)** - Comprehensive analysis of cutting-edge n8n workflows, recent implementations, and bleeding-edge automation patterns
+- **[Meta Social Automation](strategy/meta-social-automation.md)** - Instagram and TikTok API automation guides including process guides, automation flows, and API integration
+- **[Client Onboarding Strategy](strategy/client-onboarding-strategy.md)** - Comprehensive implementation guide for client onboarding with UX excellence, French SME personalization, and RGPD compliance
+
+### Research
+
+- **[Obsidian Vault Integration](research/obsidian-vault-integration.md)** - Analysis of Obsidian setup and changelog data for integration planning
+- **[Vitesse Analysis](research/vitesse-analysis.md)** - Repository analysis of Vitesse by Anthony Fu (Vue 3 starter template)
 
 ### Reference
 
@@ -102,13 +115,25 @@ The documentation is organized into the following categories:
 docs/
 ├── README.md                          # This file - documentation index
 ├── architecture/                      # Architecture and system design
+│   └── architecture-overview.md       # Comprehensive architecture overview
 ├── development/                       # Development guides and setup
+│   ├── cli-tools.md                  # CLI tools documentation
+│   ├── scripts.md                    # Utility scripts documentation
+│   └── vercel-react-best-practices.md # Performance optimization guide
 ├── deployment/                        # CI/CD and deployment
 ├── security/                          # Security configuration and practices
 ├── testing/                           # Testing guides and strategies
 ├── integrations/                      # Third-party service integrations
 ├── migrations/                        # Migration guides and plans
 ├── strategy/                          # Strategic planning documents
+│   ├── n8n-workflows-research.md      # n8n workflows research
+│   ├── meta-social-automation.md     # Instagram & TikTok automation
+│   └── client-onboarding-strategy.md # Client onboarding guide
+├── research/                          # Research and analysis documents
+│   ├── obsidian-vault-integration.md # Obsidian integration analysis
+│   └── vitesse-analysis.md            # Vitesse template analysis
+├── workflows/                         # n8n workflow templates
+│   └── README.md                      # Workflow implementation guide
 └── archive/                           # Historical documentation
 ```
 
