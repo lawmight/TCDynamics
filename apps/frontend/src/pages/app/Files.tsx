@@ -153,6 +153,7 @@ const Files = () => {
                     className="hidden"
                     accept=".pdf,.txt,.doc,.docx"
                     onChange={handleUpload}
+                    aria-label="Upload a document for Vertex retrieval (PDF, TXT, DOCX supported)"
                   />
                   {uploading ? 'Uploading…' : 'Choose file'}
                 </label>

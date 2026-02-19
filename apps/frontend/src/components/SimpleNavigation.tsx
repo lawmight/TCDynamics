@@ -1,4 +1,4 @@
-import { startTransition, useEffect, useState } from 'react'
+import { startTransition, useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import ScrollProgressBar from '@/components/ScrollProgressBar'
@@ -36,6 +36,8 @@ const SimpleNavigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [showBackToTop, setShowBackToTop] = useState(false)
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const mobileMenuRef = useRef<HTMLDivElement>(null)
   const location = useLocation()
   const navigate = useNavigate()
   const { resolvedTheme, setTheme } = useTheme()
@@ -63,6 +65,28 @@ const SimpleNavigation = () => {
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Mobile menu: focus first focusable on open, restore focus to button on close, Escape to close
+  useEffect(() => {
+    if (!isMobileMenuOpen) return
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsMobileMenuOpen(false)
+      }
+    }
+    window.addEventListener('keydown', handleEscape)
+    const frame = requestAnimationFrame(() => {
+      const first = mobileMenuRef.current?.querySelector<HTMLElement>(
+        'a, button'
+      )
+      first?.focus()
+    })
+    return () => {
+      window.removeEventListener('keydown', handleEscape)
+      cancelAnimationFrame(frame)
+      menuButtonRef.current?.focus()
+    }
+  }, [isMobileMenuOpen])
 
   const handleNavClick = (item: NavigationItem) => {
     if (item.scrollId && location.pathname === '/') {
@@ -127,7 +151,7 @@ const SimpleNavigation = () => {
             </Link>
 
             {/* Desktop Navigation - centered */}
-            <nav className="hidden items-center justify-center space-x-4 lg:flex">
+            <nav className="hidden items-center justify-center space-x-4 lg:flex" aria-label="Main navigation">
               {shouldShowDesktopNav ? (
                 <>
                   {navigationItems.map(item =>
@@ -223,9 +247,12 @@ const SimpleNavigation = () => {
                 )}
               </div>
               <button
+                ref={menuButtonRef}
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="p-2 text-foreground transition-colors hover:text-primary lg:hidden"
                 aria-label="Toggle menu"
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="mobile-menu"
               >
                 {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
@@ -235,9 +262,16 @@ const SimpleNavigation = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="border-b border-border bg-background/95 backdrop-blur-sm lg:hidden">
+          <div
+            id="mobile-menu"
+            ref={mobileMenuRef}
+            className="border-b border-border bg-background/95 backdrop-blur-sm lg:hidden"
+          >
             <div className="container mx-auto p-4">
-              <nav className="flex flex-col space-y-3">
+              <nav
+                className="flex flex-col space-y-3"
+                aria-label="Mobile navigation menu"
+              >
                 {location.pathname === '/' ? (
                   navigationItems.map(item =>
                     item.path ? (

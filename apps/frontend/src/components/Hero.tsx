@@ -395,6 +395,19 @@ const Hero = () => {
                       }}
                       className="h-auto w-full object-cover"
                     >
+                      <track
+                        kind="captions"
+                        src="/captions/hero-automation-fr.vtt"
+                        srcLang="fr"
+                        label="Français"
+                        default
+                      />
+                      <track
+                        kind="descriptions"
+                        src="/captions/hero-automation-descriptions-fr.vtt"
+                        srcLang="fr"
+                        label="Descriptions (Français)"
+                      />
                       Votre navigateur ne supporte pas la lecture de vidéos.
                     </video>
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-background/40 via-transparent to-background/10"></div>

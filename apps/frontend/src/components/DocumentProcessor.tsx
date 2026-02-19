@@ -262,6 +262,7 @@ const DocumentProcessor = () => {
             onChange={handleFileUpload}
             className="hidden"
             data-testid="file-input"
+            aria-label="Sélectionner des documents à analyser (formats acceptés: JPG, PNG, PDF, DOC, DOCX)"
           />
 
           <div className="space-y-4">

@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 
 import ApiKeyManager from '@/components/app/ApiKeyManager'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { useRequireAuth } from '@/hooks/useAuth'
 import { getWithMigration, LS } from '@/utils/storageMigration'
@@ -87,26 +89,24 @@ const Settings = () => {
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">RUM Configuration</h2>
         <div className="space-y-2">
-          <label htmlFor="projectId" className="block text-sm font-medium">
+          <Label htmlFor="projectId" className="block">
             Project ID
-          </label>
-          <input
+          </Label>
+          <Input
             id="projectId"
             aria-required="true"
-            className="w-full rounded-md border p-2"
             value={projectId}
             onChange={e => setProjectId(e.target.value)}
             placeholder="UUID of your project"
           />
         </div>
         <div className="space-y-2">
-          <label htmlFor="writeKey" className="block text-sm font-medium">
+          <Label htmlFor="writeKey" className="block">
             Public Write Key
-          </label>
-          <input
+          </Label>
+          <Input
             id="writeKey"
             aria-required="true"
-            className="w-full rounded-md border p-2"
             value={writeKey}
             onChange={e => setWriteKey(e.target.value)}
             placeholder="pk_..."

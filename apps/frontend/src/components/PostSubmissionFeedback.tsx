@@ -1,5 +1,5 @@
 import { track } from '@vercel/analytics'
-import { useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -24,6 +24,67 @@ export const PostSubmissionFeedback = ({
   const [followup, setFollowup] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { hasAnalyticsConsent } = useCookieConsent()
+
+  const modalRef = useRef<HTMLDivElement>(null)
+  const previousFocusRef = useRef<HTMLElement | null>(null)
+  const titleId = useId()
+
+  useEffect(() => {
+    previousFocusRef.current = document.activeElement as HTMLElement | null
+
+    const modal = modalRef.current
+    if (modal) {
+      const focusableSelector =
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      const focusable = modal.querySelector<HTMLElement>(focusableSelector)
+      if (focusable) {
+        focusable.focus()
+      } else {
+        modal.focus()
+      }
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        onClose()
+        return
+      }
+
+      if (e.key !== 'Tab' || !modalRef.current) return
+
+      const focusableSelector =
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      const focusables = Array.from(
+        modalRef.current.querySelectorAll<HTMLElement>(focusableSelector)
+      ).filter(el => !el.hasAttribute('disabled') && el.offsetParent !== null)
+
+      if (focusables.length === 0) return
+
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      const active = document.activeElement
+
+      if (e.shiftKey) {
+        if (active === first) {
+          e.preventDefault()
+          last.focus()
+        }
+      } else {
+        if (active === last) {
+          e.preventDefault()
+          first.focus()
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      previousFocusRef.current?.focus()
+    }
+  }, [onClose])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -95,7 +156,14 @@ export const PostSubmissionFeedback = ({
 
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-md rounded-lg border border-border bg-background shadow-lg">
+        <div
+          ref={modalRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={titleId}
+          tabIndex={-1}
+          className="w-full max-w-md rounded-lg border border-border bg-background shadow-lg"
+        >
           {/* Header */}
           <div className="relative border-b border-border p-6">
             <button
@@ -108,7 +176,7 @@ export const PostSubmissionFeedback = ({
               <span className="sr-only">Close</span>
             </button>
             <div>
-              <h2 className="text-xl font-semibold">
+              <h2 id={titleId} className="text-xl font-semibold">
                 Votre avis nous intéresse
               </h2>
               <p className="pt-2 text-sm text-muted-foreground">
@@ -125,21 +193,37 @@ export const PostSubmissionFeedback = ({
               <label htmlFor="rating" className="block text-sm font-medium">
                 Étiez-vous satisfait de votre expérience ? *
               </label>
-              <div className="grid grid-cols-5 gap-2">
-                {[1, 2, 3, 4, 5].map(value => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setRating(value)}
-                    className={`rounded-lg border-2 py-3 text-sm font-semibold transition-[border-color,box-shadow] ${
-                      rating === value
-                        ? 'border-primary bg-primary/10 text-primary'
-                        : 'border-border hover:border-primary/50'
-                    }`}
-                  >
-                    {value}
-                  </button>
-                ))}
+              <div
+                role="radiogroup"
+                aria-label="Note de satisfaction de 1 à 5"
+                className="grid grid-cols-5 gap-2"
+              >
+                {[1, 2, 3, 4, 5].map(value => {
+                  const labels: Record<number, string> = {
+                    1: '1 sur 5, pas satisfait',
+                    2: '2 sur 5, peu satisfait',
+                    3: '3 sur 5, neutre',
+                    4: '4 sur 5, satisfait',
+                    5: '5 sur 5, très satisfait',
+                  }
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      role="radio"
+                      aria-checked={rating === value ? 'true' : 'false'}
+                      aria-label={labels[value]}
+                      onClick={() => setRating(value)}
+                      className={`rounded-lg border-2 py-3 text-sm font-semibold transition-[border-color,box-shadow] ${
+                        rating === value
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-border hover:border-primary/50'
+                      }`}
+                    >
+                      {value}
+                    </button>
+                  )
+                })}
               </div>
               <p className="text-xs text-muted-foreground">
                 {rating === 1 && 'Pas satisfait'}
@@ -175,7 +259,7 @@ export const PostSubmissionFeedback = ({
                 id="followup"
                 checked={followup}
                 onChange={e => setFollowup(e.target.checked)}
-                className="mt-1 size-4 rounded border-border"
+                className="mt-1 size-4 rounded border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               />
               <label htmlFor="followup" className="text-sm">
                 Puis-je vous contacter pour discuter de vos besoins spécifiques

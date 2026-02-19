@@ -10,6 +10,7 @@ import Users from '~icons/lucide/users'
 const Footer = () => {
   return (
     <footer className="border-t border-border/40 bg-background py-12">
+      <h2 className="sr-only">Site footer</h2>
       <div className="container mx-auto px-4">
         {/* Top Row: Trust Signals */}
         <div className="mb-12 flex flex-wrap justify-center gap-6 border-b border-border/40 pb-12 font-mono text-sm text-muted-foreground">

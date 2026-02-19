@@ -49,7 +49,7 @@ export const AppLayout = () => {
             </div>
           </div>
 
-          <nav className="flex-1 space-y-1 px-3">
+          <nav className="flex-1 space-y-1 px-3" aria-label="App navigation">
             {navItems.map(item => {
               const Icon = item.icon
               return (

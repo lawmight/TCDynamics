@@ -30,6 +30,25 @@ const useAccordion = () => {
   return context
 }
 
+// AccordionItem context for shared trigger/content IDs (aria-labelledby fix)
+interface AccordionItemContextType {
+  triggerId: string
+  contentId: string
+}
+
+const AccordionItemContext =
+  createContext<AccordionItemContextType | null>(null)
+
+const useAccordionItem = () => {
+  const context = useContext(AccordionItemContext)
+  if (!context) {
+    throw new Error(
+      'AccordionTrigger and AccordionContent must be used within AccordionItem'
+    )
+  }
+  return context
+}
+
 // Main Accordion component
 const Accordion = ({
   children,
@@ -88,11 +107,17 @@ const AccordionItem = ({
   children: React.ReactNode
   value: string
   className?: string
-}) => (
-  <div className={className} data-value={value}>
-    {children}
-  </div>
-)
+}) => {
+  const triggerId = useId()
+  const contentId = useId()
+  return (
+    <AccordionItemContext.Provider value={{ triggerId, contentId }}>
+      <div className={className} data-value={value}>
+        {children}
+      </div>
+    </AccordionItemContext.Provider>
+  )
+}
 
 const AccordionTrigger = ({
   children,
@@ -104,9 +129,8 @@ const AccordionTrigger = ({
   value: string
 }) => {
   const { openItems, toggleItem } = useAccordion()
+  const { triggerId, contentId } = useAccordionItem()
   const isOpen = openItems.has(value)
-  const triggerId = useId()
-  const contentId = `accordion-content-${value}`
 
   const handleClick = () => {
     toggleItem(value)
@@ -125,7 +149,7 @@ const AccordionTrigger = ({
       className={`${className} flex w-full items-center justify-between rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2`}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      aria-expanded={isOpen}
+      aria-expanded={isOpen ? 'true' : 'false'}
       aria-controls={contentId}
       type="button"
     >
@@ -158,8 +182,8 @@ const AccordionContent = ({
   value: string
 }) => {
   const { openItems } = useAccordion()
+  const { triggerId, contentId } = useAccordionItem()
   const isOpen = openItems.has(value)
-  const contentId = `accordion-content-${value}`
 
   return (
     <div
@@ -168,7 +192,7 @@ const AccordionContent = ({
         isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
       }`}
       role="region"
-      aria-labelledby={`accordion-trigger-${value}`}
+      aria-labelledby={triggerId}
     >
       <div className="pb-4 pt-2">{children}</div>
     </div>
