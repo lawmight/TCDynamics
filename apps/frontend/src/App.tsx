@@ -176,7 +176,6 @@ const AppRouter = () => {
           <Route path="/pages" element={<Pages />} />
           <Route path="/diagnostics" element={<Diagnostics />} />
           <Route path="/recommendations" element={<Recommendations />} />
-          <Route path="/settings" element={<Settings />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/checkout-enterprise" element={<CheckoutEnterprise />} />
           <Route path="/checkout-success" element={<CheckoutSuccess />} />
@@ -205,6 +204,7 @@ const AppRouter = () => {
             <Route path="chat" element={<ChatApp />} />
             <Route path="files" element={<FilesApp />} />
             <Route path="analytics" element={<AnalyticsApp />} />
+            <Route path="settings" element={<Settings />} />
             <Route path="settings/email" element={<EmailPreferences />} />
           </Route>
 

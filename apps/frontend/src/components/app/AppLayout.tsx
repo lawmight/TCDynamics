@@ -17,7 +17,7 @@ const navItems = [
   { to: '/app/chat', label: 'Chat', icon: MessageSquare },
   { to: '/app/files', label: 'Files / KB', icon: Folder },
   { to: '/app/analytics', label: 'Analytics', icon: BarChart3 },
-  { to: '/settings', label: 'Settings', icon: Settings },
+  { to: '/app/settings', label: 'Settings', icon: Settings },
 ]
 
 const baseNavClasses =
@@ -36,8 +36,8 @@ export const AppLayout = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="flex min-h-screen">
-        <aside className="hidden w-72 shrink-0 border-r border-border bg-sidebar md:flex md:flex-col">
+      <div className="flex h-screen overflow-hidden">
+        <aside className="hidden w-72 shrink-0 border-r border-border bg-sidebar md:flex md:flex-col h-full">
           <div className="flex items-center gap-3 p-6">
             {/* eslint-disable-next-line tailwindcss/classnames-order */}
             <div className="flex size-10 items-center justify-center rounded-xl ring-1 ring-primary/30 bg-primary/10 text-primary font-semibold">
@@ -100,7 +100,7 @@ export const AppLayout = () => {
           </div>
         </aside>
 
-        <main id="main" className="flex min-h-screen flex-1 flex-col">
+        <main id="main" className="flex min-h-0 flex-1 flex-col overflow-hidden">
           <header className="flex items-center justify-between border-b border-border p-4 md:hidden">
             <Link to="/app/chat" className="flex items-center gap-2">
               {/* eslint-disable-next-line tailwindcss/classnames-order */}
@@ -125,7 +125,7 @@ export const AppLayout = () => {
             </div>
           </header>
 
-          <div className="flex flex-1 flex-col gap-6 bg-gradient-to-b from-background via-muted/40 to-background px-4 py-6 md:px-8">
+          <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto scrollbar-hide bg-gradient-to-b from-background via-muted/40 to-background px-4 py-6 md:px-8">
             <div className="grid grid-cols-1 gap-4 md:hidden">
               <Card className="p-3">
                 <div className="flex items-center justify-between">

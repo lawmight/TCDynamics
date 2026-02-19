@@ -17,6 +17,7 @@ build/
 .env.backup
 .env.preview
 .env.temp
+.env.temp
 .env.*
 backend/.env
 local.settings.json
@@ -103,4 +104,6 @@ md/
 
 .env*.local
 
-coordination
+coordination/
+
+docs/

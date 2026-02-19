@@ -317,22 +317,27 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - Hidden completely, let content handle overflow naturally */
 ::-webkit-scrollbar {
-  width: 8px;
+  display: none;
 }
 
-::-webkit-scrollbar-track {
+/* Firefox scrollbar hiding */
+main#main .overflow-y-auto {
+  scrollbar-width: none;
+}
+
+/* Show scrollbar only when content overflows significantly (optional fallback) */
+main#main .overflow-y-auto.has-overflow::-webkit-scrollbar {
+  display: block;
+  width: 8px;
+  height: 8px;
   background: hsl(var(--background));
 }
 
-::-webkit-scrollbar-thumb {
+main#main .overflow-y-auto.has-overflow::-webkit-scrollbar-thumb {
   background: hsl(var(--primary));
   border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary-glow));
 }
 
 /* Keyframe Animations */

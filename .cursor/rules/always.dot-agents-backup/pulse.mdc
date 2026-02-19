@@ -1,6 +1,6 @@
 ---
 description: "PULSE framework: call pulse_status first every response, pulse_doctor after code changes, and follow safeguards (no delete/push without confirmation, checkpoints, loop detection). Apply when using the PULSE MCP workflow."
-alwaysApply: true
+alwaysApply: false
 ---
 # ⛔ STOP - READ THIS FIRST
 

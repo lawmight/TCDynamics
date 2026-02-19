@@ -116,5 +116,20 @@ export default {
       },
     },
   },
-  plugins: [tailwindcssAnimate],
+  plugins: [
+    tailwindcssAnimate,
+    function ({ addUtilities }: { addUtilities: any }) {
+      const newUtilities = {
+        '.scrollbar-hide': {
+          'scrollbar-width': 'none',
+          '-ms-overflow-style': 'none',
+        },
+        '.scrollbar-thin': {
+          'scrollbar-width': 'thin',
+          'scrollbar-color': 'hsl(var(--primary)) hsl(var(--background))',
+        },
+      }
+      addUtilities(newUtilities)
+    },
+  ],
 } satisfies Config

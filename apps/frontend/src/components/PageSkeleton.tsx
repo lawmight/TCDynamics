@@ -81,9 +81,9 @@ function FormSkeleton() {
 function AppSkeleton() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="flex min-h-screen">
+      <div className="flex h-screen overflow-hidden">
         {/* Sidebar - matches AppLayout aside: w-72, hidden md:flex */}
-        <aside className="hidden w-72 shrink-0 border-r border-border bg-sidebar md:flex md:flex-col">
+        <aside className="hidden w-72 shrink-0 border-r border-border bg-sidebar md:flex md:flex-col h-full">
           {/* Logo + workspace name */}
           <div className="flex items-center gap-3 p-6">
             <Skeleton className="size-10 rounded-xl" />
@@ -120,7 +120,7 @@ function AppSkeleton() {
         </aside>
 
         {/* Main content area */}
-        <main className="flex min-h-screen flex-1 flex-col">
+        <main className="flex min-h-0 flex-1 flex-col overflow-hidden">
           {/* Mobile header - matches AppLayout header md:hidden */}
           <header className="flex items-center justify-between border-b border-border p-4 md:hidden">
             <div className="flex items-center gap-2">
@@ -137,7 +137,7 @@ function AppSkeleton() {
           </header>
 
           {/* Content area - matches AppLayout gradient background */}
-          <div className="flex flex-1 flex-col gap-6 bg-gradient-to-b from-background via-muted/40 to-background px-4 py-6 md:px-8">
+          <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto scrollbar-hide bg-gradient-to-b from-background via-muted/40 to-background px-4 py-6 md:px-8">
             {/* Mobile nav card - md:hidden */}
             <Card className="p-3 md:hidden">
               <div className="flex items-center justify-between">

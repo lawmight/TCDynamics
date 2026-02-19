@@ -1,6 +1,7 @@
 import { sendContactNotification, sendDemoNotification } from './_lib/email.js'
 import { saveContact, saveDemoRequest } from './_lib/mongodb-db.js'
 import { withGuards } from './_lib/request-guards.js'
+import { sanitizeString } from './_lib/sanitize.js'
 import { withSentry } from './_lib/sentry.js'
 import { validateFormData } from './_lib/validation.js'
 
@@ -53,11 +54,16 @@ async function handler(req, res, body) {
 export async function handleContactForm(req, res, body, requestId) {
   const { name, email, message, phone, company } = body
 
+  const sanitized = {
+    name: sanitizeString(name ?? ''),
+    email: typeof email === 'string' ? sanitizeString(email).trim() : email,
+    message: typeof message === 'string' ? sanitizeString(message).trim() : message,
+    phone: sanitizeString(phone ?? ''),
+    company: sanitizeString(company ?? ''),
+  }
+
   const { valid, errors: validationErrors, warnings: validationWarnings } =
-    validateFormData(
-      { name, email, message, phone, company: company ?? '' },
-      'contact'
-    )
+    validateFormData(sanitized, 'contact')
 
   if (!valid) {
     return res.status(400).json({
@@ -70,23 +76,19 @@ export async function handleContactForm(req, res, body, requestId) {
     })
   }
 
-  const sanitizedEmail = typeof email === 'string' ? email.trim() : email
-  const sanitizedMessage =
-    typeof message === 'string' ? message.trim() : message
-
   console.log('New contact form submission:', {
     requestId,
-    name,
-    email: sanitizedEmail,
+    name: sanitized.name,
+    email: sanitized.email,
   })
 
   // Save to MongoDB
   const result = await saveContact({
-    name,
-    email: sanitizedEmail,
-    message: sanitizedMessage,
-    phone,
-    company,
+    name: sanitized.name,
+    email: sanitized.email,
+    message: sanitized.message,
+    phone: sanitized.phone,
+    company: sanitized.company,
     source: 'website',
   })
 
@@ -100,11 +102,11 @@ export async function handleContactForm(req, res, body, requestId) {
 
   // Send email notification
   const emailResult = await sendContactNotification({
-    name,
-    email: sanitizedEmail,
-    message: sanitizedMessage,
-    phone,
-    company,
+    name: sanitized.name,
+    email: sanitized.email,
+    message: sanitized.message,
+    phone: sanitized.phone,
+    company: sanitized.company,
   })
 
   if (emailResult.success) {
@@ -142,18 +144,33 @@ export async function handleDemoForm(req, res, body, requestId) {
     preferredDate,
   } = body
 
+  const sanitized = {
+    name: sanitizeString(name ?? ''),
+    email: typeof email === 'string' ? sanitizeString(email).trim() : email,
+    company: sanitizeString(company ?? ''),
+    businessNeeds: typeof businessNeeds === 'string' ? sanitizeString(businessNeeds).trim() : businessNeeds ?? '',
+    phone: sanitizeString(phone ?? ''),
+    jobTitle: sanitizeString(jobTitle ?? ''),
+    companySize: sanitizeString(companySize ?? ''),
+    industry: sanitizeString(industry ?? ''),
+    useCase: sanitizeString(useCase ?? ''),
+    timeline: sanitizeString(timeline ?? ''),
+    message: typeof message === 'string' ? sanitizeString(message).trim() : message ?? '',
+    preferredDate: typeof preferredDate === 'string' ? sanitizeString(preferredDate).trim() : preferredDate ?? '',
+  }
+
   const { valid, errors: validationErrors, warnings: validationWarnings } =
     validateFormData(
       {
-        name,
-        email,
-        company: company ?? '',
-        businessNeeds: businessNeeds ?? '',
-        phone: phone ?? '',
-        companySize: companySize ?? '',
-        industry: industry ?? '',
-        useCase: useCase ?? '',
-        timeline: timeline ?? '',
+        name: sanitized.name,
+        email: sanitized.email,
+        company: sanitized.company,
+        businessNeeds: sanitized.businessNeeds,
+        phone: sanitized.phone,
+        companySize: sanitized.companySize,
+        industry: sanitized.industry,
+        useCase: sanitized.useCase,
+        timeline: sanitized.timeline,
       },
       'demo'
     )
@@ -169,29 +186,25 @@ export async function handleDemoForm(req, res, body, requestId) {
     })
   }
 
-  const sanitizedEmail = typeof email === 'string' ? email.trim() : email
-  const sanitizedBusinessNeeds =
-    typeof businessNeeds === 'string' ? businessNeeds.trim() : businessNeeds
-
   console.log('New demo request:', {
     requestId,
-    name,
+    name: sanitized.name,
   })
 
   // Save to MongoDB
   const result = await saveDemoRequest({
-    name,
-    email: sanitizedEmail,
-    company,
-    businessNeeds: sanitizedBusinessNeeds,
-    phone,
-    jobTitle,
-    companySize,
-    industry,
-    useCase,
-    timeline,
-    message,
-    preferredDate,
+    name: sanitized.name,
+    email: sanitized.email,
+    company: sanitized.company,
+    businessNeeds: sanitized.businessNeeds,
+    phone: sanitized.phone,
+    jobTitle: sanitized.jobTitle,
+    companySize: sanitized.companySize,
+    industry: sanitized.industry,
+    useCase: sanitized.useCase,
+    timeline: sanitized.timeline,
+    message: sanitized.message,
+    preferredDate: sanitized.preferredDate,
   })
 
   if (!result.success) {
@@ -207,18 +220,18 @@ export async function handleDemoForm(req, res, body, requestId) {
 
   // Send email notification
   const emailResult = await sendDemoNotification({
-    name,
-    email: sanitizedEmail,
-    phone,
-    jobTitle,
-    company,
-    companySize,
-    industry,
-    businessNeeds: sanitizedBusinessNeeds,
-    useCase,
-    timeline,
-    preferredDate,
-    message,
+    name: sanitized.name,
+    email: sanitized.email,
+    phone: sanitized.phone,
+    jobTitle: sanitized.jobTitle,
+    company: sanitized.company,
+    companySize: sanitized.companySize,
+    industry: sanitized.industry,
+    businessNeeds: sanitized.businessNeeds,
+    useCase: sanitized.useCase,
+    timeline: sanitized.timeline,
+    preferredDate: sanitized.preferredDate,
+    message: sanitized.message,
   })
 
   if (emailResult.success) {
