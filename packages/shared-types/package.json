@@ -1,0 +1,32 @@
+{
+  "name": "@tcd/shared-types",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "check-types": "tsc --noEmit"
+  },
+  "exports": {
+    "./api": {
+      "types": "./src/api.ts",
+      "import": "./dist/api.js"
+    },
+    "./user": {
+      "types": "./src/user.ts",
+      "import": "./dist/user.js"
+    },
+    "./forms": {
+      "types": "./src/forms.ts",
+      "import": "./dist/forms.js"
+    },
+    "./constants": {
+      "types": "./src/constants.ts",
+      "import": "./dist/constants.js"
+    }
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}

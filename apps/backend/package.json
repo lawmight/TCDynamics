@@ -21,6 +21,8 @@
     "format:check": "prettier --check \"src/**/*.{js,ts}\" --config ../tools/configs/.prettierrc --ignore-path ../tools/configs/.prettierignore"
   },
   "dependencies": {
+    "@tcd/shared-types": "*",
+    "@tcd/shared-utils": "*",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",

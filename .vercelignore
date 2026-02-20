@@ -1,3 +1,9 @@
+# Local/IDE files first (OneDrive sync can cause EACCES on deploy)
+.cursor
+.cursor/
+.claude
+.claude/
+
 # Note: Root api/ directory is now included for serverless functions
 
 # We remove apps/frontend/api/ before deployment to avoid duplicates
@@ -47,4 +53,3 @@ oh-my-opencode/
 # Local/IDE files (OneDrive sync can cause EACCES on deploy)
 CLAUDE.md
 .codex/
-.claude/

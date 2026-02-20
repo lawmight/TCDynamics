@@ -150,6 +150,7 @@ export default defineConfig(({ mode }) => {
       reportCompressedSize: false, // Disable gzip size reporting for faster builds
     },
     optimizeDeps: {
+      exclude: ['@tcd/shared-types', '@tcd/shared-utils'],
       include: [
         'react',
         'react-dom',

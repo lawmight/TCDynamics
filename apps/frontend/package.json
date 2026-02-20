@@ -45,6 +45,8 @@
     ]
   },
   "dependencies": {
+    "@tcd/shared-types": "*",
+    "@tcd/shared-utils": "*",
     "@clerk/clerk-react": "^5.61.0",
     "@clerk/types": "^4.101.17",
     "@modelcontextprotocol/sdk": "^1.26.0",

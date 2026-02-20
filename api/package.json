@@ -7,11 +7,14 @@
     "build": "echo 'API functions deployed via Vercel - no build needed'",
     "dev": "echo 'API functions run via Vercel dev'",
     "lint": "echo 'API linting handled by root ESLint'",
-    "type-check": "echo 'API type checking handled by root TypeScript'"
+    "type-check": "echo 'API type checking handled by root TypeScript'",
+    "test": "echo 'No tests in api'"
   },
   "private": true,
   "type": "module",
   "dependencies": {
+    "@tcd/shared-types": "*",
+    "@tcd/shared-utils": "*",
     "@clerk/backend": "^2.31.2",
     "@polar-sh/sdk": "^0.43.1",
     "@sentry/node": "9.47.1",

@@ -18,10 +18,12 @@
     "url": "https://github.com/your-repo/tcdynamics/issues"
   },
   "private": true,
+  "packageManager": "npm@10.9.3",
   "type": "module",
   "workspaces": [
     "apps/*",
-    "api"
+    "api",
+    "packages/*"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:vercel\"",

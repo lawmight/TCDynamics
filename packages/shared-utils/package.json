@@ -1,0 +1,31 @@
+{
+  "name": "@tcd/shared-utils",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "check-types": "tsc --noEmit"
+  },
+  "exports": {
+    "./sanitize": {
+      "types": "./src/sanitize.ts",
+      "import": "./dist/sanitize.js"
+    },
+    "./validation": {
+      "types": "./src/validation.ts",
+      "import": "./dist/validation.js"
+    },
+    "./logger-core": {
+      "types": "./src/logger-core.ts",
+      "import": "./dist/logger-core.js"
+    }
+  },
+  "dependencies": {
+    "@tcd/shared-types": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}
