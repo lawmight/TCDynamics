@@ -26,5 +26,8 @@
     "mongoose": "^9.2.1",
     "resend": "^6.9.2",
     "svix": "^1.85.0"
+  },
+  "overrides": {
+    "minimatch": ">=10.2.1"
   }
 }

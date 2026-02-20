@@ -90,7 +90,7 @@ jobs:
         with:
           # Install only frontend so apps/frontend/node_modules has @eslint/js (ESM resolution)
           skip-root: true
-          skip-api: true
+          skip-api: false
 
       - name: Type Check
         id: type-check
