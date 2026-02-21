@@ -82,8 +82,8 @@
   "devDependencies": {
     "dotenv-cli": "^11.0.0",
     "turbo": "^2.8.10",
-    "vercel": "^50.22.0",
-    "@eslint/js": "^9.39.2",
+    "vercel": "^50.22.1",
+    "@eslint/js": "^9.39.3",
     "@typescript-eslint/scope-manager": "^8.56.1-alpha.2",
     "@vitejs/plugin-react-swc": "^3.11.0",
     "autoprefixer": "^10.4.24",
