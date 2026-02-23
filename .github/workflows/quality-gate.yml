@@ -102,7 +102,7 @@ jobs:
         id: lint
         if: ${{ inputs.skip_lint != 'true' && github.event.inputs.skip_lint != 'true' }}
         working-directory: ./apps/frontend
-        run: npm run lint
+        run: node ./node_modules/eslint/bin/eslint.js . --ext ts,tsx --report-unused-disable-directives --max-warnings 150
 
       - name: Unit Tests
         id: test-run
