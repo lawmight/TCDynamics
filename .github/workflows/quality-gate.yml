@@ -92,13 +92,6 @@ jobs:
           skip-root: false
           skip-api: false
 
-      - name: Verify root node_modules for lint
-        if: ${{ inputs.skip_lint != 'true' && github.event.inputs.skip_lint != 'true' }}
-        run: |
-          echo "Root node_modules eslint:"
-          ls -la node_modules/eslint/bin/eslint.js 2>/dev/null || echo "MISSING"
-          ls node_modules | grep -E "eslint|@eslint" || true
-
       - name: Type Check
         id: type-check
         if: ${{ inputs.skip_lint != 'true' && github.event.inputs.skip_lint != 'true' }}
