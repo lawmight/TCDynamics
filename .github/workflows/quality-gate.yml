@@ -88,9 +88,8 @@ jobs:
       - name: Install Dependencies
         uses: ./.github/actions/install-dependencies
         with:
-          # Root install only: frontend npm ci overwrites/clears root node_modules so we skip it and use root for lint
+          # Root install runs last so its node_modules (with eslint) is not overwritten by frontend install
           skip-root: false
-          skip-frontend: true
           skip-api: false
 
       - name: Verify root node_modules for lint
