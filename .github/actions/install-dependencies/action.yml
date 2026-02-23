@@ -40,8 +40,6 @@ runs:
       with:
         path: apps/frontend/node_modules
         key: ${{ runner.os }}-node-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-frontend-
 
     - name: Install frontend dependencies
       if: inputs.skip-frontend != 'true'
