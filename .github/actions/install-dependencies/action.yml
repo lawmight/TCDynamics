@@ -23,7 +23,11 @@ runs:
       shell: bash
       env:
         NODE_ENV: development
-      run: npm ci
+      run: |
+        echo "PWD=$PWD GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
+        cd "$GITHUB_WORKSPACE" && npm ci
+        echo "After npm ci, node_modules/eslint:"
+        ls -la node_modules/eslint/bin/eslint.js 2>/dev/null || echo "MISSING"
 
     - name: Install frontend dependencies
       if: inputs.skip-frontend != 'true'
