@@ -88,8 +88,9 @@ jobs:
       - name: Install Dependencies
         uses: ./.github/actions/install-dependencies
         with:
-          # Root install so workspace deps (eslint, @eslint/js) are in root node_modules; frontend node_modules is empty in CI
+          # Root install only: frontend npm ci overwrites/clears root node_modules so we skip it and use root for lint
           skip-root: false
+          skip-frontend: true
           skip-api: false
 
       - name: Verify root node_modules for lint
