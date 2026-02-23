@@ -57,8 +57,8 @@ jobs:
       - name: Verify (install + lint + type-check + tests)
         run: |
           npm ci
-          npm run lint -ws
-          npm run type-check -ws
+          npm run lint -ws --if-present
+          npm run type-check -ws --if-present
           npm run test -ws --if-present
 
       - name: Commit and push (only if verify passed)

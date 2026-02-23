@@ -19,9 +19,9 @@
     "test:e2e:debug": "playwright test --debug",
     "lighthouse": "lhci autorun",
     "preview": "vite preview",
-    "lint": "npx eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 150",
+    "lint": "eslint . --report-unused-disable-directives --max-warnings 150",
     "type-check": "tsc --noEmit",
-    "lint:fix": "npx eslint . --ext ts,tsx --fix",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write . --config tools/configs/.prettierrc --ignore-path tools/configs/.prettierignore",
     "format:check": "prettier --check . --config tools/configs/.prettierrc --ignore-path tools/configs/.prettierignore",
     "prepare": "husky",
@@ -33,11 +33,11 @@
     "verify-bugbots": "node scripts/verify-bugbots.js",
     "pre-push-checks": "node scripts/pre-push-checks.js",
     "verify": "npm run lint && npm run type-check && npm run test -- --run",
-    "verify:exercise": "npx eslint src/utils/math.ts src/utils/__tests__/math.test.ts --ext ts,tsx && tsc --noEmit --pretty false --skipLibCheck && vitest --run src/utils/__tests__/math.test.ts"
+    "verify:exercise": "eslint src/utils/math.ts src/utils/__tests__/math.test.ts && tsc --noEmit --pretty false --skipLibCheck && vitest --run src/utils/__tests__/math.test.ts"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "npx eslint --fix",
+      "eslint --fix",
       "prettier --write --config ../../tools/configs/.prettierrc --ignore-path ../../tools/configs/.prettierignore"
     ],
     "*.{json,md,css}": [

@@ -87,10 +87,6 @@ jobs:
 
       - name: Install Dependencies
         uses: ./.github/actions/install-dependencies
-        with:
-          # Install only frontend so apps/frontend/node_modules has @eslint/js (ESM resolution)
-          skip-root: true
-          skip-api: false
 
       - name: Type Check
         id: type-check
