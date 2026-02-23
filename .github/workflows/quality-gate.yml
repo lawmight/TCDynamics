@@ -97,6 +97,20 @@ jobs:
         working-directory: ./apps/frontend
         run: npm run type-check
 
+      - name: Verify frontend node_modules for lint
+        if: ${{ inputs.skip_lint != 'true' && github.event.inputs.skip_lint != 'true' }}
+        working-directory: ./apps/frontend
+        run: |
+          echo "Checking for ESLint in apps/frontend/node_modules..."
+          if [ -f node_modules/eslint/bin/eslint.js ]; then
+            echo "OK: eslint.js found"
+          else
+            echo "Missing: node_modules/eslint/bin/eslint.js"
+            ls -la node_modules 2>/dev/null | head -5 || true
+            ls -la node_modules/.bin 2>/dev/null | head -10 || true
+            exit 1
+          fi
+
       - name: Lint
         id: lint
         if: ${{ inputs.skip_lint != 'true' && github.event.inputs.skip_lint != 'true' }}
