@@ -24,9 +24,9 @@ runs:
       continue-on-error: true
       with:
         path: node_modules
-        key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+        key: ${{ runner.os }}-node-v2-${{ hashFiles('package-lock.json') }}
         restore-keys: |
-          ${{ runner.os }}-node-
+          ${{ runner.os }}-node-v2-
 
     - name: Install root dependencies
       if: inputs.skip-root != 'true'
