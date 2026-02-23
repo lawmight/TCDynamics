@@ -6,7 +6,9 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "lint": "echo 'No linting configured for shared-utils'",
+    "type-check": "tsc --noEmit"
   },
   "exports": {
     "./sanitize": {
