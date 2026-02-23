@@ -88,8 +88,8 @@ jobs:
       - name: Install Dependencies
         uses: ./.github/actions/install-dependencies
         with:
-          # Install only frontend so apps/frontend/node_modules has @eslint/js (ESM resolution)
-          skip-root: true
+          # Full workspace install so ESLint and @eslint/js resolve from root or frontend
+          skip-root: false
           skip-api: false
 
       - name: Type Check
@@ -102,7 +102,7 @@ jobs:
         id: lint
         if: ${{ inputs.skip_lint != 'true' && github.event.inputs.skip_lint != 'true' }}
         working-directory: ./apps/frontend
-        run: node ./node_modules/eslint/bin/eslint.js . --ext ts,tsx --report-unused-disable-directives --max-warnings 150
+        run: npm run lint
 
       - name: Unit Tests
         id: test-run
