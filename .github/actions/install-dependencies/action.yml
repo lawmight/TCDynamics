@@ -21,6 +21,8 @@ runs:
     - name: Install root dependencies
       if: inputs.skip-root != 'true'
       shell: bash
+      env:
+        NODE_ENV: development
       run: npm ci
 
     - name: Install frontend dependencies
