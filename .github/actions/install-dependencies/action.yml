@@ -33,14 +33,6 @@ runs:
       shell: bash
       run: npm ci
 
-    - name: Cache frontend node_modules
-      if: inputs.skip-frontend != 'true'
-      uses: actions/cache@v4
-      continue-on-error: true
-      with:
-        path: apps/frontend/node_modules
-        key: ${{ runner.os }}-node-frontend-${{ hashFiles('apps/frontend/package-lock.json') }}
-
     - name: Install frontend dependencies
       if: inputs.skip-frontend != 'true'
       shell: bash
