@@ -15,7 +15,7 @@
   "dependencies": {
     "@tcd/shared-types": "*",
     "@tcd/shared-utils": "*",
-    "@clerk/backend": "^2.31.2",
+    "@clerk/backend": "^2.32.0",
     "@polar-sh/sdk": "^0.43.1",
     "@sentry/node": "9.47.1",
     "bcryptjs": "^2.4.3",
