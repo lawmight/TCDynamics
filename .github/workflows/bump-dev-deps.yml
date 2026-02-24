@@ -57,6 +57,7 @@ jobs:
       - name: Verify (install + lint + type-check + tests)
         run: |
           npm ci
+          npm run build -w packages/shared-types -w packages/shared-utils
           npm run lint -ws
           npm run type-check -ws
           npm run test -ws --if-present
