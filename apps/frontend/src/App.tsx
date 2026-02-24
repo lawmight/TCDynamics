@@ -248,6 +248,14 @@ const ThemedClerkProvider = ({ children }: { children: React.ReactNode }) => {
     ? import.meta.env.VITE_CLERK_PREVIEW_PUBLISHABLE_KEY
     : import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
+  // In development mode, allow running without Clerk for testing
+  if (!PUBLISHABLE_KEY && import.meta.env.MODE === 'development') {
+    console.warn(
+      'Running without Clerk authentication in development mode. Auth features will not work.'
+    )
+    return <>{children}</>
+  }
+
   if (!PUBLISHABLE_KEY) {
     throw new Error(
       `Missing Clerk Publishable Key for ${isPreview ? 'preview' : 'production'} environment`
