@@ -19,7 +19,7 @@
     "test:e2e:debug": "playwright test --debug",
     "lighthouse": "lhci autorun",
     "preview": "vite preview",
-    "lint": "node node_modules/eslint/bin/eslint.js . --ext ts,tsx --report-unused-disable-directives --max-warnings 150",
+    "lint": "npx eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 150",
     "type-check": "tsc --noEmit",
     "lint:fix": "npx eslint . --ext ts,tsx --fix",
     "format": "prettier --write . --config tools/configs/.prettierrc --ignore-path tools/configs/.prettierignore",
