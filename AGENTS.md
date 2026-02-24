@@ -43,6 +43,12 @@ Standard commands documented in `README.md`. Quick reference:
 
 Frontend env file: `apps/frontend/.env.local`. See `apps/frontend/.env.example` for full list. Most features work without external service credentials. Required for API features: `CLERK_SECRET_KEY`, `MONGODB_URI`.
 
+### Vercel Dev Server (API Functions)
+
+`npm run dev:vercel` requires Vercel CLI authentication. Set `VERCEL_TOKEN` as a secret/env var, or run `vercel login` interactively. Without it, the API functions on port 3001 won't start. The frontend still runs standalone on port 3000 — API proxy calls to `/api` will fail gracefully.
+
+To verify MongoDB connectivity independently: `cd api && node --input-type=module -e "import{MongoClient}from'mongodb';const c=new MongoClient(process.env.MONGODB_URI);await c.connect();console.log('OK');await c.close()"`
+
 ### Gotchas
 
 - The `rollup-plugin-visualizer` devDep requires Node 22; safe to ignore the EBADENGINE warning on Node 20 — it only runs during `vite build --mode analyze`.
