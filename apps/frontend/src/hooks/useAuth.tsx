@@ -17,65 +17,75 @@ type AuthContextType = {
 
 /**
  * Custom hook that wraps Clerk's auth hooks for authentication
+ * Returns safe defaults when Clerk is not available (development mode)
  */
 export const useAuth = (): AuthContextType => {
-  const { isLoaded, isSignedIn, getToken, signOut } = useClerkAuth()
-  const { user } = useUser()
+  try {
+    const { isLoaded, isSignedIn, getToken, signOut } = useClerkAuth()
+    const { user } = useUser()
 
-  const signInWithGoogle = async () => {
-    // Clerk handles OAuth redirects automatically via SignInButton component
-    // This function is kept for compatibility but should use SignInButton instead
-    throw new Error(
-      'Use Clerk SignInButton component instead of signInWithGoogle function'
-    )
-  }
-
-  const refreshSession = async () => {
-    // Clerk handles session refresh automatically
-    // This is a no-op for compatibility
-  }
-
-  // Create a session-like object for compatibility
-  const session =
-    isSignedIn && user
-      ? {
-          access_token: undefined, // Use getToken() instead
-          id: user.id,
-        }
-      : null
-
-  // Wrapper for getToken that ensures proper error handling
-  // In development, Clerk sessions might expire more frequently
-  // Clerk automatically refreshes tokens when needed
-  const getFreshToken = async (): Promise<string | null> => {
-    try {
-      // Clerk's getToken() automatically handles token refresh
-      // If the session is valid, it will return a fresh token
-      const token = await getToken()
-      return token
-    } catch (error) {
-      // If token retrieval fails, it usually means session is invalid
-      // In development, log this for debugging
-      if (import.meta.env.DEV) {
-        console.warn(
-          '[Clerk Dev] Token retrieval failed - session may have expired:',
-          error
-        )
-      }
-      return null
+    const signInWithGoogle = async () => {
+      throw new Error(
+        'Use Clerk SignInButton component instead of signInWithGoogle function'
+      )
     }
-  }
 
-  return {
-    user: user ?? null,
-    session,
-    loading: !isLoaded,
-    authReady: isLoaded,
-    signInWithGoogle,
-    signOut,
-    refreshSession,
-    getToken: getFreshToken,
-    isSignedIn,
+    const refreshSession = async () => {
+      // Clerk handles session refresh automatically
+      // This is a no-op for compatibility
+    }
+
+    const session =
+      isSignedIn && user
+        ? {
+            access_token: undefined,
+            id: user.id,
+          }
+        : null
+
+    const getFreshToken = async (): Promise<string | null> => {
+      try {
+        const token = await getToken()
+        return token
+      } catch (error) {
+        if (import.meta.env.DEV) {
+          console.warn(
+            '[Clerk Dev] Token retrieval failed - session may have expired:',
+            error
+          )
+        }
+        return null
+      }
+    }
+
+    return {
+      user: user ?? null,
+      session,
+      loading: !isLoaded,
+      authReady: isLoaded,
+      signInWithGoogle,
+      signOut,
+      refreshSession,
+      getToken: getFreshToken,
+      isSignedIn,
+    }
+  } catch (error) {
+    // Clerk not available (development mode without Clerk configured)
+    if (import.meta.env.DEV) {
+      console.warn('[Auth] Clerk not available, using mock auth state')
+    }
+    const noopAsync = async () => {}
+    return {
+      user: null,
+      session: null,
+      loading: false,
+      authReady: true,
+      signInWithGoogle: noopAsync,
+      signOut: noopAsync,
+      refreshSession: noopAsync,
+      getToken: async () => null,
+      isSignedIn: false,
+    }
   }
 }
 
