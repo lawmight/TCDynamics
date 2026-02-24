@@ -45,7 +45,9 @@ Frontend env file: `apps/frontend/.env.local`. See `apps/frontend/.env.example` 
 
 ### Vercel Dev Server (API Functions)
 
-`npm run dev:vercel` requires Vercel CLI authentication. Set `VERCEL_TOKEN` as a secret/env var, or run `vercel login` interactively. Without it, the API functions on port 3001 won't start. The frontend still runs standalone on port 3000 — API proxy calls to `/api` will fail gracefully.
+`npm run dev:vercel` requires Vercel CLI authentication. The `--token` flag must be passed explicitly (the `VERCEL_TOKEN` env var alone is not enough). Run `vercel link --yes --token $VERCEL_TOKEN --scope tcd-ynamics` first, then start the server.
+
+**Known issue in Cloud VM:** The `vercel dev` initial build hangs during `npm install` inside the `@vercel/static-build` builder worker. Workaround: use a minimal `vercel.json` with explicit `builds` config (API functions only) during dev. The frontend runs separately on port 3000 via Vite anyway.
 
 To verify MongoDB connectivity independently: `cd api && node --input-type=module -e "import{MongoClient}from'mongodb';const c=new MongoClient(process.env.MONGODB_URI);await c.connect();console.log('OK');await c.close()"`
 
@@ -55,3 +57,5 @@ To verify MongoDB connectivity independently: `cd api && node --input-type=modul
 - Frontend lint has `--max-warnings 150` threshold; currently ~5 warnings (Tailwind class order + React hooks).
 - The `vercel` CLI (`npm run dev:vercel`) auto-creates `.vercel/` config on first run with `--yes` flag.
 - `npm run dev` sets `NODE_OPTIONS="--max-http-header-size=65536"` to accommodate large Clerk auth tokens; if you get 431 errors, ensure you use `npm run dev` not just `npm run dev:frontend`.
+- When adding secrets in Cursor Cloud, enter ONLY the value (e.g. `pk_test_abc123...`), not `KEY=VALUE` format. Clerk publishable keys must start with `pk_test_` or `pk_live_`.
+- Do NOT install `yarn` globally — the Vercel CLI misdetects it as the package manager and causes `packageManager` field conflicts. This project uses npm only.
