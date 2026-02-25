@@ -3,7 +3,7 @@
  * Handles email preferences and onboarding struggle detection
  */
 
-import { getAuth } from '@clerk/nextjs/server'
+import { verifyClerkAuth } from './_lib/auth.js'
 import { User } from './_lib/models/User.js'
 import { connectToDatabase } from './_lib/mongodb.js'
 
@@ -193,11 +193,14 @@ function analyzeEvents(events) {
 
 async function handleEmailPreferences(req, res) {
   try {
-    // Get authenticated user
-    const { userId } = getAuth(req)
+    const authHeader = req.headers.authorization
+    const { userId, error: authError } = await verifyClerkAuth(authHeader)
 
-    if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' })
+    if (authError || !userId) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: authError || 'Missing or invalid Authorization header',
+      })
     }
 
     await connectToDatabase()

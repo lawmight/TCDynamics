@@ -7,6 +7,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
+import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -34,6 +35,7 @@ interface EmailPreference {
 
 const EmailPreferences = () => {
   const { toast } = useToast()
+  const { getToken } = useAuth()
   const [isSaving, setIsSaving] = useState(false)
 
   const [preferences, setPreferences] = useState<EmailPreference[]>([
@@ -88,9 +90,16 @@ const EmailPreferences = () => {
         {} as Record<string, boolean>
       )
 
+      const token = await getToken()
+      if (!token) {
+        throw new Error('Not authenticated')
+      }
       const response = await fetch('/api/user?action=email-preferences', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ preferences: preferencesObj }),
       })
 
