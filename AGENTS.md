@@ -21,7 +21,7 @@ See `README.md` Quick Start section. Key command: `npm run dev` runs both fronte
 
 ### Clerk Authentication
 
-The app uses Clerk for auth. Without `VITE_CLERK_PUBLISHABLE_KEY`, the frontend runs in a degraded mode (no auth features). The code in `App.tsx` and `useAuth.tsx` handles this gracefully in development mode. To test auth features, set `VITE_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` env vars.
+The app uses Clerk for auth. **In development mode**, `ThemedClerkProvider` in `App.tsx` reads `VITE_CLERK_PREVIEW_PUBLISHABLE_KEY` (not `VITE_CLERK_PUBLISHABLE_KEY`). Both must be set in `apps/frontend/.env.local` to the same `pk_test_...` value. Without either key, the frontend runs in degraded mode (no auth). The `CLERK_SECRET_KEY` env var is needed for API functions.
 
 ### Shared Packages
 
