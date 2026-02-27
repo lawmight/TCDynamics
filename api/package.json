@@ -15,15 +15,15 @@
   "dependencies": {
     "@tcd/shared-types": "*",
     "@tcd/shared-utils": "*",
-    "@clerk/backend": "^2.32.1",
-    "@polar-sh/sdk": "^0.44.0",
+    "@clerk/backend": "^2.32.2",
+    "@polar-sh/sdk": "^0.45.0",
     "@sentry/node": "9.47.1",
     "bcryptjs": "^2.4.3",
     "google-auth-library": "^9.14.1",
     "isomorphic-dompurify": "^2.36.0",
     "lru-cache": "^11.2.6",
     "mongodb": "^7.1.0",
-    "mongoose": "^9.2.2",
+    "mongoose": "^9.2.3",
     "resend": "^6.9.2",
     "svix": "^1.86.0"
   },
