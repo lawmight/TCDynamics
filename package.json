@@ -33,6 +33,7 @@
     "dev:vercel": "cross-env NODE_OPTIONS=\"--max-http-header-size=65536\" vercel dev --listen 3001 --yes",
     "dev:functions": "echo \"Azure Functions archived - see apps/functions-archive/\"",
     "build": "npm run build -ws",
+    "build:packages": "npm run build -w packages/shared-types && npm run build -w packages/shared-utils",
     "build:api": "npm run build -w api",
     "build:frontend": "npm run build -w apps/frontend",
     "build:backend": "npm run build -w apps/backend",
@@ -110,8 +111,9 @@
     "npm": ">=9.0.0"
   },
   "overrides": {
+    "minimatch": "10.2.4",
     "@sentry/node": {
-      "minimatch": ">=10.2.1"
+      "minimatch": "10.2.4"
     },
     "test-exclude": "7.0.1",
     "babel-plugin-istanbul": {
