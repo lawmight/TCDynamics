@@ -44,7 +44,7 @@
     "winston": "^3.19.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.59.0-alpha-2026-02-28",
+    "@playwright/test": "^1.59.0-alpha-2026-03-01",
     "@types/compression": "^1.8.1",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
