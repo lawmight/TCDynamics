@@ -79,8 +79,8 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@commitlint/cli": "^20.4.2",
-    "@commitlint/config-conventional": "^20.4.2",
+    "@commitlint/cli": "^20.4.3",
+    "@commitlint/config-conventional": "^20.4.3",
     "@eslint/js": "^9.39.3",
     "@iconify-json/lucide": "^1.2.95",
     "@sentry/vite-plugin": "^2.23.1",
