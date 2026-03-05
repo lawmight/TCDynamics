@@ -177,7 +177,7 @@ async function handleOpenRouterChat(req, res, body, clerkId) {
       ? Math.max(1, Math.min(MAX_TOKENS, maxTokens))
       : MAX_TOKENS
 
-  const openRouterModel = process.env.OPENROUTER_MODEL || 'openrouter/auto'
+  const openRouterModel = process.env.OPENROUTER_MODEL || 'openrouter/free'
   const response = await fetch(OPENROUTER_API_URL, {
     method: 'POST',
     headers: {
@@ -271,7 +271,7 @@ async function handleOpenRouterVision(req, res, body, clerkId) {
     return res.status(503).json({ error: 'Service Vision non configuré' })
   }
 
-  const visionModel = process.env.OPENROUTER_VISION_MODEL || 'openrouter/auto'
+  const visionModel = process.env.OPENROUTER_VISION_MODEL || 'openrouter/free'
   const response = await fetch(OPENROUTER_API_URL, {
     method: 'POST',
     headers: {
