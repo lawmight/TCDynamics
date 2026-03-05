@@ -7,8 +7,7 @@ const { logger } = require('../utils/logger')
 const apiKeyAuth = (req, res, next) => {
   const apiKey =
     req.headers['x-api-key'] ||
-    req.headers.authorization?.replace('Bearer ', '') ||
-    req.query.apiKey
+    req.headers.authorization?.replace('Bearer ', '')
 
   const validApiKey = process.env.API_KEY || process.env.ADMIN_KEY
 
@@ -64,8 +63,7 @@ const apiKeyAuth = (req, res, next) => {
 const optionalApiKeyAuth = (req, res, next) => {
   const apiKey =
     req.headers['x-api-key'] ||
-    req.headers.authorization?.replace('Bearer ', '') ||
-    req.query.apiKey
+    req.headers.authorization?.replace('Bearer ', '')
 
   const validApiKey = process.env.API_KEY || process.env.ADMIN_KEY
 
