@@ -12,7 +12,7 @@ import { embedText, generateText } from './_lib/vertex.js'
  * @security
  * Auth: Clerk JWT (`verifyClerkAuth`) required for all actions
  * Tenant isolation: `clerkId` resolved from JWT for user-level policy checks
- * Rate limit: IP-based limiter on OpenAI chat (defense-in-depth)
+ * Rate limit: IP-based limiter on OpenRouter chat (defense-in-depth)
  * Last audit: 2026-02-26 (Phase 4)
  */
 
@@ -41,6 +41,9 @@ const MAX_REQUESTS_PER_WINDOW = 5
 const RATE_LIMIT_WINDOW_MS = 60_000
 // Simple in-memory rate limiter; replace with a persistent store (e.g., Vercel KV / Upstash Redis) in production to share state across invocations
 const rateLimitStore = new Map()
+
+const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
+const OPENROUTER_APP_TITLE = process.env.OPENROUTER_APP_TITLE || 'WorkFlowAI'
 
 const CHAT_MAX_BODY_BYTES = 10 * 1024 // 10KB for chat messages
 const VERTEX_MAX_BODY_BYTES = 5 * 1024 * 1024 // 5MB for Vertex payloads
@@ -99,8 +102,8 @@ function hashClientIp(clientIp) {
 
 function getMaxBodyBytes(provider, action) {
   if (provider === 'vertex') return VERTEX_MAX_BODY_BYTES
-  if (provider === 'openai' && action === 'chat') return CHAT_MAX_BODY_BYTES
-  if (provider === 'openai' && action === 'vision') return VISION_MAX_BODY_BYTES
+  if (provider === 'openrouter' && action === 'chat') return CHAT_MAX_BODY_BYTES
+  if (provider === 'openrouter' && action === 'vision') return VISION_MAX_BODY_BYTES
   return CHAT_MAX_BODY_BYTES
 }
 
@@ -124,8 +127,7 @@ async function parseBody(req, maxBytes) {
   }
 }
 
-async function handleOpenAiChat(req, res, body, clerkId) {
-  // Route is internal-only unless explicitly enabled
+async function handleOpenRouterChat(req, res, body, clerkId) {
   if (!ALLOW_VERCEL_CHAT) {
     return res.status(403).json({
       error: 'Chat route disabled on this edge. Use Azure Functions endpoint.',
@@ -136,7 +138,6 @@ async function handleOpenAiChat(req, res, body, clerkId) {
     return res.status(403).json({ error: 'Origin not allowed' })
   }
 
-  // Optional internal token for extra safety
   if (INTERNAL_CHAT_TOKEN) {
     const provided =
       req.headers['x-internal-token'] ||
@@ -146,7 +147,6 @@ async function handleOpenAiChat(req, res, body, clerkId) {
     }
   }
 
-  // Rate limit by client IP
   const clientIp = getClientIp(req)
   if (isRateLimited(clientIp)) {
     return res.status(429).json({
@@ -167,9 +167,8 @@ async function handleOpenAiChat(req, res, body, clerkId) {
     })
   }
 
-  // Check if OpenAI is configured
-  const openaiApiKey = process.env.OPENAI_API_KEY
-  if (!openaiApiKey) {
+  const apiKey = process.env.OPENROUTER_API_KEY
+  if (!apiKey) {
     return res.status(503).json({ error: 'Service IA non configuré' })
   }
 
@@ -178,17 +177,17 @@ async function handleOpenAiChat(req, res, body, clerkId) {
       ? Math.max(1, Math.min(MAX_TOKENS, maxTokens))
       : MAX_TOKENS
 
-  // Call OpenAI (keep lightweight for internal/testing)
-  const openaiApiUrl =
-    process.env.OPENAI_API_URL || 'https://api.openai.com/v1/chat/completions'
-  const response = await fetch(openaiApiUrl, {
+  const openRouterModel = process.env.OPENROUTER_MODEL || 'openrouter/auto'
+  const response = await fetch(OPENROUTER_API_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${openaiApiKey}`,
+      Authorization: `Bearer ${apiKey}`,
+      'HTTP-Referer': ALLOWED_ORIGIN,
+      'X-Title': OPENROUTER_APP_TITLE,
     },
     body: JSON.stringify({
-      model: 'gpt-3.5-turbo',
+      model: openRouterModel,
       messages: [
         {
           role: 'system',
@@ -203,7 +202,7 @@ async function handleOpenAiChat(req, res, body, clerkId) {
   })
 
   if (!response.ok) {
-    throw new Error(`OpenAI API error: ${response.status}`)
+    throw new Error(`OpenRouter API error: ${response.status}`)
   }
 
   const data = await response.json()
@@ -211,17 +210,17 @@ async function handleOpenAiChat(req, res, body, clerkId) {
     data.choices?.[0]?.message?.content ||
     "Désolé, je n'ai pas pu générer une réponse."
   const tokensUsed = data.usage?.total_tokens || 0
+  const actualModel = data.model || openRouterModel
   const clientIpHash = hashClientIp(clientIp)
 
-  // Save conversation to MongoDB (best-effort)
   try {
-    // IP logging is optional (ENABLE_CLIENT_IP_LOGGING + IP_HASH_SALT)
     const metadata = {
-      model: 'gpt-3.5-turbo',
+      model: actualModel,
       tokens_used: tokensUsed,
       temperature: 0.7,
       source: 'vercel-chat',
       origin: ALLOWED_ORIGIN,
+      provider: 'openrouter',
     }
     if (clientIpHash) {
       metadata.clientIpHash = clientIpHash
@@ -246,7 +245,7 @@ async function handleOpenAiChat(req, res, body, clerkId) {
   })
 }
 
-async function handleOpenAiVision(req, res, body, clerkId) {
+async function handleOpenRouterVision(req, res, body, clerkId) {
   await connectToDatabase()
   const user = await User.findOne({ clerkId })
   if (!user || !['professional', 'enterprise'].includes(user.plan)) {
@@ -258,7 +257,6 @@ async function handleOpenAiVision(req, res, body, clerkId) {
 
   const { imageUrl } = body || {}
 
-  // Type-check imageUrl before calling string methods
   if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.trim()) {
     return res.status(400).json({ error: "URL d'image requise" })
   }
@@ -268,22 +266,22 @@ async function handleOpenAiVision(req, res, body, clerkId) {
     return res.status(400).json({ error: urlCheck.error })
   }
 
-  const openaiApiKey = process.env.OPENAI_API_KEY
-  if (!openaiApiKey) {
+  const apiKey = process.env.OPENROUTER_API_KEY
+  if (!apiKey) {
     return res.status(503).json({ error: 'Service Vision non configuré' })
   }
 
-  // Use OpenAI Vision API (GPT-4o)
-  const openaiApiUrl =
-    process.env.OPENAI_API_URL || 'https://api.openai.com/v1/chat/completions'
-  const response = await fetch(openaiApiUrl, {
+  const visionModel = process.env.OPENROUTER_VISION_MODEL || 'openrouter/auto'
+  const response = await fetch(OPENROUTER_API_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${openaiApiKey}`,
+      Authorization: `Bearer ${apiKey}`,
+      'HTTP-Referer': ALLOWED_ORIGIN,
+      'X-Title': OPENROUTER_APP_TITLE,
     },
     body: JSON.stringify({
-      model: 'gpt-4o',
+      model: visionModel,
       messages: [
         {
           role: 'user',
@@ -305,14 +303,13 @@ async function handleOpenAiVision(req, res, body, clerkId) {
   })
 
   if (!response.ok) {
-    throw new Error(`OpenAI Vision API error: ${response.status}`)
+    throw new Error(`OpenRouter Vision API error: ${response.status}`)
   }
 
   const data = await response.json()
   const analysis =
     data.choices?.[0]?.message?.content || "Impossible d'analyser l'image."
 
-  // Extract text if possible (simple extraction)
   const textMatch = analysis.match(/text[^:]*:?\s*([^.]*)/i)
   const extractedText = textMatch ? textMatch[1].trim() : ''
 
@@ -356,14 +353,14 @@ async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const provider = getQueryValue(req.query.provider) || 'openai'
+  const provider = getQueryValue(req.query.provider) || 'openrouter'
   const action = getQueryValue(req.query.action)
 
   if (!action) {
     return res.status(400).json({
       error: 'Action missing',
       validActions: {
-        openai: ['chat', 'vision'],
+        openrouter: ['chat', 'vision'],
         vertex: ['chat', 'embed'],
       },
     })
@@ -391,11 +388,11 @@ async function handler(req, res) {
   }
 
   try {
-    if (provider === 'openai' && action === 'chat') {
-      return await handleOpenAiChat(req, res, body, clerkId)
+    if (provider === 'openrouter' && action === 'chat') {
+      return await handleOpenRouterChat(req, res, body, clerkId)
     }
-    if (provider === 'openai' && action === 'vision') {
-      return await handleOpenAiVision(req, res, body, clerkId)
+    if (provider === 'openrouter' && action === 'vision') {
+      return await handleOpenRouterVision(req, res, body, clerkId)
     }
     if (provider === 'vertex' && action === 'chat') {
       return await handleVertexChat(req, res, body)
@@ -407,7 +404,7 @@ async function handler(req, res) {
     return res.status(400).json({
       error: 'Invalid action',
       validActions: {
-        openai: ['chat', 'vision'],
+        openrouter: ['chat', 'vision'],
         vertex: ['chat', 'embed'],
       },
     })

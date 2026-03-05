@@ -208,7 +208,7 @@ export async function callOpenAIWithCache(
   // Make actual API call if not cached
   try {
     // Import your existing API service
-    const response = await fetch('/api/openai', {
+    const response = await fetch('/api/ai?provider=openrouter&action=chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
