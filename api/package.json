@@ -14,19 +14,19 @@
   "type": "module",
   "dependencies": {
     "@clerk/backend": "^2.32.1",
-    "@polar-sh/sdk": "^0.44.0",
+    "@polar-sh/sdk": "^0.46.2",
     "@sentry/node": "9.47.1",
     "@tcd/shared-types": "*",
     "@tcd/shared-utils": "*",
     "@upstash/ratelimit": "^2.0.8",
-    "@upstash/redis": "^1.36.2",
+    "@upstash/redis": "^1.36.3",
     "bcryptjs": "^2.4.3",
     "google-auth-library": "^9.14.1",
     "isomorphic-dompurify": "^2.36.0",
     "lru-cache": "^11.2.6",
     "mongodb": "^7.1.0",
-    "mongoose": "^9.2.2",
-    "resend": "^6.9.2",
+    "mongoose": "^9.2.4",
+    "resend": "^6.9.3",
     "svix": "^1.86.0"
   },
   "overrides": {
