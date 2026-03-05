@@ -1,14 +1,41 @@
 import { randomUUID } from 'crypto'
+import { Ratelimit } from '@upstash/ratelimit'
+import { Redis } from '@upstash/redis'
 import { LRUCache } from 'lru-cache'
 
 const DEFAULT_WINDOW_MS = 15 * 60 * 1000 // 15 minutes
 const DEFAULT_MAX_BYTES = 64 * 1024 // 64 KB
 
-const rateLimiter = new LRUCache({
+const localRateLimiter = new LRUCache({
   max: 5000,
   ttl: DEFAULT_WINDOW_MS,
   updateAgeOnGet: true,
 })
+const distributedRateLimiters = new Map()
+
+function getRateLimiter(limit, windowMs) {
+  const url = process.env.UPSTASH_REDIS_REST_URL
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN
+  if (!url || !token) {
+    return null
+  }
+
+  const windowMinutes = Math.max(1, Math.ceil(windowMs / 60000))
+  const limiterKey = `${limit}:${windowMinutes}`
+  if (distributedRateLimiters.has(limiterKey)) {
+    return distributedRateLimiters.get(limiterKey)
+  }
+
+  const createdLimiter = new Ratelimit({
+    redis: Redis.fromEnv(),
+    limiter: Ratelimit.slidingWindow(limit, `${windowMinutes} m`),
+    analytics: true,
+    prefix: 'tcd:ratelimit',
+  })
+  distributedRateLimiters.set(limiterKey, createdLimiter)
+
+  return createdLimiter
+}
 
 export function getClientIp(req) {
   const forwarded = req.headers['x-forwarded-for']
@@ -78,13 +105,8 @@ export function validateAllowedFields(body, allowedFields = []) {
   }
 }
 
-export function applyRateLimit(
-  req,
-  { limit = 10, windowMs = DEFAULT_WINDOW_MS, scope = 'api' } = {}
-) {
-  const client = getClientIp(req)
-  const key = `${scope}:${client}`
-  const current = rateLimiter.get(key) || { count: 0 }
+function applyLocalRateLimit(key, limit, windowMs) {
+  const current = localRateLimiter.get(key) || { count: 0 }
 
   if (current.count >= limit) {
     return {
@@ -97,7 +119,29 @@ export function applyRateLimit(
     count: current.count + 1,
   }
 
-  rateLimiter.set(key, next, { ttl: windowMs })
+  localRateLimiter.set(key, next, { ttl: windowMs })
+
+  return { allowed: true }
+}
+
+export async function applyRateLimit(
+  req,
+  { limit = 10, windowMs = DEFAULT_WINDOW_MS, scope = 'api' } = {}
+) {
+  const client = getClientIp(req)
+  const key = `${scope}:${client}`
+  const limiter = getRateLimiter(limit, windowMs)
+
+  if (!limiter) {
+    return applyLocalRateLimit(key, limit, windowMs)
+  }
+
+  const { success, reset } = await limiter.limit(key)
+
+  if (!success) {
+    const retryAfter = Math.max(1, Math.ceil((reset - Date.now()) / 1000))
+    return { allowed: false, retryAfter }
+  }
 
   return { allowed: true }
 }
@@ -189,7 +233,7 @@ export function withGuards(handler, options = {}) {
         return res.status(405).json({ error: 'Method not allowed', requestId })
       }
 
-      const rateResult = applyRateLimit(req, rateLimitOptions)
+      const rateResult = await applyRateLimit(req, rateLimitOptions)
       if (!rateResult.allowed) {
         if (rateResult.retryAfter) {
           res.setHeader('Retry-After', rateResult.retryAfter.toString())
