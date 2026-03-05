@@ -209,8 +209,6 @@ describe('Configuration Management', () => {
             VITE_ENABLE_CACHE: true,
           },
           server: {
-            AZURE_OPENAI_ENDPOINT: 'https://example.openai.azure.com/',
-            AZURE_VISION_ENDPOINT: 'https://example.vision.azure.com/',
             ZOHO_EMAIL: 'test@example.com',
             COSMOS_CONNECTION_STRING: 'connection-string',
           },
@@ -225,8 +223,6 @@ describe('Configuration Management', () => {
               cache: true,
             },
             services: {
-              openai: true,
-              vision: true,
               email: true,
               database: true,
             },
@@ -238,8 +234,6 @@ describe('Configuration Management', () => {
       const summary = mockConfig.getSafeConfigSummary()
 
       expect(summary.environment).toBe('development')
-      expect(summary.services.openai).toBe(true)
-      expect(summary.services.vision).toBe(true)
       expect(summary.services.email).toBe(true)
       expect(summary.services.database).toBe(true)
     })

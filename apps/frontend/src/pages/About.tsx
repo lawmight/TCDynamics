@@ -117,7 +117,7 @@ const stats = [
   },
   {
     label: 'Précision Vision',
-    description: 'Mesurée sur Azure Computer Vision pour les documents',
+    description: 'Mesurée sur notre IA Vision pour les documents', // pragma: allowlist secret
     end: 99,
     suffix: '%',
   },

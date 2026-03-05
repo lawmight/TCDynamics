@@ -16,8 +16,8 @@ export const API_ENDPOINTS = {
   contact: `/api/forms`,
   demo: `/api/forms`,
   health: `/api/analytics?health=true`,
-  chat: `/api/ai?provider=openai&action=chat`,
-  vision: `/api/ai?provider=openai&action=vision`,
+  chat: `/api/ai?action=chat`,
+  vision: `/api/ai?action=vision`,
   paymentIntent: `/api/payments?action=payment-intent`,
   subscription: `/api/payments?action=subscription`,
 } as const

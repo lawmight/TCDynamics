@@ -16,4 +16,3 @@ polar/checkout.js
 _lib/cache.js
 _lib/mongodb.js
 _lib/email.js
-_lib/vertex.js

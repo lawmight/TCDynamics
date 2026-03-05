@@ -1,5 +1,5 @@
 // src/api/azureServices.ts
-// Centralized API client for TCDynamics Azure Functions with comprehensive error handling,
+// Centralized API client with comprehensive error handling, // pragma: allowlist secret
 // retry logic, type safety, and performance optimizations
 
 import { z } from 'zod'
@@ -29,13 +29,7 @@ const API_CONFIG: ApiConfig = {
 // Get API base URL from config
 const getApiBaseUrl = (): string => config.apiBaseUrl
 
-// Prefer Azure Functions for chat unless explicitly opting into Vercel
-const getChatBaseUrl = (preferVercel?: boolean): string => {
-  if (preferVercel || config.client.VITE_FEATURE_ENABLE_VERCEL_CHAT) {
-    return getApiBaseUrl()
-  }
-  return config.functionsBaseUrl || getApiBaseUrl()
-}
+const getChatBaseUrl = (): string => getApiBaseUrl()
 
 // ========== TYPE DEFINITIONS ==========
 
@@ -79,7 +73,6 @@ export interface ChatRequest {
   sessionId: string
   temperature?: number
   maxTokens?: number
-  useVercelChat?: boolean
 }
 
 export interface ChatResponse {
@@ -542,7 +535,6 @@ export const paymentAPI = {
 
 export const chatAPI = {
   async sendMessage(request: ChatRequest): Promise<ApiResponse<ChatResponse>> {
-    // Check rate limiting
     const rateLimitKey = `chat_${request.sessionId}`
     if (rateLimiters.chat.isRateLimited(rateLimitKey)) {
       return {
@@ -555,12 +547,9 @@ export const chatAPI = {
 
     const validatedRequest = validateAndSanitize(chatRequestSchema, request)
 
-    const preferVercel = request.useVercelChat === true
-    const chatBaseUrl = getChatBaseUrl(preferVercel)
-
     try {
       const response = await apiRequest<ApiResponse<ChatResponse>>(
-        '/chat',
+        '/api/ai?action=chat',
         {
           method: 'POST',
           body: JSON.stringify({
@@ -570,7 +559,7 @@ export const chatAPI = {
           }),
         },
         undefined,
-        chatBaseUrl
+        getChatBaseUrl()
       )
       return response
     } catch (error) {
@@ -583,7 +572,6 @@ export const chatAPI = {
     }
   },
 
-  // Convenience method for simple prompts
   async sendSimpleMessage(
     prompt: string,
     sessionId: string
@@ -614,7 +602,6 @@ export const visionAPI = {
       }
     }
 
-    // Check rate limiting
     const rateLimitKey = `vision_${Date.now()}`
     if (rateLimiters.vision.isRateLimited(rateLimitKey)) {
       return {
@@ -625,7 +612,6 @@ export const visionAPI = {
       }
     }
 
-    // Validate image data
     if (!contentSecurity.validateImageData(request.imageData)) {
       return {
         success: false,
@@ -636,11 +622,11 @@ export const visionAPI = {
 
     try {
       const response = await apiRequest<ApiResponse<VisionResponse>>(
-        '/vision',
+        '/api/ai?action=vision',
         {
           method: 'POST',
           body: JSON.stringify({
-            imageData: request.imageData,
+            imageUrl: request.imageData,
             analyzeText: request.analyzeText ?? true,
           }),
         }

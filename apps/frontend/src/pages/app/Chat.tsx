@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { recordEvent } from '@/api/analytics'
-import { sendVertexChat, type VertexChatMessage } from '@/api/vertex'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
@@ -19,6 +18,43 @@ import Loader2 from '~icons/lucide/loader-2'
 import Plus from '~icons/lucide/plus'
 import Send from '~icons/lucide/send'
 import User from '~icons/lucide/user'
+
+type ChatMessage = {
+  role: 'user' | 'assistant' | 'system'
+  content: string
+}
+
+type ChatResponse = {
+  message: string
+  usage?: {
+    promptTokens?: number
+    completionTokens?: number
+    totalTokens?: number
+  }
+}
+
+const sendChat = async ({
+  messages,
+  sessionId,
+  temperature,
+}: {
+  messages: ChatMessage[]
+  sessionId: string
+  temperature?: number
+}): Promise<ChatResponse> => {
+  const res = await fetch('/api/ai?action=chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages, sessionId, temperature }),
+  })
+
+  if (!res.ok) {
+    const errorText = await res.text()
+    throw new Error(errorText || 'Chat request failed')
+  }
+
+  return res.json()
+}
 
 const SUGGESTED_PROMPTS = [
   {
@@ -44,7 +80,7 @@ const SUGGESTED_PROMPTS = [
 
 const Chat = () => {
   const { user } = useAuth()
-  const [messages, setMessages] = useState<VertexChatMessage[]>([])
+  const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -67,7 +103,7 @@ const Chat = () => {
     async (overrideInput?: string) => {
       const text = (overrideInput ?? input).trim()
       if (!text || isSending) return
-      const userMessage: VertexChatMessage = { role: 'user', content: text }
+      const userMessage: ChatMessage = { role: 'user', content: text }
       const payload = [...messages, userMessage]
       setMessages(payload)
       setInput('')
@@ -75,12 +111,12 @@ const Chat = () => {
       setError(null)
 
       try {
-        const response = await sendVertexChat({
+        const response = await sendChat({
           messages: payload,
           sessionId,
           temperature: 0.3,
         })
-        const assistantMessage: VertexChatMessage = {
+        const assistantMessage: ChatMessage = {
           role: 'assistant',
           content: response.message || 'No response received.',
         }
@@ -127,7 +163,7 @@ const Chat = () => {
         <div>
           <h1 className="text-xl font-semibold">Chat</h1>
           <p className="text-muted-foreground text-sm">
-            Vertex AI &middot; Session {sessionId.slice(0, 8)}
+            AI Chat &middot; Session {sessionId.slice(0, 8)}
           </p>
         </div>
         {hasMessages && (
@@ -290,7 +326,7 @@ const Chat = () => {
             </Button>
           </div>
           <p className="text-muted-foreground mt-2 text-xs">
-            Powered by Vertex AI (Gemini). Data is not stored unless uploaded to
+            Powered by OpenRouter. Data is not stored unless uploaded to
             KB.
           </p>
         </div>

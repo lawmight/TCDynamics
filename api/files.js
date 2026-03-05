@@ -4,7 +4,6 @@ import { verifyClerkAuth } from './_lib/auth.js'
 import { KnowledgeFile } from './_lib/models/KnowledgeFile.js'
 import { connectToDatabase } from './_lib/mongodb.js'
 import { withSentry } from './_lib/sentry.js'
-import { embedText } from './_lib/vertex.js'
 
 /**
  * @security
@@ -217,33 +216,10 @@ async function handleUploadFile(req, res) {
     const isDoc = mimeLower === 'application/msword'
 
     let textContent = ''
-    let embedding = []
+    const embedding = []
 
     if (isTextLike) {
       textContent = buffer.toString('utf-8').slice(0, 8000)
-      const embedInput = textContent || fileName || ''
-      if (embedInput) {
-        try {
-          embedding = await embedText(embedInput)
-        } catch (embeddingError) {
-          console.warn(
-            'Embedding failed, continuing without vectors',
-            embeddingError
-          )
-        }
-      } else {
-        console.info('No textual content to embed', { fileName, mimeType })
-      }
-    } else if (isPdf || isDocx || isDoc) {
-      console.info('Skipping embedding for binary document type', {
-        fileName,
-        mimeType,
-      })
-    } else {
-      console.info('Skipping embedding for unsupported mimeType', {
-        fileName,
-        mimeType,
-      })
     }
 
     const { summary: sanitizedSummary, allowed: summaryAllowed } =

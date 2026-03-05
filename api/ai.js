@@ -6,13 +6,12 @@ import { connectToDatabase } from './_lib/mongodb.js'
 import { getClientIp, parseJsonBody } from './_lib/request-guards.js'
 import { withSentry } from './_lib/sentry.js'
 import { validateImageUrl } from './_lib/validate-url.js'
-import { embedText, generateText } from './_lib/vertex.js'
 
 /**
  * @security
  * Auth: Clerk JWT (`verifyClerkAuth`) required for all actions
  * Tenant isolation: `clerkId` resolved from JWT for user-level policy checks
- * Rate limit: IP-based limiter on OpenAI chat (defense-in-depth)
+ * Rate limit: IP-based limiter on OpenRouter chat (defense-in-depth)
  * Last audit: 2026-02-26 (Phase 4)
  */
 
@@ -42,8 +41,10 @@ const RATE_LIMIT_WINDOW_MS = 60_000
 // Simple in-memory rate limiter; replace with a persistent store (e.g., Vercel KV / Upstash Redis) in production to share state across invocations
 const rateLimitStore = new Map()
 
+const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
+const OPENROUTER_APP_TITLE = process.env.OPENROUTER_APP_TITLE || 'WorkFlowAI'
+
 const CHAT_MAX_BODY_BYTES = 10 * 1024 // 10KB for chat messages
-const VERTEX_MAX_BODY_BYTES = 5 * 1024 * 1024 // 5MB for Vertex payloads
 const VISION_MAX_BODY_BYTES = 256 * 1024 // 256KB for image URL requests
 
 function getQueryValue(value) {
@@ -97,10 +98,8 @@ function hashClientIp(clientIp) {
     .digest('hex')
 }
 
-function getMaxBodyBytes(provider, action) {
-  if (provider === 'vertex') return VERTEX_MAX_BODY_BYTES
-  if (provider === 'openai' && action === 'chat') return CHAT_MAX_BODY_BYTES
-  if (provider === 'openai' && action === 'vision') return VISION_MAX_BODY_BYTES
+function getMaxBodyBytes(action) {
+  if (action === 'vision') return VISION_MAX_BODY_BYTES
   return CHAT_MAX_BODY_BYTES
 }
 
@@ -124,8 +123,7 @@ async function parseBody(req, maxBytes) {
   }
 }
 
-async function handleOpenAiChat(req, res, body, clerkId) {
-  // Route is internal-only unless explicitly enabled
+async function handleOpenRouterChat(req, res, body, clerkId) {
   if (!ALLOW_VERCEL_CHAT) {
     return res.status(403).json({
       error: 'Chat route disabled on this edge. Use Azure Functions endpoint.',
@@ -136,7 +134,6 @@ async function handleOpenAiChat(req, res, body, clerkId) {
     return res.status(403).json({ error: 'Origin not allowed' })
   }
 
-  // Optional internal token for extra safety
   if (INTERNAL_CHAT_TOKEN) {
     const provided =
       req.headers['x-internal-token'] ||
@@ -146,7 +143,6 @@ async function handleOpenAiChat(req, res, body, clerkId) {
     }
   }
 
-  // Rate limit by client IP
   const clientIp = getClientIp(req)
   if (isRateLimited(clientIp)) {
     return res.status(429).json({
@@ -167,9 +163,8 @@ async function handleOpenAiChat(req, res, body, clerkId) {
     })
   }
 
-  // Check if OpenAI is configured
-  const openaiApiKey = process.env.OPENAI_API_KEY
-  if (!openaiApiKey) {
+  const apiKey = process.env.OPENROUTER_API_KEY
+  if (!apiKey) {
     return res.status(503).json({ error: 'Service IA non configuré' })
   }
 
@@ -178,17 +173,17 @@ async function handleOpenAiChat(req, res, body, clerkId) {
       ? Math.max(1, Math.min(MAX_TOKENS, maxTokens))
       : MAX_TOKENS
 
-  // Call OpenAI (keep lightweight for internal/testing)
-  const openaiApiUrl =
-    process.env.OPENAI_API_URL || 'https://api.openai.com/v1/chat/completions'
-  const response = await fetch(openaiApiUrl, {
+  const openRouterModel = process.env.OPENROUTER_MODEL || 'openrouter/free'
+  const response = await fetch(OPENROUTER_API_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${openaiApiKey}`,
+      Authorization: `Bearer ${apiKey}`,
+      'HTTP-Referer': ALLOWED_ORIGIN,
+      'X-Title': OPENROUTER_APP_TITLE,
     },
     body: JSON.stringify({
-      model: 'gpt-3.5-turbo',
+      model: openRouterModel,
       messages: [
         {
           role: 'system',
@@ -203,7 +198,7 @@ async function handleOpenAiChat(req, res, body, clerkId) {
   })
 
   if (!response.ok) {
-    throw new Error(`OpenAI API error: ${response.status}`)
+    throw new Error(`OpenRouter API error: ${response.status}`)
   }
 
   const data = await response.json()
@@ -211,17 +206,17 @@ async function handleOpenAiChat(req, res, body, clerkId) {
     data.choices?.[0]?.message?.content ||
     "Désolé, je n'ai pas pu générer une réponse."
   const tokensUsed = data.usage?.total_tokens || 0
+  const actualModel = data.model || openRouterModel
   const clientIpHash = hashClientIp(clientIp)
 
-  // Save conversation to MongoDB (best-effort)
   try {
-    // IP logging is optional (ENABLE_CLIENT_IP_LOGGING + IP_HASH_SALT)
     const metadata = {
-      model: 'gpt-3.5-turbo',
+      model: actualModel,
       tokens_used: tokensUsed,
       temperature: 0.7,
       source: 'vercel-chat',
       origin: ALLOWED_ORIGIN,
+      provider: 'openrouter',
     }
     if (clientIpHash) {
       metadata.clientIpHash = clientIpHash
@@ -246,7 +241,7 @@ async function handleOpenAiChat(req, res, body, clerkId) {
   })
 }
 
-async function handleOpenAiVision(req, res, body, clerkId) {
+async function handleOpenRouterVision(req, res, body, clerkId) {
   await connectToDatabase()
   const user = await User.findOne({ clerkId })
   if (!user || !['professional', 'enterprise'].includes(user.plan)) {
@@ -258,7 +253,6 @@ async function handleOpenAiVision(req, res, body, clerkId) {
 
   const { imageUrl } = body || {}
 
-  // Type-check imageUrl before calling string methods
   if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.trim()) {
     return res.status(400).json({ error: "URL d'image requise" })
   }
@@ -268,22 +262,22 @@ async function handleOpenAiVision(req, res, body, clerkId) {
     return res.status(400).json({ error: urlCheck.error })
   }
 
-  const openaiApiKey = process.env.OPENAI_API_KEY
-  if (!openaiApiKey) {
+  const apiKey = process.env.OPENROUTER_API_KEY
+  if (!apiKey) {
     return res.status(503).json({ error: 'Service Vision non configuré' })
   }
 
-  // Use OpenAI Vision API (GPT-4o)
-  const openaiApiUrl =
-    process.env.OPENAI_API_URL || 'https://api.openai.com/v1/chat/completions'
-  const response = await fetch(openaiApiUrl, {
+  const visionModel = process.env.OPENROUTER_VISION_MODEL || 'openrouter/free'
+  const response = await fetch(OPENROUTER_API_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${openaiApiKey}`,
+      Authorization: `Bearer ${apiKey}`,
+      'HTTP-Referer': ALLOWED_ORIGIN,
+      'X-Title': OPENROUTER_APP_TITLE,
     },
     body: JSON.stringify({
-      model: 'gpt-4o',
+      model: visionModel,
       messages: [
         {
           role: 'user',
@@ -305,14 +299,13 @@ async function handleOpenAiVision(req, res, body, clerkId) {
   })
 
   if (!response.ok) {
-    throw new Error(`OpenAI Vision API error: ${response.status}`)
+    throw new Error(`OpenRouter Vision API error: ${response.status}`)
   }
 
   const data = await response.json()
   const analysis =
     data.choices?.[0]?.message?.content || "Impossible d'analyser l'image."
 
-  // Extract text if possible (simple extraction)
   const textMatch = analysis.match(/text[^:]*:?\s*([^.]*)/i)
   const extractedText = textMatch ? textMatch[1].trim() : ''
 
@@ -325,57 +318,21 @@ async function handleOpenAiVision(req, res, body, clerkId) {
   })
 }
 
-async function handleVertexChat(req, res, body) {
-  const { messages, sessionId, temperature } = body || {}
-
-  if (!messages || !Array.isArray(messages) || messages.length === 0) {
-    return res.status(400).json({ error: 'Messages are required' })
-  }
-
-  const result = await generateText({ messages, temperature })
-  return res.status(200).json({
-    message: result.message,
-    usage: result.usage,
-    sessionId,
-  })
-}
-
-async function handleVertexEmbed(req, res, body) {
-  const { text } = body || {}
-
-  if (!text || typeof text !== 'string') {
-    return res.status(400).json({ error: 'Text is required for embedding' })
-  }
-
-  const embedding = await embedText(text)
-  return res.status(200).json({ embedding })
-}
-
 async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const provider = getQueryValue(req.query.provider) || 'openai'
   const action = getQueryValue(req.query.action)
 
   if (!action) {
     return res.status(400).json({
       error: 'Action missing',
-      validActions: {
-        openai: ['chat', 'vision'],
-        vertex: ['chat', 'embed'],
-      },
+      validActions: ['chat', 'vision'],
     })
   }
 
-  if (provider === 'vertex' && !process.env.VERTEX_PROJECT_ID) {
-    return res.status(500).json({
-      error: 'VERTEX_PROJECT_ID missing. Please configure Vertex env vars.',
-    })
-  }
-
-  const maxBytes = getMaxBodyBytes(provider, action)
+  const maxBytes = getMaxBodyBytes(action)
   const bodyResult = await parseBody(req, maxBytes)
   if (bodyResult?.error) {
     return res
@@ -391,25 +348,16 @@ async function handler(req, res) {
   }
 
   try {
-    if (provider === 'openai' && action === 'chat') {
-      return await handleOpenAiChat(req, res, body, clerkId)
+    if (action === 'chat') {
+      return await handleOpenRouterChat(req, res, body, clerkId)
     }
-    if (provider === 'openai' && action === 'vision') {
-      return await handleOpenAiVision(req, res, body, clerkId)
-    }
-    if (provider === 'vertex' && action === 'chat') {
-      return await handleVertexChat(req, res, body)
-    }
-    if (provider === 'vertex' && action === 'embed') {
-      return await handleVertexEmbed(req, res, body)
+    if (action === 'vision') {
+      return await handleOpenRouterVision(req, res, body, clerkId)
     }
 
     return res.status(400).json({
       error: 'Invalid action',
-      validActions: {
-        openai: ['chat', 'vision'],
-        vertex: ['chat', 'embed'],
-      },
+      validActions: ['chat', 'vision'],
     })
   } catch (error) {
     console.error('AI error:', error)
