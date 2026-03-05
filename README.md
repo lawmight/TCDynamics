@@ -9,9 +9,12 @@ Hybrid system: Vercel serverless API + React frontend. Express backend exists fo
 - `apps/frontend` — React 18 + Vite; deployed on Vercel (includes `/api` serverless routes copied from root `api/` during CI)
 - `api` — Vercel serverless functions (contact, demo, chat, vision, polar, health)
 - `apps/backend` — Express server for local development/testing (not deployed to production)
-- `apps/functions-archive/` — Archived Azure Functions (Python) code (see archive README for details)
+- `packages/shared-types`, `packages/shared-utils` — shared TypeScript packages (must be built before type-checking; see AGENTS.md)
 - `tests/e2e` — Playwright e2e tests
 - `docker/` — local docker-compose + nginx config
+- `docs/` — project documentation (environment setup, migrations, security, testing, etc.)
+- `scripts/` — deployment and utility scripts (e.g. deploy-vercel.ps1, ship.ps1)
+- `tools/` — shared configs (Prettier, Jest, CommitLint, etc.) and tool scripts
 
 ## Quick Start
 
@@ -76,9 +79,7 @@ Workspace scripts reference these configs using relative paths (e.g., `--config 
 - **Frontend + serverless API**: Vercel
 - **Express backend**: local/dev only
 
-**Note**: Azure Functions have been archived to `apps/functions-archive/`. See the archive README for restoration instructions if needed.
-
-**Important**: The archived Azure Functions use `azure-ai-vision-imageanalysis` which depends on Azure Computer Vision - Image Analysis API. This API will be retired on September 25, 2028, with migration recommended by September 2026. See `docs/migrations/azure-vision.md` for migration tracking and planning.
+**Note**: Azure Functions were previously used and have been archived; the archive is not in the current repository. See `docs/migrations/azure-vision.md` for migration tracking and planning.
 
 ### Vercel Deployment
 
@@ -130,4 +131,4 @@ Serverless API functions hash sensitive identifiers (orgId, userId) before loggi
 
 ## Documentation
 
-Detailed project documentation, architecture diagrams, and implementation guides are maintained locally in the `md/` directory (excluded from this repository).
+In-repo documentation lives in `docs/` (environment setup, migrations, security, testing, etc.). Additional detailed project documentation, architecture diagrams, and implementation guides may be maintained locally in the `md/` directory (excluded from this repository).
