@@ -3,7 +3,16 @@
  * Handles email preferences and onboarding struggle detection
  */
 
+/**
+ * @security
+ * Auth: Clerk JWT (`verifyClerkAuth`) required for all actions
+ * Tenant isolation: `clerkId` resolved from JWT for user document access
+ * Rate limit: N/A (authenticated endpoint)
+ * Last audit: 2026-02-26 (Phase 4)
+ */
+
 import { verifyClerkAuth } from './_lib/auth.js'
+import { ensureString } from './_lib/sanitize-mongo.js'
 import { User } from './_lib/models/User.js'
 import { connectToDatabase } from './_lib/mongodb.js'
 
@@ -205,7 +214,7 @@ async function handleEmailPreferences(req, res) {
 
     await connectToDatabase()
 
-    const user = await User.findOne({ clerkId: userId })
+    const user = await User.findOne({ clerkId: ensureString(userId) })
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' })
@@ -298,12 +307,14 @@ async function handleDetectStruggle(req, res) {
   }
 
   try {
-    const { userId, events: eventsParam } = req.query
-
-    if (!userId) {
-      return res.status(400).json({ error: 'userId is required' })
+    const { userId: clerkId, error: authError } = await verifyClerkAuth(
+      req.headers.authorization
+    )
+    if (authError || !clerkId) {
+      return res.status(401).json({ error: 'Unauthorized' })
     }
 
+    const { events: eventsParam } = req.query
     let events = []
 
     // For testing: accept events directly
@@ -315,8 +326,10 @@ async function handleDetectStruggle(req, res) {
       }
     } else {
       // In production: fetch from analytics database
-      // For now, return no struggle if no events provided
+      // Scope by authenticated user only; never trust query params for identity.
+      // For now, return no struggle if no events provided.
       // TODO: Connect to real analytics backend
+      // Example future call: events = await loadRecentEventsByClerkId(clerkId)
       events = []
     }
 

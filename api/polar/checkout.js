@@ -4,6 +4,16 @@
  * POST: Create checkout. Supports ?public=true (no auth, optional X-Checkout-Token) or authenticated (Clerk JWT).
  */
 
+/**
+ * @security
+ * Auth:
+ * - GET and standard POST: Clerk JWT (`verifyClerkAuth`)
+ * - Public POST flow: `x-checkout-token` when `PUBLIC_CHECKOUT_SECRET` is set
+ * Tenant isolation: authenticated checkout metadata ties to JWT user id
+ * Rate limit: N/A (auth/token-protected endpoint)
+ * Last audit: 2026-02-26 (Phase 4)
+ */
+
 import { Polar } from '@polar-sh/sdk'
 import { verifyClerkAuth } from '../_lib/auth.js'
 

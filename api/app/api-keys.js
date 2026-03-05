@@ -3,6 +3,14 @@
  * Allows authenticated users to create, list, and revoke API keys
  */
 
+/**
+ * @security
+ * Auth: Clerk JWT (`verifyClerkAuth`) required for all operations
+ * Tenant isolation: API key documents are always scoped by authenticated `clerkId`
+ * Rate limit: N/A (authenticated endpoint)
+ * Last audit: 2026-02-26 (Phase 4)
+ */
+
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
 import { verifyClerkAuth } from '../_lib/auth.js'

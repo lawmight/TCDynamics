@@ -5,6 +5,14 @@ import { User } from '../_lib/models/User.js'
 import { savePolarEvent } from '../_lib/mongodb-db.js'
 import { connectToDatabase } from '../_lib/mongodb.js'
 
+/**
+ * @security
+ * Auth: Polar webhook signature verification (`validateEvent`)
+ * Tenant isolation: user updates keyed by trusted Polar `customer.external_id` (Clerk id)
+ * Rate limit: N/A (signed webhook endpoint)
+ * Last audit: 2026-02-26 (Phase 4)
+ */
+
 // Reverse mapping: product_id → plan name
 const PRODUCT_TO_PLAN = {
   [process.env.POLAR_PRODUCT_STARTER]: 'starter',
@@ -30,14 +38,16 @@ function pruneCache() {
 
 /**
  * Sync subscription to User collection
- * customer.external_id contains the Clerk userId
+ * customer.external_id contains the Clerk userId (Polar also uses external_customer_id in some APIs; we accept both)
  * Handles manual onboarding checkouts (no clerkId but manual_onboarding metadata)
  */
 async function syncSubscriptionToUser(subscription, eventType) {
   await connectToDatabase()
 
-  // external_id is the Clerk userId
-  const clerkId = subscription.customer?.external_id
+  // Prefer external_customer_id (new) then external_id (Polar docs use external_id in webhooks)
+  const clerkId =
+    subscription.customer?.external_customer_id ??
+    subscription.customer?.external_id
   const metadata = subscription.metadata || {}
   const isManualOnboarding = metadata.manual_onboarding === 'true'
 
@@ -232,7 +242,9 @@ export default async function handler(req, res) {
 
       case 'subscription.revoked': {
         const subscription = event.data
-        const clerkId = subscription.customer?.external_id
+        const clerkId =
+          subscription.customer?.external_customer_id ??
+          subscription.customer?.external_id
         if (clerkId) {
           await connectToDatabase()
           const user = await User.findOneAndUpdate(
@@ -271,6 +283,16 @@ export default async function handler(req, res) {
           'Subscription revoked',
           `Subscription ${subscription.id} revoked`
         )
+        break
+      }
+
+      case 'order.updated': {
+        // Polar changelog: status changes and refunds
+        const order = event.data
+        console.log('Order updated:', {
+          orderId: order.id,
+          status: order.status,
+        })
         break
       }
 

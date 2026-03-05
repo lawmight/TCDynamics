@@ -1,8 +1,17 @@
 import { AnalyticsEvent } from './_lib/models/AnalyticsEvent.js'
+import { verifyClerkAuth } from './_lib/auth.js'
 import { ChatConversation } from './_lib/models/ChatConversation.js'
 import { KnowledgeFile } from './_lib/models/KnowledgeFile.js'
 import { connectToDatabase } from './_lib/mongodb.js'
 import { withSentry } from './_lib/sentry.js'
+
+/**
+ * @security
+ * Auth: Clerk JWT (`verifyClerkAuth`) required for GET/POST analytics data
+ * Tenant isolation: all reads/writes are scoped by `clerkId` from JWT
+ * Rate limit: N/A (authenticated endpoint)
+ * Last audit: 2026-02-26 (Phase 4)
+ */
 
 /**
  * Consolidated Analytics API
@@ -38,14 +47,21 @@ async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const { event, metadata, clerkId } = req.body || {}
+    const { userId: clerkId, error: authError } = await verifyClerkAuth(
+      req.headers.authorization
+    )
+    if (authError || !clerkId) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+    const { event, metadata } = req.body || {}
     if (!event) return res.status(400).json({ error: 'event is required' })
 
     try {
       await AnalyticsEvent.create({
         event,
         metadata: metadata || {},
-        clerkId: clerkId || null,
+        clerkId,
       })
 
       return res.status(200).json({ success: true })
@@ -56,17 +72,25 @@ async function handler(req, res) {
   }
 
   if (req.method === 'GET') {
+    const { userId: clerkId, error: authError } = await verifyClerkAuth(
+      req.headers.authorization
+    )
+    if (authError || !clerkId) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
     try {
-      const [chatCount, uploadCount, uniqueUserIds] = await Promise.all([
-        ChatConversation.countDocuments({}),
-        KnowledgeFile.countDocuments({}),
-        AnalyticsEvent.distinct('clerkId'),
+      const [chatCount, uploadCount, eventCount] = await Promise.all([
+        ChatConversation.countDocuments({ clerkId }),
+        KnowledgeFile.countDocuments({ clerkId }),
+        AnalyticsEvent.countDocuments({ clerkId }),
       ])
 
       return res.status(200).json({
         chatMessages: chatCount,
         uploads: uploadCount,
-        activeUsers: uniqueUserIds.filter(id => id !== null).length,
+        // Endpoint is now user-scoped. Keep contract shape stable for frontend.
+        activeUsers: chatCount > 0 || uploadCount > 0 || eventCount > 0 ? 1 : 0,
         avgLatencyMs: null, // TODO: Implement actual latency calculation
       })
     } catch (error) {

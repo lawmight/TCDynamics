@@ -3,9 +3,21 @@
  * Handles cron jobs, sending, segments, and triggers in one function
  */
 
+/**
+ * @security
+ * Auth:
+ * - `action=send`: Clerk JWT (`verifyClerkAuth`)
+ * - `action=cron|segments|trigger`: CRON_SECRET (`Authorization` or `x-cron-secret`)
+ * Tenant isolation: `send` is user-authenticated; cron-style actions are system-level
+ * Rate limit: N/A (protected by auth secret/JWT)
+ * Last audit: 2026-02-26 (Phase 4)
+ */
+
 import { getResendClient } from './_lib/email.js'
 import { User } from './_lib/models/User.js'
+import { verifyClerkAuth } from './_lib/auth.js'
 import { connectToDatabase } from './_lib/mongodb.js'
+import { ensureString, sanitizeMongoInput } from './_lib/sanitize-mongo.js'
 
 // Import templates
 import tipsTemplate from './emails/templates/advanced-tips.js'
@@ -153,11 +165,12 @@ function getUserSegments(user) {
  */
 async function getUsersBySegment(criteria) {
   await connectToDatabase()
+  const safeCriteria = sanitizeMongoInput(criteria || {})
 
   const query = { deletedAt: { $exists: false } }
 
-  if (criteria.onboardingStatus) {
-    switch (criteria.onboardingStatus) {
+  if (safeCriteria.onboardingStatus) {
+    switch (safeCriteria.onboardingStatus) {
       case 'completed':
         query['onboarding.completed'] = true
         break
@@ -172,8 +185,8 @@ async function getUsersBySegment(criteria) {
     }
   }
 
-  if (criteria.activationStatus) {
-    switch (criteria.activationStatus) {
+  if (safeCriteria.activationStatus) {
+    switch (safeCriteria.activationStatus) {
       case 'power_user':
         query.workflowCount = { $gte: 5 }
         break
@@ -190,18 +203,24 @@ async function getUsersBySegment(criteria) {
     }
   }
 
-  if (criteria.plan) {
-    query.plan = criteria.plan
+  const safePlan = ensureString(safeCriteria.plan)
+  if (safePlan) {
+    query.plan = safePlan
   }
 
-  if (criteria.signupDateRange) {
+  if (safeCriteria.signupDateRange) {
     query.createdAt = {
-      $gte: new Date(criteria.signupDateRange.start),
-      $lte: new Date(criteria.signupDateRange.end),
+      $gte: new Date(safeCriteria.signupDateRange.start),
+      $lte: new Date(safeCriteria.signupDateRange.end),
     }
   }
 
-  return User.find(query).limit(criteria.limit || 100)
+  const limit = Number.isInteger(safeCriteria.limit)
+    ? safeCriteria.limit
+    : parseInt(safeCriteria.limit, 10)
+  const boundedLimit = Math.max(1, Math.min(1000, limit || 100))
+
+  return User.find(query).limit(boundedLimit)
 }
 
 async function runOnboardingStalled({ dryRun }) {
@@ -468,6 +487,13 @@ async function handleSend(req, res) {
   }
 
   try {
+    const { userId: clerkId, error: authError } = await verifyClerkAuth(
+      req.headers.authorization
+    )
+    if (authError || !clerkId) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
     const { template, to, data = {} } = req.body
 
     // Validate required fields
@@ -531,6 +557,17 @@ async function handleSend(req, res) {
 }
 
 async function handleSegments(req, res) {
+  const authHeader = req.headers.authorization
+  const cronSecret = req.headers['x-cron-secret'] || req.query.secret
+  if (
+    authHeader !== `Bearer ${process.env.CRON_SECRET}` &&
+    cronSecret !== process.env.CRON_SECRET
+  ) {
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+  }
+
   if (req.method === 'GET') {
     return res.status(200).json({
       segments: SEGMENTS,
@@ -575,7 +612,7 @@ async function handleTriggerSignup(req, res, body) {
     await connectToDatabase()
 
     // Check if user has opted in to onboarding emails
-    const user = await User.findOne({ clerkId: userId })
+    const user = await User.findOne({ clerkId: ensureString(userId) })
     if (user?.emailPreferences?.onboarding === false) {
       console.log(`[Email] Skipping welcome email - user opted out: ${email}`)
       return res
@@ -603,7 +640,7 @@ async function handleTriggerSignup(req, res, body) {
 
     // Record email sent in user document
     await User.findOneAndUpdate(
-      { clerkId: userId },
+      { clerkId: ensureString(userId) },
       {
         $set: { 'emailHistory.welcomeSentAt': new Date() },
         $push: {
@@ -646,8 +683,9 @@ async function handleTriggerFirstValue(req, res, body) {
     await connectToDatabase()
 
     // Find user by clerkId or _id
+    const safeClerkId = ensureString(userId)
     const user = await User.findOne({
-      $or: [{ clerkId: userId }, { _id: userId }],
+      $or: [{ clerkId: safeClerkId }, { _id: userId }],
     })
 
     if (!user) {
@@ -763,6 +801,17 @@ async function handleTriggerWeeklyTips(req, res, body) {
 async function handleTrigger(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
+  }
+
+  const authHeader = req.headers.authorization
+  const cronSecret = req.headers['x-cron-secret'] || req.query.secret
+  if (
+    authHeader !== `Bearer ${process.env.CRON_SECRET}` &&
+    cronSecret !== process.env.CRON_SECRET
+  ) {
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
   }
 
   const body = req.body || {}

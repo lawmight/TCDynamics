@@ -4,6 +4,14 @@
  * Configure webhook URL in Resend dashboard: /api/emails/webhooks
  */
 
+/**
+ * @security
+ * Auth: HMAC signature verification when `RESEND_WEBHOOK_SECRET` is configured
+ * Tenant isolation: updates by recipient email; no user-id override from request body
+ * Rate limit: N/A (webhook endpoint)
+ * Last audit: 2026-02-26 (Phase 4)
+ */
+
 import crypto from 'crypto'
 import { User } from '../_lib/models/User.js'
 import { connectToDatabase } from '../_lib/mongodb.js'

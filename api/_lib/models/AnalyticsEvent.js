@@ -9,7 +9,15 @@ const AnalyticsEventSchema = new mongoose.Schema(
   {
     event: { type: String, required: true },
     metadata: { type: mongoose.Schema.Types.Mixed, default: {} },
-    clerkId: { type: String, default: null },
+    clerkId: {
+      type: String,
+      default: null,
+      index: true,
+      validate: {
+        validator: v => v === null || typeof v === 'string',
+        message: 'clerkId must be a string or null',
+      },
+    },
   },
   {
     timestamps: true,
@@ -18,7 +26,6 @@ const AnalyticsEventSchema = new mongoose.Schema(
 
 // Indexes
 AnalyticsEventSchema.index({ event: 1 })
-AnalyticsEventSchema.index({ clerkId: 1 })
 AnalyticsEventSchema.index({ clerkId: 1, event: 1 })
 AnalyticsEventSchema.index({ createdAt: -1 })
 

@@ -20,7 +20,15 @@ const KnowledgeFileSchema = new mongoose.Schema(
       default: 'mongodb_gridfs',
     },
     storagePath: { type: String, default: null },
-    clerkId: { type: String, default: null, index: true },
+    clerkId: {
+      type: String,
+      default: null,
+      index: true,
+      validate: {
+        validator: v => v === null || typeof v === 'string',
+        message: 'clerkId must be a string or null',
+      },
+    },
   },
   {
     timestamps: true,
@@ -29,7 +37,6 @@ const KnowledgeFileSchema = new mongoose.Schema(
 
 // Indexes
 KnowledgeFileSchema.index({ path: 1 }, { unique: true })
-KnowledgeFileSchema.index({ clerkId: 1 })
 KnowledgeFileSchema.index({ createdAt: -1 })
 
 export const KnowledgeFile =

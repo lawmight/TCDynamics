@@ -1,9 +1,18 @@
 import crypto from 'crypto'
 import mongoose from 'mongoose'
+import { verifyClerkAuth } from './_lib/auth.js'
 import { KnowledgeFile } from './_lib/models/KnowledgeFile.js'
 import { connectToDatabase } from './_lib/mongodb.js'
 import { withSentry } from './_lib/sentry.js'
 import { embedText } from './_lib/vertex.js'
+
+/**
+ * @security
+ * Auth: Clerk JWT (`verifyClerkAuth`) required for list/upload operations
+ * Tenant isolation: file metadata queries and updates are scoped by `clerkId`
+ * Rate limit: N/A (authenticated endpoint)
+ * Last audit: 2026-02-26 (Phase 4)
+ */
 
 /**
  * Consolidated Files API
@@ -88,12 +97,19 @@ export default withSentry(handler)
  */
 async function handleListFiles(req, res) {
   try {
+    const { userId: clerkId, error: authError } = await verifyClerkAuth(
+      req.headers.authorization
+    )
+    if (authError || !clerkId) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
     const { page = 1, limit = 50 } = req.query
     const offset = (parseInt(page) - 1) * parseInt(limit)
 
     await connectToDatabase()
 
-    const files = await KnowledgeFile.find({})
+    const files = await KnowledgeFile.find({ clerkId })
       .sort({ createdAt: -1 })
       .skip(offset)
       .limit(parseInt(limit))
@@ -128,6 +144,13 @@ async function handleUploadFile(req, res) {
   }
 
   try {
+    const { userId: clerkId, error: authError } = await verifyClerkAuth(
+      req.headers.authorization
+    )
+    if (authError || !clerkId) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
     await connectToDatabase()
 
     const buffer = Buffer.from(base64, 'base64')
@@ -229,9 +252,10 @@ async function handleUploadFile(req, res) {
     // Store metadata in KnowledgeFile collection
     try {
       await KnowledgeFile.findOneAndUpdate(
-        { path },
+        { path, clerkId },
         {
           $set: {
+            clerkId,
             path,
             name: uniqueName,
             size: size || buffer.length,

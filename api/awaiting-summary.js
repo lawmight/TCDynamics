@@ -6,6 +6,14 @@
  * Auth: x-internal-token or Authorization: Bearer INTERNAL_HOOK_TOKEN
  */
 
+/**
+ * @security
+ * Auth: internal bearer token (`INTERNAL_HOOK_TOKEN`)
+ * Tenant isolation: N/A (internal operational telemetry endpoint)
+ * Rate limit: N/A (internal endpoint)
+ * Last audit: 2026-02-26 (Phase 4)
+ */
+
 import { Contact } from './_lib/models/Contact.js'
 import { DemoRequest } from './_lib/models/DemoRequest.js'
 import { PolarEvent } from './_lib/models/PolarEvent.js'

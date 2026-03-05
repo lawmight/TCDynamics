@@ -8,6 +8,14 @@
  * - user.deleted: Soft-delete User document
  */
 
+/**
+ * @security
+ * Auth: Svix signature verification (`Webhook.verify`)
+ * Tenant isolation: user records keyed by trusted Clerk event `id`
+ * Rate limit: N/A (signed webhook endpoint)
+ * Last audit: 2026-02-26 (Phase 4)
+ */
+
 import { Webhook } from 'svix'
 import { getRawBody } from '../_lib/body.js'
 import { User } from '../_lib/models/User.js'

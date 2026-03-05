@@ -5,6 +5,14 @@ import { sanitizeString } from './_lib/sanitize.js'
 import { withSentry } from './_lib/sentry.js'
 import { validateFormData } from './_lib/validation.js'
 
+/**
+ * @security
+ * Auth: public endpoint (no user JWT)
+ * Abuse controls: captcha verification + IP rate limiting via `withGuards`
+ * Tenant isolation: N/A (lead capture endpoint)
+ * Last audit: 2026-02-26 (Phase 4)
+ */
+
 // Disable Vercel's automatic body parsing - we handle size + JSON manually
 export const config = {
   api: {

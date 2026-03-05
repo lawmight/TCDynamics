@@ -1,4 +1,5 @@
 import { GoogleAuth } from 'google-auth-library'
+import { validateImageUrl } from './validate-url.js'
 
 const SCOPES = ['https://www.googleapis.com/auth/cloud-platform']
 let cachedClient = null
@@ -105,13 +106,24 @@ export const generateText = async ({ messages, temperature = 0.4 }) => {
         return
       }
       if (entry.fileData?.fileUri) {
-        parts.push({ fileData: entry.fileData })
+        const urlCheck = validateImageUrl(entry.fileData.fileUri)
+        if (urlCheck.valid) {
+          parts.push({
+            fileData: {
+              ...entry.fileData,
+              fileUri: urlCheck.url,
+            },
+          })
+        }
         return
       }
 
       // Common OpenAI-style multimodal payloads
       if (entry.type === 'image_url' && entry.image_url?.url) {
-        parts.push({ fileData: { fileUri: entry.image_url.url } })
+        const urlCheck = validateImageUrl(entry.image_url.url)
+        if (urlCheck.valid) {
+          parts.push({ fileData: { fileUri: urlCheck.url } })
+        }
         return
       }
 

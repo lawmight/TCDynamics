@@ -1,8 +1,20 @@
 import crypto from 'crypto'
+import { verifyClerkAuth } from './_lib/auth.js'
 import { saveConversation } from './_lib/mongodb-db.js'
+import { User } from './_lib/models/User.js'
+import { connectToDatabase } from './_lib/mongodb.js'
 import { getClientIp, parseJsonBody } from './_lib/request-guards.js'
 import { withSentry } from './_lib/sentry.js'
+import { validateImageUrl } from './_lib/validate-url.js'
 import { embedText, generateText } from './_lib/vertex.js'
+
+/**
+ * @security
+ * Auth: Clerk JWT (`verifyClerkAuth`) required for all actions
+ * Tenant isolation: `clerkId` resolved from JWT for user-level policy checks
+ * Rate limit: IP-based limiter on OpenAI chat (defense-in-depth)
+ * Last audit: 2026-02-26 (Phase 4)
+ */
 
 // Disable Vercel's automatic body parsing - we'll handle it manually
 export const config = {
@@ -112,7 +124,7 @@ async function parseBody(req, maxBytes) {
   }
 }
 
-async function handleOpenAiChat(req, res, body) {
+async function handleOpenAiChat(req, res, body, clerkId) {
   // Route is internal-only unless explicitly enabled
   if (!ALLOW_VERCEL_CHAT) {
     return res.status(403).json({
@@ -221,6 +233,7 @@ async function handleOpenAiChat(req, res, body) {
       aiResponse,
       userEmail: userEmail || null,
       metadata,
+      clerkId,
     })
   } catch (logError) {
     console.warn('Conversation log failed', logError)
@@ -233,7 +246,16 @@ async function handleOpenAiChat(req, res, body) {
   })
 }
 
-async function handleOpenAiVision(req, res, body) {
+async function handleOpenAiVision(req, res, body, clerkId) {
+  await connectToDatabase()
+  const user = await User.findOne({ clerkId })
+  if (!user || !['professional', 'enterprise'].includes(user.plan)) {
+    return res.status(403).json({
+      error: 'Upgrade required',
+      message: 'Vision analysis requires a Professional or Enterprise plan',
+    })
+  }
+
   const { imageUrl } = body || {}
 
   // Type-check imageUrl before calling string methods
@@ -241,11 +263,9 @@ async function handleOpenAiVision(req, res, body) {
     return res.status(400).json({ error: "URL d'image requise" })
   }
 
-  // Basic URL validation
-  try {
-    new URL(imageUrl)
-  } catch {
-    return res.status(400).json({ error: "URL d'image invalide" })
+  const urlCheck = validateImageUrl(imageUrl)
+  if (!urlCheck.valid) {
+    return res.status(400).json({ error: urlCheck.error })
   }
 
   const openaiApiKey = process.env.OPENAI_API_KEY
@@ -274,7 +294,7 @@ async function handleOpenAiVision(req, res, body) {
             },
             {
               type: 'image_url',
-              image_url: { url: imageUrl },
+              image_url: { url: urlCheck.url },
             },
           ],
         },
@@ -363,13 +383,19 @@ async function handler(req, res) {
       .json({ error: bodyResult.error.message })
   }
   const body = bodyResult || {}
+  const { userId: clerkId, error: authError } = await verifyClerkAuth(
+    req.headers.authorization
+  )
+  if (authError || !clerkId) {
+    return res.status(401).json({ error: 'Unauthorized' })
+  }
 
   try {
     if (provider === 'openai' && action === 'chat') {
-      return await handleOpenAiChat(req, res, body)
+      return await handleOpenAiChat(req, res, body, clerkId)
     }
     if (provider === 'openai' && action === 'vision') {
-      return await handleOpenAiVision(req, res, body)
+      return await handleOpenAiVision(req, res, body, clerkId)
     }
     if (provider === 'vertex' && action === 'chat') {
       return await handleVertexChat(req, res, body)
