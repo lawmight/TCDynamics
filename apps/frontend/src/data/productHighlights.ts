@@ -44,7 +44,7 @@ export const featureModules: FeatureModule[] = [
     delay: '0s',
     detail: {
       mission:
-        'Remplacer la saisie manuelle par une capture automatisée adossée à Azure Computer Vision et Cosmos DB.',
+        'Remplacer la saisie manuelle par une capture automatisée adossée à l\'IA et MongoDB.',
       proofPoints: [
         'Contrôles RGPD appliqués dès la capture',
         'Audit trail complet vers MongoDB',
@@ -54,7 +54,7 @@ export const featureModules: FeatureModule[] = [
         { label: 'Précision mesurée', value: '99.7%' },
         { label: 'Temps moyen', value: '< 5 s/document' },
       ],
-      integrations: ['Azure Vision', 'Cosmos DB', 'MongoDB'],
+      integrations: ['OpenRouter AI', 'MongoDB'],
     },
   },
   {
@@ -73,7 +73,7 @@ export const featureModules: FeatureModule[] = [
     delay: '0.1s',
     detail: {
       mission:
-        'Fournir un support client cohérent, opéré par Azure OpenAI mais supervisé par l’équipe française.',
+        'Fournir un support client cohérent, opéré par OpenRouter AI et supervisé par l’équipe française.',
       proofPoints: [
         'Escalade instantanée vers Zoho Mail pour les cas sensibles',
         'Historique client conservé côté backend Node',
@@ -83,7 +83,7 @@ export const featureModules: FeatureModule[] = [
         { label: 'Demandes résolues', value: '80%' },
         { label: 'Disponibilité', value: '24/7' },
       ],
-      integrations: ['Azure OpenAI', 'Node.js Backend', 'Zoho Mail'],
+      integrations: ['OpenRouter AI', 'Node.js Backend', 'Zoho Mail'],
     },
   },
   {

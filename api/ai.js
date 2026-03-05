@@ -6,7 +6,6 @@ import { connectToDatabase } from './_lib/mongodb.js'
 import { getClientIp, parseJsonBody } from './_lib/request-guards.js'
 import { withSentry } from './_lib/sentry.js'
 import { validateImageUrl } from './_lib/validate-url.js'
-import { embedText, generateText } from './_lib/vertex.js'
 
 /**
  * @security
@@ -46,7 +45,6 @@ const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
 const OPENROUTER_APP_TITLE = process.env.OPENROUTER_APP_TITLE || 'WorkFlowAI'
 
 const CHAT_MAX_BODY_BYTES = 10 * 1024 // 10KB for chat messages
-const VERTEX_MAX_BODY_BYTES = 5 * 1024 * 1024 // 5MB for Vertex payloads
 const VISION_MAX_BODY_BYTES = 256 * 1024 // 256KB for image URL requests
 
 function getQueryValue(value) {
@@ -100,10 +98,8 @@ function hashClientIp(clientIp) {
     .digest('hex')
 }
 
-function getMaxBodyBytes(provider, action) {
-  if (provider === 'vertex') return VERTEX_MAX_BODY_BYTES
-  if (provider === 'openrouter' && action === 'chat') return CHAT_MAX_BODY_BYTES
-  if (provider === 'openrouter' && action === 'vision') return VISION_MAX_BODY_BYTES
+function getMaxBodyBytes(action) {
+  if (action === 'vision') return VISION_MAX_BODY_BYTES
   return CHAT_MAX_BODY_BYTES
 }
 
@@ -322,57 +318,21 @@ async function handleOpenRouterVision(req, res, body, clerkId) {
   })
 }
 
-async function handleVertexChat(req, res, body) {
-  const { messages, sessionId, temperature } = body || {}
-
-  if (!messages || !Array.isArray(messages) || messages.length === 0) {
-    return res.status(400).json({ error: 'Messages are required' })
-  }
-
-  const result = await generateText({ messages, temperature })
-  return res.status(200).json({
-    message: result.message,
-    usage: result.usage,
-    sessionId,
-  })
-}
-
-async function handleVertexEmbed(req, res, body) {
-  const { text } = body || {}
-
-  if (!text || typeof text !== 'string') {
-    return res.status(400).json({ error: 'Text is required for embedding' })
-  }
-
-  const embedding = await embedText(text)
-  return res.status(200).json({ embedding })
-}
-
 async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const provider = getQueryValue(req.query.provider) || 'openrouter'
   const action = getQueryValue(req.query.action)
 
   if (!action) {
     return res.status(400).json({
       error: 'Action missing',
-      validActions: {
-        openrouter: ['chat', 'vision'],
-        vertex: ['chat', 'embed'],
-      },
+      validActions: ['chat', 'vision'],
     })
   }
 
-  if (provider === 'vertex' && !process.env.VERTEX_PROJECT_ID) {
-    return res.status(500).json({
-      error: 'VERTEX_PROJECT_ID missing. Please configure Vertex env vars.',
-    })
-  }
-
-  const maxBytes = getMaxBodyBytes(provider, action)
+  const maxBytes = getMaxBodyBytes(action)
   const bodyResult = await parseBody(req, maxBytes)
   if (bodyResult?.error) {
     return res
@@ -388,25 +348,16 @@ async function handler(req, res) {
   }
 
   try {
-    if (provider === 'openrouter' && action === 'chat') {
+    if (action === 'chat') {
       return await handleOpenRouterChat(req, res, body, clerkId)
     }
-    if (provider === 'openrouter' && action === 'vision') {
+    if (action === 'vision') {
       return await handleOpenRouterVision(req, res, body, clerkId)
-    }
-    if (provider === 'vertex' && action === 'chat') {
-      return await handleVertexChat(req, res, body)
-    }
-    if (provider === 'vertex' && action === 'embed') {
-      return await handleVertexEmbed(req, res, body)
     }
 
     return res.status(400).json({
       error: 'Invalid action',
-      validActions: {
-        openrouter: ['chat', 'vision'],
-        vertex: ['chat', 'embed'],
-      },
+      validActions: ['chat', 'vision'],
     })
   } catch (error) {
     console.error('AI error:', error)

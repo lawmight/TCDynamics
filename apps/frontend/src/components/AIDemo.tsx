@@ -110,7 +110,7 @@ const AIDemo = () => {
 
           <p className="mx-auto max-w-3xl text-xl text-muted-foreground">
             Testez nos fonctionnalités d'intelligence artificielle propulsées
-            par Azure.
+            par OpenRouter.
             <span className="text-primary-glow">
               {' '}
               Essayez gratuitement dès maintenant !
@@ -166,7 +166,7 @@ const AIDemo = () => {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <p className="font-mono text-muted-foreground">
-                        Notre chatbot alimenté par GPT-3.5-turbo comprend le
+                        Notre chatbot alimenté par l'IA comprend le
                         français et peut aider vos clients 24h/24 avec des
                         réponses contextuelles et pertinentes.
                       </p>
@@ -195,7 +195,7 @@ const AIDemo = () => {
                           </span>
                         </div>
                         <Badge variant="secondary" className="font-mono">
-                          Azure OpenAI GPT-3.5-turbo
+                          OpenRouter AI
                         </Badge>
                       </div>
 
@@ -349,7 +349,7 @@ const AIDemo = () => {
                           </span>
                         </div>
                         <Badge variant="secondary" className="font-mono">
-                          Azure AI Vision OCR
+                          OpenRouter AI Vision
                         </Badge>
                       </div>
                     </CardContent>
@@ -420,8 +420,7 @@ const AIDemo = () => {
               </h3>
               <p className="mb-6 font-mono text-muted-foreground">
                 Ces technologies d'IA sont maintenant intégrées à notre
-                plateforme et consomment activement votre crédit Azure pour des
-                fonctionnalités réelles.
+                plateforme pour des fonctionnalités réelles.
               </p>
               <div className="flex flex-col justify-center gap-4 sm:flex-row">
                 <Button

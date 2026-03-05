@@ -403,7 +403,7 @@ const AIChatbot = () => {
                   </Button>
                 </div>
                 <p className="mt-2 text-center font-mono text-xs text-muted-foreground">
-                  Propulsé par Azure OpenAI GPT-3.5-turbo
+                  Propulsé par OpenRouter AI
                 </p>
               </div>
             </CardContent>

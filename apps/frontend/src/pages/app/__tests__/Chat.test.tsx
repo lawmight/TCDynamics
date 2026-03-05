@@ -6,10 +6,6 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 
 import Chat from '../Chat'
 
-vi.mock('@/api/vertex', () => ({
-  sendVertexChat: vi.fn().mockResolvedValue({ message: 'Hello from Vertex' }),
-}))
-
 vi.mock('@/api/analytics', () => ({
   recordEvent: vi.fn().mockResolvedValue(undefined),
 }))
@@ -18,9 +14,17 @@ vi.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({ user: { email: 'tester@example.com' }, loading: false }),
 }))
 
+const fetchMock = vi.fn()
+globalThis.fetch = fetchMock
+
 describe('Chat page', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ message: 'Hello from OpenRouter' }),
+      text: () => Promise.resolve('Hello from OpenRouter'),
+    })
   })
 
   it('renders chat UI and sends a message', async () => {
@@ -36,7 +40,7 @@ describe('Chat page', () => {
     await userEvent.click(screen.getByRole('button', { name: /Send/i }))
 
     await waitFor(() =>
-      expect(screen.getByText(/Hello from Vertex/)).toBeInTheDocument()
+      expect(screen.getByText(/Hello from OpenRouter/)).toBeInTheDocument()
     )
   })
 })

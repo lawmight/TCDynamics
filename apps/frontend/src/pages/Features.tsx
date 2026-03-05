@@ -21,9 +21,9 @@ const integrationHighlights = [
     ],
   },
   {
-    title: 'Azure Vision & OpenAI',
+    title: 'AI Vision & Chat',
     detail:
-      'Fonctions Python isolées pour le traitement documentaire, la vision et le chat opérés depuis Azure Functions.',
+      'Traitement documentaire, vision et chat opérés via OpenRouter AI.',
     benefits: [
       'Python 3.11 managé',
       '99.7% de précision Vision',

@@ -1,5 +1,5 @@
 // AI Response Caching System
-// Reduces Azure OpenAI API calls by caching responses
+// Reduces AI API calls by caching responses
 
 import crypto from 'crypto'
 
@@ -110,7 +110,6 @@ class AIResponseCache {
       totalHits += entry.hitCount
     }
 
-    // Azure OpenAI pricing: $0.002 per 1K tokens (GPT-3.5-turbo)
     const estimatedCostSaved = (totalTokensSaved / 1000) * 0.002
 
     return {
@@ -208,7 +207,7 @@ export async function callOpenAIWithCache(
   // Make actual API call if not cached
   try {
     // Import your existing API service
-    const response = await fetch('/api/ai?provider=openrouter&action=chat', {
+    const response = await fetch('/api/ai?action=chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

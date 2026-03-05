@@ -78,7 +78,7 @@ vi.mock('@/utils/config', () => ({
   },
 }))
 
-describe('Azure Services API Client', () => {
+describe('API Client', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     fetchMock.mockClear()
@@ -296,7 +296,7 @@ describe('Azure Services API Client', () => {
       const result = await chatAPI.sendMessage(validChatRequest)
 
       expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining('/chat'),
+        expect.stringContaining('/api/ai?action=chat'),
         expect.objectContaining({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -389,11 +389,14 @@ describe('Azure Services API Client', () => {
       const result = await visionAPI.processDocument(validVisionRequest)
 
       expect(fetchMock).toHaveBeenCalledWith(
-        'https://test-api.com/vision',
+        'https://test-api.com/api/ai?action=vision',
         expect.objectContaining({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(validVisionRequest),
+          body: JSON.stringify({
+            imageUrl: validVisionRequest.imageData,
+            analyzeText: validVisionRequest.analyzeText,
+          }),
         })
       )
       expect(result).toEqual(mockResponse)

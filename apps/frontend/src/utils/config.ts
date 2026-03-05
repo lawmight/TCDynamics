@@ -61,15 +61,6 @@ const clientConfigSchema = z.object({
 })
 
 const serverConfigSchema = z.object({
-  // Azure OpenAI
-  AZURE_OPENAI_ENDPOINT: z.string().url().optional(),
-  AZURE_OPENAI_KEY: z.string().optional(),
-  AZURE_OPENAI_DEPLOYMENT: z.string().default('gpt-35-turbo'),
-
-  // Azure Vision
-  AZURE_VISION_ENDPOINT: z.string().url().optional(),
-  AZURE_VISION_KEY: z.string().optional(),
-
   // Email configuration
   ZOHO_EMAIL: z.string().email().optional(),
   ZOHO_PASSWORD: z.string().optional(),
@@ -185,11 +176,6 @@ class ConfigManager {
     const env = this.loadServerEnvironmentVariables()
 
     return {
-      AZURE_OPENAI_ENDPOINT: env.AZURE_OPENAI_ENDPOINT,
-      AZURE_OPENAI_KEY: env.AZURE_OPENAI_KEY,
-      AZURE_OPENAI_DEPLOYMENT: env.AZURE_OPENAI_DEPLOYMENT || 'gpt-35-turbo',
-      AZURE_VISION_ENDPOINT: env.AZURE_VISION_ENDPOINT,
-      AZURE_VISION_KEY: env.AZURE_VISION_KEY,
       ZOHO_EMAIL: env.ZOHO_EMAIL,
       ZOHO_PASSWORD: env.ZOHO_PASSWORD,
       COSMOS_CONNECTION_STRING: env.COSMOS_CONNECTION_STRING,
@@ -353,11 +339,6 @@ class ConfigManager {
     const env: Record<string, string | undefined> = {}
 
     const serverVars = [
-      'AZURE_OPENAI_ENDPOINT',
-      'AZURE_OPENAI_KEY',
-      'AZURE_OPENAI_DEPLOYMENT',
-      'AZURE_VISION_ENDPOINT',
-      'AZURE_VISION_KEY',
       'ZOHO_EMAIL',
       'ZOHO_PASSWORD',
       'COSMOS_CONNECTION_STRING',
@@ -390,12 +371,6 @@ class ConfigManager {
         securityStrict: this.clientConfig.VITE_SECURITY_CSP_STRICT,
       },
       server: {
-        openai: this.serverConfig.AZURE_OPENAI_ENDPOINT
-          ? 'configured'
-          : 'missing',
-        vision: this.serverConfig.AZURE_VISION_ENDPOINT
-          ? 'configured'
-          : 'missing',
         email: this.serverConfig.ZOHO_EMAIL ? 'configured' : 'missing',
         database: this.serverConfig.COSMOS_CONNECTION_STRING
           ? 'configured'
@@ -494,10 +469,6 @@ class ConfigManager {
     // Check server-side required configs (only if we're on server and not in test)
     if (typeof window === 'undefined' && !isTestEnv) {
       const requiredServer = [
-        'AZURE_OPENAI_ENDPOINT',
-        'AZURE_OPENAI_KEY',
-        'AZURE_VISION_ENDPOINT',
-        'AZURE_VISION_KEY',
         'ZOHO_EMAIL',
         'ZOHO_PASSWORD',
         'ADMIN_KEY',
@@ -532,8 +503,6 @@ class ConfigManager {
       securityStrict: boolean
     }
     services: {
-      openai: boolean
-      vision: boolean
       email: boolean
       database: boolean
     }
@@ -551,8 +520,6 @@ class ConfigManager {
         securityStrict: this.client.VITE_SECURITY_CSP_STRICT,
       },
       services: {
-        openai: !!this.server.AZURE_OPENAI_ENDPOINT,
-        vision: !!this.server.AZURE_VISION_ENDPOINT,
         email: !!this.server.ZOHO_EMAIL,
         database: !!this.server.COSMOS_CONNECTION_STRING,
       },
