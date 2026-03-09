@@ -14,7 +14,7 @@
   "type": "module",
   "dependencies": {
     "@clerk/backend": "^2.32.1",
-    "@polar-sh/sdk": "^0.46.2",
+    "@polar-sh/sdk": "^0.46.3",
     "@sentry/node": "9.47.1",
     "@tcd/shared-types": "*",
     "@tcd/shared-utils": "*",
