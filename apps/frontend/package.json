@@ -68,7 +68,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
-    "framer-motion": "^12.35.1",
+    "framer-motion": "^12.35.2",
     "isomorphic-dompurify": "^2.36.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -119,7 +119,7 @@
     "tailwindcss-animate": "^1.0.7",
     "terser": "^5.46.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.56.1",
+    "typescript-eslint": "^8.57.0",
     "unplugin-icons": "^23.0.1",
     "vite": "^7.3.1",
     "vitest": "^3.2.4"
