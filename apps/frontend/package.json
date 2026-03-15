@@ -82,7 +82,7 @@
     "@commitlint/cli": "^20.4.4",
     "@commitlint/config-conventional": "^20.4.4",
     "@eslint/js": "^9.39.4",
-    "@iconify-json/lucide": "^1.2.97",
+    "@iconify-json/lucide": "^1.2.98",
     "@sentry/vite-plugin": "^2.23.1",
     "@svgr/core": "^8.1.0",
     "@svgr/plugin-jsx": "^8.1.0",
