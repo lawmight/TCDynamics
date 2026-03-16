@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { HelpBubble } from '@/components/app/HelpBubble'
@@ -8,6 +8,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useProactiveSupport } from '@/hooks/useProactiveSupport'
+import {
+  buildPageSchema,
+  clearPageStructuredData,
+  setPageStructuredData,
+} from '@/lib/structuredData'
 import ArrowRight from '~icons/lucide/arrow-right'
 import CheckCircle from '~icons/lucide/check-circle'
 import Clock from '~icons/lucide/clock'
@@ -19,12 +24,29 @@ import Shield from '~icons/lucide/shield'
 import Sparkles from '~icons/lucide/sparkles'
 import Zap from '~icons/lucide/zap'
 
+const getStartedPageMeta = {
+  headline: 'Commencer – TCDynamics',
+  description:
+    'Choisissez votre formule et lancez-vous avec TCDynamics. Essai gratuit, démo personnalisée.',
+  datePublished: '2025-10-01',
+}
+
 const GetStarted = () => {
   const navigate = useNavigate()
   const demoLink = import.meta.env.VITE_DEMO_URL || '/demo'
   const [selectedPlan, setSelectedPlan] = useState<'starter' | 'professional'>(
     'starter'
   )
+
+  useEffect(() => {
+    setPageStructuredData(
+      buildPageSchema({
+        type: 'Article',
+        ...getStartedPageMeta,
+      })
+    )
+    return () => clearPageStructuredData()
+  }, [])
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',

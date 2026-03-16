@@ -1,13 +1,36 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import {
+  buildPageSchema,
+  clearPageStructuredData,
+  setPageStructuredData,
+} from '@/lib/structuredData'
 import Cloud from '~icons/lucide/cloud'
 import Lock from '~icons/lucide/lock'
 import Phone from '~icons/lucide/phone'
 import Shield from '~icons/lucide/shield'
 
+const securityPageMeta = {
+  headline: 'Sécurité, conformité et disponibilité – TCDynamics',
+  description:
+    'Cette page est un point de passage rapide en attendant la publication complète (certifications, statuts temps réel et runbooks). Contactez-nous pour obtenir les documents à jour.',
+  datePublished: '2025-10-01',
+}
+
 const Security = () => {
+  useEffect(() => {
+    setPageStructuredData(
+      buildPageSchema({
+        type: 'Article',
+        ...securityPageMeta,
+      })
+    )
+    return () => clearPageStructuredData()
+  }, [])
+
   const guarantees = [
     {
       icon: Shield,

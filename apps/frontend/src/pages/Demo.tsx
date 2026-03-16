@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 import { Badge } from '@/components/ui/badge'
@@ -6,6 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useDemoForm } from '@/hooks/useDemoForm'
+import {
+  buildPageSchema,
+  clearPageStructuredData,
+  setPageStructuredData,
+} from '@/lib/structuredData'
 import ArrowRight from '~icons/lucide/arrow-right'
 import Calendar from '~icons/lucide/calendar'
 import CheckCircle from '~icons/lucide/check-circle'
@@ -17,8 +23,25 @@ import Users from '~icons/lucide/users'
 import Video from '~icons/lucide/video'
 import Zap from '~icons/lucide/zap'
 
+const demoPageMeta = {
+  headline: 'Demander une démo – TCDynamics',
+  description:
+    "Réservez une démonstration personnalisée de 45 minutes. Testez l'IA avec vos données.",
+  datePublished: '2025-10-01',
+}
+
 const Demo = () => {
   const demoForm = useDemoForm()
+
+  useEffect(() => {
+    setPageStructuredData(
+      buildPageSchema({
+        type: 'Article',
+        ...demoPageMeta,
+      })
+    )
+    return () => clearPageStructuredData()
+  }, [])
 
   const demoFeatures = [
     {

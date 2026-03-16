@@ -1,8 +1,13 @@
 import { motion, useReducedMotion } from 'framer-motion'
-import React, { createContext, useContext, useId, useState } from 'react'
+import React, { createContext, useContext, useEffect, useId, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
+import { allFaqs } from '@/data/faq'
+import {
+  clearFaqPageStructuredData,
+  setFaqPageStructuredData,
+} from '@/lib/structuredData'
 import CheckCircle from '~icons/lucide/check-circle'
 import Clock from '~icons/lucide/clock'
 import Gift from '~icons/lucide/gift'
@@ -222,109 +227,25 @@ const itemReveal = {
   }),
 }
 
+const faqDisplayMeta: Record<
+  string,
+  { icon: React.ComponentType<{ className?: string }>; badge: string }
+> = {
+  security: { icon: Shield, badge: 'Sécurité' },
+  integration: { icon: Wrench, badge: 'Intégration' },
+  support: { icon: HeadphonesIcon, badge: 'Support' },
+  trial: { icon: Gift, badge: 'Essai gratuit' },
+  pricing: { icon: Clock, badge: 'Tarifs' },
+  team: { icon: Users, badge: 'Utilisateurs' },
+}
+
 const FAQ = () => {
   const reduceMotion = useReducedMotion()
 
-  const faqs = [
-    {
-      id: 'security',
-      icon: Shield,
-      question: 'Vos données sont-elles sécurisées ?',
-      badge: 'Sécurité',
-      answer: [
-        'Absolument. La sécurité de vos données est notre priorité absolue :',
-        '• **Hébergement français** : Nos serveurs sont situés en France (Paris et Lille)',
-        '• **Chiffrement AES-256** : Toutes vos données sont chiffrées en transit et au repos',
-        '• **Conformité RGPD** : Respect total du règlement européen sur la protection des données',
-        '• **Certifications** : ISO 27001, SOC 2 Type II, et audits de sécurité réguliers',
-        '• **Sauvegarde** : Sauvegardes automatiques quotidiennes avec rétention 30 jours',
-        "• **Accès contrôlé** : Authentification multi-facteurs et gestion des droits d'accès",
-      ],
-    },
-    {
-      id: 'integration',
-      icon: Wrench,
-      question: 'Comment intégrer avec nos outils existants ?',
-      badge: 'Intégration',
-      answer: [
-        "TCDynamics s'intègre facilement avec vos outils actuels :",
-        '• **Connecteurs natifs** : Office 365, Google Workspace, Salesforce, HubSpot',
-        '• **APIs REST** : Plus de 200 intégrations disponibles via notre marketplace',
-        '• **Import de données** : Migration assistée depuis vos fichiers Excel, CSV, PDF',
-        '• **Webhooks** : Synchronisation en temps réel avec vos systèmes métier',
-        '• **Formation incluse** : Notre équipe vous accompagne dans la mise en place',
-        "• **Support technique** : Assistance dédiée pendant toute la phase d'intégration",
-        '• **Temps de déploiement** : Généralement 24-48h pour une configuration standard',
-      ],
-    },
-    {
-      id: 'support',
-      icon: HeadphonesIcon,
-      question: 'Quel support technique proposez-vous ?',
-      badge: 'Support',
-      answer: [
-        'Notre support technique français est disponible quand vous en avez besoin :',
-        '• **Équipe francophone** : Support 100% en français par des experts locaux',
-        '• **Horaires étendus** : Lundi-Vendredi 8h-19h, Samedi 9h-17h',
-        '• **Canaux multiples** : Téléphone, chat, email, visioconférence',
-        '• **Intervention sur site** : Possible dans la région Île-de-France',
-        '• **Documentation complète** : Base de connaissances, tutoriels vidéo, FAQ',
-        '• **Formation personnalisée** : Sessions individuelles ou en groupe',
-        '• **Temps de réponse** : Moins de 2h en moyenne, 30min pour les urgences',
-      ],
-    },
-    {
-      id: 'trial',
-      icon: Gift,
-      question: 'Puis-je essayer gratuitement ?',
-      badge: 'Essai gratuit',
-      answer: [
-        'Bien sûr ! Nous proposons plusieurs options pour découvrir TCDynamics :',
-        '• **Essai gratuit 30 jours** : Accès complet sans engagement ni carte bancaire',
-        '• **Démonstration personnalisée** : Présentation adaptée à vos besoins (1h)',
-        '• **Environnement de test** : Testez avec vos propres données en toute sécurité',
-        "• **Support pendant l'essai** : Accompagnement complet de notre équipe",
-        '• **Migration des données** : Import gratuit de vos données existantes',
-        '• **Formation incluse** : Sessions de prise en main personnalisées',
-        "• **Pas d'engagement** : Résiliation possible à tout moment sans frais",
-      ],
-    },
-  ]
-
-  const additionalFaqs = [
-    {
-      id: 'pricing',
-      icon: Clock,
-      question: 'Quels sont vos tarifs et conditions ?',
-      badge: 'Tarifs',
-      answer: [
-        'Nos tarifs sont transparents et adaptés aux entreprises françaises :',
-        '• **Starter 29$/mois** : Parfait pour les petites entreprises (1-10 utilisateurs)',
-        "• **Professional 79$/mois** : Idéal pour les PME (jusqu'à 50 utilisateurs)",
-        '• **Enterprise sur mesure** : Solutions personnalisées pour les grandes entreprises',
-        "• **Facturation mensuelle** : Pas d'engagement annuel obligatoire",
-        "• **Réduction annuelle** : -20% sur les abonnements payés à l'année",
-        '• **Formation incluse** : Prise en main gratuite avec tous les plans',
-      ],
-    },
-    {
-      id: 'team',
-      icon: Users,
-      question: "Combien d'utilisateurs peuvent utiliser la plateforme ?",
-      badge: 'Utilisateurs',
-      answer: [
-        "TCDynamics s'adapte à la taille de votre équipe :",
-        "• **Gestion flexible** : Ajout/suppression d'utilisateurs en quelques clics",
-        '• **Rôles personnalisés** : Administrateur, utilisateur, invité, consultant',
-        '• **Droits granulaires** : Contrôle précis des accès par département/projet',
-        '• **Facturation proportionnelle** : Payez uniquement pour les utilisateurs actifs',
-        '• **Comptes invités** : Collaboration gratuite avec vos partenaires externes',
-        "• **Single Sign-On** : Connexion simplifiée via votre annuaire d'entreprise",
-      ],
-    },
-  ]
-
-  const allFaqs = [...faqs, ...additionalFaqs]
+  useEffect(() => {
+    setFaqPageStructuredData(allFaqs)
+    return () => clearFaqPageStructuredData()
+  }, [])
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-background/50 to-background py-24">
@@ -394,7 +315,11 @@ const FAQ = () => {
             <Card className="border-primary/20 bg-card/60 p-8 backdrop-blur-sm">
               <Accordion type="single" collapsible className="space-y-4">
                 {allFaqs.map(faq => {
-                  const IconComponent = faq.icon
+                  const { icon: IconComponent, badge: badgeLabel } =
+                    faqDisplayMeta[faq.id] ?? {
+                      icon: Shield,
+                      badge: 'FAQ',
+                    }
                   return (
                     <AccordionItem
                       key={faq.id}
@@ -418,7 +343,7 @@ const FAQ = () => {
                                 variant="secondary"
                                 className="border-primary/20 bg-primary/10 font-mono text-xs text-primary"
                               >
-                                {faq.badge}
+                                {badgeLabel}
                               </Badge>
                             </div>
                           </div>

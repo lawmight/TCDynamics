@@ -1,8 +1,14 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { featureModules } from '@/data/productHighlights'
+import {
+  buildPageSchema,
+  clearPageStructuredData,
+  setPageStructuredData,
+} from '@/lib/structuredData'
 import CheckCircle2 from '~icons/lucide/check-circle-2'
 import PlugZap from '~icons/lucide/plug-zap'
 import ShieldCheck from '~icons/lucide/shield-check'
@@ -60,7 +66,24 @@ const reliabilityHighlights = [
   },
 ]
 
+const featuresPageMeta = {
+  headline: 'Modules IA TCDynamics – Fonctionnalités',
+  description:
+    'Découvrez les modules IA, intégrations et fiabilité de la plateforme TCDynamics.',
+  datePublished: '2025-10-01',
+}
+
 const FeaturesPage = () => {
+  useEffect(() => {
+    setPageStructuredData(
+      buildPageSchema({
+        type: 'Article',
+        ...featuresPageMeta,
+      })
+    )
+    return () => clearPageStructuredData()
+  }, [])
+
   return (
     <main
       id="features-page"

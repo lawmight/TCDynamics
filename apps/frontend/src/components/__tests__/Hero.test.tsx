@@ -14,11 +14,12 @@ describe('Hero Component', () => {
   it('should render hero section', () => {
     renderWithRouter()
 
-    // Vérifier que le titre principal existe et contient le texte clé
+    // Vérifier que le titre principal existe et contient le texte clé SEO
     const heading = screen.getByRole('heading', { level: 1 })
     expect(heading).toBeInTheDocument()
-    expect(heading).toHaveTextContent('Automatisez Votre')
-    expect(heading).toHaveTextContent("Entreprise avec l'IA")
+    expect(heading).toHaveTextContent('Automatisation IA')
+    expect(heading).toHaveTextContent('entreprises françaises')
+    expect(heading).toHaveTextContent('Gagnez 10 h par semaine')
 
     // Vérifier le paragraphe de description (story-driven)
     const descriptionElement = screen.getByText(/Finies les heures perdues/i)

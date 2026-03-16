@@ -1,8 +1,14 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 import { AnimatedCounter } from '@/components/ui/animated-counter'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
+import {
+  buildPageSchema,
+  clearPageStructuredData,
+  setPageStructuredData,
+} from '@/lib/structuredData'
 import Building2 from '~icons/lucide/building-2'
 import CheckCircle2 from '~icons/lucide/check-circle-2'
 import Globe from '~icons/lucide/globe'
@@ -75,6 +81,13 @@ const complianceCommitments = [
   },
 ]
 
+const aboutPageMeta = {
+  headline: 'À propos – TCDynamics',
+  description:
+    'Mission, conformité et empreinte technique de TCDynamics. Automatisation IA pour les PME françaises.',
+  datePublished: '2025-10-01',
+}
+
 const milestones = [
   {
     date: 'Octobre 2025',
@@ -124,6 +137,16 @@ const stats = [
 ]
 
 const About = () => {
+  useEffect(() => {
+    setPageStructuredData(
+      buildPageSchema({
+        type: 'Article',
+        ...aboutPageMeta,
+      })
+    )
+    return () => clearPageStructuredData()
+  }, [])
+
   return (
     <main
       id="main"

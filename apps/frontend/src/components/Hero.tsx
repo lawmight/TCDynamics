@@ -177,8 +177,8 @@ const Hero = () => {
               }}
             >
               <h1 className="text-5xl font-bold leading-[0.9] tracking-tight text-foreground lg:text-7xl">
-                Automatisez Votre{' '}
-                <span className="text-gradient">Entreprise avec l'IA</span>
+                Automatisation IA pour les entreprises françaises –{' '}
+                <span className="text-gradient">Gagnez 10 h par semaine</span>
               </h1>
               <p className="text-lg font-light tracking-wide text-muted-foreground">
                 WorkFlowAI - L'automatisation intelligente de vos processus

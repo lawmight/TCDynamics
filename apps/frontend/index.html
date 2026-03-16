@@ -24,7 +24,7 @@
       })()
     </script>
 
-    <title>TCDynamics - Automatisez Votre Entreprise avec l'IA</title>
+    <title>Automatisation IA pour les entreprises françaises – Gagnez 10 h par semaine | TCDynamics</title>
     <meta
       name="description"
       content="Gagnez 10h par semaine avec notre intelligence artificielle. Spécialement conçu pour les entreprises françaises de Montigny-le-Bretonneux et Guyancourt."
@@ -33,7 +33,7 @@
     <!-- Open Graph / Social Media Meta Tags -->
     <meta
       property="og:title"
-      content="TCDynamics - Automatisez Votre Entreprise avec l'IA"
+      content="Automatisation IA pour les entreprises françaises – Gagnez 10 h par semaine | TCDynamics"
     />
     <meta
       property="og:description"
@@ -58,7 +58,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
-      content="TCDynamics - Automatisez Votre Entreprise avec l'IA"
+      content="Automatisation IA pour les entreprises françaises – Gagnez 10 h par semaine | TCDynamics"
     />
     <meta
       name="twitter:description"
@@ -125,15 +125,18 @@
       {
         "@context": "https://schema.org",
         "@type": "Organization",
+        "@id": "%VITE_FRONTEND_URL%/#organization",
         "name": "TCDynamics",
         "url": "%VITE_FRONTEND_URL%/",
         "logo": "%VITE_FRONTEND_URL%/apple-touch-icon.png",
-        "contactPoint": {
-          "@type": "ContactPoint",
-          "telephone": "+33-1-39-44-75-00",
-          "contactType": "customer support",
-          "areaServed": "FR"
-        },
+        "contactPoint": [
+          {
+            "@type": "ContactPoint",
+            "telephone": "+33-1-39-44-75-00",
+            "contactType": "customer support",
+            "areaServed": "FR"
+          }
+        ],
         "sameAs": [
           "https://x.com/tomcoustols",
           "https://www.linkedin.com/in/tom-coustols/",
@@ -148,11 +151,12 @@
       {
         "@context": "https://schema.org",
         "@type": "LocalBusiness",
+        "@id": "%VITE_FRONTEND_URL%/#business",
         "name": "TCDynamics",
         "image": "%VITE_FRONTEND_URL%/android-chrome-512x512.png",
-        "@id": "%VITE_FRONTEND_URL%/#business",
         "url": "%VITE_FRONTEND_URL%/",
         "telephone": "+33-1-39-44-75-00",
+        "priceRange": "€€",
         "address": {
           "@type": "PostalAddress",
           "streetAddress": "8 Rue du Général de Gaulle",
@@ -169,15 +173,15 @@
         "openingHoursSpecification": [
           {
             "@type": "OpeningHoursSpecification",
-            "dayOfWeek": [
-              "Monday",
-              "Tuesday",
-              "Wednesday",
-              "Thursday",
-              "Friday"
-            ],
+            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
             "opens": "09:00",
             "closes": "18:00"
+          },
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": "Saturday",
+            "opens": "09:00",
+            "closes": "17:00"
           }
         ],
         "sameAs": [
@@ -187,6 +191,33 @@
           "https://www.instagram.com/tomcoustols/",
           "https://www.youtube.com/@tomcoustols"
         ]
+      }
+    </script>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "@id": "%VITE_FRONTEND_URL%/#author",
+        "name": "Tom Coustols",
+        "url": "%VITE_FRONTEND_URL%/about",
+        "sameAs": [
+          "https://x.com/tomcoustols",
+          "https://www.linkedin.com/in/tom-coustols/",
+          "https://www.facebook.com/tom.coustols",
+          "https://www.instagram.com/tomcoustols/",
+          "https://www.youtube.com/@tomtowo"
+        ]
+      }
+    </script>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "TCDynamics",
+        "url": "%VITE_FRONTEND_URL%/",
+        "publisher": { "@id": "%VITE_FRONTEND_URL%/#organization" }
       }
     </script>
   </head>
