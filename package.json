@@ -111,6 +111,7 @@
     "npm": ">=9.0.0"
   },
   "overrides": {
+    "undici": ">=7.24.0",
     "minimatch": "10.2.4",
     "@sentry/node": {
       "minimatch": "10.2.4"
