@@ -14,7 +14,7 @@
   "type": "module",
   "dependencies": {
     "@clerk/backend": "^2.32.1",
-    "@polar-sh/sdk": "^0.46.4",
+    "@polar-sh/sdk": "^0.46.5",
     "@sentry/node": "9.47.1",
     "@tcd/shared-types": "*",
     "@tcd/shared-utils": "*",
@@ -27,7 +27,7 @@
     "mongodb": "^7.1.0",
     "mongoose": "^9.3.1",
     "resend": "^6.9.4",
-    "svix": "^1.88.0"
+    "svix": "^1.89.0"
   },
   "overrides": {
     "minimatch": "10.2.4"
