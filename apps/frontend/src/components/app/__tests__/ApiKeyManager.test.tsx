@@ -62,14 +62,14 @@ describe('ApiKeyManager', () => {
     expect(screen.getByText('tc_abc123...')).toBeInTheDocument()
 
     // Check for unnamed key
-    expect(screen.getByText('Unnamed key')).toBeInTheDocument()
+    expect(screen.getByText('Cle sans nom')).toBeInTheDocument()
     expect(screen.getByText('tc_def456...')).toBeInTheDocument()
   })
 
   it('shows create button when keys exist', () => {
     renderApiKeyManager()
 
-    const createButton = screen.getByRole('button', { name: /create key/i })
+    const createButton = screen.getByRole('button', { name: /creer une cle/i })
     expect(createButton).toBeInTheDocument()
   })
 
@@ -78,13 +78,15 @@ describe('ApiKeyManager', () => {
     renderApiKeyManager()
 
     // Find and click first revoke button
-    const revokeButtons = screen.getAllByRole('button', { name: /revoke key/i })
+    const revokeButtons = screen.getAllByRole('button', {
+      name: /revoquer la cle/i,
+    })
     await user.click(revokeButtons[0])
 
     // Check dialog content appears
     await waitFor(() => {
-      expect(screen.getByText(/Revoke API Key/)).toBeInTheDocument()
-      expect(screen.getByText(/Immediate Impact/)).toBeInTheDocument()
+      expect(screen.getByText(/Revoquer cette cle API/)).toBeInTheDocument()
+      expect(screen.getByText(/Impact immediat/)).toBeInTheDocument()
     })
   })
 
@@ -93,12 +95,14 @@ describe('ApiKeyManager', () => {
     renderApiKeyManager()
 
     // Click revoke on first key
-    const revokeButtons = screen.getAllByRole('button', { name: /revoke key/i })
+    const revokeButtons = screen.getAllByRole('button', {
+      name: /revoquer la cle/i,
+    })
     await user.click(revokeButtons[0])
 
     // Check key prefix is shown in dialog
     await waitFor(() => {
-      expect(screen.getByText('Key Prefix:')).toBeInTheDocument()
+      expect(screen.getByText('Prefixe :')).toBeInTheDocument()
     })
   })
 })

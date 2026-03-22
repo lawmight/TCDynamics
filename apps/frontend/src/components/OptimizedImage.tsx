@@ -60,7 +60,7 @@ export const OptimizedImage = ({
     >
       {!loaded && (
         <div
-          className="image-placeholder animate-pulse rounded bg-gray-300 dark:bg-gray-700"
+          className="image-placeholder animate-pulse rounded bg-muted"
           style={{
             width: width ? `${width}px` : '100%',
             height: height ? `${height}px` : 'auto',
@@ -72,17 +72,17 @@ export const OptimizedImage = ({
         <>
           {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- onLoad is a resource load event, not user interaction */}
           <img
-          src={src}
-          alt={alt}
-          width={width}
-          height={height}
-          onLoad={handleLoad}
-          className={`transition-opacity duration-300 ${
-            loaded ? 'opacity-100' : 'opacity-0'
-          }`}
-          loading={priority ? 'eager' : 'lazy'}
-          decoding="async"
-        />
+            src={src}
+            alt={alt}
+            width={width}
+            height={height}
+            onLoad={handleLoad}
+            className={`transition-opacity duration-300 ${
+              loaded ? 'opacity-100' : 'opacity-0'
+            }`}
+            loading={priority ? 'eager' : 'lazy'}
+            decoding="async"
+          />
         </>
       )}
     </div>

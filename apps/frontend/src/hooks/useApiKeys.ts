@@ -56,14 +56,14 @@ export function useApiKeys(): UseApiKeysReturn {
       createApiKey(getToken, request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: API_KEYS_QUERY_KEY })
-      toast.success('API key created', {
+      toast.success('Clé API créée', {
         description:
-          "Your new API key is ready. Copy it now - it won't be shown again.",
+          'Votre nouvelle clé API est prête. Copiez-la maintenant : elle ne sera plus affichée.',
       })
     },
     onError: (error: Error) => {
-      toast.error('Failed to create API key', {
-        description: error.message || 'An unexpected error occurred',
+      toast.error('Impossible de créer la clé API', {
+        description: error.message || 'Une erreur inattendue est survenue',
       })
     },
   })
@@ -73,18 +73,18 @@ export function useApiKeys(): UseApiKeysReturn {
     mutationFn: (keyId: string) => revokeApiKey(keyId, getToken),
     onSuccess: (_, keyId) => {
       queryClient.invalidateQueries({ queryKey: API_KEYS_QUERY_KEY })
-      toast.success('API key revoked', {
-        description: 'This action can be undone within 10 seconds',
+      toast.success('Clé API révoquée', {
+        description: 'Cette action peut être annulée pendant 10 secondes',
         action: {
-          label: 'Undo',
+          label: 'Annuler',
           onClick: () => restoreMutation.mutate(keyId),
         },
         duration: 10000, // Match restore window
       })
     },
     onError: (error: Error) => {
-      toast.error('Failed to revoke API key', {
-        description: error.message || 'An unexpected error occurred',
+      toast.error('Impossible de révoquer la clé API', {
+        description: error.message || 'Une erreur inattendue est survenue',
       })
     },
   })
@@ -94,13 +94,13 @@ export function useApiKeys(): UseApiKeysReturn {
     mutationFn: (keyId: string) => restoreApiKey(keyId, getToken),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: API_KEYS_QUERY_KEY })
-      toast.success('API key restored', {
-        description: 'Your API key is active again',
+      toast.success('Clé API restaurée', {
+        description: 'Votre clé API est de nouveau active',
       })
     },
     onError: (error: Error) => {
-      toast.error('Failed to restore API key', {
-        description: error.message || 'An unexpected error occurred',
+      toast.error('Impossible de restaurer la clé API', {
+        description: error.message || 'Une erreur inattendue est survenue',
       })
     },
   })

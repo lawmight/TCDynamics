@@ -48,9 +48,9 @@ describe('Settings page', () => {
 
     renderSettings()
 
-    expect(screen.getByText('Settings')).toBeInTheDocument()
-    expect(screen.getByRole('tab', { name: /Profile/i })).toBeInTheDocument()
-    expect(screen.getByRole('tab', { name: /API Keys/i })).toBeInTheDocument()
+    expect(screen.getByText('Parametres')).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /Profil/i })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /Cles API/i })).toBeInTheDocument()
   })
 
   it('saves RUM settings on developer tab', async () => {
@@ -59,10 +59,18 @@ describe('Settings page', () => {
 
     renderSettings()
 
-    await user.click(screen.getByRole('tab', { name: /Developer/i }))
-    await user.type(screen.getByLabelText(/Project ID/i), 'project-1')
-    await user.type(screen.getByLabelText(/Public Write Key/i), 'pk_123')
-    await user.click(screen.getByRole('button', { name: /Save Configuration/i }))
+    await user.click(screen.getByRole('tab', { name: /Developpeur/i }))
+    await user.type(
+      screen.getByLabelText(/Identifiant du projet/i),
+      'project-1'
+    )
+    await user.type(
+      screen.getByLabelText(/Cle publique d'ecriture/i),
+      'pk_123'
+    )
+    await user.click(
+      screen.getByRole('button', { name: /Enregistrer la configuration/i })
+    )
 
     expect(localStorage.getItem('rum.projectId:v1')).toBe('project-1')
     expect(localStorage.getItem('rum.writeKey:v1')).toBe('pk_123')

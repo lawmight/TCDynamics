@@ -127,7 +127,9 @@ const CheckoutEnterprise = () => {
               <div className="space-y-6">
                 <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                   <CardHeader>
-                    <CardTitle className="text-2xl">Montant</CardTitle>
+                    <CardTitle as="h2" className="text-2xl">
+                      Montant
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="space-y-2">
@@ -190,6 +192,7 @@ const CheckoutEnterprise = () => {
                             name="paymentType"
                             checked={!isSubscription}
                             onChange={() => setIsSubscription(false)}
+                            aria-label="Paiement unique"
                             className="size-4 border-primary text-primary focus:ring-primary"
                           />
                           <Label
@@ -206,6 +209,7 @@ const CheckoutEnterprise = () => {
                             name="paymentType"
                             checked={isSubscription}
                             onChange={() => setIsSubscription(true)}
+                            aria-label="Créer un abonnement récurrent"
                             className="size-4 border-primary text-primary focus:ring-primary"
                           />
                           <Label
@@ -232,7 +236,7 @@ const CheckoutEnterprise = () => {
                     >
                       {isLoading ? (
                         <>
-                          <div className="mr-2 size-4 animate-spin rounded-full border-b-2 border-white"></div>
+                          <div className="border-primary-foreground mr-2 size-4 animate-spin rounded-full border-b-2"></div>
                           Redirection…
                         </>
                       ) : (
@@ -278,7 +282,7 @@ const CheckoutEnterprise = () => {
               <div className="space-y-6">
                 <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-2xl">
+                    <CardTitle as="h2" className="flex items-center gap-2 text-2xl">
                       <CreditCard className="size-6 text-primary" />
                       Informations
                     </CardTitle>

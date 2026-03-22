@@ -22,6 +22,12 @@
     --accent-foreground: 0 0% 9%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 9%;
+    --info: 200deg 95% 48%;
+    --info-foreground: 0 0% 100%;
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
     --ring: 0 0% 3.9%;
@@ -30,6 +36,14 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 200deg 95% 48%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 200deg 95% 48%;
     --radius: 0.5rem;
 
     /* Custom Design Tokens - Light */
@@ -42,6 +56,11 @@
       135deg,
       hsl(var(--secondary)),
       hsl(var(--muted))
+    );
+    --gradient-subtle: linear-gradient(
+      135deg,
+      hsl(var(--background)) 0%,
+      hsl(var(--muted)) 100%
     );
     --gradient-hero: linear-gradient(
       135deg,
@@ -93,6 +112,12 @@
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
+    --success: 142 69% 58%;
+    --success-foreground: 0 0% 9%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 9%;
+    --info: 200deg 95% 60%;
+    --info-foreground: 0 0% 9%;
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
     --ring: 0 0% 83.1%;
@@ -101,6 +126,19 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 200deg 95% 48%;
+    --sidebar-primary-foreground: 240 5.9% 10%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 200deg 95% 60%;
+    --gradient-subtle: linear-gradient(
+      135deg,
+      hsl(var(--background)) 0%,
+      hsl(var(--muted)) 100%
+    );
   }
 }
 
@@ -186,8 +224,8 @@ a,
 
 .text-gradient {
   background: var(--gradient-primary);
-  background-clip: text;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   background-size: 200% 200%;
   animation: gradient-shift 3s ease-in-out infinite alternate;
@@ -412,7 +450,8 @@ main#main .overflow-y-auto.has-overflow::-webkit-scrollbar-thumb {
   height: 3rem;
   border-radius: 50%;
   border: none;
-  background: hsla(var(--primary), 0.2);
+  background: hsl(var(--primary) / 0.2);
+  -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
   box-shadow:
     var(--shadow-elegant),
@@ -428,8 +467,8 @@ main#main .overflow-y-auto.has-overflow::-webkit-scrollbar-thumb {
   transform: scale(1.1) rotate(10deg);
   box-shadow:
     var(--shadow-button),
-    0 0 2rem hsla(var(--primary-glow), 0.4);
-  background: hsla(var(--primary), 0.3);
+    0 0 2rem hsl(var(--primary-glow) / 0.4);
+  background: hsl(var(--primary) / 0.3);
 }
 
 .theme-toggle:active {
@@ -449,8 +488,8 @@ main#main .overflow-y-auto.has-overflow::-webkit-scrollbar-thumb {
   border-radius: 50%;
   background: hsl(var(--primary));
   box-shadow:
-    0 0 1.25rem hsla(var(--primary-glow), 0.6),
-    0 0 2.5rem hsla(var(--primary-glow), 0.3);
+    0 0 1.25rem hsl(var(--primary-glow) / 0.6),
+    0 0 2.5rem hsl(var(--primary-glow) / 0.3);
   opacity: 1;
   transform: scale(1) rotate(0deg);
   transition: var(--transition-smooth);
@@ -790,14 +829,5 @@ main#main .overflow-y-auto.has-overflow::-webkit-scrollbar-thumb {
   .section-indicators,
   .section-indicators * {
     transition: none !important;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
   }
 }

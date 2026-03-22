@@ -10,15 +10,14 @@ export interface ThemeToggleProps {
 }
 
 /**
- * ThemeToggle component for switching between light, dark, and system themes
+ * ThemeToggle component for switching between light and dark themes
  *
  * Features:
- * - Cycles through light → dark → system → light
+ * - Toggles light ↔ dark
  * - Visual icon feedback based on current theme
  * - Keyboard accessible (Enter/Space to toggle)
  * - Screen reader friendly with ARIA labels
  * - Follows existing button component patterns
- * - Supports reduced motion preferences
  *
  * @example
  * ```tsx
@@ -30,10 +29,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
   const { theme, setTheme, resolvedTheme } = useTheme()
 
   const handleToggle = () => {
-    // Cycle through themes: light → dark → system → light
-    const nextTheme =
-      theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light'
-    setTheme(nextTheme)
+    setTheme(theme === 'light' ? 'dark' : 'light')
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -44,34 +40,22 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
   }
 
   const getAriaLabel = () => {
-    const currentThemeDisplay = theme === 'system' ? resolvedTheme : theme
-    const nextTheme =
-      theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light'
-    return `Switch theme from ${currentThemeDisplay} to ${nextTheme}. Current theme: ${currentThemeDisplay}`
+    const nextTheme = theme === 'light' ? 'dark' : 'light'
+    const currentThemeLabel = theme === 'dark' ? 'sombre' : 'clair'
+    const nextThemeLabel = nextTheme === 'dark' ? 'sombre' : 'clair'
+    return `Changer le theme de ${currentThemeLabel} vers ${nextThemeLabel}. Theme actuel : ${currentThemeLabel}`
   }
 
   const getIcon = () => {
-    switch (theme) {
-      case 'light':
-        return <Sun className="size-4" />
-      case 'dark':
-        return <Moon className="size-4" />
-      case 'system':
-        return resolvedTheme === 'dark' ? (
-          <Moon className="size-4" />
-        ) : (
-          <Sun className="size-4" />
-        )
-      default:
-        return <Sun className="size-4" />
-    }
+    return resolvedTheme === 'dark' ? (
+      <Moon className="size-4" />
+    ) : (
+      <Sun className="size-4" />
+    )
   }
 
   const getButtonText = () => {
-    if (theme === 'system') {
-      return resolvedTheme === 'dark' ? 'Dark (System)' : 'Light (System)'
-    }
-    return theme.charAt(0).toUpperCase() + theme.slice(1)
+    return theme === 'dark' ? 'Sombre' : 'Clair'
   }
 
   return (
@@ -81,7 +65,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       onClick={handleToggle}
       onKeyDown={handleKeyDown}
       aria-label={getAriaLabel()}
-      aria-checked={resolvedTheme === 'dark'}
+      aria-checked={theme === 'dark'}
       role="switch"
       className={cn(
         'transition-colors duration-200 hover:shadow-sm',
@@ -90,7 +74,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       type="button"
     >
       {getIcon()}
-      <span className="sr-only">Theme: {getButtonText()}</span>
+      <span className="sr-only">Theme : {getButtonText()}</span>
       {/* Visible text for larger screens */}
       <span className="ml-2 hidden text-sm md:inline">{getButtonText()}</span>
     </Button>

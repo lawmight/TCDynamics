@@ -188,9 +188,9 @@ const Contact = () => {
 
   const ValidationIcon = ({ valid }: { valid: boolean }) => {
     if (valid) {
-      return <CheckCircle className="size-4 text-green-500" />
+      return <CheckCircle className="text-success size-4" />
     }
-    return <XCircle className="size-4 text-red-500" />
+    return <XCircle className="text-destructive size-4" />
   }
 
   const ValidationMessage = ({
@@ -206,7 +206,7 @@ const Contact = () => {
     return (
       <p
         id={id}
-        className={`mt-1 text-sm ${valid ? 'text-green-600' : 'text-red-600'}`}
+        className={`mt-1 text-sm ${valid ? 'text-success' : 'text-destructive'}`}
         role="status"
         aria-live="polite"
       >
@@ -462,7 +462,7 @@ const Contact = () => {
                           placeholder="Jean"
                           className={`bg-background/50 ${
                             demoValidation.firstName.message
-                              ? 'border-red-500'
+                              ? 'border-destructive'
                               : ''
                           }`}
                           required
@@ -510,7 +510,7 @@ const Contact = () => {
                           placeholder="Dupont"
                           className={`bg-background/50 ${
                             demoValidation.lastName.message
-                              ? 'border-red-500'
+                              ? 'border-destructive'
                               : ''
                           }`}
                           required
@@ -561,7 +561,7 @@ const Contact = () => {
                         spellCheck={false}
                         placeholder="jean.dupont@entreprise.fr"
                         className={`bg-background/50 ${
-                          demoValidation.email.message ? 'border-red-500' : ''
+                          demoValidation.email.message ? 'border-destructive' : ''
                         }`}
                         required
                         aria-required="true"
@@ -658,7 +658,9 @@ const Contact = () => {
                         name="needs"
                         placeholder="Décrivez brièvement vos processus à automatiser (minimum 10 caractères)…"
                         className={`min-h-[100px] bg-background/50 ${
-                          demoValidation.needs.message ? 'border-red-500' : ''
+                          demoValidation.needs.message
+                            ? 'border-destructive'
+                            : ''
                         }`}
                         required
                         minLength={10}
@@ -999,7 +1001,7 @@ const Contact = () => {
                           placeholder="Prénom"
                           className={`bg-background/50 ${
                             contactValidation.firstName.message
-                              ? 'border-red-500'
+                              ? 'border-destructive'
                               : ''
                           }`}
                           required
@@ -1049,7 +1051,7 @@ const Contact = () => {
                           placeholder="Nom"
                           className={`bg-background/50 ${
                             contactValidation.lastName.message
-                              ? 'border-red-500'
+                              ? 'border-destructive'
                               : ''
                           }`}
                           required
@@ -1103,7 +1105,7 @@ const Contact = () => {
                         placeholder="votre@email.fr"
                         className={`bg-background/50 ${
                           contactValidation.email.message
-                            ? 'border-red-500'
+                            ? 'border-destructive'
                             : ''
                         }`}
                         required
@@ -1183,7 +1185,7 @@ const Contact = () => {
                         placeholder="Décrivez votre demande (minimum 10 caractères)…"
                         className={`min-h-[120px] bg-background/50 ${
                           contactValidation.message.message
-                            ? 'border-red-500'
+                            ? 'border-destructive'
                             : ''
                         }`}
                         required

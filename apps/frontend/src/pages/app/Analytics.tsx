@@ -4,6 +4,9 @@ import { fetchAnalytics, type AnalyticsSummary } from '@/api/analytics'
 import { AnimatedCounter } from '@/components/ui/animated-counter'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { EmptyState } from '@/components/ui/empty-state'
+import { ErrorState } from '@/components/ui/error-state'
+import { LoadingState } from '@/components/ui/loading-state'
 import { cn } from '@/lib/utils'
 import Activity from '~icons/lucide/activity'
 import ArrowDown from '~icons/lucide/arrow-down'
@@ -20,14 +23,14 @@ interface StatCardProps {
   description: string
   icon: React.ComponentType<{ className?: string }>
   trend?: { value: number; label: string }
-  color?: 'blue' | 'green' | 'purple' | 'orange'
+  color?: 'primary' | 'success' | 'info' | 'warning'
 }
 
 const colorMap = {
-  blue: 'bg-blue-500/10 text-blue-500',
-  green: 'bg-emerald-500/10 text-emerald-500',
-  purple: 'bg-violet-500/10 text-violet-500',
-  orange: 'bg-orange-500/10 text-orange-500',
+  primary: 'bg-primary/10 text-primary',
+  success: 'bg-success/10 text-success',
+  info: 'bg-info/10 text-info',
+  warning: 'bg-warning/10 text-warning',
 }
 
 function StatCard({
@@ -36,7 +39,7 @@ function StatCard({
   description,
   icon: Icon,
   trend,
-  color = 'blue',
+  color = 'primary',
 }: StatCardProps) {
   const isPositive = trend && trend.value >= 0
   return (
@@ -54,14 +57,14 @@ function StatCard({
       {trend && (
         <div className="mt-3 flex items-center gap-1 text-xs">
           {isPositive ? (
-            <ArrowUp className="size-3 text-emerald-500" />
+            <ArrowUp className="text-success size-3" />
           ) : (
             <ArrowDown className="text-destructive size-3" />
           )}
           <span
             className={cn(
               'font-medium',
-              isPositive ? 'text-emerald-500' : 'text-destructive'
+              isPositive ? 'text-success' : 'text-destructive'
             )}
           >
             {isPositive ? '+' : ''}
@@ -87,7 +90,9 @@ const Analytics = () => {
       setData(result)
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load analytics'
+        err instanceof Error
+          ? err.message
+          : "Impossible de charger les analyses"
       setError(message)
     } finally {
       setLoading(false)
@@ -99,13 +104,13 @@ const Analytics = () => {
   }, [])
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-6">
+    <div className="mx-auto w-full max-w-5xl space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">Analytics</h1>
+          <h1 className="text-2xl font-semibold">Analyses</h1>
           <p className="text-muted-foreground text-sm">
-            Usage insights across chat, knowledge base, and sessions.
+            Suivez l'usage du chat, de la base de connaissances et des sessions.
           </p>
         </div>
         <Button
@@ -117,64 +122,58 @@ const Analytics = () => {
           <RefreshCcw
             className={cn('mr-1.5 size-3.5', loading && 'animate-spin')}
           />
-          Refresh
+          Actualiser
         </Button>
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i} className="p-5">
-              <div className="animate-pulse space-y-3">
-                <div className="bg-muted h-3 w-20 rounded" />
-                <div className="bg-muted h-8 w-16 rounded" />
-                <div className="bg-muted h-3 w-32 rounded" />
-              </div>
-            </Card>
-          ))}
-        </div>
+        <LoadingState
+          variant="skeleton"
+          preset="cards"
+          count={4}
+          label="Chargement des analyses"
+        />
       ) : error ? (
-        <Card className="flex flex-col items-center gap-3 p-8 text-center">
-          <p className="text-destructive text-sm">{error}</p>
-          <Button variant="outline" size="sm" onClick={() => void load()}>
-            <RefreshCcw className="mr-1.5 size-3.5" />
-            Retry
-          </Button>
-        </Card>
+        <ErrorState
+          variant="card"
+          title="Impossible de charger les analyses"
+          message={error}
+          onRetry={() => void load()}
+        />
       ) : data ? (
         <>
           {/* Stat cards grid */}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             <StatCard
-              title="Chat Messages"
+              title="Messages chat"
               value={data.chatMessages ?? 0}
-              description="Vertex AI [REDACTED] this week"
+              description="Messages traites cette semaine"
               icon={BarChart2}
-              trend={{ value: 12, label: 'vs last week' }}
-              color="blue"
+              trend={{ value: 12, label: 'vs la semaine derniere' }}
+              color="primary"
             />
             <StatCard
-              title="KB Documents"
+              title="Documents indexes"
               value={data.uploads ?? 0}
-              description="Files indexed for retrieval"
+              description="Fichiers prets pour la recherche"
               icon={Activity}
-              trend={{ value: 5, label: 'vs last week' }}
-              color="green"
+              trend={{ value: 5, label: 'vs la semaine derniere' }}
+              color="success"
             />
             <StatCard
-              title="Active Users"
+              title="Utilisateurs actifs"
               value={data.activeUsers ?? 0}
-              description="Signed-in users last 24h"
+              description="Utilisateurs connectes sur 24 h"
               icon={Users}
-              trend={{ value: -2, label: 'vs yesterday' }}
-              color="purple"
+              trend={{ value: -2, label: 'vs hier' }}
+              color="info"
             />
             <StatCard
-              title="Avg Latency"
+              title="Latence moyenne"
               value={data.avgLatencyMs ? Math.round(data.avgLatencyMs) : 0}
-              description="End-to-end response time"
+              description="Temps de reponse bout en bout"
               icon={Zap}
-              color="orange"
+              color="warning"
             />
           </div>
 
@@ -182,12 +181,14 @@ const Analytics = () => {
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <Card className="p-5">
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-sm font-semibold">Performance</h3>
-                <span className="text-muted-foreground text-xs">Last 7 days</span>
+                <h2 className="text-sm font-semibold">Performance</h2>
+                <span className="text-muted-foreground text-xs">
+                  7 derniers jours
+                </span>
               </div>
               <div className="space-y-4">
                 <PerformanceRow
-                  label="Chat response time"
+                  label="Temps de reponse du chat"
                   value={
                     data.avgLatencyMs
                       ? `${Math.round(data.avgLatencyMs)}ms`
@@ -200,12 +201,12 @@ const Analytics = () => {
                   }
                 />
                 <PerformanceRow
-                  label="File indexing"
+                  label="Indexation des fichiers"
                   value="< 5s"
                   status="good"
                 />
                 <PerformanceRow
-                  label="API uptime"
+                  label="Disponibilite API"
                   value="99.9%"
                   status="good"
                 />
@@ -214,34 +215,46 @@ const Analytics = () => {
 
             <Card className="p-5">
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-sm font-semibold">Quick Actions</h3>
+                <h2 className="text-sm font-semibold">Actions rapides</h2>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <QuickAction
                   icon={BarChart2}
-                  label="View chat logs"
+                  label="Ouvrir le chat"
                   href="/app/chat"
                 />
                 <QuickAction
                   icon={Activity}
-                  label="Upload [REDACTED]"
+                  label="Importer un document"
                   href="/app/files"
                 />
                 <QuickAction
                   icon={Clock}
-                  label="API key usage"
+                  label="Gerer les cles API"
                   href="/app/settings"
                 />
                 <QuickAction
                   icon={Users}
-                  label="Team settings"
+                  label="Preferences d'equipe"
                   href="/app/settings"
                 />
               </div>
             </Card>
           </div>
         </>
-      ) : null}
+      ) : (
+        <EmptyState
+          icon={<BarChart2 className="size-7" />}
+          title="Aucune donnee disponible"
+          description="Les statistiques apparaitront ici des que votre activite commencera a remonter."
+          action={
+            <Button variant="outline" size="sm" onClick={() => void load()}>
+              <RefreshCcw className="mr-1.5 size-3.5" />
+              Recharger
+            </Button>
+          }
+        />
+      )}
     </div>
   )
 }
@@ -256,8 +269,8 @@ function PerformanceRow({
   status: 'good' | 'warning' | 'error'
 }) {
   const statusColors = {
-    good: 'bg-emerald-500',
-    warning: 'bg-yellow-500',
+    good: 'bg-success',
+    warning: 'bg-warning',
     error: 'bg-destructive',
   }
   return (

@@ -59,7 +59,7 @@ const Security = () => {
             variant="outline"
             className="mb-4 border-primary/40 text-primary"
           >
-            Security & Availability
+            Sécurité & disponibilité
           </Badge>
           <h1 className="mb-4 text-4xl font-bold text-foreground lg:text-5xl">
             Sécurité, conformité et disponibilité
@@ -80,9 +80,9 @@ const Security = () => {
               <CardContent className="space-y-3 p-6">
                 <div className="flex items-center gap-3">
                   <item.icon className="size-6 text-primary" />
-                  <h3 className="text-lg font-semibold text-foreground">
+                  <h2 className="text-lg font-semibold text-foreground">
                     {item.title}
-                  </h3>
+                  </h2>
                 </div>
                 <p className="font-mono text-sm text-muted-foreground">
                   {item.description}
@@ -95,9 +95,9 @@ const Security = () => {
         <div className="mt-12 grid gap-6 md:grid-cols-2">
           <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
             <CardContent className="space-y-3 p-6">
-              <h3 className="text-xl font-bold text-foreground">
+              <h2 className="text-xl font-bold text-foreground">
                 Documents disponibles
-              </h3>
+              </h2>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>• DPA / RGPD</li>
                 <li>• Architecture & zones d'hébergement</li>
@@ -111,9 +111,9 @@ const Security = () => {
 
           <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
             <CardContent className="space-y-3 p-6">
-              <h3 className="text-xl font-bold text-foreground">
+              <h2 className="text-xl font-bold text-foreground">
                 Contact sécurité
-              </h3>
+              </h2>
               <p className="text-sm text-muted-foreground">
                 Besoin d'une revue ou d'un questionnaire ? Contactez-nous.
               </p>

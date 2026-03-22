@@ -25,11 +25,12 @@ export default defineConfig(({ mode }) => {
   return {
     server: {
       host: '127.0.0.1',
-      port: 3000,
-      // Proxy API requests to Vercel Dev (serverless functions with MongoDB)
+      // Avoid 3000 on Windows: it often falls in excludedportrange (2991–3090) → EACCES
+      port: 3100,
+      // Proxy API requests to Vercel Dev on a Windows-safe port
       proxy: {
         '/api': {
-          target: 'http://localhost:3001',
+          target: 'http://localhost:3201',
           changeOrigin: true,
           secure: false,
         },

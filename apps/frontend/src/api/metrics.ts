@@ -36,7 +36,9 @@ export const fetchMetricsOverview = async (
 ): Promise<OverviewMetrics> => {
   const url = `${API_BASE}/api/metrics/overview?projectId=${encodeURIComponent(projectId)}&days=${days}`
   const res = await fetch(url)
-  if (!res.ok) throw new Error(`Failed to fetch overview: ${res.status}`)
+  if (!res.ok) {
+    throw new Error(`Impossible de récupérer la vue d'ensemble : ${res.status}`)
+  }
   return res.json()
 }
 
@@ -47,6 +49,8 @@ export const fetchMetricsPages = async (
 ): Promise<PagesResponse> => {
   const url = `${API_BASE}/api/metrics/pages?projectId=${encodeURIComponent(projectId)}&days=${days}&limit=${limit}`
   const res = await fetch(url)
-  if (!res.ok) throw new Error(`Failed to fetch pages: ${res.status}`)
+  if (!res.ok) {
+    throw new Error(`Impossible de récupérer les pages : ${res.status}`)
+  }
   return res.json()
 }

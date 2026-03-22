@@ -432,7 +432,7 @@ const GetStarted = () => {
                         >
                           {isSubmitting ? (
                             <>
-                              <div className="mr-2 size-4 animate-spin rounded-full border-b-2 border-white"></div>
+                              <div className="border-primary-foreground mr-2 size-4 animate-spin rounded-full border-b-2"></div>
                               Redirection vers la démo…
                             </>
                           ) : (

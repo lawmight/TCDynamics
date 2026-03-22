@@ -3,6 +3,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { recordEvent } from '@/api/analytics'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { EmptyState } from '@/components/ui/empty-state'
+import { ErrorState } from '@/components/ui/error-state'
+import { LoadingState } from '@/components/ui/loading-state'
 import { Textarea } from '@/components/ui/textarea'
 import {
   Tooltip,
@@ -25,7 +28,9 @@ type ChatMessage = {
 }
 
 type ChatResponse = {
-  message: string
+  message?: string
+  response?: string
+  conversationId?: string
   usage?: {
     promptTokens?: number
     completionTokens?: number
@@ -33,24 +38,163 @@ type ChatResponse = {
   }
 }
 
+const SESSION_EXPIRED_MESSAGE =
+  'Votre session a expire. Reconnectez-vous puis reessayez.'
+
+const getApiUnavailableMessage = () =>
+  import.meta.env.DEV
+    ? "Impossible de se connecter au serveur API. Verifiez que vous avez demarre l'environnement complet avec `npm run dev` (et pas seulement `npm run dev:frontend`)."
+    : 'Erreur reseau : impossible de joindre le serveur API. Reessayez plus tard.'
+
+const getApiNotFoundMessage = () =>
+  import.meta.env.DEV
+    ? "Point d'entree API introuvable. Verifiez que le serveur Vercel de developpement est actif (`npm run dev` lance a la fois le frontend et l'API)."
+    : "Point d'entree API introuvable. Verifiez votre configuration."
+
+const getLargeHeaderMessage = () =>
+  import.meta.env.DEV
+    ? "En-tetes de requete trop volumineux. Verifiez que vous utilisez `npm run dev` (qui applique le correctif de taille d'en-tete), puis reconnectez-vous si necessaire."
+    : "Les donnees d'authentification sont trop volumineuses. Deconnectez-vous puis reconnectez-vous pour rafraichir votre session."
+
+const getAiServiceNotConfiguredMessage = () =>
+  import.meta.env.DEV
+    ? "Service IA non configure. Ajoutez OPENROUTER_API_KEY dans votre .env.local, puis redemarrez `npm run dev`."
+    : "Service IA momentanement indisponible. Reessayez plus tard."
+
+const getChatErrorMessage = async (res: Response): Promise<string> => {
+  if (res.status === 404) {
+    return getApiNotFoundMessage()
+  }
+
+  if (res.status === 431) {
+    return getLargeHeaderMessage()
+  }
+
+  const rawBody = (await res.text().catch(() => '')).trim()
+  if (rawBody) {
+    const contentType = res.headers.get('content-type') || ''
+    if (contentType.includes('application/json')) {
+      try {
+        const parsedError = JSON.parse(rawBody) as {
+          error?: unknown
+          message?: unknown
+        }
+
+        if (
+          typeof parsedError.message === 'string' &&
+          parsedError.message.trim().length > 0
+        ) {
+          if (
+            parsedError.message.toLowerCase().includes('jwt is expired') ||
+            parsedError.message.toLowerCase().includes('token is expired')
+          ) {
+            return SESSION_EXPIRED_MESSAGE
+          }
+          return parsedError.message
+        }
+
+        if (
+          typeof parsedError.error === 'string' &&
+          parsedError.error.trim().length > 0
+        ) {
+          if (
+            parsedError.error.toLowerCase().includes('service ia non configur')
+          ) {
+            return getAiServiceNotConfiguredMessage()
+          }
+          if (
+            parsedError.error.toLowerCase().includes('jwt is expired') ||
+            parsedError.error.toLowerCase().includes('token is expired')
+          ) {
+            return SESSION_EXPIRED_MESSAGE
+          }
+          return parsedError.error
+        }
+      } catch {
+        // Fall through to the raw response text below when JSON parsing fails.
+      }
+    }
+
+    return rawBody
+  }
+
+  if (res.status === 401) {
+    return 'Authentification requise. Connectez-vous pour continuer.'
+  }
+
+  return 'La requete de chat a echoue'
+}
+
+const isSessionExpiredError = (status: number, errorMessage: string) =>
+  status === 401 &&
+  (errorMessage === SESSION_EXPIRED_MESSAGE ||
+    errorMessage.toLowerCase().includes('jwt is expired') ||
+    errorMessage.toLowerCase().includes('token is expired'))
+
 const sendChat = async ({
-  messages,
+  message,
   sessionId,
   temperature,
+  userEmail,
+  getToken,
 }: {
-  messages: ChatMessage[]
+  message: string
   sessionId: string
   temperature?: number
+  userEmail?: string
+  getToken: (forceRefresh?: boolean) => Promise<string | null>
 }): Promise<ChatResponse> => {
-  const res = await fetch('/api/ai?action=chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ messages, sessionId, temperature }),
-  })
+  const token = await getToken()
+  if (!token) {
+    throw new Error('Authentification requise. Connectez-vous pour continuer.')
+  }
+
+  const makeRequest = (accessToken: string) =>
+    fetch('/api/ai?action=chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ message, sessionId, temperature, userEmail }),
+    })
+
+  let res: Response
+  try {
+    res = await makeRequest(token)
+  } catch {
+    throw new Error(getApiUnavailableMessage())
+  }
 
   if (!res.ok) {
-    const errorText = await res.text()
-    throw new Error(errorText || 'Chat request failed')
+    const errorMessage = await getChatErrorMessage(res)
+    if (isSessionExpiredError(res.status, errorMessage)) {
+      const refreshedToken = await getToken(true)
+      if (!refreshedToken) {
+        throw new Error(SESSION_EXPIRED_MESSAGE)
+      }
+
+      try {
+        const retryResponse = await makeRequest(refreshedToken)
+        if (retryResponse.ok) {
+          return retryResponse.json()
+        }
+
+        const retryError = await getChatErrorMessage(retryResponse)
+        throw new Error(
+          isSessionExpiredError(retryResponse.status, retryError)
+            ? SESSION_EXPIRED_MESSAGE
+            : retryError
+        )
+      } catch (retryError) {
+        if (retryError instanceof Error) {
+          throw retryError
+        }
+        throw new Error(SESSION_EXPIRED_MESSAGE)
+      }
+    }
+
+    throw new Error(errorMessage)
   }
 
   return res.json()
@@ -58,28 +202,29 @@ const sendChat = async ({
 
 const SUGGESTED_PROMPTS = [
   {
-    label: 'Summarize my [REDACTED]',
-    prompt: 'Summarize the key points from my uploaded knowledge base [REDACTED].',
+    label: 'Resumer mes documents',
+    prompt:
+      'Resume les points importants de ma base de connaissances importee.',
   },
   {
-    label: 'Create a workflow',
+    label: 'Creer un workflow',
     prompt:
-      'Help me create an automated workflow for processing incoming client emails.',
+      "Aide-moi a creer un workflow automatise pour traiter les emails entrants de mes clients.",
   },
   {
-    label: 'Analyze trends',
+    label: 'Analyser les tendances',
     prompt:
-      'What trends can you identify from my recent data and workflow activity?',
+      'Quelles tendances identifies-tu dans mes donnees recentes et mon activite ?',
   },
   {
     label: 'RGPD compliance',
     prompt:
-      'What steps should I take to ensure my workflows are RGPD compliant?',
+      'Quelles etapes dois-je suivre pour garder mes workflows conformes au RGPD ?',
   },
 ]
 
 const Chat = () => {
-  const { user } = useAuth()
+  const { user, getToken } = useAuth()
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
   const [isSending, setIsSending] = useState(false)
@@ -94,6 +239,9 @@ const Chat = () => {
         : Date.now().toString(),
     []
   )
+  const userEmail =
+    user?.primaryEmailAddress?.emailAddress ||
+    user?.emailAddresses?.[0]?.emailAddress
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -112,26 +260,28 @@ const Chat = () => {
 
       try {
         const response = await sendChat({
-          messages: payload,
+          message: text,
           sessionId,
           temperature: 0.3,
+          userEmail,
+          getToken,
         })
         const assistantMessage: ChatMessage = {
           role: 'assistant',
-          content: response.message || 'No response received.',
+          content: response.response || response.message || 'Aucune reponse recue.',
         }
         setMessages([...payload, assistantMessage])
-        await recordEvent('chat_message', { sessionId, user: user?.email })
+        await recordEvent('chat_message', { sessionId, user: userEmail })
       } catch (err) {
         const message =
-          err instanceof Error ? err.message : 'Failed to send message'
+          err instanceof Error ? err.message : "Impossible d'envoyer le message"
         setError(message)
       } finally {
         setIsSending(false)
         textareaRef.current?.focus()
       }
     },
-    [input, isSending, messages, sessionId, user?.email]
+    [getToken, input, isSending, messages, sessionId, userEmail]
   )
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -157,19 +307,19 @@ const Chat = () => {
   const hasMessages = messages.length > 0
 
   return (
-    <div className="mx-auto flex h-full w-full max-w-4xl flex-col">
+    <div className="mx-auto flex h-full w-full max-w-5xl flex-col">
       {/* Page header */}
       <div className="flex items-center justify-between pb-4">
         <div>
-          <h1 className="text-xl font-semibold">Chat</h1>
+          <h1 className="text-2xl font-semibold">Assistant IA</h1>
           <p className="text-muted-foreground text-sm">
-            AI Chat &middot; Session {sessionId.slice(0, 8)}
+            Conversation assistee par IA &middot; Session {sessionId.slice(0, 8)}
           </p>
         </div>
         {hasMessages && (
           <Button variant="outline" size="sm" onClick={handleNewConversation}>
             <Plus className="mr-1.5 size-3.5" />
-            New chat
+            Nouvelle conversation
           </Button>
         )}
       </div>
@@ -178,31 +328,27 @@ const Chat = () => {
       <Card className="border-border flex min-h-0 flex-1 flex-col overflow-hidden">
         <div className="flex-1 overflow-y-auto p-4 md:p-6">
           {!hasMessages ? (
-            /* Empty state with suggestions */
-            <div className="flex h-full flex-col items-center justify-center gap-6 py-12">
-              <div className="bg-primary/10 text-primary flex size-14 items-center justify-center rounded-2xl">
-                <Bot className="size-7" />
-              </div>
-              <div className="text-center">
-                <h2 className="text-lg font-semibold">
-                  How can I help you today?
-                </h2>
-                <p className="text-muted-foreground mt-1 text-sm">
-                  Ask anything about your workflows or knowledge base.
-                </p>
-              </div>
-              <div className="grid w-full max-w-lg grid-cols-1 gap-2 sm:grid-cols-2">
-                {SUGGESTED_PROMPTS.map(suggestion => (
-                  <button
-                    key={suggestion.label}
-                    type="button"
-                    className="border-border bg-card hover:border-primary/30 hover:bg-accent rounded-lg border p-3 text-left text-sm transition-colors"
-                    onClick={() => void handleSend(suggestion.prompt)}
-                  >
-                    <span className="font-medium">{suggestion.label}</span>
-                  </button>
-                ))}
-              </div>
+            <div className="flex h-full items-center py-8">
+              <EmptyState
+                className="w-full"
+                icon={<Bot className="size-7" />}
+                title="Comment puis-je vous aider aujourd'hui ?"
+                description="Posez une question sur vos workflows, vos documents ou votre activite."
+                action={
+                  <div className="grid w-full max-w-2xl grid-cols-1 gap-2 sm:grid-cols-2">
+                    {SUGGESTED_PROMPTS.map(suggestion => (
+                      <button
+                        key={suggestion.label}
+                        type="button"
+                        className="border-border bg-card hover:border-primary/30 hover:bg-accent rounded-lg border p-3 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        onClick={() => void handleSend(suggestion.prompt)}
+                      >
+                        <span className="font-medium">{suggestion.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                }
+              />
             </div>
           ) : (
             /* Message list */
@@ -262,11 +408,11 @@ const Chat = () => {
                               ) : (
                                 <Copy className="size-3" />
                               )}
-                              <span className="sr-only">Copy message</span>
+                              <span className="sr-only">Copier le message</span>
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            {copiedIndex === index ? 'Copied!' : 'Copy'}
+                            {copiedIndex === index ? 'Copie !' : 'Copier'}
                           </TooltipContent>
                         </Tooltip>
                       </div>
@@ -282,9 +428,10 @@ const Chat = () => {
                     <Bot className="size-4" />
                   </div>
                   <div className="bg-muted flex items-center gap-1.5 rounded-2xl px-4 py-3">
-                    <span className="bg-muted-foreground/50 size-2 animate-bounce rounded-full [animation-delay:0ms]" />
-                    <span className="bg-muted-foreground/50 size-2 animate-bounce rounded-full [animation-delay:150ms]" />
-                    <span className="bg-muted-foreground/50 size-2 animate-bounce rounded-full [animation-delay:300ms]" />
+                    <LoadingState
+                      variant="dots"
+                      label="L'assistant est en train d'ecrire"
+                    />
                   </div>
                 </div>
               )}
@@ -297,7 +444,11 @@ const Chat = () => {
         {/* Input area */}
         <div className="border-border bg-card border-t p-4">
           {error && (
-            <p className="text-destructive mb-2 text-sm">{error}</p>
+            <ErrorState
+              variant="inline"
+              message={error}
+              className="mb-3"
+            />
           )}
           <div className="flex items-end gap-2">
             <Textarea
@@ -305,11 +456,11 @@ const Chat = () => {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Type a message... (Shift+Enter for newline)"
+              placeholder="Ecrivez votre message... (Maj+Entree pour un retour a la ligne)"
               className="max-h-[200px] min-h-[44px] resize-none"
               rows={1}
               disabled={isSending}
-              aria-label="Chat message input"
+              aria-label="Champ de message"
             />
             <Button
               size="icon"
@@ -322,12 +473,12 @@ const Chat = () => {
               ) : (
                 <Send className="size-4" />
               )}
-              <span className="sr-only">Send message</span>
+              <span className="sr-only">Envoyer le message</span>
             </Button>
           </div>
           <p className="text-muted-foreground mt-2 text-xs">
-            Powered by OpenRouter. Data is not stored unless uploaded to
-            KB.
+            Propulse par OpenRouter. Les donnees ne sont conservees que si vous
+            les importez dans votre base de connaissances.
           </p>
         </div>
       </Card>

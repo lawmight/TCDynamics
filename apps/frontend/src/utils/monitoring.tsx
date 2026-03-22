@@ -170,10 +170,10 @@ export class ErrorBoundary extends React.Component<
       return (
         <div className="flex min-h-screen items-center justify-center p-4">
           <div className="text-center">
-            <h2 className="mb-4 text-2xl font-bold text-red-600">
+            <h2 className="text-destructive mb-4 text-2xl font-bold">
               Une erreur s'est produite
             </h2>
-            <p className="mb-4 text-gray-600">
+            <p className="text-muted-foreground mb-4">
               Nous nous excusons pour ce désagrément.
             </p>
             <button
