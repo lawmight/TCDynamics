@@ -83,7 +83,7 @@
   "devDependencies": {
     "dotenv-cli": "^11.0.0",
     "turbo": "^2.8.20",
-    "vercel": "^50.34.2",
+    "vercel": "^50.35.0",
     "eslint": "^9.39.4",
     "@eslint/js": "^9.39.4",
     "@typescript-eslint/scope-manager": "^8.57.1",
@@ -98,13 +98,13 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.5.2",
     "eslint-plugin-tailwindcss": "^3.18.2",
-    "fast-xml-parser": "^4.5.4",
+    "fast-xml-parser": "^4.5.5",
     "globals": "^16.5.0",
     "postcss": "^8.5.8",
     "terser": "^5.46.1",
     "typescript-eslint": "^8.57.1",
     "vite": "^7.3.1",
-    "yaml": "^2.8.2"
+    "yaml": "^2.8.3"
   },
   "engines": {
     "node": "20.x",
