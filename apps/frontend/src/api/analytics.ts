@@ -9,15 +9,17 @@ export const fetchAnalytics = async (): Promise<AnalyticsSummary> => {
   const res = await fetch('/api/analytics')
   if (!res.ok) {
     const errorText = await res.text()
-    throw new Error(errorText || 'Failed to load analytics')
+    throw new Error(errorText || 'Impossible de charger les analyses')
   }
   const data = await res.json()
   // Basic validation
   if (Array.isArray(data)) {
-    throw new Error('Invalid analytics data format: expected object, got array')
+    throw new Error(
+      'Format de données invalide : un objet était attendu, mais un tableau a été reçu'
+    )
   }
   if (typeof data !== 'object' || data === null) {
-    throw new Error('Invalid analytics data format: expected object')
+    throw new Error('Format de données invalide : objet attendu')
   }
   // Verify required numeric fields
   if (
@@ -25,18 +27,18 @@ export const fetchAnalytics = async (): Promise<AnalyticsSummary> => {
     !Number.isFinite(data.chatMessages)
   ) {
     throw new Error(
-      'Invalid analytics data: chatMessages must be a finite number'
+      'Données invalides : `chatMessages` doit être un nombre fini'
     )
   }
   if (typeof data.uploads !== 'number' || !Number.isFinite(data.uploads)) {
-    throw new Error('Invalid analytics data: uploads must be a finite number')
+    throw new Error('Données invalides : `uploads` doit être un nombre fini')
   }
   if (
     typeof data.activeUsers !== 'number' ||
     !Number.isFinite(data.activeUsers)
   ) {
     throw new Error(
-      'Invalid analytics data: activeUsers must be a finite number'
+      'Données invalides : `activeUsers` doit être un nombre fini'
     )
   }
   // Validate optional avgLatencyMs field
@@ -60,6 +62,8 @@ export const recordEvent = async (
     body: JSON.stringify({ event, metadata }),
   })
   if (!res.ok) {
-    throw new Error(`Failed to record analytics event: ${res.statusText}`)
+    throw new Error(
+      `Impossible d'enregistrer l'événement d'analyse : ${res.statusText}`
+    )
   }
 }

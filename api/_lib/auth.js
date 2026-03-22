@@ -5,6 +5,9 @@
 
 import { verifyToken } from '@clerk/backend'
 
+const getClerkSecretKey = () =>
+  process.env.CLERK_SECRET_KEY || process.env.CLERK_API_KEY
+
 /**
  * Verify Clerk auth token and return user ID
  * @param {string} authHeader - Authorization header (Bearer token)
@@ -19,7 +22,7 @@ export async function verifyClerkAuth(authHeader) {
 
   try {
     const payload = await verifyToken(token, {
-      secretKey: process.env.CLERK_SECRET_KEY,
+      secretKey: getClerkSecretKey(),
     })
 
     // payload.sub contains the Clerk user ID

@@ -18,7 +18,7 @@ if (typeof window !== 'undefined') {
   // Enterprise is optional (can be undefined for custom pricing)
   if (missingVars.length > 0) {
     throw new Error(
-      `Missing required Polar product ID environment variables: ${missingVars.join(', ')}`
+      `Variables d'environnement Polar manquantes : ${missingVars.join(', ')}`
     )
   }
 }
@@ -56,7 +56,7 @@ export const createCheckoutSession = async (
   if (!token) {
     return {
       success: false,
-      message: 'Authentication required',
+      message: 'Authentification requise',
       error: 'AUTH_REQUIRED',
     }
   }
@@ -76,18 +76,18 @@ export const createCheckoutSession = async (
       if (response.status === 401) {
         return {
           success: false,
-          message: 'Session expired',
+          message: 'Session expirée',
           error: 'AUTH_EXPIRED',
         }
       }
-      throw new Error(data.message || 'Failed to create checkout')
+      throw new Error(data.message || 'Impossible de créer la session de paiement')
     }
     return data
   } catch (error) {
     logger.error('Failed to create checkout session', error)
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Unknown error',
+      message: error instanceof Error ? error.message : 'Erreur inconnue',
     }
   }
 }
@@ -98,12 +98,12 @@ export const redirectToCheckout = async (
 ): Promise<{ error?: Error; authRequired?: boolean }> => {
   const token = await getToken()
   if (!token) {
-    return { error: new Error('Authentication required'), authRequired: true }
+    return { error: new Error('Authentification requise'), authRequired: true }
   }
 
   try {
     if (!(planName in POLAR_PRODUCT_IDS)) {
-      throw new Error(`Invalid plan: ${planName}`)
+      throw new Error(`Offre invalide : ${planName}`)
     }
 
     const response = await createCheckoutSession(planName, getToken)
@@ -113,13 +113,15 @@ export const redirectToCheckout = async (
       response.error === 'AUTH_EXPIRED'
     ) {
       return {
-        error: new Error(response.message || 'Authentication required'),
+        error: new Error(response.message || 'Authentification requise'),
         authRequired: true,
       }
     }
 
     if (!response.success || !response.url) {
-      throw new Error(response.message || 'Failed to create checkout')
+      throw new Error(
+        response.message || 'Impossible de créer la session de paiement'
+      )
     }
 
     window.location.href = response.url
@@ -127,7 +129,7 @@ export const redirectToCheckout = async (
   } catch (error) {
     logger.error('Failed to redirect to checkout', error)
     return {
-      error: error instanceof Error ? error : new Error('Unknown error'),
+      error: error instanceof Error ? error : new Error('Erreur inconnue'),
     }
   }
 }
@@ -138,7 +140,9 @@ export const getCheckoutSession = async (
 ): Promise<CheckoutSession | null> => {
   const token = await getToken()
   if (!token) {
-    logger.error('Authentication required to retrieve checkout session')
+    logger.error(
+      "Authentification requise pour récupérer la session de paiement"
+    )
     return null
   }
 
@@ -156,10 +160,14 @@ export const getCheckoutSession = async (
     const data = await response.json()
     if (!response.ok || !data.success) {
       if (response.status === 401) {
-        logger.error('Session expired while retrieving checkout')
+        logger.error(
+          'La session a expiré pendant la récupération du paiement'
+        )
         return null
       }
-      throw new Error(data.message || 'Failed to retrieve checkout session')
+      throw new Error(
+        data.message || 'Impossible de récupérer la session de paiement'
+      )
     }
     return data.session
   } catch (error) {
@@ -199,7 +207,7 @@ export const createOnDemandCheckout = async (
   if (!token) {
     return {
       success: false,
-      message: 'Authentication required',
+      message: 'Authentification requise',
       error: 'AUTH_REQUIRED',
     }
   }
@@ -226,18 +234,20 @@ export const createOnDemandCheckout = async (
       if (response.status === 401) {
         return {
           success: false,
-          message: 'Session expired',
+          message: 'Session expirée',
           error: 'AUTH_EXPIRED',
         }
       }
-      throw new Error(data.message || 'Failed to create on-demand checkout')
+      throw new Error(
+        data.message || 'Impossible de créer le paiement à la demande'
+      )
     }
     return data
   } catch (error) {
     logger.error('Failed to create on-demand checkout', error)
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Unknown error',
+      message: error instanceof Error ? error.message : 'Erreur inconnue',
     }
   }
 }
@@ -251,7 +261,7 @@ export const redirectToOnDemandCheckout = async (
 ): Promise<{ error?: Error; authRequired?: boolean }> => {
   const token = await getToken()
   if (!token) {
-    return { error: new Error('Authentication required'), authRequired: true }
+    return { error: new Error('Authentification requise'), authRequired: true }
   }
 
   try {
@@ -262,13 +272,15 @@ export const redirectToOnDemandCheckout = async (
       response.error === 'AUTH_EXPIRED'
     ) {
       return {
-        error: new Error(response.message || 'Authentication required'),
+        error: new Error(response.message || 'Authentification requise'),
         authRequired: true,
       }
     }
 
     if (!response.success || !response.url) {
-      throw new Error(response.message || 'Failed to create checkout')
+      throw new Error(
+        response.message || 'Impossible de créer la session de paiement'
+      )
     }
 
     window.location.href = response.url
@@ -276,7 +288,7 @@ export const redirectToOnDemandCheckout = async (
   } catch (error) {
     logger.error('Failed to redirect to on-demand checkout', error)
     return {
-      error: error instanceof Error ? error : new Error('Unknown error'),
+      error: error instanceof Error ? error : new Error('Erreur inconnue'),
     }
   }
 }

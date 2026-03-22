@@ -19,7 +19,6 @@ import Folder from '~icons/lucide/folder'
 import Menu from '~icons/lucide/menu'
 import MessageSquare from '~icons/lucide/message-square'
 import PanelLeftClose from '~icons/lucide/panel-left-close'
-import Search from '~icons/lucide/search'
 import Settings from '~icons/lucide/settings'
 import X from '~icons/lucide/x'
 import Zap from '~icons/lucide/zap'
@@ -27,38 +26,38 @@ import Zap from '~icons/lucide/zap'
 const navItems = [
   {
     to: '/app/chat',
-    label: 'Chat',
+    label: 'Assistant',
     icon: MessageSquare,
-    description: 'AI assistant',
+    description: 'Assistant IA',
   },
   {
     to: '/app/files',
-    label: 'Knowledge Base',
+    label: 'Base documentaire',
     icon: Folder,
-    description: 'Documents & files',
+    description: 'Documents et fichiers',
   },
   {
     to: '/app/analytics',
-    label: 'Analytics',
+    label: 'Analyses',
     icon: BarChart3,
-    description: 'Usage insights',
+    description: "Indicateurs d'usage",
   },
   {
     to: '/app/settings',
-    label: 'Settings',
+    label: 'Parametres',
     icon: Settings,
     description: 'Configuration',
   },
 ]
 
 const pageTitles: Record<string, { title: string; breadcrumb: string }> = {
-  '/app/chat': { title: 'Workspace Chat', breadcrumb: 'Chat' },
-  '/app/files': { title: 'Knowledge Base', breadcrumb: 'Files' },
-  '/app/analytics': { title: 'Analytics', breadcrumb: 'Analytics' },
-  '/app/settings': { title: 'Settings', breadcrumb: 'Settings' },
+  '/app/chat': { title: 'Assistant IA', breadcrumb: 'Assistant' },
+  '/app/files': { title: 'Base documentaire', breadcrumb: 'Documents' },
+  '/app/analytics': { title: 'Analyses', breadcrumb: 'Analyses' },
+  '/app/settings': { title: 'Parametres', breadcrumb: 'Parametres' },
   '/app/settings/email': {
-    title: 'Email Preferences',
-    breadcrumb: 'Email Preferences',
+    title: 'Preferences email',
+    breadcrumb: 'Emails',
   },
 }
 
@@ -73,13 +72,13 @@ export const AppLayout = () => {
   const email =
     user?.primaryEmailAddress?.emailAddress ||
     user?.emailAddresses[0]?.emailAddress ||
-    'user'
+    'utilisateur'
   const displayName = user?.firstName || email.split('@')[0]
   const initials = displayName.slice(0, 2).toUpperCase()
 
   const pageInfo = pageTitles[location.pathname] || {
-    title: 'App',
-    breadcrumb: 'App',
+    title: 'Application',
+    breadcrumb: 'Application',
   }
 
   const toggleSidebar = useCallback(() => {
@@ -118,7 +117,9 @@ export const AppLayout = () => {
             <p className="text-sidebar-foreground truncate text-sm font-semibold">
               TCDynamics
             </p>
-            <p className="text-muted-foreground truncate text-xs">Workspace</p>
+            <p className="text-muted-foreground truncate text-xs">
+              Espace de travail
+            </p>
           </div>
         )}
       </div>
@@ -129,7 +130,7 @@ export const AppLayout = () => {
           'flex-1 space-y-1 py-3',
           collapsed ? 'px-2' : 'px-3'
         )}
-        aria-label="App navigation"
+        aria-label="Navigation de l'application"
       >
         {navItems.map(item => {
           const Icon = item.icon
@@ -223,12 +224,12 @@ export const AppLayout = () => {
                     onClick={toggleSidebar}
                   >
                     <PanelLeftClose className="size-4" />
-                    <span className="sr-only">Collapse sidebar</span>
+                    <span className="sr-only">Reduire la barre laterale</span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="right">
                   <p>
-                    Collapse sidebar{' '}
+                    Reduire la barre laterale{' '}
                     <kbd className="ml-1 rounded border px-1 py-0.5 text-[10px]">
                       {'\u2318'}B
                     </kbd>
@@ -259,14 +260,14 @@ export const AppLayout = () => {
         {mobileOpen && (
           <div className="fixed inset-0 z-40 md:hidden">
             <div
-              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              className="bg-foreground/50 focus-visible:ring-ring focus-visible:ring-offset-background absolute inset-0 backdrop-blur-sm focus-visible:ring-2 focus-visible:ring-offset-2"
               onClick={() => setMobileOpen(false)}
               onKeyDown={e => {
                 if (e.key === 'Escape') setMobileOpen(false)
               }}
               role="button"
               tabIndex={0}
-              aria-label="Close navigation"
+              aria-label="Fermer la navigation"
             />
             <aside className="bg-sidebar animate-in slide-in-from-left absolute inset-y-0 left-0 w-64 shadow-xl duration-200">
               <div className="flex h-full flex-col">
@@ -284,7 +285,7 @@ export const AppLayout = () => {
                     onClick={() => setMobileOpen(false)}
                   >
                     <X className="size-4" />
-                    <span className="sr-only">Close</span>
+                    <span className="sr-only">Fermer</span>
                   </Button>
                 </div>
                 <SidebarContent collapsed={false} />
@@ -308,7 +309,7 @@ export const AppLayout = () => {
               onClick={() => setMobileOpen(true)}
             >
               <Menu className="size-4" />
-              <span className="sr-only">Open navigation</span>
+              <span className="sr-only">Ouvrir la navigation</span>
             </Button>
 
             {/* Collapse trigger (desktop) */}
@@ -322,11 +323,11 @@ export const AppLayout = () => {
                     onClick={toggleSidebar}
                   >
                     <ChevronLeft className="size-4 rotate-180" />
-                    <span className="sr-only">Expand sidebar</span>
+                    <span className="sr-only">Developper la barre laterale</span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  Expand sidebar{' '}
+                  Developper la barre laterale{' '}
                   <kbd className="ml-1 rounded border px-1 py-0.5 text-[10px]">
                     {'\u2318'}B
                   </kbd>
@@ -335,34 +336,18 @@ export const AppLayout = () => {
             )}
 
             {/* Breadcrumb */}
-            <div className="flex items-center gap-1.5 text-sm">
+            <div className="flex h-8 items-center gap-1.5 text-sm">
               <Link
                 to="/app"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="!min-h-0 !min-w-0 inline-flex items-center text-muted-foreground transition-colors hover:text-foreground"
               >
-                App
+                Application
               </Link>
-              <span className="text-muted-foreground/50">/</span>
-              <span className="font-medium">{pageInfo.breadcrumb}</span>
+              <span className="text-muted-foreground/50 leading-none">/</span>
+              <span className="font-medium leading-none">{pageInfo.breadcrumb}</span>
             </div>
 
             <div className="flex-1" />
-
-            {/* Search hint */}
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-muted-foreground hidden h-8 gap-2 md:flex"
-              onClick={() => {
-                /* placeholder for command palette */
-              }}
-            >
-              <Search className="size-3.5" />
-              <span className="text-xs">Search...</span>
-              <kbd className="bg-muted text-muted-foreground pointer-events-none rounded border px-1.5 py-0.5 font-mono text-[10px]">
-                {'\u2318'}K
-              </kbd>
-            </Button>
 
             {/* Mobile user button */}
             <div className="md:hidden">
@@ -374,7 +359,7 @@ export const AppLayout = () => {
           </header>
 
           {/* Page content */}
-          <div className="bg-muted/30 flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-6 md:px-8">
+          <div className="bg-muted/30 flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-6 md:px-6">
             <Outlet />
           </div>
         </main>

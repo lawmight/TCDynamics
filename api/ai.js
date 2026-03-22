@@ -25,10 +25,12 @@ export const config = {
 // ---------- Configuration & Guards ----------
 const ALLOW_VERCEL_CHAT = process.env.ALLOW_VERCEL_CHAT === 'true'
 const INTERNAL_CHAT_TOKEN = process.env.INTERNAL_CHAT_TOKEN
+const DEFAULT_ALLOWED_ORIGIN = 'https://tcdynamics.fr'
 const ALLOWED_ORIGIN =
   process.env.ALLOWED_ORIGIN ||
   process.env.FRONTEND_URL ||
-  'https://tcdynamics.fr'
+  process.env.VITE_FRONTEND_URL ||
+  DEFAULT_ALLOWED_ORIGIN
 const ENABLE_CLIENT_IP_LOGGING = process.env.ENABLE_CLIENT_IP_LOGGING === 'true'
 const IP_HASH_SALT = process.env.IP_HASH_SALT || ''
 const MAX_MESSAGE_LENGTH = Math.max(
@@ -50,6 +52,41 @@ const VISION_MAX_BODY_BYTES = 256 * 1024 // 256KB for image URL requests
 function getQueryValue(value) {
   if (Array.isArray(value)) return value[0]
   return value
+}
+
+function normalizeOrigin(value) {
+  if (!value || typeof value !== 'string') return null
+  try {
+    return new URL(value).origin
+  } catch {
+    return null
+  }
+}
+
+function getAllowedOrigins() {
+  return new Set(
+    [
+      DEFAULT_ALLOWED_ORIGIN,
+      process.env.ALLOWED_ORIGIN,
+      process.env.FRONTEND_URL,
+      process.env.VITE_FRONTEND_URL,
+    ]
+      .flatMap(value => (typeof value === 'string' ? value.split(',') : []))
+      .map(value => normalizeOrigin(value.trim()))
+      .filter(Boolean)
+  )
+}
+
+const ALLOWED_ORIGINS = getAllowedOrigins()
+
+function isLocalDevelopmentOrigin(origin) {
+  if (process.env.NODE_ENV === 'production') return false
+  try {
+    const { hostname } = new URL(origin)
+    return hostname === 'localhost' || hostname === '127.0.0.1'
+  } catch {
+    return false
+  }
 }
 
 function isRateLimited(key) {
@@ -77,11 +114,12 @@ function isRateLimited(key) {
 function isOriginAllowed(req) {
   const origin = req.headers.origin || req.headers.referer
   if (!origin) return false
-  try {
-    return new URL(origin).origin === new URL(ALLOWED_ORIGIN).origin
-  } catch {
-    return false
-  }
+  const normalizedOrigin = normalizeOrigin(origin)
+  if (!normalizedOrigin) return false
+  return (
+    ALLOWED_ORIGINS.has(normalizedOrigin) ||
+    isLocalDevelopmentOrigin(normalizedOrigin)
+  )
 }
 
 function hashClientIp(clientIp) {
@@ -123,6 +161,29 @@ async function parseBody(req, maxBytes) {
   }
 }
 
+function getLatestUserMessage(body) {
+  if (typeof body?.message === 'string' && body.message.trim()) {
+    return body.message
+  }
+
+  if (!Array.isArray(body?.messages)) {
+    return null
+  }
+
+  for (let index = body.messages.length - 1; index >= 0; index -= 1) {
+    const message = body.messages[index]
+    if (
+      message?.role === 'user' &&
+      typeof message.content === 'string' &&
+      message.content.trim()
+    ) {
+      return message.content
+    }
+  }
+
+  return null
+}
+
 async function handleOpenRouterChat(req, res, body, clerkId) {
   if (!ALLOW_VERCEL_CHAT) {
     return res.status(403).json({
@@ -135,10 +196,14 @@ async function handleOpenRouterChat(req, res, body, clerkId) {
   }
 
   if (INTERNAL_CHAT_TOKEN) {
-    const provided =
-      req.headers['x-internal-token'] ||
-      (req.headers.authorization || '').replace('Bearer ', '')
-    if (provided !== INTERNAL_CHAT_TOKEN) {
+    const providedHeader = req.headers['x-internal-token']
+    const providedInternalToken = Array.isArray(providedHeader)
+      ? providedHeader[0]
+      : providedHeader
+    if (
+      typeof providedInternalToken !== 'string' ||
+      providedInternalToken !== INTERNAL_CHAT_TOKEN
+    ) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
   }
@@ -150,7 +215,8 @@ async function handleOpenRouterChat(req, res, body, clerkId) {
     })
   }
 
-  const { message, sessionId, userEmail, maxTokens } = body || {}
+  const { sessionId, userEmail, maxTokens } = body || {}
+  const message = getLatestUserMessage(body)
   const conversationId =
     sessionId || `chat_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
 
@@ -165,7 +231,14 @@ async function handleOpenRouterChat(req, res, body, clerkId) {
 
   const apiKey = process.env.OPENROUTER_API_KEY
   if (!apiKey) {
-    return res.status(503).json({ error: 'Service IA non configuré' })
+    const setupHint =
+      process.env.NODE_ENV !== 'production'
+        ? "Definissez OPENROUTER_API_KEY dans votre environnement de dev (.env.local) puis redemarrez `npm run dev`."
+        : undefined
+
+    return res
+      .status(503)
+      .json({ error: 'Service IA non configuré', message: setupHint })
   }
 
   const cappedMaxTokens =
@@ -226,7 +299,7 @@ async function handleOpenRouterChat(req, res, body, clerkId) {
       sessionId: conversationId,
       userMessage: message,
       aiResponse,
-      userEmail: userEmail || null,
+      userEmail: typeof userEmail === 'string' ? userEmail : null,
       metadata,
       clerkId,
     })
@@ -237,6 +310,7 @@ async function handleOpenRouterChat(req, res, body, clerkId) {
   return res.status(200).json({
     success: true,
     response: aiResponse,
+    message: aiResponse,
     conversationId,
   })
 }
@@ -340,11 +414,20 @@ async function handler(req, res) {
       .json({ error: bodyResult.error.message })
   }
   const body = bodyResult || {}
+  const clerkSecretKey =
+    process.env.CLERK_SECRET_KEY || process.env.CLERK_API_KEY
+  if (!clerkSecretKey) {
+    return res.status(503).json({ error: 'Service auth non configuré' })
+  }
   const { userId: clerkId, error: authError } = await verifyClerkAuth(
     req.headers.authorization
   )
   if (authError || !clerkId) {
-    return res.status(401).json({ error: 'Unauthorized' })
+    const errorMessage =
+      process.env.NODE_ENV !== 'production' && authError
+        ? authError
+        : 'Unauthorized'
+    return res.status(401).json({ error: errorMessage })
   }
 
   try {

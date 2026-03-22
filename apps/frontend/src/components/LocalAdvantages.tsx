@@ -127,7 +127,7 @@ const LocalAdvantages = () => {
           <div className="mb-6 inline-flex items-center gap-3">
             <div className="flex items-center gap-1">
               <div className="h-6 w-4 rounded-sm bg-blue-600"></div>
-              <div className="h-6 w-4 rounded-sm border border-border bg-white"></div>
+              <div className="bg-background h-6 w-4 rounded-sm border border-border"></div>
               <div className="h-6 w-4 rounded-sm bg-red-600"></div>
             </div>
             <Badge

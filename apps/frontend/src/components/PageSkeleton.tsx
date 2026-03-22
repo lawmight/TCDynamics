@@ -214,7 +214,7 @@ export function PageSkeleton() {
   return (
     <div
       role="status"
-      aria-label="Loading page"
+      aria-label="Chargement de la page"
       aria-busy="true"
       className="duration-200 animate-in fade-in"
     >
@@ -223,7 +223,7 @@ export function PageSkeleton() {
       {skeletonType === 'landing' && <LandingSkeleton />}
 
       {/* Screen reader announcement */}
-      <span className="sr-only">Loading page content, please wait.</span>
+      <span className="sr-only">Chargement du contenu, veuillez patienter.</span>
     </div>
   )
 }

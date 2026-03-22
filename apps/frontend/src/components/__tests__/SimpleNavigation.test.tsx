@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -72,7 +72,7 @@ describe('SimpleNavigation Component', () => {
     renderSimpleNavigation()
 
     const mobileMenuButton = screen.getByRole('button', {
-      name: /Toggle menu/i,
+      name: /Ouvrir ou fermer le menu/i,
     })
     expect(mobileMenuButton).toBeInTheDocument()
   })
@@ -125,7 +125,7 @@ describe('SimpleNavigation Component', () => {
     renderSimpleNavigation()
 
     const mobileMenuButton = screen.getByRole('button', {
-      name: /Toggle menu/i,
+      name: /Ouvrir ou fermer le menu/i,
     })
 
     // Initially closed: one "Automatiser" (desktop only)
@@ -140,21 +140,24 @@ describe('SimpleNavigation Component', () => {
   it('should render mobile menu when open', () => {
     renderSimpleNavigation()
 
-    const mobileMenuButton = screen.getByLabelText('Toggle menu')
+    const mobileMenuButton = screen.getByLabelText('Ouvrir ou fermer le menu')
 
     // Open mobile menu
     fireEvent.click(mobileMenuButton)
 
     // Should show mobile menu navigation
-    expect(screen.getByText('Accueil')).toBeInTheDocument()
-    expect(screen.getByText('Fonctionnalités')).toBeInTheDocument()
+    const mobileNav = screen.getByRole('navigation', {
+      name: 'Menu de navigation mobile',
+    })
+    expect(within(mobileNav).getByText('Accueil')).toBeInTheDocument()
+    expect(within(mobileNav).getByText('Fonctionnalités')).toBeInTheDocument()
   })
 
   it('should close mobile menu when navigation item is clicked', () => {
     renderSimpleNavigation()
 
     const mobileMenuButton = screen.getByRole('button', {
-      name: /Toggle menu/i,
+      name: /Ouvrir ou fermer le menu/i,
     })
 
     // Open mobile menu
@@ -194,7 +197,7 @@ describe('SimpleNavigation Component', () => {
 
     // Initially no back to top button
     expect(
-      screen.queryByRole('button', { name: /Back to top/i })
+      screen.queryByRole('button', { name: /Retour en haut/i })
     ).not.toBeInTheDocument()
 
     // Simulate scroll past 300px
@@ -207,7 +210,7 @@ describe('SimpleNavigation Component', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('button', { name: /Back to top/i })
+        screen.getByRole('button', { name: /Retour en haut/i })
       ).toBeInTheDocument()
     })
   })
@@ -227,7 +230,7 @@ describe('SimpleNavigation Component', () => {
 
     fireEvent.scroll(window)
 
-    const backToTopButton = screen.getByLabelText('Back to top')
+    const backToTopButton = screen.getByLabelText('Retour en haut')
     fireEvent.click(backToTopButton)
 
     expect(mockScrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' })
@@ -257,7 +260,7 @@ describe('SimpleNavigation Component', () => {
   it('should have proper accessibility attributes for mobile menu button', () => {
     renderSimpleNavigation()
 
-    const mobileMenuButton = screen.getByLabelText('Toggle menu')
+    const mobileMenuButton = screen.getByLabelText('Ouvrir ou fermer le menu')
     expect(mobileMenuButton).toBeInTheDocument()
   })
 
@@ -273,7 +276,7 @@ describe('SimpleNavigation Component', () => {
     fireEvent.scroll(window)
 
     await waitFor(() => {
-      const backToTopButton = screen.getByLabelText('Back to top')
+      const backToTopButton = screen.getByLabelText('Retour en haut')
       expect(backToTopButton).toBeInTheDocument()
     })
   })

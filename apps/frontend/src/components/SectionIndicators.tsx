@@ -55,7 +55,7 @@ const SectionIndicators = ({
                 aria-label={`Aller à ${label}`}
                 aria-current={activeId === id ? 'true' : undefined}
                 title={label}
-                className="section-indicator-btn"
+                className="section-indicator-btn focus-visible:ring-ring focus-visible:ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-2"
               >
                 {/* Dot container - fixed size to prevent layout shift */}
                 <span className="section-indicator-dot-container">
@@ -106,6 +106,7 @@ const SectionIndicators = ({
                 aria-label={`Aller à ${label}`}
                 aria-current={activeId === id ? 'true' : undefined}
                 title={label}
+                className="focus-visible:ring-ring focus-visible:ring-offset-background rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                 style={{
                   width: activeId === id ? '24px' : '8px',
                   backgroundColor:

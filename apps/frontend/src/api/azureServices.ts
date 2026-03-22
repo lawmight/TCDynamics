@@ -566,8 +566,12 @@ export const chatAPI = {
       return {
         success: false,
         message:
-          error instanceof ApiError ? error.message : 'Chat request failed',
-        errors: [error instanceof Error ? error.message : 'Unknown error'],
+          error instanceof ApiError
+            ? error.message
+            : "La requête de chat a échoué",
+        errors: [
+          error instanceof Error ? error.message : 'Erreur inconnue',
+        ],
       }
     }
   },

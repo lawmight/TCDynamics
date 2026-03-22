@@ -28,11 +28,11 @@ export const clerkAppearance: Appearance = {
     // States - matches your design system
     colorDanger: 'hsl(var(--destructive))',
     colorDangerForeground: 'hsl(var(--destructive-foreground))',
-    colorSuccess: '#22c55e',
-    colorWarning: '#f97316',
+    colorSuccess: 'hsl(var(--success))',
+    colorWarning: 'hsl(var(--warning))',
 
-    // Typography - matches your Inter font family
-    fontFamily: 'Inter, sans-serif',
+    // Typography - matches the app's DM Sans body font
+    fontFamily: 'DM Sans, system-ui, sans-serif',
     fontSize: '0.875rem', // 14px base
     fontWeight: {
       normal: '400',
@@ -77,7 +77,7 @@ export const clerkAppearance: Appearance = {
   elements: {
     // Global element styling
     rootBox: {
-      fontFamily: 'Inter, sans-serif',
+      fontFamily: 'DM Sans, system-ui, sans-serif',
     },
     card: {
       borderRadius: '0.75rem',
@@ -133,11 +133,11 @@ export const clerkDarkAppearance: Appearance = {
     // States
     colorDanger: 'hsl(var(--destructive))',
     colorDangerForeground: 'hsl(var(--destructive-foreground))',
-    colorSuccess: '#22c55e',
-    colorWarning: '#f97316',
+    colorSuccess: 'hsl(var(--success))',
+    colorWarning: 'hsl(var(--warning))',
 
     // Typography
-    fontFamily: 'Inter, sans-serif',
+    fontFamily: 'DM Sans, system-ui, sans-serif',
     fontSize: '0.875rem',
     fontWeight: {
       normal: '400',
@@ -181,7 +181,7 @@ export const clerkDarkAppearance: Appearance = {
   },
   elements: {
     rootBox: {
-      fontFamily: 'Inter, sans-serif',
+      fontFamily: 'DM Sans, system-ui, sans-serif',
     },
     card: {
       borderRadius: '0.75rem',

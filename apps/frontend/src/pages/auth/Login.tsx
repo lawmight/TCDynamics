@@ -22,27 +22,27 @@ const Login = () => {
           <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/30">
             <ShieldCheck className="size-6" />
           </div>
-          <h1 className="text-2xl font-semibold">Sign in to TCDynamics</h1>
+          <h1 className="text-2xl font-semibold">Connexion a TCDynamics</h1>
           <p className="text-sm text-muted-foreground">
-            Continue with your account to access chat, knowledge base, and
-            analytics.
+            Connectez-vous pour acceder a votre assistant, vos documents et vos
+            analyses.
           </p>
         </div>
         <SignedOut>
           <SignInButton mode="redirect" redirectUrl="/app/chat">
-            <button className="w-full rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">
-              Sign In
+            <button className="text-primary-foreground w-full rounded-lg bg-primary px-4 py-2 text-sm font-semibold shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">
+              Se connecter
             </button>
           </SignInButton>
         </SignedOut>
         <SignedIn>
           <div className="text-center text-sm text-muted-foreground">
-            Redirecting…
+            Redirection…
           </div>
         </SignedIn>
         <p className="text-center text-xs text-muted-foreground">
-          Secure authentication via Clerk. You can manage your account settings
-          at any time.
+          Authentification securisee via Clerk. Vous pourrez gerer votre compte
+          a tout moment.
         </p>
       </Card>
     </div>

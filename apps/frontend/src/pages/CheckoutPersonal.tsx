@@ -112,7 +112,7 @@ const CheckoutPersonal = () => {
               <div className="space-y-6">
                 <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                   <CardHeader>
-                    <CardTitle className="text-2xl">
+                    <CardTitle as="h2" className="text-2xl">
                       Détails du paiement
                     </CardTitle>
                   </CardHeader>
@@ -205,7 +205,7 @@ const CheckoutPersonal = () => {
                     >
                       {isLoading ? (
                         <>
-                          <div className="mr-2 size-4 animate-spin rounded-full border-b-2 border-white"></div>
+                          <div className="border-primary-foreground mr-2 size-4 animate-spin rounded-full border-b-2"></div>
                           Redirection…
                         </>
                       ) : (
@@ -249,7 +249,7 @@ const CheckoutPersonal = () => {
               <div className="space-y-6">
                 <Card className="border-primary/20 bg-card/60 backdrop-blur-sm">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-2xl">
+                    <CardTitle as="h2" className="flex items-center gap-2 text-2xl">
                       <CreditCard className="size-6 text-primary" />
                       Informations
                     </CardTitle>
