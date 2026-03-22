@@ -44,7 +44,7 @@ const navItems = [
   },
   {
     to: '/app/settings',
-    label: 'Parametres',
+    label: 'Paramètres',
     icon: Settings,
     description: 'Configuration',
   },
@@ -54,9 +54,9 @@ const pageTitles: Record<string, { title: string; breadcrumb: string }> = {
   '/app/chat': { title: 'Assistant IA', breadcrumb: 'Assistant' },
   '/app/files': { title: 'Base documentaire', breadcrumb: 'Documents' },
   '/app/analytics': { title: 'Analyses', breadcrumb: 'Analyses' },
-  '/app/settings': { title: 'Parametres', breadcrumb: 'Parametres' },
+  '/app/settings': { title: 'Paramètres', breadcrumb: 'Paramètres' },
   '/app/settings/email': {
-    title: 'Preferences email',
+    title: 'Préférences email',
     breadcrumb: 'Emails',
   },
 }
@@ -224,12 +224,12 @@ export const AppLayout = () => {
                     onClick={toggleSidebar}
                   >
                     <PanelLeftClose className="size-4" />
-                    <span className="sr-only">Reduire la barre laterale</span>
+                    <span className="sr-only">Réduire la barre latérale</span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="right">
                   <p>
-                    Reduire la barre laterale{' '}
+                    Réduire la barre latérale{' '}
                     <kbd className="ml-1 rounded border px-1 py-0.5 text-[10px]">
                       {'\u2318'}B
                     </kbd>
@@ -260,7 +260,7 @@ export const AppLayout = () => {
         {mobileOpen && (
           <div className="fixed inset-0 z-40 md:hidden">
             <div
-              className="bg-foreground/50 focus-visible:ring-ring focus-visible:ring-offset-background absolute inset-0 backdrop-blur-sm focus-visible:ring-2 focus-visible:ring-offset-2"
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               onClick={() => setMobileOpen(false)}
               onKeyDown={e => {
                 if (e.key === 'Escape') setMobileOpen(false)
@@ -323,11 +323,11 @@ export const AppLayout = () => {
                     onClick={toggleSidebar}
                   >
                     <ChevronLeft className="size-4 rotate-180" />
-                    <span className="sr-only">Developper la barre laterale</span>
+                    <span className="sr-only">Développer la barre latérale</span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  Developper la barre laterale{' '}
+                  Développer la barre latérale{' '}
                   <kbd className="ml-1 rounded border px-1 py-0.5 text-[10px]">
                     {'\u2318'}B
                   </kbd>

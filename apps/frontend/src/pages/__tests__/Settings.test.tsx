@@ -48,9 +48,9 @@ describe('Settings page', () => {
 
     renderSettings()
 
-    expect(screen.getByText('Parametres')).toBeInTheDocument()
+    expect(screen.getByText('Paramètres')).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: /Profil/i })).toBeInTheDocument()
-    expect(screen.getByRole('tab', { name: /Cles API/i })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /Clés API/i })).toBeInTheDocument()
   })
 
   it('saves RUM settings on developer tab', async () => {
@@ -59,13 +59,13 @@ describe('Settings page', () => {
 
     renderSettings()
 
-    await user.click(screen.getByRole('tab', { name: /Developpeur/i }))
+    await user.click(screen.getByRole('tab', { name: /Développeur/i }))
     await user.type(
       screen.getByLabelText(/Identifiant du projet/i),
       'project-1'
     )
     await user.type(
-      screen.getByLabelText(/Cle publique d'ecriture/i),
+      screen.getByLabelText(/Clé publique d'écriture/i),
       'pk_123'
     )
     await user.click(

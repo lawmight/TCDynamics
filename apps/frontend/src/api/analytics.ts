@@ -5,8 +5,20 @@ export type AnalyticsSummary = {
   avgLatencyMs?: number
 }
 
-export const fetchAnalytics = async (): Promise<AnalyticsSummary> => {
-  const res = await fetch('/api/analytics')
+export type FetchAnalyticsOptions = {
+  getToken?: (forceRefresh?: boolean) => Promise<string | null>
+}
+
+export const fetchAnalytics = async (
+  options?: FetchAnalyticsOptions
+): Promise<AnalyticsSummary> => {
+  const headers: Record<string, string> = {}
+  const token = options?.getToken ? await options.getToken() : null
+  if (token) {
+    headers.Authorization = `Bearer ${token}`
+  }
+
+  const res = await fetch('/api/analytics', { headers })
   if (!res.ok) {
     const errorText = await res.text()
     throw new Error(errorText || 'Impossible de charger les analyses')
@@ -52,13 +64,27 @@ export const fetchAnalytics = async (): Promise<AnalyticsSummary> => {
   return data as AnalyticsSummary
 }
 
+export type RecordEventOptions = {
+  /** Required for POST /api/analytics (Clerk JWT). */
+  getToken?: (forceRefresh?: boolean) => Promise<string | null>
+}
+
 export const recordEvent = async (
   event: 'chat_message' | 'file_upload' | 'login',
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>,
+  options?: RecordEventOptions
 ) => {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  }
+  const token = options?.getToken ? await options.getToken() : null
+  if (token) {
+    headers.Authorization = `Bearer ${token}`
+  }
+
   const res = await fetch('/api/analytics', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify({ event, metadata }),
   })
   if (!res.ok) {

@@ -28,13 +28,8 @@ export async function verifyClerkAuth(authHeader) {
     // payload.sub contains the Clerk user ID
     return { userId: payload.sub, error: null }
   } catch (err) {
-    // Provide more helpful error messages in development
-    const isDevelopment = process.env.NODE_ENV !== 'production'
-    const errorMessage =
-      isDevelopment && err.message
-        ? `Token verification failed: ${err.message}`
-        : 'Invalid or expired token'
-    return { userId: null, error: errorMessage }
+    console.error('[auth] Token verification failed:', err.message || err)
+    return { userId: null, error: 'Invalid or expired token' }
   }
 }
 

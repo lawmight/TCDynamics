@@ -34,6 +34,6 @@ describe('Files page', () => {
     render(<Files />)
 
     expect(await screen.findByText(/doc.pdf/)).toBeInTheDocument()
-    expect(screen.getByText(/Indexe/)).toBeInTheDocument()
+    expect(screen.getByText(/Indexé/)).toBeInTheDocument()
   })
 })

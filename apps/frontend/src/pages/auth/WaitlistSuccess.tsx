@@ -13,23 +13,23 @@ const WaitlistSuccess = () => {
           <div className="bg-success/10 text-success mx-auto flex size-16 items-center justify-center rounded-full">
             <CheckCircle2 className="size-8" />
           </div>
-          <h1 className="text-2xl font-semibold">Vous etes bien inscrit(e) !</h1>
+          <h1 className="text-2xl font-semibold">Vous êtes bien inscrit(e) !</h1>
           <p className="text-muted-foreground">
             Merci d'avoir rejoint la liste d'attente TCDynamics. Nous vous
-            enverrons un email des que votre acces sera disponible.
+            enverrons un email dès que votre accès sera disponible.
           </p>
         </div>
 
         <div className="space-y-3">
           <p className="text-sm text-muted-foreground">
-            En attendant, vous pouvez decouvrir nos fonctionnalites et voir
+            En attendant, vous pouvez découvrir nos fonctionnalités et voir
             comment TCDynamics peut aider votre entreprise.
           </p>
 
           <Button asChild variant="outline" className="w-full">
             <Link to="/">
               <ArrowLeft className="mr-2 size-4" />
-              Retour a l'accueil
+              Retour à l'accueil
             </Link>
           </Button>
         </div>

@@ -19,7 +19,7 @@ const NotFound = () => {
           Oups, cette page est introuvable.
         </p>
         <a href="/" className="text-primary underline hover:text-primary/80">
-          Retour a l'accueil
+          Retour à l'accueil
         </a>
       </div>
     </div>

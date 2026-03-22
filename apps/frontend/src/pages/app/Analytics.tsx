@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ErrorState } from '@/components/ui/error-state'
 import { LoadingState } from '@/components/ui/loading-state'
+import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 import Activity from '~icons/lucide/activity'
 import ArrowDown from '~icons/lucide/arrow-down'
@@ -19,7 +20,7 @@ import Zap from '~icons/lucide/zap'
 
 interface StatCardProps {
   title: string
-  value: number
+  value: number | null
   description: string
   icon: React.ComponentType<{ className?: string }>
   trend?: { value: number; label: string }
@@ -47,7 +48,11 @@ function StatCard({
       <div className="flex items-start justify-between">
         <div className="space-y-2">
           <p className="text-muted-foreground text-sm font-medium">{title}</p>
-          <AnimatedCounter end={value} className="text-3xl font-bold" />
+          {value !== null ? (
+            <AnimatedCounter end={value} className="text-3xl font-bold" />
+          ) : (
+            <span className="text-muted-foreground text-3xl font-bold">&mdash;</span>
+          )}
           <p className="text-muted-foreground text-xs">{description}</p>
         </div>
         <div className={cn('rounded-xl p-2.5', colorMap[color])}>
@@ -78,6 +83,7 @@ function StatCard({
 }
 
 const Analytics = () => {
+  const { getToken } = useAuth()
   const [data, setData] = useState<AnalyticsSummary | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -86,7 +92,7 @@ const Analytics = () => {
     setLoading(true)
     setError(null)
     try {
-      const result = await fetchAnalytics()
+      const result = await fetchAnalytics({ getToken })
       setData(result)
     } catch (err) {
       const message =
@@ -147,31 +153,31 @@ const Analytics = () => {
             <StatCard
               title="Messages chat"
               value={data.chatMessages ?? 0}
-              description="Messages traites cette semaine"
+              description="Messages traités cette semaine"
               icon={BarChart2}
-              trend={{ value: 12, label: 'vs la semaine derniere' }}
+              trend={{ value: 12, label: 'vs la semaine dernière' }}
               color="primary"
             />
             <StatCard
-              title="Documents indexes"
+              title="Documents indexés"
               value={data.uploads ?? 0}
-              description="Fichiers prets pour la recherche"
+              description="Fichiers prêts pour la recherche"
               icon={Activity}
-              trend={{ value: 5, label: 'vs la semaine derniere' }}
+              trend={{ value: 5, label: 'vs la semaine dernière' }}
               color="success"
             />
             <StatCard
               title="Utilisateurs actifs"
               value={data.activeUsers ?? 0}
-              description="Utilisateurs connectes sur 24 h"
+              description="Utilisateurs connectés sur 24 h"
               icon={Users}
               trend={{ value: -2, label: 'vs hier' }}
               color="info"
             />
             <StatCard
               title="Latence moyenne"
-              value={data.avgLatencyMs ? Math.round(data.avgLatencyMs) : 0}
-              description="Temps de reponse bout en bout"
+              value={data.avgLatencyMs ? Math.round(data.avgLatencyMs) : null}
+              description="Temps de réponse bout en bout"
               icon={Zap}
               color="warning"
             />
@@ -188,7 +194,7 @@ const Analytics = () => {
               </div>
               <div className="space-y-4">
                 <PerformanceRow
-                  label="Temps de reponse du chat"
+                  label="Temps de réponse du chat"
                   value={
                     data.avgLatencyMs
                       ? `${Math.round(data.avgLatencyMs)}ms`
@@ -206,7 +212,7 @@ const Analytics = () => {
                   status="good"
                 />
                 <PerformanceRow
-                  label="Disponibilite API"
+                  label="Disponibilité API"
                   value="99.9%"
                   status="good"
                 />
@@ -230,12 +236,12 @@ const Analytics = () => {
                 />
                 <QuickAction
                   icon={Clock}
-                  label="Gerer les cles API"
+                  label="Gérer les clés API"
                   href="/app/settings"
                 />
                 <QuickAction
                   icon={Users}
-                  label="Preferences d'equipe"
+                  label="Préférences d'équipe"
                   href="/app/settings"
                 />
               </div>
@@ -245,8 +251,8 @@ const Analytics = () => {
       ) : (
         <EmptyState
           icon={<BarChart2 className="size-7" />}
-          title="Aucune donnee disponible"
-          description="Les statistiques apparaitront ici des que votre activite commencera a remonter."
+          title="Aucune donnée disponible"
+          description="Les statistiques apparaîtront ici dès que votre activité commencera à remonter."
           action={
             <Button variant="outline" size="sm" onClick={() => void load()}>
               <RefreshCcw className="mr-1.5 size-3.5" />

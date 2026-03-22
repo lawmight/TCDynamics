@@ -38,9 +38,9 @@ const Settings = () => {
     try {
       localStorage.setItem(LS.RUM_PROJECT_ID, projectId)
       localStorage.setItem(LS.RUM_WRITE_KEY, writeKey)
-      toast.success('Configuration enregistree')
+      toast.success('Configuration enregistrée')
     } catch {
-      toast.error("Impossible d'enregistrer les parametres")
+      toast.error("Impossible d'enregistrer les paramètres")
     }
   }
 
@@ -52,7 +52,7 @@ const Settings = () => {
         <LoadingState
           variant="skeleton"
           preset="panel"
-          label="Chargement des parametres"
+          label="Chargement des paramètres"
         />
       </div>
     )
@@ -71,9 +71,9 @@ const Settings = () => {
   return (
     <div className="mx-auto w-full max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Parametres</h1>
+        <h1 className="text-2xl font-semibold">Paramètres</h1>
         <p className="text-muted-foreground text-sm">
-          Gere votre compte, vos cles API et vos preferences.
+          Gère votre compte, vos clés API et vos préférences.
         </p>
       </div>
 
@@ -85,7 +85,7 @@ const Settings = () => {
           </TabsTrigger>
           <TabsTrigger value="api-keys" className="gap-1.5">
             <Key className="size-3.5" />
-            Cles API
+            Clés API
           </TabsTrigger>
           <TabsTrigger value="notifications" className="gap-1.5">
             <Mail className="size-3.5" />
@@ -93,7 +93,7 @@ const Settings = () => {
           </TabsTrigger>
           <TabsTrigger value="developer" className="gap-1.5">
             <Code className="size-3.5" />
-            Developpeur
+            Développeur
           </TabsTrigger>
         </TabsList>
 
@@ -102,7 +102,7 @@ const Settings = () => {
           <Card className="p-6">
             <h2 className="text-base font-semibold">Compte</h2>
             <p className="text-muted-foreground mt-1 text-sm">
-              Les informations de votre compte sont gerees via Clerk.
+              Les informations de votre compte sont gérées via Clerk.
             </p>
             <Separator className="my-4" />
             <div className="space-y-4">
@@ -117,7 +117,7 @@ const Settings = () => {
               </div>
               <p className="text-muted-foreground text-xs">
                 Pour modifier votre nom, votre email ou votre mot de passe,
-                utilisez le menu compte dans la barre laterale.
+                utilisez le menu compte dans la barre latérale.
               </p>
             </div>
           </Card>
@@ -144,7 +144,7 @@ const Settings = () => {
             >
               <Button>
                 <Mail className="mr-1.5 size-3.5" />
-                Gerer les preferences email
+                Gérer les préférences email
               </Button>
             </Link>
           </Card>
@@ -170,7 +170,7 @@ const Settings = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="writeKey">Cle publique d'ecriture</Label>
+                <Label htmlFor="writeKey">Clé publique d'écriture</Label>
                 <Input
                   id="writeKey"
                   aria-required="true"

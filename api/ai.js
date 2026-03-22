@@ -3,7 +3,8 @@ import { verifyClerkAuth } from './_lib/auth.js'
 import { saveConversation } from './_lib/mongodb-db.js'
 import { User } from './_lib/models/User.js'
 import { connectToDatabase } from './_lib/mongodb.js'
-import { getClientIp, parseJsonBody } from './_lib/request-guards.js'
+import logger from './_lib/logger.js'
+import { applyRateLimit, getClientIp, parseJsonBody } from './_lib/request-guards.js'
 import { withSentry } from './_lib/sentry.js'
 import { validateImageUrl } from './_lib/validate-url.js'
 
@@ -38,10 +39,7 @@ const MAX_MESSAGE_LENGTH = Math.max(
   Number(process.env.MAX_MESSAGE_LENGTH) || 2000
 )
 const MAX_TOKENS = Math.max(1, Number(process.env.MAX_TOKENS) || 512)
-const MAX_REQUESTS_PER_WINDOW = 5
-const RATE_LIMIT_WINDOW_MS = 60_000
-// Simple in-memory rate limiter; replace with a persistent store (e.g., Vercel KV / Upstash Redis) in production to share state across invocations
-const rateLimitStore = new Map()
+const OPENROUTER_RATE_LIMIT = { limit: 5, windowMs: 60_000, scope: 'openrouter-chat' }
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
 const OPENROUTER_APP_TITLE = process.env.OPENROUTER_APP_TITLE || 'WorkFlowAI'
@@ -89,28 +87,6 @@ function isLocalDevelopmentOrigin(origin) {
   }
 }
 
-function isRateLimited(key) {
-  const now = Date.now()
-  const cutoff = now - RATE_LIMIT_WINDOW_MS
-  const existingHistory = rateLimitStore.get(key) || []
-  const filteredHistory = existingHistory.filter(ts => ts > cutoff)
-
-  // Compute whether adding this request would exceed the limit
-  const wouldExceedLimit = filteredHistory.length >= MAX_REQUESTS_PER_WINDOW
-
-  if (wouldExceedLimit) {
-    // Request is rate-limited: update store with filtered history (evict old entries)
-    // but do NOT add the current timestamp
-    rateLimitStore.set(key, filteredHistory)
-    return true
-  }
-
-  // Request is allowed: add current timestamp and persist
-  const updatedHistory = [...filteredHistory, now]
-  rateLimitStore.set(key, updatedHistory)
-  return false
-}
-
 function isOriginAllowed(req) {
   const origin = req.headers.origin || req.headers.referer
   if (!origin) return false
@@ -125,9 +101,7 @@ function isOriginAllowed(req) {
 function hashClientIp(clientIp) {
   if (!ENABLE_CLIENT_IP_LOGGING) return null
   if (!IP_HASH_SALT || !clientIp || clientIp === 'unknown') {
-    console.warn(
-      'IP logging enabled but IP_HASH_SALT or client IP missing; skipping IP storage'
-    )
+    logger.warn('IP logging enabled but IP_HASH_SALT or client IP missing; skipping IP storage')
     return null
   }
   return crypto
@@ -208,10 +182,14 @@ async function handleOpenRouterChat(req, res, body, clerkId) {
     }
   }
 
-  const clientIp = getClientIp(req)
-  if (isRateLimited(clientIp)) {
+  const rateResult = await applyRateLimit(req, OPENROUTER_RATE_LIMIT)
+  if (!rateResult.allowed) {
+    if (rateResult.retryAfter) {
+      res.setHeader('Retry-After', rateResult.retryAfter.toString())
+    }
     return res.status(429).json({
       error: 'Rate limit exceeded. Please slow down.',
+      retryAfterSeconds: rateResult.retryAfter,
     })
   }
 
@@ -280,7 +258,7 @@ async function handleOpenRouterChat(req, res, body, clerkId) {
     "Désolé, je n'ai pas pu générer une réponse."
   const tokensUsed = data.usage?.total_tokens || 0
   const actualModel = data.model || openRouterModel
-  const clientIpHash = hashClientIp(clientIp)
+  const clientIpHash = hashClientIp(getClientIp(req))
 
   try {
     const metadata = {
@@ -304,7 +282,7 @@ async function handleOpenRouterChat(req, res, body, clerkId) {
       clerkId,
     })
   } catch (logError) {
-    console.warn('Conversation log failed', logError)
+    logger.warn('Conversation log failed', logError)
   }
 
   return res.status(200).json({
@@ -443,7 +421,7 @@ async function handler(req, res) {
       validActions: ['chat', 'vision'],
     })
   } catch (error) {
-    console.error('AI error:', error)
+    logger.error('AI error', error)
     return res.status(500).json({
       error: 'AI request failed',
       message: error instanceof Error ? error.message : 'Unknown error',

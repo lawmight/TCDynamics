@@ -43,7 +43,7 @@ const Footer = () => {
                   to="/about"
                   className="text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  A propos
+                  À propos
                 </Link>
               </li>
               <li>
@@ -66,7 +66,7 @@ const Footer = () => {
                   to="/#features"
                   className="text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  Fonctionnalites
+                  Fonctionnalités
                 </Link>
               </li>
               <li>
@@ -82,7 +82,7 @@ const Footer = () => {
 
           {/* Column 3: Social */}
           <div className="space-y-4">
-            <h3 className="text-lg font-bold text-foreground">Reseaux</h3>
+            <h3 className="text-lg font-bold text-foreground">Réseaux</h3>
             <ul className="space-y-2">
               <li>
                 <ExternalLink
@@ -141,7 +141,7 @@ const Footer = () => {
                   href="https://www.termsfeed.com/live/fa645ea2-fa78-4258-9064-630eeef14d62"
                   className="text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  Politique de confidentialite
+                  Politique de confidentialité
                 </ExternalLink>
               </li>
               <li>
@@ -149,7 +149,7 @@ const Footer = () => {
                   href="https://www.termsfeed.com/live/0d2ed5d6-3b2e-4040-b09d-1ff7cb705693"
                   className="text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  Conditions generales
+                  Conditions générales
                 </ExternalLink>
               </li>
               <li>
@@ -167,7 +167,7 @@ const Footer = () => {
         {/* Copyright */}
         <div className="text-muted-foreground mt-12 border-t border-border/40 pt-8 text-center text-sm">
           <p>
-            &copy; {new Date().getFullYear()} TCDynamics. Tous droits reserves.
+            &copy; {new Date().getFullYear()} TCDynamics. Tous droits réservés.
           </p>
         </div>
       </div>

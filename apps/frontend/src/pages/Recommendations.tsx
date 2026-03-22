@@ -19,6 +19,12 @@ type Rec = {
   impact: 'low' | 'medium' | 'high'
 }
 
+const IMPACT_LABELS: Record<Rec['impact'], string> = {
+  high: 'Élevé',
+  medium: 'Moyen',
+  low: 'Faible',
+}
+
 const Recommendations = () => {
   const [projectId] = useState<string>(getStoredProjectId())
   const days = 7
@@ -85,7 +91,7 @@ const Recommendations = () => {
             <span
               className={`mt-2 inline-block rounded px-2 py-1 text-xs ${r.impact === 'high' ? 'bg-destructive/10 text-destructive' : r.impact === 'medium' ? 'bg-warning/10 text-warning' : 'bg-primary/10 text-primary'}`}
             >
-              {r.impact.toUpperCase()}
+              {IMPACT_LABELS[r.impact]}
             </span>
           </li>
         ))}

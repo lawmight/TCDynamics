@@ -72,7 +72,7 @@ export function ErrorState({
   }
 
   const content = (
-    <Card className={cn('border-destructive/20 bg-destructive/5', className)}>
+    <Card className="border-destructive/20 bg-destructive/5">
       <CardContent className="px-6 py-8">
         <ErrorStateContent
           message={message}
@@ -88,7 +88,7 @@ export function ErrorState({
     return (
       <div
         role="alert"
-        className="flex min-h-[40vh] items-center justify-center"
+        className={cn('flex min-h-[40vh] items-center justify-center', className)}
         {...props}
       >
         {content}
@@ -97,7 +97,7 @@ export function ErrorState({
   }
 
   return (
-    <div role="alert" {...props}>
+    <div role="alert" className={className} {...props}>
       {content}
     </div>
   )

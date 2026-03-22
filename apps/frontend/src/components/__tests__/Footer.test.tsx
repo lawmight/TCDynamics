@@ -15,12 +15,12 @@ describe('Footer', () => {
   it('exposes company and product routes', () => {
     renderFooter()
 
-    expect(screen.getByRole('link', { name: /A propos/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /À propos/i })).toHaveAttribute(
       'href',
       '/about'
     )
     expect(
-      screen.getByRole('link', { name: /Fonctionnalites/i })
+      screen.getByRole('link', { name: /Fonctionnalités/i })
     ).toHaveAttribute(
       'href',
       '/#features'

@@ -7,7 +7,7 @@
 AI-powered automation platform for French SMEs. Monorepo with npm workspaces + Turborepo:
 
 - `apps/frontend` — React 18 + Vite (local dev port from `apps/frontend/vite.config.ts`, often **3100** on Windows when **3000** is inside an excluded TCP range)
-- `api/` — Vercel serverless functions (port 3001 via `vercel dev`)
+- `api/` — Vercel serverless functions; local `npm run dev:vercel` listens on **3201** (see root `package.json`, `vercel.api.dev.json`)
 - `apps/backend` — Express server (optional, local dev only, port 8080)
 - `packages/shared-types`, `packages/shared-utils` — shared TS packages (must be built before type-checking)
 
@@ -17,7 +17,7 @@ Requires **Node 20.x** (`engines.node: "20.x"` in root `package.json`). Use `nvm
 
 ### Running the Dev Server
 
-See `README.md` Quick Start section. Key command: `npm run dev` runs both frontend (Vite, port from `vite.config.ts`) and Vercel dev server (API, port 3001) concurrently. The Vite dev server proxies `/api` requests to port 3001.
+See `README.md` Quick Start section. Key command: `npm run dev` runs both frontend (Vite, port from `vite.config.ts`) and Vercel dev server (API, port **3201** in current scripts) concurrently. The Vite dev server proxies `/api` to the URL in `apps/frontend/vite.config.ts` (typically **http://localhost:3201**).
 
 ### Clerk Authentication
 
@@ -68,5 +68,5 @@ To verify MongoDB connectivity independently: `cd api && node --input-type=modul
 
 ## Learned Workspace Facts
 
-- On Windows, `netsh interface ipv4 show excludedportrange protocol=tcp` often lists ranges that include **2991–3090**; binding Vite to **3000** can fail with `EACCES`, so this repo may use another dev port (for example **3100**) in `apps/frontend/vite.config.ts` while `/api` still targets **localhost:3001**.
-- Server-side chat in this monorepo goes through OpenRouter (`api/ai.js`); integration docs under `docs/integrations/` describe model routing patterns such as `openrouter/free` where relevant.
+- On Windows, `netsh interface ipv4 show excludedportrange protocol=tcp` often lists ranges that include **2991–3090**; binding Vite to **3000** can fail with `EACCES`, so this repo often uses another dev port (for example **3100**) in `apps/frontend/vite.config.ts`, with `/api` proxied to the local Vercel dev port configured there (currently **3201** with root `npm run dev`).
+- Server-side chat goes through OpenRouter (`api/ai.js`); without `OPENROUTER_API_KEY` the API responds as IA not configured and the chat UI shows an error. Integration notes live under `docs/integrations/` (including model routes such as `openrouter/free` where relevant).

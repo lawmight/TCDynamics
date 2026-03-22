@@ -32,7 +32,9 @@ describe('Dashboard page', () => {
 
     renderDashboard()
 
-    expect(screen.getByText(/Aucun projet configure/i)).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: /Aucun projet configuré/i })
+    ).toBeInTheDocument()
   })
 
   it('renders metrics cards when data is available', () => {

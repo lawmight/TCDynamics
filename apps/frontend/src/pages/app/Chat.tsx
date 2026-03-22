@@ -61,21 +61,68 @@ const getAiServiceNotConfiguredMessage = () =>
     ? "Service IA non configure. Ajoutez OPENROUTER_API_KEY dans votre .env.local, puis redemarrez `npm run dev`."
     : "Service IA momentanement indisponible. Reessayez plus tard."
 
-const getChatErrorMessage = async (res: Response): Promise<string> => {
-  if (res.status === 404) {
+const getInvalidChatSuccessBodyMessage = () =>
+  import.meta.env.DEV
+    ? 'Reponse vide ou non JSON depuis /api/ai. Verifiez que `npm run dev` tourne (API Vercel sur le port 3201, proxy Vite) et que ALLOW_VERCEL_CHAT est actif.'
+    : 'Reponse serveur invalide. Reessayez plus tard.'
+
+const MAX_RAW_ERROR_LENGTH = 500
+const RAW_ERROR_SENSITIVE_PATTERNS = [
+  /^\s*at\s.+/i,
+  /\b(?:[A-Za-z]:\\|\/(?:Users|home|var|tmp|srv|app|workspace|private|opt)\/)/,
+  /\b[A-Za-z0-9_.-]+\.(?:ts|tsx|js|jsx|mjs|cjs|py|rb|go|java|php|cs):\d+(?::\d+)?\b/,
+  /\bfile:\/\//i,
+]
+
+const sanitizeRawChatError = (rawBody: string): string => {
+  const sanitizedLines = rawBody
+    .trim()
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(line => line.length > 0)
+
+  let sensitiveContentDetected = false
+
+  const safeText = sanitizedLines
+    .filter(line => {
+      const isSensitive = RAW_ERROR_SENSITIVE_PATTERNS.some(pattern =>
+        pattern.test(line)
+      )
+      if (isSensitive) {
+        sensitiveContentDetected = true
+      }
+      return !isSensitive
+    })
+    .join(' ')
+    .slice(0, MAX_RAW_ERROR_LENGTH)
+    .trim()
+
+  if (sensitiveContentDetected) {
+    return 'Une erreur serveur est survenue. Reessayez plus tard.'
+  }
+
+  return safeText || 'La requete de chat a echoue'
+}
+
+/** Parse error message from an already-read response body (single read per request). */
+const getChatErrorMessageFromBody = (
+  status: number,
+  contentType: string,
+  rawBody: string
+): string => {
+  if (status === 404) {
     return getApiNotFoundMessage()
   }
 
-  if (res.status === 431) {
+  if (status === 431) {
     return getLargeHeaderMessage()
   }
 
-  const rawBody = (await res.text().catch(() => '')).trim()
-  if (rawBody) {
-    const contentType = res.headers.get('content-type') || ''
+  const trimmed = rawBody.trim()
+  if (trimmed) {
     if (contentType.includes('application/json')) {
       try {
-        const parsedError = JSON.parse(rawBody) as {
+        const parsedError = JSON.parse(trimmed) as {
           error?: unknown
           message?: unknown
         }
@@ -115,14 +162,26 @@ const getChatErrorMessage = async (res: Response): Promise<string> => {
       }
     }
 
-    return rawBody
+    return sanitizeRawChatError(trimmed)
   }
 
-  if (res.status === 401) {
+  if (status === 401) {
     return 'Authentification requise. Connectez-vous pour continuer.'
   }
 
   return 'La requete de chat a echoue'
+}
+
+const parseChatSuccessJson = (bodyText: string): ChatResponse => {
+  const trimmed = bodyText.trim()
+  if (!trimmed) {
+    throw new Error(getInvalidChatSuccessBodyMessage())
+  }
+  try {
+    return JSON.parse(trimmed) as ChatResponse
+  } catch {
+    throw new Error(getInvalidChatSuccessBodyMessage())
+  }
 }
 
 const isSessionExpiredError = (status: number, errorMessage: string) =>
@@ -166,8 +225,15 @@ const sendChat = async ({
     throw new Error(getApiUnavailableMessage())
   }
 
+  const contentType = res.headers.get('content-type') || ''
+  const bodyText = await res.text().catch(() => '')
+
   if (!res.ok) {
-    const errorMessage = await getChatErrorMessage(res)
+    const errorMessage = getChatErrorMessageFromBody(
+      res.status,
+      contentType,
+      bodyText
+    )
     if (isSessionExpiredError(res.status, errorMessage)) {
       const refreshedToken = await getToken(true)
       if (!refreshedToken) {
@@ -176,16 +242,23 @@ const sendChat = async ({
 
       try {
         const retryResponse = await makeRequest(refreshedToken)
-        if (retryResponse.ok) {
-          return retryResponse.json()
+        const retryType = retryResponse.headers.get('content-type') || ''
+        const retryText = await retryResponse.text().catch(() => '')
+
+        if (!retryResponse.ok) {
+          const retryError = getChatErrorMessageFromBody(
+            retryResponse.status,
+            retryType,
+            retryText
+          )
+          throw new Error(
+            isSessionExpiredError(retryResponse.status, retryError)
+              ? SESSION_EXPIRED_MESSAGE
+              : retryError
+          )
         }
 
-        const retryError = await getChatErrorMessage(retryResponse)
-        throw new Error(
-          isSessionExpiredError(retryResponse.status, retryError)
-            ? SESSION_EXPIRED_MESSAGE
-            : retryError
-        )
+        return parseChatSuccessJson(retryText)
       } catch (retryError) {
         if (retryError instanceof Error) {
           throw retryError
@@ -197,7 +270,7 @@ const sendChat = async ({
     throw new Error(errorMessage)
   }
 
-  return res.json()
+  return parseChatSuccessJson(bodyText)
 }
 
 const SUGGESTED_PROMPTS = [
@@ -271,7 +344,11 @@ const Chat = () => {
           content: response.response || response.message || 'Aucune reponse recue.',
         }
         setMessages([...payload, assistantMessage])
-        await recordEvent('chat_message', { sessionId, user: userEmail })
+        await recordEvent(
+          'chat_message',
+          { sessionId, user: userEmail },
+          { getToken }
+        )
       } catch (err) {
         const message =
           err instanceof Error ? err.message : "Impossible d'envoyer le message"

@@ -59,8 +59,7 @@ const GetStarted = () => {
   // Proactive support for onboarding assistance
   const { struggle, dismissHelp, handleResourceClick, handleFeedback } =
     useProactiveSupport({
-      userId: formData.email || undefined, // Use email as user ID during onboarding
-      disabled: !formData.email, // Only enable after email entered
+      disabled: !formData.email,
     })
 
   const plans = [

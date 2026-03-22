@@ -50,7 +50,7 @@ function formatDate(dateString: string | null): string {
 }
 
 function formatRelativeDate(dateString: string | null): string {
-  if (!dateString) return 'Jamais utilisee'
+  if (!dateString) return 'Jamais utilisée'
   const date = new Date(dateString)
   const now = new Date()
   const diffMs = now.getTime() - date.getTime()
@@ -59,7 +59,10 @@ function formatRelativeDate(dateString: string | null): string {
   if (diffDays === 0) return "Aujourd'hui"
   if (diffDays === 1) return 'Hier'
   if (diffDays < 7) return `Il y a ${diffDays} jours`
-  if (diffDays < 30) return `Il y a ${Math.floor(diffDays / 7)} semaines`
+  if (diffDays < 30) {
+    const weeks = Math.floor(diffDays / 7)
+    return `Il y a ${weeks} ${weeks > 1 ? 'semaines' : 'semaine'}`
+  }
   return formatDate(dateString)
 }
 
@@ -83,7 +86,7 @@ function ApiKeyCard({
                 <span className="truncate font-medium">{apiKey.name}</span>
               ) : (
                 <span className="italic text-muted-foreground">
-                  Cle sans nom
+                  Clé sans nom
                 </span>
               )}
             </div>
@@ -93,7 +96,7 @@ function ApiKeyCard({
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
                 <Calendar className="size-3" />
-                Creee le {formatDate(apiKey.created_at)}
+                Créée le {formatDate(apiKey.created_at)}
               </span>
               <span className="flex items-center gap-1">
                 <Clock className="size-3" />
@@ -113,7 +116,7 @@ function ApiKeyCard({
             ) : (
               <Trash2 className="size-4" />
             )}
-            <span className="sr-only">Revoquer la cle</span>
+            <span className="sr-only">Révoquer la clé</span>
           </Button>
         </div>
       </CardContent>
@@ -176,19 +179,19 @@ export default function ApiKeyManager() {
     return (
       <Alert variant="destructive">
         <AlertTriangle className="size-4" />
-        <AlertTitle>Impossible de charger les cles API</AlertTitle>
+        <AlertTitle>Impossible de charger les clés API</AlertTitle>
         <AlertDescription className="space-y-3">
           <p>
             {
               error.message ||
-              'Une erreur inattendue est survenue. Veuillez reessayer.'
+              'Une erreur inattendue est survenue. Veuillez réessayer.'
             }
           </p>
           {import.meta.env.DEV && isAuthError && (
             <p className="text-xs italic text-muted-foreground">
-              Astuce: en mode developpement, les sessions Clerk peuvent expirer
-              rapidement. Verifiez que votre serveur Vercel et le frontend
-              utilisent la meme instance Clerk.
+              Astuce: en mode développement, les sessions Clerk peuvent expirer
+              rapidement. Vérifiez que votre serveur Vercel et le frontend
+              utilisent la même instance Clerk.
             </p>
           )}
           {isAuthError ? (
@@ -208,7 +211,7 @@ export default function ApiKeyManager() {
                 className="border-destructive text-destructive hover:bg-destructive/10"
               >
                 <RefreshCw className="mr-2 size-3" />
-                Reessayer
+                Réessayer
               </Button>
             </div>
           ) : (
@@ -219,7 +222,7 @@ export default function ApiKeyManager() {
               className="mt-2"
             >
               <RefreshCw className="mr-2 size-3" />
-              Reessayer
+              Réessayer
             </Button>
           )}
         </AlertDescription>
@@ -233,16 +236,16 @@ export default function ApiKeyManager() {
       <div className="flex items-center justify-between">
         <div>
           <CardTitle as="h2" className="text-base">
-            Cles API
+            Clés API
           </CardTitle>
           <CardDescription>
-            Gere les cles pour acceder a l'API de facon programmatique
+            Gère les clés pour accéder à l'API de façon programmatique
           </CardDescription>
         </div>
         {keys.length > 0 && (
           <Button size="sm" onClick={handleOpenCreateDialog}>
             <Plus className="mr-2 size-4" />
-            Creer une cle
+            Créer une clé
           </Button>
         )}
       </div>
@@ -253,17 +256,17 @@ export default function ApiKeyManager() {
           variant="skeleton"
           preset="list"
           count={2}
-          label="Chargement des cles API"
+          label="Chargement des clés API"
         />
       ) : keys.length === 0 ? (
         <EmptyState
           icon={<Key className="size-7" />}
-          title="Aucune cle API"
-          description="Creez une cle API pour connecter vos applications, scripts ou integrations a TCDynamics."
+          title="Aucune clé API"
+          description="Créez une clé API pour connecter vos applications, scripts ou intégrations à TCDynamics."
           action={
             <Button onClick={handleOpenCreateDialog}>
               <Plus className="mr-2 size-4" />
-              Creer votre premiere cle
+              Créer votre première clé
             </Button>
           }
         />
@@ -296,11 +299,11 @@ export default function ApiKeyManager() {
           <AlertDialogHeader>
             <div className="flex items-center gap-2">
               <AlertTriangle className="size-5 text-destructive" />
-              <AlertDialogTitle>Revoquer cette cle API ?</AlertDialogTitle>
+              <AlertDialogTitle>Révoquer cette clé API ?</AlertDialogTitle>
             </div>
             <AlertDialogDescription>
-              Vous allez revoquer la cle API suivante. Cette action peut etre
-              annulee dans les 10 secondes.
+              Vous allez révoquer la clé API suivante. Cette action peut être
+              annulée dans les 10 secondes.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
@@ -315,18 +318,18 @@ export default function ApiKeyManager() {
                 </div>
               )}
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Prefixe :</span>
+                <span className="text-sm font-medium">Préfixe :</span>
                 <code className="rounded bg-background px-2 py-1 font-mono text-xs">
                   {keyToRevoke?.key_prefix}
                 </code>
               </div>
               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>Creee le :</span>
+                <span>Créée le :</span>
                 <span>{formatDate(keyToRevoke?.created_at ?? null)}</span>
               </div>
               {keyToRevoke?.last_used_at && (
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>Derniere utilisation :</span>
+                  <span>Dernière utilisation :</span>
                   <span>{formatDate(keyToRevoke.last_used_at)}</span>
                 </div>
               )}
@@ -335,10 +338,10 @@ export default function ApiKeyManager() {
             {/* Warning Alert */}
             <Alert variant="destructive" className="mt-3">
               <AlertTriangle className="size-4" />
-              <AlertTitle>Impact immediat</AlertTitle>
+              <AlertTitle>Impact immédiat</AlertTitle>
               <AlertDescription>
-                Cette cle cessera de fonctionner immediatement. Les services qui
-                l'utilisent perdront l'acces et pourront rencontrer une
+                Cette clé cessera de fonctionner immédiatement. Les services qui
+                l'utilisent perdront l'accès et pourront rencontrer une
                 interruption.
               </AlertDescription>
             </Alert>
@@ -359,10 +362,10 @@ export default function ApiKeyManager() {
               {isRevoking ? (
                 <>
                   <Loader2 className="mr-2 size-4 animate-spin" />
-                  Revocation…
+                  Révocation…
                 </>
               ) : (
-                'Revoquer la cle'
+                'Révoquer la clé'
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

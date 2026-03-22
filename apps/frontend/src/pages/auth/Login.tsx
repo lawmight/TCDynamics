@@ -22,9 +22,9 @@ const Login = () => {
           <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/30">
             <ShieldCheck className="size-6" />
           </div>
-          <h1 className="text-2xl font-semibold">Connexion a TCDynamics</h1>
+          <h1 className="text-2xl font-semibold">Connexion à TCDynamics</h1>
           <p className="text-sm text-muted-foreground">
-            Connectez-vous pour acceder a votre assistant, vos documents et vos
+            Connectez-vous pour accéder à votre assistant, vos documents et vos
             analyses.
           </p>
         </div>
@@ -41,8 +41,8 @@ const Login = () => {
           </div>
         </SignedIn>
         <p className="text-center text-xs text-muted-foreground">
-          Authentification securisee via Clerk. Vous pourrez gerer votre compte
-          a tout moment.
+          Authentification sécurisée via Clerk. Vous pourrez gérer votre compte
+          à tout moment.
         </p>
       </Card>
     </div>

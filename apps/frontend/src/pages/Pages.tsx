@@ -37,11 +37,11 @@ const Pages = () => {
         <h1 className="text-2xl font-semibold">Pages</h1>
         <EmptyState
           icon={<Settings className="size-7" />}
-          title="Aucun projet configure"
-          description="Ajoutez votre identifiant de projet dans les parametres pour afficher les performances par page."
+          title="Aucun projet configuré"
+          description="Ajoutez votre identifiant de projet dans les paramètres pour afficher les performances par page."
           action={
             <Button asChild>
-              <Link to="/app/settings">Ouvrir les parametres</Link>
+              <Link to="/app/settings">Ouvrir les paramètres</Link>
             </Button>
           }
         />
@@ -77,7 +77,7 @@ const Pages = () => {
           <thead className="bg-muted">
             <tr>
               <th className="p-2 text-left">Chemin</th>
-              <th className="p-2 text-left">Echantillons</th>
+              <th className="p-2 text-left">Échantillons</th>
               <th className="p-2 text-left">p75 LCP (ms)</th>
               <th className="p-2 text-left">p75 INP (ms)</th>
               <th className="p-2 text-left">p75 CLS</th>
@@ -102,7 +102,7 @@ const Pages = () => {
         </table>
       </div>
       <p className="mt-4 text-sm text-muted-foreground">
-        Fenetre : {days} derniers jours • Projet : {projectId}
+        Fenêtre : {days} derniers jours • Projet : {projectId}
       </p>
     </div>
   )

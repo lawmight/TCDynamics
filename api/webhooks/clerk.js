@@ -18,8 +18,15 @@
 
 import { Webhook } from 'svix'
 import { getRawBody } from '../_lib/body.js'
+import logger from '../_lib/logger.js'
 import { User } from '../_lib/models/User.js'
 import { connectToDatabase } from '../_lib/mongodb.js'
+
+function getAppBaseUrl() {
+  if (process.env.APP_URL) return process.env.APP_URL
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
+  return 'http://localhost:3201'
+}
 
 export const config = {
   api: { bodyParser: false },
@@ -32,7 +39,7 @@ export default async function handler(req, res) {
 
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SIGNING_SECRET
   if (!WEBHOOK_SECRET) {
-    console.error('CLERK_WEBHOOK_SIGNING_SECRET not configured')
+    logger.error('CLERK_WEBHOOK_SIGNING_SECRET not configured')
     return res.status(500).json({ error: 'Webhook secret not configured' })
   }
 
@@ -48,7 +55,7 @@ export default async function handler(req, res) {
     const wh = new Webhook(WEBHOOK_SECRET)
     event = wh.verify(payload.toString(), headers)
   } catch (err) {
-    console.error('Webhook signature verification failed:', err.message)
+    logger.error('Webhook signature verification failed', err)
     return res.status(403).json({ error: 'Invalid signature' })
   }
 
@@ -72,12 +79,11 @@ export default async function handler(req, res) {
           plan: 'starter', // Default plan for new users
         })
 
-        console.log('✅ Created user from Clerk webhook', { clerkId: id })
+        logger.info('Created user from Clerk webhook', { clerkId: id })
 
-        // Trigger welcome email (fire and forget - don't block webhook response)
         if (primaryEmail) {
           fetch(
-            `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : ''}/api/emails?action=trigger&type=signup`,
+            `${getAppBaseUrl()}/api/emails?action=trigger&type=signup`,
             {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -88,7 +94,7 @@ export default async function handler(req, res) {
               }),
             }
           ).catch(err => {
-            console.error('⚠️ Failed to trigger welcome email:', err.message)
+            logger.error('Failed to trigger welcome email', err)
           })
         }
 
@@ -115,12 +121,12 @@ export default async function handler(req, res) {
         )
 
         if (!result) {
-          console.warn('⚠️ User not found for update, skipping', {
-            clerkId: id,
-          })
+          logger.warn('User not found for update, skipping', { clerkId: id })
         }
 
-        console.log('✅ Updated user from Clerk webhook', { clerkId: id })
+        if (result) {
+          logger.info('Updated user from Clerk webhook', { clerkId: id })
+        }
         break
       }
 
@@ -133,17 +139,17 @@ export default async function handler(req, res) {
           { $set: { deletedAt: new Date() } }
         )
 
-        console.log('✅ Soft-deleted user from Clerk webhook', { clerkId: id })
+        logger.info('Soft-deleted user from Clerk webhook', { clerkId: id })
         break
       }
 
       default:
-        console.log(`Unhandled Clerk event: ${event.type}`)
+        logger.info(`Unhandled Clerk event: ${event.type}`)
     }
 
     return res.status(200).json({ received: true, type: event.type })
   } catch (error) {
-    console.error('Error processing Clerk webhook:', error)
+    logger.error('Error processing Clerk webhook', error)
     return res.status(500).json({ error: 'Webhook processing failed' })
   }
 }

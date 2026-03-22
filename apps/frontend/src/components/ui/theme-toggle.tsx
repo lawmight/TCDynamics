@@ -27,6 +27,7 @@ export interface ThemeToggleProps {
  */
 export function ThemeToggle({ className }: ThemeToggleProps) {
   const { theme, setTheme, resolvedTheme } = useTheme()
+  const currentTheme = resolvedTheme ?? theme
 
   const handleToggle = () => {
     setTheme(theme === 'light' ? 'dark' : 'light')
@@ -40,10 +41,10 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
   }
 
   const getAriaLabel = () => {
-    const nextTheme = theme === 'light' ? 'dark' : 'light'
-    const currentThemeLabel = theme === 'dark' ? 'sombre' : 'clair'
+    const nextTheme = currentTheme === 'light' ? 'dark' : 'light'
+    const currentThemeLabel = currentTheme === 'dark' ? 'sombre' : 'clair'
     const nextThemeLabel = nextTheme === 'dark' ? 'sombre' : 'clair'
-    return `Changer le theme de ${currentThemeLabel} vers ${nextThemeLabel}. Theme actuel : ${currentThemeLabel}`
+    return `Changer le thème de ${currentThemeLabel} vers ${nextThemeLabel}. Thème actuel : ${currentThemeLabel}`
   }
 
   const getIcon = () => {
@@ -55,7 +56,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
   }
 
   const getButtonText = () => {
-    return theme === 'dark' ? 'Sombre' : 'Clair'
+    return currentTheme === 'dark' ? 'Sombre' : 'Clair'
   }
 
   return (
@@ -65,7 +66,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       onClick={handleToggle}
       onKeyDown={handleKeyDown}
       aria-label={getAriaLabel()}
-      aria-checked={theme === 'dark'}
+      aria-checked={currentTheme === 'dark'}
       role="switch"
       className={cn(
         'transition-colors duration-200 hover:shadow-sm',
@@ -74,7 +75,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       type="button"
     >
       {getIcon()}
-      <span className="sr-only">Theme : {getButtonText()}</span>
+      <span className="sr-only">Thème : {getButtonText()}</span>
       {/* Visible text for larger screens */}
       <span className="ml-2 hidden text-sm md:inline">{getButtonText()}</span>
     </Button>

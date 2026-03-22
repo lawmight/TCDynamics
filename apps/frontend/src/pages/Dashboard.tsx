@@ -88,11 +88,11 @@ const Dashboard = () => {
         </div>
         <EmptyState
           icon={<Settings className="size-7" />}
-          title="Aucun projet configure"
-          description="Ajoutez votre identifiant de projet dans les parametres pour afficher vos indicateurs de performance."
+          title="Aucun projet configuré"
+          description="Ajoutez votre identifiant de projet dans les paramètres pour afficher vos indicateurs de performance."
           action={
             <Button asChild>
-              <Link to="/app/settings">Ouvrir les parametres</Link>
+              <Link to="/app/settings">Ouvrir les paramètres</Link>
             </Button>
           }
         />
@@ -125,13 +125,13 @@ const Dashboard = () => {
         <div>
           <h1 className="text-2xl font-semibold">Tableau de bord performance</h1>
           <p className="text-muted-foreground text-sm">
-            Un probleme est survenu lors du chargement de vos indicateurs.
+            Un problème est survenu lors du chargement de vos indicateurs.
           </p>
         </div>
         <ErrorState
           variant="card"
           title="Impossible de charger les mesures"
-          message="Verifiez votre configuration puis relancez le chargement."
+          message="Vérifiez votre configuration puis relancez le chargement."
           onRetry={() => void refetch()}
         />
       </div>
@@ -152,7 +152,7 @@ const Dashboard = () => {
       <div>
         <h1 className="text-2xl font-semibold">Tableau de bord performance</h1>
         <p className="text-muted-foreground text-sm">
-          Vue synthese des Core Web Vitals de votre projet.
+          Vue synthèse des Core Web Vitals de votre projet.
         </p>
       </div>
 
@@ -181,7 +181,7 @@ const Dashboard = () => {
       </div>
 
       <p className="text-sm text-muted-foreground">
-        Fenetre : {days} derniers jours • Projet : {projectId}
+        Fenêtre : {days} derniers jours • Projet : {projectId}
       </p>
     </main>
   )

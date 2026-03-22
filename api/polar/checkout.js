@@ -16,6 +16,8 @@
 
 import { Polar } from '@polar-sh/sdk'
 import { verifyClerkAuth } from '../_lib/auth.js'
+import { allowCors } from '../_lib/cors.js'
+import logger from '../_lib/logger.js'
 
 const POLAR_PRODUCTS = {
   starter: process.env.POLAR_PRODUCT_STARTER,
@@ -38,17 +40,12 @@ const polar = process.env.POLAR_ACCESS_TOKEN
     })
   : null
 
-const allowCors = fn => async (req, res) => {
-  res.setHeader('Access-Control-Allow-Credentials', true)
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST')
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'Content-Type, Authorization, X-Checkout-Token'
-  )
-  if (req.method === 'OPTIONS') return res.status(200).end()
-  return await fn(req, res)
-}
+const CHECKOUT_FRONTEND_ORIGIN =
+  process.env.VITE_FRONTEND_URL ||
+  process.env.FRONTEND_URL ||
+  (process.env.NODE_ENV === 'development'
+    ? 'http://localhost:3100'
+    : 'https://tcdynamics.fr')
 
 async function handleGet(req, res) {
   const { checkoutId } = req.query
@@ -91,11 +88,9 @@ async function handleGet(req, res) {
       },
     })
   } catch (error) {
-    console.error('Failed to retrieve checkout:', {
-      error: error.message,
-      stack: error.stack,
-      status: error.status || error.statusCode,
+    logger.error('Failed to retrieve checkout', {
       checkoutId,
+      status: error.status || error.statusCode,
     })
     const isNotFound =
       error.status === 404 ||
@@ -220,14 +215,12 @@ async function handlePost(req, res) {
       }
 
       const checkout = await polar.checkouts.create(checkoutConfig)
-      console.log('Polar public checkout created:', {
+      logger.info('Polar public checkout created', {
         checkoutId: checkout.id,
         planName,
-        productId: resolvedProductId,
         amount,
         currency,
         paymentType,
-        ...(customerEmail && { customerEmail }),
       })
 
       return res.status(200).json({
@@ -320,15 +313,10 @@ async function handlePost(req, res) {
     }
 
     const checkout = await polar.checkouts.create(checkoutConfig)
-    console.log('Polar checkout created:', {
+    logger.info('Polar checkout created', {
       checkoutId: checkout.id,
       planName: planName || 'custom',
-      productId: resolvedProductId,
-      ...(isOnDemand && {
-        amount: amountType === 'fixed' ? amount : 'custom',
-        currency,
-        amountType,
-      }),
+      ...(isOnDemand && { amountType }),
     })
 
     return res.status(200).json({
@@ -337,7 +325,7 @@ async function handlePost(req, res) {
       url: checkout.url,
     })
   } catch (error) {
-    console.error('Error creating Polar checkout:', error)
+    logger.error('Error creating Polar checkout', error)
     return res.status(500).json({
       success: false,
       message: 'Failed to create checkout',
@@ -352,4 +340,9 @@ const handler = async (req, res) => {
   return res.status(405).json({ success: false, message: 'Method not allowed' })
 }
 
-export default allowCors(handler)
+export default allowCors(handler, {
+  methods: ['GET', 'OPTIONS', 'POST'],
+  headers: 'Content-Type, Authorization, X-Checkout-Token',
+  credentials: true,
+  allowedOrigins: [CHECKOUT_FRONTEND_ORIGIN],
+})

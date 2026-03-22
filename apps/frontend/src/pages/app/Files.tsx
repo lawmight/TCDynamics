@@ -13,6 +13,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { ErrorState } from '@/components/ui/error-state'
 import { Input } from '@/components/ui/input'
 import { LoadingState } from '@/components/ui/loading-state'
+import { useAuth } from '@/hooks/useAuth'
 import { useMilestoneDetection } from '@/hooks/useMilestoneDetection'
 import { cn } from '@/lib/utils'
 import type { UserMilestoneState } from '@/utils/celebrations'
@@ -38,12 +39,16 @@ function formatFileSize(bytes: number): string {
 }
 
 const Files = () => {
+  const { getToken } = useAuth()
   const [files, setFiles] = useState<KnowledgeFile[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [messageType, setMessageType] = useState<'success' | 'error'>(
     'success'
+  )
+  const [errorSource, setErrorSource] = useState<'fetch' | 'upload' | null>(
+    null
   )
   const [hasUploadedFirst, setHasUploadedFirst] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -70,9 +75,11 @@ const Files = () => {
   const fetchFiles = useCallback(async () => {
     setIsLoading(true)
     setMessage(null)
+    setErrorSource(null)
     try {
       const data = await listKnowledgeFiles()
       setFiles(data)
+      setErrorSource(null)
     } catch (error) {
       const text =
         error instanceof Error
@@ -80,6 +87,7 @@ const Files = () => {
           : 'Impossible de charger les fichiers'
       setMessage(text)
       setMessageType('error')
+      setErrorSource('fetch')
     } finally {
       setIsLoading(false)
     }
@@ -101,6 +109,7 @@ const Files = () => {
   const processUpload = async (file: globalThis.File) => {
     setUploading(true)
     setMessage(null)
+    setErrorSource(null)
     try {
       const base64 = await toBase64(file)
       await uploadKnowledgeFile({
@@ -109,16 +118,22 @@ const Files = () => {
         size: file.size,
         base64,
       })
-      await recordEvent('file_upload', { name: file.name, size: file.size })
+      await recordEvent(
+        'file_upload',
+        { name: file.name, size: file.size },
+        { getToken }
+      )
       await fetchFiles()
-      setMessage(`"${file.name}" a ete importe et indexe avec succes.`)
+      setMessage(`"${file.name}" a été importé et indexé avec succès.`)
       setMessageType('success')
+      setErrorSource(null)
       if (files.length === 0) setHasUploadedFirst(true)
     } catch (error) {
       const text =
-        error instanceof Error ? error.message : "L'import du fichier a echoue"
+        error instanceof Error ? error.message : "L'import du fichier a échoué"
       setMessage(text)
       setMessageType('error')
+      setErrorSource('upload')
     } finally {
       setUploading(false)
     }
@@ -169,8 +184,8 @@ const Files = () => {
           <div>
             <h1 className="text-2xl font-semibold">Base de connaissances</h1>
             <p className="text-muted-foreground text-sm">
-              Importez vos documents pour alimenter la recherche semantique et
-              les reponses de l'assistant.
+              Importez vos documents pour alimenter la recherche sémantique et
+              les réponses de l'assistant.
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -230,7 +245,7 @@ const Files = () => {
             <p className="text-sm font-medium">
               {uploading
                 ? 'Import et indexation en cours...'
-                : 'Glissez-deposez un fichier ici'}
+                : 'Glissez-déposez un fichier ici'}
             </p>
             <p className="text-muted-foreground mt-1 text-xs">
               PDF, TXT et DOCX pris en charge &middot; 10 Mo max
@@ -254,7 +269,13 @@ const Files = () => {
           </div>
         ) : null}
         {message && messageType === 'error' ? (
-          <ErrorState variant="inline" message={message} onRetry={() => void fetchFiles()} />
+          <ErrorState
+            variant="inline"
+            message={message}
+            onRetry={
+              errorSource === 'fetch' ? () => void fetchFiles() : undefined
+            }
+          />
         ) : null}
 
         {/* File list */}
@@ -314,7 +335,7 @@ const Files = () => {
                       )}
                     </div>
                     <span className="bg-success/10 text-success shrink-0 rounded-full px-2.5 py-1 text-xs font-medium">
-                      Indexe
+                      Indexé
                     </span>
                   </div>
                 )
@@ -324,15 +345,15 @@ const Files = () => {
             <div className="p-4">
               <EmptyState
                 icon={<SearchIcon className="size-7" />}
-                title="Aucun resultat"
-                description={`Aucun fichier ne correspond a "${searchQuery}".`}
+                title="Aucun résultat"
+                description={`Aucun fichier ne correspond à "${searchQuery}".`}
                 action={
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setSearchQuery('')}
                   >
-                    Reinitialiser la recherche
+                    Réinitialiser la recherche
                   </Button>
                 }
               />
@@ -341,8 +362,8 @@ const Files = () => {
             <div className="p-4">
               <EmptyState
                 icon={<FileText className="size-7" />}
-                title="Aucun document indexe"
-                description="Importez votre premier PDF, TXT ou DOCX pour activer la recherche et la recuperation dans le chat."
+                title="Aucun document indexé"
+                description="Importez votre premier PDF, TXT ou DOCX pour activer la recherche et la récupération dans le chat."
                 action={
                   <Button
                     size="sm"

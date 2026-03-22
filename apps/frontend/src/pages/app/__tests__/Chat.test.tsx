@@ -108,6 +108,7 @@ describe('Chat page', () => {
       ok: false,
       status: 503,
       headers: { get: () => 'application/json' },
+      json: () => Promise.resolve({ error: 'Service IA non configuré' }),
       text: () => Promise.resolve(JSON.stringify({ error: 'Service IA non configuré' })),
     })
 
