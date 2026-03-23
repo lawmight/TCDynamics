@@ -19,9 +19,9 @@ All values are defined as HSL in CSS; hex/RGBA below are computed for Figma. Use
 | Card foreground       | `--card-foreground`    | 0 0% 3.9%         | `#0A0A0A`   | Card foreground             |
 | Popover               | `--popover`            | 0 0% 100%         | `#FFFFFF`   | Popover                     |
 | Popover foreground    | `--popover-foreground` | 0 0% 3.9%         | `#0A0A0A`   | Popover foreground          |
-| Primary               | `--primary`            | 200° 95% 48%      | `#0EA5E9`   | Primary                     |
+| Primary               | `--primary`            | 200° 95% 48%      | `#06A1EF`   | Primary                     |
 | Primary foreground    | `--primary-foreground` | 0 0% 100%         | `#FFFFFF`   | Primary foreground          |
-| Primary glow          | `--primary-glow`       | 200° 95% 60%      | `#38BDF8`   | Primary glow                |
+| Primary glow          | `--primary-glow`       | 200° 95% 60%      | `#38B9FA`   | Primary glow                |
 | Secondary             | `--secondary`         | 0 0% 96.1%        | `#F5F5F5`   | Secondary                   |
 | Secondary foreground  | `--secondary-foreground` | 0 0% 9%         | `#171717`   | Secondary foreground        |
 | Muted                 | `--muted`              | 0 0% 96.1%        | `#F5F5F5`   | Muted                       |
@@ -30,6 +30,12 @@ All values are defined as HSL in CSS; hex/RGBA below are computed for Figma. Use
 | Accent foreground     | `--accent-foreground`  | 0 0% 9%           | `#171717`   | Accent foreground           |
 | Destructive           | `--destructive`        | 0 84.2% 60.2%     | `#EF4444`   | Destructive                 |
 | Destructive foreground| `--destructive-foreground` | 0 0% 98%   | `#FAFAFA`   | Destructive foreground      |
+| Success               | `--success`            | 142 76% 36%       | `#16A249`   | Success                     |
+| Success foreground    | `--success-foreground` | 0 0% 100%         | `#FFFFFF`   | Success foreground          |
+| Warning               | `--warning`            | 38 92% 50%        | `#F59F0A`   | Warning                     |
+| Warning foreground    | `--warning-foreground` | 0 0% 9%           | `#171717`   | Warning foreground          |
+| Info                  | `--info`               | 200° 95% 48%      | `#06A1EF`   | Info                        |
+| Info foreground       | `--info-foreground`    | 0 0% 100%         | `#FFFFFF`   | Info foreground             |
 | Border                | `--border`             | 0 0% 89.8%        | `#E5E5E5`   | Border                      |
 | Input                 | `--input`              | 0 0% 89.8%        | `#E5E5E5`   | Input                       |
 | Ring                  | `--ring`               | 0 0% 3.9%         | `#0A0A0A`   | Ring (focus)                |
@@ -44,9 +50,9 @@ All values are defined as HSL in CSS; hex/RGBA below are computed for Figma. Use
 | Card foreground       | `--card-foreground`    | 0 0% 98%          | `#FAFAFA`   | Card foreground (dark)       |
 | Popover               | `--popover`            | 0 0% 3.9%         | `#0A0A0A`   | Popover (dark)               |
 | Popover foreground    | `--popover-foreground` | 0 0% 98%          | `#FAFAFA`   | Popover foreground (dark)    |
-| Primary               | `--primary`            | 200° 95% 48%      | `#0EA5E9`   | Primary (same)              |
+| Primary               | `--primary`            | 200° 95% 48%      | `#06A1EF`   | Primary (same)              |
 | Primary foreground    | `--primary-foreground` | 0 0% 100%         | `#FFFFFF`   | Primary foreground (same)    |
-| Primary glow          | `--primary-glow`       | 200° 95% 60%      | `#38BDF8`   | Primary glow (same)          |
+| Primary glow          | `--primary-glow`       | 200° 95% 60%      | `#38B9FA`   | Primary glow (same)          |
 | Secondary             | `--secondary`         | 0 0% 14.9%        | `#262626`   | Secondary (dark)             |
 | Secondary foreground  | `--secondary-foreground` | 0 0% 98%       | `#FAFAFA`   | Secondary foreground (dark)  |
 | Muted                 | `--muted`              | 0 0% 14.9%        | `#262626`   | Muted (dark)                 |
@@ -55,9 +61,41 @@ All values are defined as HSL in CSS; hex/RGBA below are computed for Figma. Use
 | Accent foreground     | `--accent-foreground`  | 0 0% 98%          | `#FAFAFA`   | Accent foreground (dark)     |
 | Destructive           | `--destructive`        | 0 62.8% 30.6%     | `#9F1239`   | Destructive (dark)           |
 | Destructive foreground| `--destructive-foreground` | 0 0% 98%   | `#FAFAFA`   | Destructive foreground (dark) |
+| Success               | `--success`            | 142 69% 58%       | `#4ADE80`   | Success (dark)               |
+| Success foreground    | `--success-foreground` | 0 0% 9%           | `#171717`   | Success foreground (dark)    |
+| Warning               | `--warning`            | 38 92% 50%        | `#F59F0A`   | Warning (dark)               |
+| Warning foreground    | `--warning-foreground` | 0 0% 9%           | `#171717`   | Warning foreground (dark)    |
+| Info                  | `--info`               | 200° 95% 60%      | `#38B9FA`   | Info (dark)                  |
+| Info foreground       | `--info-foreground`    | 0 0% 9%           | `#171717`   | Info foreground (dark)       |
 | Border                | `--border`             | 0 0% 14.9%        | `#262626`   | Border (dark)                |
 | Input                 | `--input`              | 0 0% 14.9%        | `#262626`   | Input (dark)                 |
 | Ring                  | `--ring`               | 0 0% 83.1%        | `#D4D4D4`   | Ring (dark)                  |
+
+### Sidebar colors (Light)
+
+| Semantic name              | CSS variable                    | HSL (code)     | Hex (Figma) | Suggested Figma style name      |
+|---------------------------|---------------------------------|----------------|-------------|---------------------------------|
+| Sidebar background        | `--sidebar-background`          | 0 0% 98%       | `#FAFAFA`   | Sidebar / Background            |
+| Sidebar foreground        | `--sidebar-foreground`          | 240 5.3% 26.1% | `#3F3F46`   | Sidebar / Foreground            |
+| Sidebar primary           | `--sidebar-primary`             | 200° 95% 48%   | `#06A1EF`   | Sidebar / Primary               |
+| Sidebar primary foreground| `--sidebar-primary-foreground`  | 0 0% 98%       | `#FAFAFA`   | Sidebar / Primary foreground    |
+| Sidebar accent            | `--sidebar-accent`              | 240 4.8% 95.9% | `#F4F4F5`   | Sidebar / Accent                |
+| Sidebar accent foreground | `--sidebar-accent-foreground`   | 240 5.9% 10%   | `#18181B`   | Sidebar / Accent foreground     |
+| Sidebar border            | `--sidebar-border`              | 220 13% 91%    | `#E5E7EB`   | Sidebar / Border                |
+| Sidebar ring              | `--sidebar-ring`                | 200° 95% 48%   | `#06A1EF`   | Sidebar / Ring                  |
+
+### Sidebar colors (Dark)
+
+| Semantic name              | CSS variable                    | HSL (code)     | Hex (Figma) | Suggested Figma style name      |
+|---------------------------|---------------------------------|----------------|-------------|---------------------------------|
+| Sidebar background        | `--sidebar-background`          | 240 5.9% 10%   | `#18181B`   | Sidebar / Background (dark)     |
+| Sidebar foreground        | `--sidebar-foreground`          | 240 4.8% 95.9% | `#F4F4F5`   | Sidebar / Foreground (dark)     |
+| Sidebar primary           | `--sidebar-primary`             | 200° 95% 48%   | `#06A1EF`   | Sidebar / Primary (dark)        |
+| Sidebar primary foreground| `--sidebar-primary-foreground`  | 240 5.9% 10%   | `#18181B`   | Sidebar / Primary fg (dark)     |
+| Sidebar accent            | `--sidebar-accent`              | 240 3.7% 15.9% | `#27272A`   | Sidebar / Accent (dark)         |
+| Sidebar accent foreground | `--sidebar-accent-foreground`   | 240 4.8% 95.9% | `#F4F4F5`   | Sidebar / Accent fg (dark)      |
+| Sidebar border            | `--sidebar-border`              | 240 3.7% 15.9% | `#27272A`   | Sidebar / Border (dark)         |
+| Sidebar ring              | `--sidebar-ring`                | 200° 95% 60%   | `#38B9FA`   | Sidebar / Ring (dark)           |
 
 ### Chart colors (Light)
 
@@ -79,13 +117,16 @@ All values are defined as HSL in CSS; hex/RGBA below are computed for Figma. Use
 | Chart 4  | `--chart-4`  | 280 65% 60%  | `#A855F7`   | Chart 4 (dark)             |
 | Chart 5  | `--chart-5`  | 340 75% 55%  | `#EC4899`   | Chart 5 (dark)             |
 
+**Chart note:** when extending the chart palette, prefer a monochromatic lightness ramp inside a shared hue family (per the current ShadCN recommendation) instead of mixing unrelated saturated accents.
+
 ### Gradients (reference; create as gradient fills in Figma)
 
-- **Gradient primary:** 135° linear, Primary → Primary glow (`#0EA5E9` → `#38BDF8`).
+- **Gradient primary:** 135° linear, Primary → Primary glow (`#06A1EF` → `#38B9FA`).
+- **Gradient subtle:** 135° linear, Background → Muted (`--background` → `--muted`).
 - **Gradient hero (light):** 135° linear, 3 stops: `hsl(50 30% 92%)` → `hsl(50 20% 95%)` (50%) → `hsl(50 50% 97%)` (100%). Approx hex: `#EDE9E0` → `#F2F0EB` → `#F9F8F3`.
 - **Gradient card:** 135° linear, Card → Muted (same as code).
 
-**Note:** Sidebar colors (`--sidebar-background`, etc.) are referenced in `tailwind.config.ts` but not defined in `index.css`. For Figma you can duplicate Card/Popover styles or add a “Sidebar” set when those tokens are added to the codebase.
+**Note:** The sidebar uses a dedicated token namespace (`--sidebar-*`) so its colors can diverge from the main app surface. Mirror them as a separate Figma variable set rather than reusing `Card`/`Popover` tokens.
 
 ---
 
@@ -109,7 +150,10 @@ All values are defined as HSL in CSS; hex/RGBA below are computed for Figma. Use
 
 - **Max width:** 1400px (Tailwind `screens.2xl`).
 - **Padding:** 2rem (32px) — Tailwind `container.padding: '2rem'`.
-- **Usage:** `container mx-auto px-4` or `px-6`; horizontal padding overrides common (16px / 24px).
+- **Marketing sections:** `container mx-auto px-6`.
+- **App standard pages:** `max-w-5xl`.
+- **App focused forms / settings:** `max-w-3xl`.
+- **App shell inner spacing:** `px-4 py-6 md:px-6`.
 
 ### Recurring spacing (convert to pixels for Figma)
 
@@ -186,6 +230,13 @@ Use these to align Figma frame structure and padding with the live site.
 - **Content:** `container relative z-10 mx-auto px-4` (or `px-6`).
 - **Grids:** Often `gap-8`, `lg:grid-cols-2` or `lg:grid-cols-3`, sometimes `max-w-7xl` or `max-w-5xl` for inner width.
 
+### App pages
+
+- **Standard app pages:** `mx-auto w-full max-w-5xl space-y-6`.
+- **Focused app forms/settings:** `mx-auto w-full max-w-3xl space-y-6`.
+- **App page heading:** `text-2xl font-semibold`.
+- **App empty/error/loading states:** use the shared `EmptyState`, `ErrorState`, and `LoadingState` patterns in code.
+
 ### Navigation (SimpleNavigation)
 
 - **Bar:** `container mx-auto p-4`; on lg: `grid grid-cols-[1fr_auto_1fr]` with `gap-4`.
@@ -199,11 +250,12 @@ Use these to align Figma frame structure and padding with the live site.
 
 ## 6. Figma-side checklist
 
-- [ ] Create **Color styles** (or Variables in a “tcdynamics” / “Code” set) for every semantic and chart color above; duplicate for dark where values differ.
+- [ ] Create **Color styles** (or Variables in a “tcdynamics” / “Code” set) for every semantic, sidebar, and chart color above; duplicate for dark where values differ.
 - [ ] Optionally create **Text styles** for Display (Outfit), Sans (DM Sans), Mono.
 - [ ] Create **Effect styles** for the four shadows.
 - [ ] Set **border radius** tokens (8px, 6px, 4px).
+- [ ] Add **status styles** for Success / Warning / Info and map all validation, upload, and analytics feedback surfaces to them.
 - [ ] Apply these styles to the imported tcdynamics frames (replace fills/strokes with the new color styles).
-- [ ] Set frame or content width to **1400px** and apply container padding (e.g. 32px) and section spacing from §3 and §5.
+- [ ] Set marketing frame width to **1400px** with 32px container padding; use **max-w-5xl** for standard app pages and **max-w-3xl** for focused settings/forms.
 
 When the codebase design tokens or layout change, update this spec and then refresh Figma styles/layout from it.

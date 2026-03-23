@@ -1,8 +1,9 @@
 -- ================================================
--- TC Dynamics Supabase Database Schema
+-- ARCHIVED — TC Dynamics Supabase Database Schema
 -- ================================================
--- Run this SQL in your Supabase SQL Editor
--- Project: https://anrouunclxibnyyisztz.supabase.co
+-- Status: HISTORICAL — the app now uses MongoDB.
+-- Kept for reference only; do not run against production.
+-- Original project: https://anrouunclxibnyyisztz.supabase.co
 -- ================================================
 
 -- Enable UUID extension (if not already enabled)

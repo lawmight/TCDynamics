@@ -199,9 +199,9 @@ const DocumentProcessor = () => {
       case 'processing':
         return <Loader2 className="size-4 animate-spin text-primary" />
       case 'completed':
-        return <CheckCircle className="size-4 text-green-500" />
+        return <CheckCircle className="text-success size-4" />
       case 'error':
-        return <AlertCircle className="size-4 text-red-500" />
+        return <AlertCircle className="text-destructive size-4" />
       default:
         return null
     }
@@ -359,15 +359,15 @@ const DocumentProcessor = () => {
           <h4 className="mb-3 font-mono font-semibold">Fonctionnalités IA :</h4>
           <div className="grid grid-cols-1 gap-4 font-mono text-sm md:grid-cols-3">
             <div className="flex items-center gap-2">
-              <CheckCircle className="size-4 text-green-500" />
+              <CheckCircle className="text-success size-4" />
               <span>OCR haute précision</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="size-4 text-green-500" />
+              <CheckCircle className="text-success size-4" />
               <span>Analyse automatique</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="size-4 text-green-500" />
+              <CheckCircle className="text-success size-4" />
               <span>Extraction de données</span>
             </div>
           </div>

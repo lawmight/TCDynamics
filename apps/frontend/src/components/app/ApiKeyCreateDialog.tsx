@@ -43,10 +43,10 @@ const AUTO_CLOSE_SECONDS = 30
 // Validation schema for API key name
 const apiKeyNameSchema = z
   .string()
-  .max(100, 'API key name must be 100 characters or less')
+  .max(100, 'Le nom de la cle API doit contenir 100 caracteres maximum')
   .regex(
     /^[a-zA-Z0-9\s\-_]+$/,
-    'API key name can only contain letters, numbers, spaces, hyphens, and underscores'
+    'Le nom de la cle API ne peut contenir que des lettres, chiffres, espaces, tirets et underscores'
   )
   .optional()
   .or(z.literal(''))
@@ -107,12 +107,12 @@ export function ApiKeyCreateDialog({
     try {
       await navigator.clipboard.writeText(createdKey.key)
       setCopied(true)
-      toast.success('API key copied to clipboard')
+      toast.success('Cle API copiee')
 
       // Reset copy button after 2 seconds
       setTimeout(() => setCopied(false), 2000)
     } catch {
-      toast.error('Failed to copy to clipboard')
+      toast.error('Impossible de copier la cle API')
     }
   }
 
@@ -123,7 +123,7 @@ export function ApiKeyCreateDialog({
       const result = apiKeyNameSchema.safeParse(trimmedName)
 
       if (!result.success) {
-        setNameError(result.error.errors[0]?.message || 'Invalid name')
+        setNameError(result.error.errors[0]?.message || 'Nom invalide')
         return
       }
     }
@@ -147,7 +147,7 @@ export function ApiKeyCreateDialog({
       const result = apiKeyNameSchema.safeParse(trimmedName)
 
       if (!result.success) {
-        setNameError(result.error.errors[0]?.message || 'Invalid name')
+        setNameError(result.error.errors[0]?.message || 'Nom invalide')
       }
     }
   }
@@ -159,10 +159,10 @@ export function ApiKeyCreateDialog({
       if (copied) {
         handleClose()
       } else {
-        toast.warning('Make sure to copy your API key before closing', {
-          description: "You won't be able to see it again",
+        toast.warning('Copiez votre cle API avant de fermer cette fenetre', {
+          description: 'Vous ne pourrez plus la consulter ensuite',
           action: {
-            label: 'Close anyway',
+            label: 'Fermer quand meme',
             onClick: handleClose,
           },
         })
@@ -178,12 +178,12 @@ export function ApiKeyCreateDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Key className="size-5" />
-            {createdKey ? 'Your API Key' : 'Create API Key'}
+            {createdKey ? 'Votre cle API' : 'Creer une cle API'}
           </DialogTitle>
           <DialogDescription>
             {createdKey
-              ? "Copy this key now. You won't be able to see it again."
-              : 'Create a new API key to access the API programmatically.'}
+              ? 'Copiez cette cle maintenant. Elle ne sera plus affichee ensuite.'
+              : "Creez une nouvelle cle API pour acceder a l'API de facon programmatique."}
           </DialogDescription>
         </DialogHeader>
 
@@ -191,10 +191,10 @@ export function ApiKeyCreateDialog({
           // Creation form
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="key-name">Name (optional)</Label>
+              <Label htmlFor="key-name">Nom (optionnel)</Label>
               <Input
                 id="key-name"
-                placeholder="e.g., Production Server, CI/CD Pipeline"
+                placeholder="ex. Serveur de production, pipeline CI/CD"
                 value={name}
                 onChange={handleNameChange}
                 disabled={isCreating}
@@ -208,8 +208,9 @@ export function ApiKeyCreateDialog({
                 </p>
               ) : (
                 <p className="text-xs text-muted-foreground">
-                  Give your key a name to identify it later (max 100 characters,
-                  alphanumeric, spaces, hyphens, and underscores only).
+                  Donnez un nom a votre cle pour la retrouver plus tard (100
+                  caracteres max, lettres, chiffres, espaces, tirets et
+                  underscores uniquement).
                 </p>
               )}
             </div>
@@ -218,7 +219,7 @@ export function ApiKeyCreateDialog({
           // Key display
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="api-key">API Key</Label>
+              <Label htmlFor="api-key">Cle API</Label>
               <div className="flex gap-2">
                 <Input
                   id="api-key"
@@ -234,7 +235,7 @@ export function ApiKeyCreateDialog({
                   className="shrink-0"
                 >
                   {copied ? (
-                    <CheckCircle2 className="size-4 text-green-500" />
+                    <CheckCircle2 className="text-success size-4" />
                   ) : (
                     <Copy className="size-4" />
                   )}
@@ -244,16 +245,17 @@ export function ApiKeyCreateDialog({
 
             <Alert variant="destructive">
               <AlertTriangle className="size-4" />
-              <AlertTitle>Store this key securely</AlertTitle>
+              <AlertTitle>Conservez cette cle en lieu sur</AlertTitle>
               <AlertDescription>
-                This is the only time you&apos;ll see this key. Store it in a
-                secure location like a password manager or environment
-                variables. Never commit API keys to version control.
+                C'est la seule fois ou cette cle sera affichee. Stockez-la dans
+                un gestionnaire de mots de passe ou dans des variables
+                d'environnement. Ne versionnez jamais une cle API.
               </AlertDescription>
             </Alert>
 
             <p className="text-center text-xs text-muted-foreground">
-              This dialog will auto-close in {autoCloseCountdown} seconds
+              Cette fenetre se fermera automatiquement dans {autoCloseCountdown}{' '}
+              secondes
             </p>
           </div>
         )}
@@ -266,23 +268,23 @@ export function ApiKeyCreateDialog({
                 onClick={() => onOpenChange(false)}
                 disabled={isCreating}
               >
-                Cancel
+                Annuler
               </Button>
               <Button onClick={handleCreate} disabled={isCreating}>
                 {isCreating ? (
                   <>
                     <Loader2 className="mr-2 size-4 animate-spin" />
-                    Creating…
+                    Creation…
                   </>
                 ) : (
-                  'Create Key'
+                  'Creer la cle'
                 )}
               </Button>
             </>
           ) : (
             <Button onClick={handleClose} className="w-full">
               <X className="mr-2 size-4" />
-              {copied ? 'Close' : "I've copied the key"}
+              {copied ? 'Fermer' : "J'ai copie la cle"}
             </Button>
           )}
         </DialogFooter>

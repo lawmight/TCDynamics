@@ -10,7 +10,7 @@ type AuthContextType = {
   signInWithGoogle: () => Promise<void>
   signOut: () => Promise<void>
   refreshSession: () => Promise<void>
-  getToken: () => Promise<string | null>
+  getToken: (forceRefresh?: boolean) => Promise<string | null>
   isSignedIn: boolean | undefined
 }
 
@@ -64,9 +64,11 @@ export const useAuth = (): AuthContextType => {
       ? { access_token: undefined, id: user.id }
       : null
 
-  const getFreshToken = async (): Promise<string | null> => {
+  const getFreshToken = async (
+    forceRefresh = false
+  ): Promise<string | null> => {
     try {
-      return await getToken()
+      return await getToken(forceRefresh ? { skipCache: true } : undefined)
     } catch (_err) {
       if (import.meta.env.DEV) {
         console.warn('[Clerk Dev] Token retrieval failed:', _err)

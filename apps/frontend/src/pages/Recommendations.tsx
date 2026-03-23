@@ -19,6 +19,12 @@ type Rec = {
   impact: 'low' | 'medium' | 'high'
 }
 
+const IMPACT_LABELS: Record<Rec['impact'], string> = {
+  high: 'Élevé',
+  medium: 'Moyen',
+  low: 'Faible',
+}
+
 const Recommendations = () => {
   const [projectId] = useState<string>(getStoredProjectId())
   const days = 7
@@ -36,36 +42,36 @@ const Recommendations = () => {
     if (r.LCP && num(r.LCP.p75) > 2500) {
       list.push({
         id: 'lcp-img',
-        title: 'Optimize LCP image',
+        title: "Optimiser l'image LCP",
         rationale:
-          'Reduce LCP by compressing and properly sizing the hero image, add preload for critical resource.',
+          "Réduisez le LCP en compressant l'image hero, en fixant des dimensions explicites et en préchargeant la ressource critique.",
         impact: 'high',
       })
     }
     if (r.INP && num(r.INP.p75) > 200) {
       list.push({
         id: 'inp-longtask',
-        title: 'Reduce main-thread work',
+        title: 'Réduire le travail du thread principal',
         rationale:
-          'Break up long tasks; code-split non-critical JS and defer analytics/3rd party scripts.',
+          'Découpez les longues tâches, chargez le JavaScript non critique à la demande et différez les scripts tiers.',
         impact: 'high',
       })
     }
     if (r.CLS && num(r.CLS.p75) > 0.1) {
       list.push({
         id: 'cls-layout',
-        title: 'Stabilize layout',
+        title: 'Stabiliser la mise en page',
         rationale:
-          'Set explicit width/height on images and ads; avoid inserting content above existing content.',
+          "Définissez des dimensions explicites sur les images et évitez d'insérer du contenu au-dessus du contenu déjà affiché.",
         impact: 'medium',
       })
     }
     if (!list.length) {
       list.push({
         id: 'good',
-        title: 'Great job!',
+        title: 'Très bon travail',
         rationale:
-          'Core Web Vitals look good. Maintain budgets and monitor regressions.',
+          'Les Core Web Vitals sont bons. Maintenez vos budgets de performance et surveillez les régressions.',
         impact: 'low',
       })
     }
@@ -74,7 +80,7 @@ const Recommendations = () => {
 
   return (
     <div className="mx-auto max-w-5xl p-6">
-      <h1 className="mb-4 text-2xl font-semibold">Recommendations</h1>
+      <h1 className="mb-4 text-2xl font-semibold">Recommandations</h1>
       <ul className="space-y-3">
         {recs.map(r => (
           <li key={r.id} className="rounded-md border p-4">
@@ -83,9 +89,9 @@ const Recommendations = () => {
               {r.rationale}
             </div>
             <span
-              className={`mt-2 inline-block rounded px-2 py-1 text-xs ${r.impact === 'high' ? 'bg-destructive/10 text-destructive' : r.impact === 'medium' ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400' : 'bg-primary/10 text-primary'}`}
+              className={`mt-2 inline-block rounded px-2 py-1 text-xs ${r.impact === 'high' ? 'bg-destructive/10 text-destructive' : r.impact === 'medium' ? 'bg-warning/10 text-warning' : 'bg-primary/10 text-primary'}`}
             >
-              {r.impact.toUpperCase()}
+              {IMPACT_LABELS[r.impact]}
             </span>
           </li>
         ))}

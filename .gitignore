@@ -8,6 +8,7 @@ venv/
 # Build output
 dist/
 build/
+*.tsbuildinfo
 
 # Environment variables
 .env
@@ -41,6 +42,7 @@ cursor/*
 .cursor/skills/
 .cursor/plans/
 .cursor/hooks/logs/
+.cursor/hooks/state/
 .gemini/
 .claude/
 *.swp
@@ -96,14 +98,7 @@ lerna-debug.log*
 .vercel
 .next
 out/
-.vercel
 
-# Local documentation (keep local, don't push to GitHub)
+# Local-only directories
 md/
-.env*.local
-
-.env*.local
-
 coordination/
-
-docs/

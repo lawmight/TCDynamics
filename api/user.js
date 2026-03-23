@@ -206,10 +206,7 @@ async function handleEmailPreferences(req, res) {
     const { userId, error: authError } = await verifyClerkAuth(authHeader)
 
     if (authError || !userId) {
-      return res.status(401).json({
-        error: 'Unauthorized',
-        message: authError || 'Missing or invalid Authorization header',
-      })
+      return res.status(401).json({ error: 'Unauthorized' })
     }
 
     await connectToDatabase()
@@ -277,9 +274,8 @@ async function handleEmailPreferences(req, res) {
         },
       })
 
-      console.log(
-        `[EmailPreferences] Updated for ${user.email}:`,
-        sanitizedPreferences
+      console.warn(
+        `[EmailPreferences] Updated for user ${user._id}`
       )
 
       return res.status(200).json({
@@ -294,9 +290,7 @@ async function handleEmailPreferences(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   } catch (error) {
     console.error('[EmailPreferences] Error:', error)
-    return res.status(500).json({
-      error: error.message,
-    })
+    return res.status(500).json({ error: 'Internal server error' })
   }
 }
 

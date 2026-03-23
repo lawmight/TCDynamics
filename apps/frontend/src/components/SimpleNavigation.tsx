@@ -18,7 +18,7 @@ const routePrefetchers: Record<string, () => Promise<unknown>> = {
   '/about': () => import('../pages/About'),
   '/demo': () => import('../pages/Demo'),
   '/get-started': () => import('../pages/GetStarted'),
-  '/settings': () => import('../pages/Settings'),
+  '/app/settings': () => import('../pages/Settings'),
   '/app': () => import('../pages/app/Chat'),
 }
 
@@ -114,7 +114,7 @@ const SimpleNavigation = () => {
     { label: 'À propos', path: '/about' },
     { label: 'Démo', path: '/demo' },
     { label: 'Démarrer', path: '/get-started' },
-    ...(isSignedIn ? [{ label: 'Settings', path: '/settings' }] : []),
+    ...(isSignedIn ? [{ label: 'Paramètres', path: '/app/settings' }] : []),
   ]
 
   // Avoid rendering duplicate nav items in tests/mobile by hiding desktop set when the mobile menu is open.
@@ -151,7 +151,10 @@ const SimpleNavigation = () => {
             </Link>
 
             {/* Desktop Navigation - centered */}
-            <nav className="hidden items-center justify-center space-x-4 lg:flex" aria-label="Main navigation">
+            <nav
+              className="hidden items-center justify-center space-x-4 lg:flex"
+              aria-label="Navigation principale"
+            >
               {shouldShowDesktopNav ? (
                 <>
                   {navigationItems.map(item =>
@@ -204,7 +207,7 @@ const SimpleNavigation = () => {
                     to="/"
                     className="px-0 py-1.5 text-foreground/80 transition-colors hover:text-primary"
                   >
-                    Home
+                    Accueil
                   </Link>
                 </>
               )}
@@ -227,8 +230,8 @@ const SimpleNavigation = () => {
                       onClick={() =>
                         setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
                       }
-                      title="Toggle theme"
-                      aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+                      title="Changer de thème"
+                      aria-label={`Passer au mode ${resolvedTheme === 'dark' ? 'clair' : 'sombre'}`}
                     >
                       <div className="sun-moon">
                         <div className="sun" />
@@ -249,9 +252,8 @@ const SimpleNavigation = () => {
               <button
                 ref={menuButtonRef}
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 text-foreground transition-colors hover:text-primary lg:hidden"
-                aria-label="Toggle menu"
-                aria-expanded={isMobileMenuOpen}
+                className="text-foreground focus-visible:ring-ring focus-visible:ring-offset-background p-2 transition-colors hover:text-primary focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 lg:hidden"
+                aria-label="Ouvrir ou fermer le menu"
                 aria-controls="mobile-menu"
               >
                 {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -270,7 +272,7 @@ const SimpleNavigation = () => {
             <div className="container mx-auto p-4">
               <nav
                 className="flex flex-col space-y-3"
-                aria-label="Mobile navigation menu"
+                aria-label="Menu de navigation mobile"
               >
                 {location.pathname === '/' ? (
                   navigationItems.map(item =>
@@ -323,7 +325,7 @@ const SimpleNavigation = () => {
                       }
                     }}
                   >
-                    Home
+                    Accueil
                   </Link>
                 )}
                 <button
@@ -340,8 +342,8 @@ const SimpleNavigation = () => {
                     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
                     setIsMobileMenuOpen(false)
                   }}
-                  title="Toggle theme"
-                  aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+                  title="Changer de thème"
+                  aria-label={`Passer au mode ${resolvedTheme === 'dark' ? 'clair' : 'sombre'}`}
                 >
                   <div className="sun-moon">
                     <div className="sun" />
@@ -358,8 +360,8 @@ const SimpleNavigation = () => {
       {showBackToTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-6 left-6 z-50 rounded-full bg-primary p-3 text-primary-foreground shadow-lg transition-[background-color,border-color] duration-300 hover:bg-primary-glow"
-          aria-label="Back to top"
+          className="fixed bottom-6 left-6 z-50 rounded-full bg-primary p-3 text-primary-foreground shadow-lg transition-[background-color,border-color] duration-300 hover:bg-primary-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          aria-label="Retour en haut"
         >
           <ArrowUp size={20} />
         </button>

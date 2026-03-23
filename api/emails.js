@@ -14,6 +14,7 @@
  */
 
 import { getResendClient } from './_lib/email.js'
+import logger from './_lib/logger.js'
 import { User } from './_lib/models/User.js'
 import { verifyClerkAuth } from './_lib/auth.js'
 import { connectToDatabase } from './_lib/mongodb.js'
@@ -295,10 +296,7 @@ async function runOnboardingStalled({ dryRun }) {
 
       results.push({ email: user.email, success: true })
     } catch (error) {
-      console.error(
-        `[Email] Failed to send reminder to ${user.email}:`,
-        error
-      )
+      logger.error(`Failed to send reminder to user ${user._id}`, error)
       results.push({
         email: user.email,
         success: false,
@@ -307,8 +305,8 @@ async function runOnboardingStalled({ dryRun }) {
     }
   }
 
-  console.log(
-    `[Email] Sent ${results.filter(r => r.success).length}/${eligibleUsers.length} reminder emails`
+  logger.info(
+    `Sent ${results.filter(r => r.success).length}/${eligibleUsers.length} reminder emails`
   )
 
   return {
@@ -390,7 +388,7 @@ async function runWeeklyTips({ dryRun }) {
 
       results.push({ email: user.email, success: true })
     } catch (error) {
-      console.error(`[Email] Failed to send tips to ${user.email}:`, error)
+      logger.error(`Failed to send tips to user ${user._id}`, error)
       results.push({
         email: user.email,
         success: false,
@@ -399,8 +397,8 @@ async function runWeeklyTips({ dryRun }) {
     }
   }
 
-  console.log(
-    `[Email] Sent ${results.filter(r => r.success).length}/${eligibleUsers.length} tips emails`
+  logger.info(
+    `Sent ${results.filter(r => r.success).length}/${eligibleUsers.length} tips emails`
   )
 
   return {
@@ -463,7 +461,7 @@ async function handleCron(req, res) {
         })
     }
 
-    console.log(`[Cron] Job '${job}' completed:`, result)
+    logger.info(`Cron job '${job}' completed`, result)
 
     return res.status(200).json({
       success: true,
@@ -472,7 +470,7 @@ async function handleCron(req, res) {
       result,
     })
   } catch (error) {
-    console.error(`[Cron] Job '${job}' failed:`, error)
+    logger.error(`Cron job '${job}' failed`, error)
     return res.status(500).json({
       success: false,
       job,
@@ -540,7 +538,7 @@ async function handleSend(req, res) {
       },
     })
 
-    console.log(`[Email] Sent ${template} email to ${to}:`, result)
+    logger.info(`Sent ${template} email`)
 
     return res.status(200).json({
       success: true,
@@ -548,7 +546,7 @@ async function handleSend(req, res) {
       template,
     })
   } catch (error) {
-    console.error('[Email] Send engagement email error:', error)
+    logger.error('Send engagement email error', error)
     return res.status(500).json({
       success: false,
       error: error.message,
@@ -589,7 +587,7 @@ async function handleSegments(req, res) {
         })),
       })
     } catch (error) {
-      console.error('[Segments] Query error:', error)
+      logger.error('Segments query error', error)
       return res.status(500).json({ error: error.message })
     }
   }
@@ -614,7 +612,7 @@ async function handleTriggerSignup(req, res, body) {
     // Check if user has opted in to onboarding emails
     const user = await User.findOne({ clerkId: ensureString(userId) })
     if (user?.emailPreferences?.onboarding === false) {
-      console.log(`[Email] Skipping welcome email - user opted out: ${email}`)
+      logger.info(`Skipping welcome email - user opted out: userId=${userId}`)
       return res
         .status(200)
         .json({ success: true, skipped: true, reason: 'user_opted_out' })
@@ -653,14 +651,14 @@ async function handleTriggerSignup(req, res, body) {
       }
     )
 
-    console.log(`[Email] Sent welcome email to ${email}:`, result)
+    logger.info(`Sent welcome email: userId=${userId}`)
 
     return res.status(200).json({
       success: true,
       emailId: result.data?.id || result.id,
     })
   } catch (error) {
-    console.error('[Email] Signup trigger error:', error)
+    logger.error('Signup trigger error', error)
     return res.status(500).json({
       success: false,
       error: error.message,
@@ -747,14 +745,14 @@ async function handleTriggerFirstValue(req, res, body) {
       },
     })
 
-    console.log(`[Email] Sent first-value email to ${user.email}:`, result)
+    logger.info(`Sent first-value email to user ${user._id}`)
 
     return res.status(200).json({
       success: true,
       emailId: result.data?.id || result.id,
     })
   } catch (error) {
-    console.error('[Email] First value trigger error:', error)
+    logger.error('First value trigger error', error)
     return res.status(500).json({
       success: false,
       error: error.message,
@@ -772,7 +770,7 @@ async function handleTriggerOnboardingStalled(req, res, body) {
     const result = await runOnboardingStalled({ dryRun })
     return res.status(200).json(result)
   } catch (error) {
-    console.error('[Email] Onboarding stalled trigger error:', error)
+    logger.error('Onboarding stalled trigger error', error)
     return res.status(500).json({
       success: false,
       error: error.message,
@@ -790,7 +788,7 @@ async function handleTriggerWeeklyTips(req, res, body) {
     const result = await runWeeklyTips({ dryRun })
     return res.status(200).json(result)
   } catch (error) {
-    console.error('[Email] Weekly tips trigger error:', error)
+    logger.error('Weekly tips trigger error', error)
     return res.status(500).json({
       success: false,
       error: error.message,

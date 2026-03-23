@@ -8,10 +8,14 @@
     "dev": "echo 'API functions run via Vercel dev'",
     "lint": "echo 'API linting handled by root ESLint'",
     "type-check": "echo 'API type checking handled by root TypeScript'",
-    "test": "echo 'No tests in api'"
+    "test": "npx --node-options=--experimental-vm-modules jest --config jest.config.js --passWithNoTests"
   },
   "private": true,
   "type": "module",
+  "devDependencies": {
+    "@jest/globals": "^30.3.0",
+    "jest": "^30.3.0"
+  },
   "dependencies": {
     "@clerk/backend": "^2.33.1",
     "@polar-sh/sdk": "^0.46.6",
@@ -28,8 +32,5 @@
     "mongoose": "^9.3.1",
     "resend": "^6.9.4",
     "svix": "^1.89.0"
-  },
-  "overrides": {
-    "minimatch": "10.2.4"
   }
 }

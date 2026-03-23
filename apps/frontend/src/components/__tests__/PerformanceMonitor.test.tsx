@@ -112,11 +112,13 @@ describe('PerformanceMonitor Component', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText((content) => content.includes('Performance Monitor'))
+        screen.getByText((content) =>
+          content.includes('Moniteur de performance')
+        )
       ).toBeInTheDocument()
-      expect(screen.getByText(/Load: \d+ms/)).toBeInTheDocument()
-      expect(screen.getByText(/Render: \d+ms/)).toBeInTheDocument()
-      expect(screen.getByText(/Memory: \d+MB/)).toBeInTheDocument()
+      expect(screen.getByText(/Chargement: \d+ms/)).toBeInTheDocument()
+      expect(screen.getByText(/Rendu: \d+ms/)).toBeInTheDocument()
+      expect(screen.getByText(/Mémoire: \d+MB/)).toBeInTheDocument()
     })
   })
 
@@ -127,7 +129,9 @@ describe('PerformanceMonitor Component', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText((content) => content.includes('Performance Monitor'))
+        screen.getByText((content) =>
+          content.includes('Moniteur de performance')
+        )
       ).toBeInTheDocument()
     })
   })
@@ -156,10 +160,12 @@ describe('PerformanceMonitor Component', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText((content) => content.includes('Performance Monitor'))
+        screen.getByText((content) =>
+          content.includes('Moniteur de performance')
+        )
       ).toBeInTheDocument()
     })
-    expect(screen.queryByText(/Memory:/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Mémoire:/)).not.toBeInTheDocument()
   })
 
   it('should handle missing paint entries gracefully', async () => {
@@ -179,9 +185,11 @@ describe('PerformanceMonitor Component', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText((content) => content.includes('Performance Monitor'))
+        screen.getByText((content) =>
+          content.includes('Moniteur de performance')
+        )
       ).toBeInTheDocument()
-      expect(screen.getByText('Render: 0ms')).toBeInTheDocument()
+      expect(screen.getByText('Rendu: 0ms')).toBeInTheDocument()
     })
   })
 
@@ -190,7 +198,9 @@ describe('PerformanceMonitor Component', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText((content) => content.includes('Performance Monitor'))
+        screen.getByText((content) =>
+          content.includes('Moniteur de performance')
+        )
       ).toBeInTheDocument()
     })
 
@@ -215,7 +225,9 @@ describe('PerformanceMonitor Component', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText((content) => content.includes('Performance Monitor'))
+        screen.getByText((content) =>
+          content.includes('Moniteur de performance')
+        )
       ).toBeInTheDocument()
     })
     expect(addEventListenerSpy).toHaveBeenCalledWith(
@@ -231,7 +243,9 @@ describe('PerformanceMonitor Component', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText((content) => content.includes('Performance Monitor'))
+        screen.getByText((content) =>
+          content.includes('Moniteur de performance')
+        )
       ).toBeInTheDocument()
     })
     unmount()
@@ -247,11 +261,13 @@ describe('PerformanceMonitor Component', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText((content) => content.includes('Performance Monitor'))
+        screen.getByText((content) =>
+          content.includes('Moniteur de performance')
+        )
       ).toBeInTheDocument()
     })
     const closeButton = screen.getByRole('button', {
-      name: 'Close performance monitor',
+      name: 'Fermer le moniteur de performance',
     })
 
     fireEvent.click(closeButton)
@@ -339,8 +355,8 @@ describe('PerformanceMonitor Component', () => {
     render(<PerformanceMonitor />)
 
     await waitFor(() => {
-      expect(screen.getByText(/Load: 1400ms/)).toBeInTheDocument()
-      expect(screen.getByText(/Render: 250ms/)).toBeInTheDocument()
+      expect(screen.getByText(/Chargement: 1400ms/)).toBeInTheDocument()
+      expect(screen.getByText(/Rendu: 250ms/)).toBeInTheDocument()
     })
   })
 })

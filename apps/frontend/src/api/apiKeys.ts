@@ -61,7 +61,9 @@ export const listApiKeys = async (
   // Get a fresh token - Clerk automatically handles refresh if needed
   const token = await getToken()
   if (!token) {
-    throw new Error('Authentication required. Please sign in to continue.')
+    throw new Error(
+      'Authentification requise. Connectez-vous pour continuer.'
+    )
   }
 
   try {
@@ -80,11 +82,11 @@ export const listApiKeys = async (
       const isDevelopment = import.meta.env.DEV
       if (isDevelopment) {
         throw new Error(
-          'Cannot connect to API server. Make sure you started the development server with `npm run dev` (not just `npm run dev:frontend`)'
+          "Impossible de se connecter au serveur API. Vérifiez que vous avez démarré l'environnement complet avec `npm run dev` (et pas seulement `npm run dev:frontend`)."
         )
       }
       throw new Error(
-        'Network error: Cannot connect to API server. Please try again later.'
+        "Erreur réseau : impossible de joindre le serveur API. Réessayez plus tard."
       )
     }
 
@@ -93,12 +95,10 @@ export const listApiKeys = async (
       const isDevelopment = import.meta.env.DEV
       if (isDevelopment) {
         throw new Error(
-          'API endpoint not found. Make sure the Vercel dev server is running (use `npm run dev` to start both frontend and API)'
+          "Point d'entrée API introuvable. Vérifiez que le serveur Vercel de développement est actif (`npm run dev` lance à la fois le frontend et l'API)."
         )
       }
-      throw new Error(
-        'API endpoint not found. Please check your configuration.'
-      )
+      throw new Error("Point d'entrée API introuvable. Vérifiez votre configuration.")
     }
 
     // Handle 431 - Request headers too large (usually large auth tokens)
@@ -106,13 +106,13 @@ export const listApiKeys = async (
       const isDevelopment = import.meta.env.DEV
       if (isDevelopment) {
         throw new Error(
-          'Request headers too large. This is usually caused by large authentication tokens. ' +
-            'Make sure you started the development server with `npm run dev` (which includes the header size fix). ' +
-            'If the error persists, try signing out and back in to refresh your session.'
+          "En-têtes de requête trop volumineux. Cela vient souvent de jetons d'authentification trop grands. " +
+            "Vérifiez que vous utilisez `npm run dev` (qui applique le correctif de taille d'en-tête). " +
+            'Si le problème persiste, déconnectez-vous puis reconnectez-vous pour rafraîchir votre session.'
         )
       }
       throw new Error(
-        'Authentication data too large. Please try signing out and back in to refresh your session.'
+        "Les données d'authentification sont trop volumineuses. Déconnectez-vous puis reconnectez-vous pour rafraîchir votre session."
       )
     }
 
@@ -124,18 +124,18 @@ export const listApiKeys = async (
     if (!text || text.trim().length === 0) {
       if (response.status === 401) {
         throw new Error(
-          'Your session has expired. Please sign in again to continue.'
+          'Votre session a expiré. Reconnectez-vous pour continuer.'
         )
       }
       throw new Error(
-        `Server returned empty response (${response.status}). Please try again.`
+        `Le serveur a renvoyé une réponse vide (${response.status}). Réessayez.`
       )
     }
 
     // Validate content type
     if (!contentType?.includes('application/json')) {
       throw new Error(
-        `Unexpected response format: ${contentType}. Expected JSON.`
+        `Format de réponse inattendu : ${contentType}. JSON attendu.`
       )
     }
 
@@ -144,22 +144,21 @@ export const listApiKeys = async (
       data = JSON.parse(text) as ListApiKeysResponse
     } catch (parseError) {
       throw new Error(
-        `Failed to parse server response: ${parseError instanceof Error ? parseError.message : 'Invalid JSON'}`
+        `Impossible d'analyser la réponse serveur : ${parseError instanceof Error ? parseError.message : 'JSON invalide'}`
       )
     }
 
     if (!response.ok) {
       if (response.status === 401) {
         // More specific error message for session expiration
-        const errorMsg =
-          data.error || 'Your session has expired. Please sign in again.'
+        const errorMsg = data.error || 'Votre session a expiré. Reconnectez-vous.'
         throw new Error(errorMsg)
       }
-      throw new Error(data.error || 'Failed to list API keys')
+      throw new Error(data.error || 'Impossible de charger les clés API')
     }
 
     if (!data.success) {
-      throw new Error(data.error || 'Failed to list API keys')
+      throw new Error(data.error || 'Impossible de charger les clés API')
     }
 
     return data.keys
@@ -178,7 +177,7 @@ export const createApiKey = async (
 ): Promise<CreateApiKeyResponse> => {
   const token = await getToken()
   if (!token) {
-    throw new Error('Authentication required')
+    throw new Error('Authentification requise')
   }
 
   try {
@@ -196,13 +195,13 @@ export const createApiKey = async (
 
     if (!response.ok) {
       if (response.status === 401) {
-        throw new Error('Session expired')
+        throw new Error('Session expirée')
       }
-      throw new Error(data.error || 'Failed to create API key')
+      throw new Error(data.error || 'Impossible de créer la clé API')
     }
 
     if (!data.success) {
-      throw new Error(data.error || 'Failed to create API key')
+      throw new Error(data.error || 'Impossible de créer la clé API')
     }
 
     return data
@@ -221,7 +220,7 @@ export const revokeApiKey = async (
 ): Promise<RevokeApiKeyResponse> => {
   const token = await getToken()
   if (!token) {
-    throw new Error('Authentication required')
+    throw new Error('Authentification requise')
   }
 
   try {
@@ -239,13 +238,13 @@ export const revokeApiKey = async (
 
     if (!response.ok) {
       if (response.status === 401) {
-        throw new Error('Session expired')
+        throw new Error('Session expirée')
       }
-      throw new Error(data.error || 'Failed to revoke API key')
+      throw new Error(data.error || 'Impossible de révoquer la clé API')
     }
 
     if (!data.success) {
-      throw new Error(data.error || 'Failed to revoke API key')
+      throw new Error(data.error || 'Impossible de révoquer la clé API')
     }
 
     return data
@@ -264,7 +263,7 @@ export const restoreApiKey = async (
 ): Promise<RestoreApiKeyResponse> => {
   const token = await getToken()
   if (!token) {
-    throw new Error('Authentication required')
+    throw new Error('Authentification requise')
   }
 
   try {
@@ -284,13 +283,13 @@ export const restoreApiKey = async (
 
     if (!response.ok) {
       if (response.status === 401) {
-        throw new Error('Session expired')
+        throw new Error('Session expirée')
       }
-      throw new Error(data.error || 'Failed to restore API key')
+      throw new Error(data.error || 'Impossible de restaurer la clé API')
     }
 
     if (!data.success) {
-      throw new Error(data.error || 'Failed to restore API key')
+      throw new Error(data.error || 'Impossible de restaurer la clé API')
     }
 
     return data

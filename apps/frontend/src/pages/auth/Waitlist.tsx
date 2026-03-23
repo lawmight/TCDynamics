@@ -11,10 +11,10 @@ const Waitlist = () => {
           <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/30">
             <Sparkles className="size-6" />
           </div>
-          <h1 className="text-2xl font-semibold">Join the Waitlist</h1>
+          <h1 className="text-2xl font-semibold">Rejoindre la liste d'attente</h1>
           <p className="text-sm text-muted-foreground">
-            Be among the first to experience TCDynamics. We'll notify you when
-            it's your turn.
+            Faites partie des premiers à découvrir TCDynamics. Nous vous
+            préviendrons dès que votre accès sera disponible.
           </p>
         </div>
 

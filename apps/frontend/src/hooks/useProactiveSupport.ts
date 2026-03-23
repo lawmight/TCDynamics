@@ -11,8 +11,8 @@ import { analytics } from '@/utils/analytics'
 import { getCached, removeCached, setCached } from '@/utils/storageMigration'
 
 interface UseProactiveSupportOptions {
-  /** User ID to monitor */
-  userId?: string
+  /** Clerk getToken for authenticated API calls */
+  getToken?: (forceRefresh?: boolean) => Promise<string | null>
   /** Whether to disable polling */
   disabled?: boolean
   /** Polling interval in milliseconds (default: 2 minutes) */
@@ -42,7 +42,7 @@ const FEEDBACK_KEY = 'tc_proactive_support_feedback'
  * Hook for proactive support with polling and cooldown management
  */
 export function useProactiveSupport({
-  userId,
+  getToken,
   disabled = false,
   pollingInterval = 2 * 60 * 1000, // 2 minutes
   dismissCooldown = 10 * 60 * 1000, // 10 minutes
@@ -135,16 +135,13 @@ export function useProactiveSupport({
     return null
   }, [])
 
-  // Fetch struggle detection from API
   const checkForStruggle = useCallback(async () => {
-    if (disabled || onCooldown || !userId) return
+    if (disabled || onCooldown) return
 
     try {
-      // First try local detection
       const localStruggle = detectStruggleLocally()
       if (localStruggle) {
         setStruggle(localStruggle)
-        // Track that help was offered
         analytics.trackEvent({
           category: 'ProactiveSupport',
           action: 'help_offered',
@@ -153,7 +150,8 @@ export function useProactiveSupport({
         return
       }
 
-      // Then try API (for server-side analytics)
+      if (!getToken) return
+
       const eventsParam = encodeURIComponent(
         JSON.stringify(
           lastEventRef.current
@@ -168,8 +166,16 @@ export function useProactiveSupport({
         )
       )
 
+      const token = await getToken()
+      if (!token) return
+
+      const headers: Record<string, string> = {
+        Authorization: `Bearer ${token}`,
+      }
+
       const response = await fetch(
-        `/api/user?action=detect-struggle&userId=${userId}&events=${eventsParam}`
+        `/api/user?action=detect-struggle&events=${eventsParam}`,
+        { headers }
       )
 
       if (!response.ok) return
@@ -185,21 +191,17 @@ export function useProactiveSupport({
         })
       }
     } catch {
-      // Silently fail - proactive support should never break the app
-      // Error logged via logger if needed
+      // Silently fail -- proactive support must never break the app
     }
-  }, [userId, disabled, onCooldown, detectStruggleLocally])
+  }, [getToken, disabled, onCooldown, detectStruggleLocally])
 
-  // Set up polling
   useEffect(() => {
-    if (disabled || !userId) return
+    if (disabled) return
 
-    // Initial check after short delay
     const initialTimeout = setTimeout(() => {
       checkForStruggle()
-    }, 30000) // 30 seconds after mount
+    }, 30000)
 
-    // Set up polling interval
     pollingRef.current = setInterval(checkForStruggle, pollingInterval)
 
     return () => {
@@ -208,7 +210,7 @@ export function useProactiveSupport({
         clearInterval(pollingRef.current)
       }
     }
-  }, [userId, disabled, pollingInterval, checkForStruggle])
+  }, [disabled, pollingInterval, checkForStruggle])
 
   const dismissHelp = useCallback(() => {
     setStruggle(null)

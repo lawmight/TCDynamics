@@ -1,4 +1,5 @@
 import { sendContactNotification, sendDemoNotification } from './_lib/email.js'
+import logger from './_lib/logger.js'
 import { saveContact, saveDemoRequest } from './_lib/mongodb-db.js'
 import { withGuards } from './_lib/request-guards.js'
 import { sanitizeString } from './_lib/sanitize.js'
@@ -39,7 +40,7 @@ async function handler(req, res, body) {
       (error?.name === 'MongoServerSelectionError' && !process.env.MONGODB_URI)
 
     if (isMongoConfig) {
-      console.warn('Form submission skipped: database not configured', {
+      logger.warn('Form submission skipped: database not configured', {
         requestId: req.requestId,
       })
       return res.status(503).json({
@@ -50,7 +51,7 @@ async function handler(req, res, body) {
       })
     }
 
-    console.error('Form submission error:', { requestId: req.requestId, error })
+    logger.error('Form submission error', { requestId: req.requestId, error })
     res.status(500).json({
       error: 'Erreur serveur',
       message: msg || 'Une erreur inattendue est survenue',
@@ -84,7 +85,7 @@ export async function handleContactForm(req, res, body, requestId) {
     })
   }
 
-  console.log('New contact form submission:', {
+  logger.info('New contact form submission', {
     requestId,
     name: sanitized.name,
     email: sanitized.email,
@@ -101,7 +102,7 @@ export async function handleContactForm(req, res, body, requestId) {
   })
 
   if (!result.success) {
-    console.error('Failed to save contact:', { requestId, error: result.error })
+    logger.error('Failed to save contact', { requestId, error: result.error })
     return res.status(500).json({
       error: 'Failed to save contact',
       details: result.error,
@@ -117,10 +118,8 @@ export async function handleContactForm(req, res, body, requestId) {
     company: sanitized.company,
   })
 
-  if (emailResult.success) {
-    console.log('Contact email sent successfully:', emailResult.emailId)
-  } else {
-    console.error('Failed to send email notification:', {
+  if (!emailResult.success) {
+    logger.error('Failed to send contact email notification', {
       requestId,
       error: emailResult.error,
     })
@@ -194,9 +193,8 @@ export async function handleDemoForm(req, res, body, requestId) {
     })
   }
 
-  console.log('New demo request:', {
+  logger.info('New demo request', {
     requestId,
-    name: sanitized.name,
   })
 
   // Save to MongoDB
@@ -216,7 +214,7 @@ export async function handleDemoForm(req, res, body, requestId) {
   })
 
   if (!result.success) {
-    console.error('Failed to save demo request:', {
+    logger.error('Failed to save demo request', {
       requestId,
       error: result.error,
     })
@@ -242,13 +240,8 @@ export async function handleDemoForm(req, res, body, requestId) {
     message: sanitized.message,
   })
 
-  if (emailResult.success) {
-    console.log('Demo email sent successfully:', {
-      requestId,
-      emailId: emailResult.emailId,
-    })
-  } else {
-    console.error('Failed to send email notification:', {
+  if (!emailResult.success) {
+    logger.error('Failed to send demo email notification', {
       requestId,
       error: emailResult.error,
     })

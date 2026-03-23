@@ -1,8 +1,15 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 import { fetchMetricsPages } from '@/api/metrics'
+import { Button } from '@/components/ui/button'
+import { EmptyState } from '@/components/ui/empty-state'
+import { ErrorState } from '@/components/ui/error-state'
+import { LoadingState } from '@/components/ui/loading-state'
 import { getWithMigration, LS } from '@/utils/storageMigration'
+import FileText from '~icons/lucide/file-text'
+import Settings from '~icons/lucide/settings'
 
 const getStoredProjectId = (): string => {
   try {
@@ -15,7 +22,7 @@ const getStoredProjectId = (): string => {
 const Pages = () => {
   const [projectId] = useState<string>(getStoredProjectId())
   const days = 7
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['metrics', 'pages', projectId, days],
     queryFn: () => fetchMetricsPages(projectId, days, 100),
     enabled: !!projectId,
@@ -26,41 +33,51 @@ const Pages = () => {
 
   if (!projectId) {
     return (
-      <div className="mx-auto max-w-6xl p-6">
-        <h1 className="mb-2 text-2xl font-semibold">Pages</h1>
-        <p className="text-muted-foreground">
-          No project configured. Go to Settings to set your Project ID.
-        </p>
+      <div className="mx-auto max-w-5xl space-y-6 p-6">
+        <h1 className="text-2xl font-semibold">Pages</h1>
+        <EmptyState
+          icon={<Settings className="size-7" />}
+          title="Aucun projet configuré"
+          description="Ajoutez votre identifiant de projet dans les paramètres pour afficher les performances par page."
+          action={
+            <Button asChild>
+              <Link to="/app/settings">Ouvrir les paramètres</Link>
+            </Button>
+          }
+        />
       </div>
     )
   }
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center">
-        <div className="size-12 animate-spin rounded-full border-b-2 border-primary"></div>
-      </div>
+      <LoadingState label="Chargement des performances par page..." />
     )
   }
 
   if (isError) {
     return (
-      <div className="mx-auto max-w-6xl p-6">
-        <h1 className="mb-2 text-2xl font-semibold">Pages</h1>
-        <p className="text-destructive">Failed to load page metrics.</p>
+      <div className="mx-auto max-w-5xl space-y-6 p-6">
+        <h1 className="text-2xl font-semibold">Pages</h1>
+        <ErrorState
+          variant="card"
+          title="Impossible de charger les performances"
+          message="Les indicateurs par page n'ont pas pu être récupérés."
+          onRetry={() => void refetch()}
+        />
       </div>
     )
   }
 
   return (
-    <div className="mx-auto max-w-6xl p-6">
+    <div className="mx-auto max-w-5xl p-6">
       <h1 className="mb-4 text-2xl font-semibold">Pages</h1>
       <div className="overflow-x-auto rounded-md border">
         <table className="min-w-full text-sm">
           <thead className="bg-muted">
             <tr>
-              <th className="p-2 text-left">Path</th>
-              <th className="p-2 text-left">Samples</th>
+              <th className="p-2 text-left">Chemin</th>
+              <th className="p-2 text-left">Échantillons</th>
               <th className="p-2 text-left">p75 LCP (ms)</th>
               <th className="p-2 text-left">p75 INP (ms)</th>
               <th className="p-2 text-left">p75 CLS</th>
@@ -69,7 +86,12 @@ const Pages = () => {
           <tbody>
             {rows.map(r => (
               <tr key={r.path} className="border-t">
-                <td className="p-2 font-mono">{r.path}</td>
+                <td className="p-2 font-mono">
+                  <span className="inline-flex items-center gap-2">
+                    <FileText className="text-muted-foreground size-3.5" />
+                    {r.path}
+                  </span>
+                </td>
                 <td className="p-2">{r.samples}</td>
                 <td className="p-2">{r.p75LCP ? Math.round(r.p75LCP) : '-'}</td>
                 <td className="p-2">{r.p75INP ? Math.round(r.p75INP) : '-'}</td>
@@ -80,7 +102,7 @@ const Pages = () => {
         </table>
       </div>
       <p className="mt-4 text-sm text-muted-foreground">
-        Window: last {days} days • Project: {projectId}
+        Fenêtre : {days} derniers jours • Projet : {projectId}
       </p>
     </div>
   )

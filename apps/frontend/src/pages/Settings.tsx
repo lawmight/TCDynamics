@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { LoadingState } from '@/components/ui/loading-state'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useRequireAuth } from '@/hooks/useAuth'
@@ -37,21 +38,22 @@ const Settings = () => {
     try {
       localStorage.setItem(LS.RUM_PROJECT_ID, projectId)
       localStorage.setItem(LS.RUM_WRITE_KEY, writeKey)
-      toast.success('Configuration saved!')
+      toast.success('Configuration enregistrée')
     } catch {
-      toast.error('Failed to save settings')
+      toast.error("Impossible d'enregistrer les paramètres")
     }
   }
 
-  const snippet = `<script src="/rum/v1/rum.js" data-key="${writeKey || 'YOUR_WRITE_KEY'}" data-project="${projectId || 'YOUR_PROJECT_ID'}" defer></script>`
+  const snippet = `<script src="/rum/v1/rum.js" data-key="${writeKey || 'VOTRE_WRITE_KEY'}" data-project="${projectId || 'VOTRE_PROJECT_ID'}" defer></script>`
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-4xl">
-        <div className="animate-pulse space-y-4">
-          <div className="bg-muted h-8 w-32 rounded" />
-          <div className="bg-muted h-64 rounded" />
-        </div>
+      <div className="mx-auto w-full max-w-3xl">
+        <LoadingState
+          variant="skeleton"
+          preset="panel"
+          label="Chargement des paramètres"
+        />
       </div>
     )
   }
@@ -60,47 +62,47 @@ const Settings = () => {
 
   const displayName = user?.firstName
     ? `${user.firstName} ${user.lastName || ''}`.trim()
-    : user?.primaryEmailAddress?.emailAddress || 'User'
+    : user?.primaryEmailAddress?.emailAddress || 'Utilisateur'
   const email =
     user?.primaryEmailAddress?.emailAddress ||
     user?.emailAddresses[0]?.emailAddress ||
     ''
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="mx-auto w-full max-w-3xl space-y-6">
       <div>
-        <h1 className="text-xl font-semibold">Settings</h1>
+        <h1 className="text-2xl font-semibold">Paramètres</h1>
         <p className="text-muted-foreground text-sm">
-          Manage your account, API keys, and preferences.
+          Gère votre compte, vos clés API et vos préférences.
         </p>
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList>
+        <TabsList className="flex h-auto w-full flex-wrap justify-start gap-2 bg-transparent p-0">
           <TabsTrigger value="profile" className="gap-1.5">
             <UserIcon className="size-3.5" />
-            Profile
+            Profil
           </TabsTrigger>
           <TabsTrigger value="api-keys" className="gap-1.5">
             <Key className="size-3.5" />
-            API Keys
+            Clés API
           </TabsTrigger>
           <TabsTrigger value="notifications" className="gap-1.5">
             <Mail className="size-3.5" />
-            Notifications
+            Emails
           </TabsTrigger>
           <TabsTrigger value="developer" className="gap-1.5">
             <Code className="size-3.5" />
-            Developer
+            Développeur
           </TabsTrigger>
         </TabsList>
 
         {/* Profile Tab */}
         <TabsContent value="profile">
           <Card className="p-6">
-            <h2 className="text-base font-semibold">Account</h2>
+            <h2 className="text-base font-semibold">Compte</h2>
             <p className="text-muted-foreground mt-1 text-sm">
-              Your account details are managed through Clerk.
+              Les informations de votre compte sont gérées via Clerk.
             </p>
             <Separator className="my-4" />
             <div className="space-y-4">
@@ -114,8 +116,8 @@ const Settings = () => {
                 </div>
               </div>
               <p className="text-muted-foreground text-xs">
-                To update your name, email, or password, use the Clerk
-                UserButton in the sidebar.
+                Pour modifier votre nom, votre email ou votre mot de passe,
+                utilisez le menu compte dans la barre latérale.
               </p>
             </div>
           </Card>
@@ -131,9 +133,9 @@ const Settings = () => {
         {/* Notifications Tab */}
         <TabsContent value="notifications">
           <Card className="p-6">
-            <h2 className="text-base font-semibold">Email Notifications</h2>
+            <h2 className="text-base font-semibold">Notifications email</h2>
             <p className="text-muted-foreground mt-1 text-sm">
-              Control which emails you receive from TCDynamics.
+              Choisissez les emails que vous souhaitez recevoir de TCDynamics.
             </p>
             <Separator className="my-4" />
             <Link
@@ -142,7 +144,7 @@ const Settings = () => {
             >
               <Button>
                 <Mail className="mr-1.5 size-3.5" />
-                Manage Email Preferences
+                Gérer les préférences email
               </Button>
             </Link>
           </Card>
@@ -151,24 +153,24 @@ const Settings = () => {
         {/* Developer Tab */}
         <TabsContent value="developer">
           <Card className="p-6">
-            <h2 className="text-base font-semibold">RUM Configuration</h2>
+            <h2 className="text-base font-semibold">Configuration RUM</h2>
             <p className="text-muted-foreground mt-1 text-sm">
-              Configure Real User Monitoring for your applications.
+              Configurez le Real User Monitoring pour vos applications.
             </p>
             <Separator className="my-4" />
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="projectId">Project ID</Label>
+                <Label htmlFor="projectId">Identifiant du projet</Label>
                 <Input
                   id="projectId"
                   aria-required="true"
                   value={projectId}
                   onChange={e => setProjectId(e.target.value)}
-                  placeholder="UUID of your project"
+                  placeholder="UUID de votre projet"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="writeKey">Public Write Key</Label>
+                <Label htmlFor="writeKey">Clé publique d'écriture</Label>
                 <Input
                   id="writeKey"
                   aria-required="true"
@@ -177,10 +179,10 @@ const Settings = () => {
                   placeholder="pk_..."
                 />
               </div>
-              <Button onClick={handleSaveRum}>Save Configuration</Button>
+              <Button onClick={handleSaveRum}>Enregistrer la configuration</Button>
               <Separator />
               <div className="space-y-2">
-                <Label htmlFor="embedSnippet">Embed Snippet</Label>
+                <Label htmlFor="embedSnippet">Extrait d'integration</Label>
                 <pre
                   id="embedSnippet"
                   className="bg-muted whitespace-pre-wrap break-all rounded-lg border p-3 font-mono text-xs"

@@ -45,8 +45,8 @@ const CheckoutSuccess = () => {
           <Card className="border-primary/20 bg-card/95 text-center backdrop-blur-sm">
             <CardContent className="pb-6 pt-8">
               <div className="mb-6 flex justify-center">
-                <div className="flex size-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
-                  <CheckCircle className="size-12 text-green-600 dark:text-green-400" />
+                <div className="bg-success/10 flex size-20 items-center justify-center rounded-full">
+                  <CheckCircle className="text-success size-12" />
                 </div>
               </div>
 
@@ -76,7 +76,7 @@ const CheckoutSuccess = () => {
           {/* Order Confirmation */}
           <Card className="border-primary/20 bg-card/95 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="flex items-center gap-3 text-2xl">
+              <CardTitle as="h2" className="flex items-center gap-3 text-2xl">
                 <Mail className="size-6 text-primary" />
                 Confirmation de commande
               </CardTitle>
@@ -93,7 +93,9 @@ const CheckoutSuccess = () => {
           {/* Next Steps */}
           <Card className="border-primary/20 bg-card/95 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="text-2xl">Prochaines étapes</CardTitle>
+              <CardTitle as="h2" className="text-2xl">
+                Prochaines étapes
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <ol className="space-y-4">
@@ -166,7 +168,9 @@ const CheckoutSuccess = () => {
           {/* Support Section */}
           <Card className="border-primary/20 bg-card/95 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="text-2xl">Besoin d'aide ?</CardTitle>
+              <CardTitle as="h2" className="text-2xl">
+                Besoin d'aide ?
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">

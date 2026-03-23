@@ -122,7 +122,7 @@ export const PostSubmissionFeedback = ({
       })
 
       if (!response.ok) {
-        throw new Error('Failed to submit feedback')
+        throw new Error("Impossible d'envoyer le retour")
       }
 
       // Close dialog after successful submission
@@ -132,7 +132,7 @@ export const PostSubmissionFeedback = ({
       if (hasAnalyticsConsent) {
         track('feedback_error', {
           formType,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? error.message : 'Erreur inconnue',
           timestamp: new Date().toISOString(),
         })
       }
@@ -170,10 +170,9 @@ export const PostSubmissionFeedback = ({
               type="button"
               onClick={onClose}
               className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              aria-label="Close dialog"
+              aria-label="Fermer la fenêtre"
             >
               <X className="size-4" />
-              <span className="sr-only">Close</span>
             </button>
             <div>
               <h2 id={titleId} className="text-xl font-semibold">
@@ -189,12 +188,11 @@ export const PostSubmissionFeedback = ({
           {/* Content */}
           <form onSubmit={handleSubmit} className="space-y-6 p-6">
             {/* Question 1: Satisfaction Rating */}
-            <div className="space-y-3">
-              <label htmlFor="rating" className="block text-sm font-medium">
+            <fieldset className="space-y-3">
+              <legend className="block text-sm font-medium">
                 Étiez-vous satisfait de votre expérience ? *
-              </label>
+              </legend>
               <div
-                role="radiogroup"
                 aria-label="Note de satisfaction de 1 à 5"
                 className="grid grid-cols-5 gap-2"
               >
@@ -207,21 +205,28 @@ export const PostSubmissionFeedback = ({
                     5: '5 sur 5, très satisfait',
                   }
                   return (
-                    <button
-                      key={value}
-                      type="button"
-                      role="radio"
-                      aria-checked={rating === value ? 'true' : 'false'}
-                      aria-label={labels[value]}
-                      onClick={() => setRating(value)}
-                      className={`rounded-lg border-2 py-3 text-sm font-semibold transition-[border-color,box-shadow] ${
+                    <div key={value}>
+                      <input
+                        id={`rating-${value}`}
+                        type="radio"
+                        name="rating"
+                        value={value}
+                        checked={rating === value}
+                        onChange={() => setRating(value)}
+                        className="sr-only"
+                      />
+                      <label
+                        htmlFor={`rating-${value}`}
+                        className={`block rounded-lg border-2 py-3 text-center text-sm font-semibold transition-[border-color,box-shadow] ${
                         rating === value
                           ? 'border-primary bg-primary/10 text-primary'
                           : 'border-border hover:border-primary/50'
-                      }`}
-                    >
-                      {value}
-                    </button>
+                        }`}
+                      >
+                        <span aria-hidden="true">{value}</span>
+                        <span className="sr-only">{labels[value]}</span>
+                      </label>
+                    </div>
                   )
                 })}
               </div>
@@ -232,7 +237,7 @@ export const PostSubmissionFeedback = ({
                 {rating === 4 && 'Satisfait'}
                 {rating === 5 && 'Très satisfait'}
               </p>
-            </div>
+            </fieldset>
 
             {/* Question 2: What were they looking for */}
             <div className="space-y-3">

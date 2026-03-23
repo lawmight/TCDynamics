@@ -18,7 +18,7 @@ import {
 export const validateEmail = (email: unknown): ValidationResult => {
   const warnings: string[] = []
 
-  if (!email || typeof email !== 'string') {
+  if (email === null || email === undefined || typeof email !== 'string') {
     return {
       valid: false,
       errors: ["L'email est requis et doit être une chaîne de caractères"],
@@ -97,7 +97,7 @@ export const validateName = (
 ): ValidationResult => {
   const warnings: string[] = []
 
-  if (!name || typeof name !== 'string') {
+  if (name === null || name === undefined || typeof name !== 'string') {
     return {
       valid: false,
       errors: [
@@ -163,7 +163,7 @@ export const validateMessage = (
 ): ValidationResult => {
   const warnings: string[] = []
 
-  if (!message || typeof message !== 'string') {
+  if (message === null || message === undefined || typeof message !== 'string') {
     return {
       valid: false,
       errors: [
@@ -209,11 +209,11 @@ export const validateMessage = (
     warnings.push(`${fieldName} semble trop court en termes de mots`)
   }
 
-  // Check for potential spam patterns
+  // Check for potential spam patterns (no /g flag — .test() must not mutate lastIndex across patterns)
   const spamPatterns = [
-    /http[s]?:\/\/[^\s]+/gi,
-    /(?:\d{3}[-.\s]??\d{2}[-.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-.\s]??\d{4}|\d{3}\.\d{3}\.\d{4})/g,
-    /(?:[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g,
+    /http[s]?:\/\/[^\s]+/i,
+    /(?:\d{3}[-.\s]?\d{3}[-.\s]?\d{4}|\d{3}[-.\s]?\d{2}[-.\s]?\d{4}|\(\d{3}\)\s*\d{3}[-.\s]?\d{4}|\d{3}\.\d{3}\.\d{4})/,
+    /(?:[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/,
   ]
 
   const hasSpamPatterns = spamPatterns.some((pattern: RegExp) =>
@@ -247,7 +247,7 @@ export const validateMessage = (
 export const validatePhone = (phone: unknown): ValidationResult => {
   const warnings: string[] = []
 
-  if (!phone || typeof phone !== 'string') {
+  if (phone === null || phone === undefined || typeof phone !== 'string') {
     return {
       valid: true, // Phone is optional
       errors: [],
@@ -255,28 +255,27 @@ export const validatePhone = (phone: unknown): ValidationResult => {
     }
   }
 
-  const cleanedPhone = phone.replace(/[^\d+]/g, '')
+  const trimmed = phone.trim()
+  if (trimmed.length === 0) {
+    return { valid: true, errors: [], warnings: [] }
+  }
 
-  if (cleanedPhone.length > 0) {
-    // Basic phone number validation
-    const phonePattern = /^[+]?[\d\s\-()]{7,15}$/
-    if (!phonePattern.test(phone)) {
-      return {
-        valid: false,
-        errors: ['Format de numéro de téléphone invalide'],
-        warnings: [],
-      }
-    }
+  const digitCount = (trimmed.match(/\d/g) ?? []).length
 
-    // Warning for very short numbers
-    if (cleanedPhone.length < 7) {
-      warnings.push('Numéro de téléphone très court')
+  if (digitCount === 0 || digitCount < 7 || digitCount > 15) {
+    return {
+      valid: false,
+      errors: ['Format de numéro de téléphone invalide'],
+      warnings: [],
     }
+  }
 
-    // Warning for very long numbers
-    if (cleanedPhone.length > 15) {
-      warnings.push('Numéro de téléphone très long')
-    }
+  if (digitCount <= 9) {
+    warnings.push('Numéro de téléphone très court')
+  }
+
+  if (digitCount >= 13) {
+    warnings.push('Numéro de téléphone très long')
   }
 
   return { valid: true, errors: [], warnings }

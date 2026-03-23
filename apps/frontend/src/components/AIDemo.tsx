@@ -274,23 +274,23 @@ const AIDemo = () => {
                   </Card>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <Card className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/20">
+                    <Card className="border-success/30 bg-success/10">
                       <CardContent className="p-4 text-center">
-                        <div className="mb-1 text-2xl font-bold text-green-600 dark:text-green-400">
+                        <div className="text-success mb-1 text-2xl font-bold">
                           80%
                         </div>
-                        <div className="font-mono text-sm text-green-700 dark:text-green-300">
+                        <div className="text-success/90 font-mono text-sm">
                           des demandes résolues automatiquement
                         </div>
                       </CardContent>
                     </Card>
 
-                    <Card className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/20">
+                    <Card className="border-info/30 bg-info/10">
                       <CardContent className="p-4 text-center">
-                        <div className="mb-1 text-2xl font-bold text-blue-600 dark:text-blue-400">
+                        <div className="text-info mb-1 text-2xl font-bold">
                           24/7
                         </div>
-                        <div className="font-mono text-sm text-blue-700 dark:text-blue-300">
+                        <div className="text-info/90 font-mono text-sm">
                           disponibilité du support
                         </div>
                       </CardContent>

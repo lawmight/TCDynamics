@@ -30,7 +30,7 @@
     "dev:all": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\" \"npm run dev:vercel\"",
     "dev:frontend": "npm run dev -w apps/frontend",
     "dev:backend": "npm run dev -w apps/backend",
-    "dev:vercel": "cross-env NODE_OPTIONS=\"--max-http-header-size=65536\" vercel dev --listen 3001 --yes",
+    "dev:vercel": "cross-env ALLOW_VERCEL_CHAT=true NODE_OPTIONS=\"--max-http-header-size=65536 --max-old-space-size=4096\" dotenv -e .env -e .env.local -e apps/frontend/.env -e apps/frontend/.env.local -- vercel dev --local-config vercel.api.dev.json --listen 3201 --yes",
     "dev:functions": "echo \"Azure Functions archived - see apps/functions-archive/\"",
     "build": "npm run build -ws",
     "build:packages": "npm run build -w packages/shared-types && npm run build -w packages/shared-utils",
@@ -113,6 +113,9 @@
   "overrides": {
     "undici": ">=7.24.0",
     "minimatch": "10.2.4",
+    "eslint-plugin-jsx-a11y": {
+      "minimatch": "3.1.2"
+    },
     "@sentry/node": {
       "minimatch": "10.2.4"
     },

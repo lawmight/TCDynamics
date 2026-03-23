@@ -132,7 +132,7 @@ const EmailPreferences = () => {
   }
 
   return (
-    <div className="mx-auto max-w-2xl p-6">
+    <div className="mx-auto max-w-3xl p-6">
       {/* Header */}
       <div className="mb-8">
         <Link
@@ -152,7 +152,9 @@ const EmailPreferences = () => {
       {/* Preferences List */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle className="text-lg">Communications</CardTitle>
+          <CardTitle as="h2" className="text-lg">
+            Communications
+          </CardTitle>
           <CardDescription>
             Choisissez les emails que vous souhaitez recevoir
           </CardDescription>
@@ -198,7 +200,7 @@ const EmailPreferences = () => {
         <Button onClick={handleSave} disabled={isSaving}>
           {isSaving ? (
             <>
-              <div className="mr-2 size-4 animate-spin rounded-full border-b-2 border-white"></div>
+              <div className="border-primary-foreground mr-2 size-4 animate-spin rounded-full border-b-2"></div>
               Enregistrement…
             </>
           ) : (

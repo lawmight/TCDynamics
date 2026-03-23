@@ -26,7 +26,7 @@ export const uploadKnowledgeFile = async (
 
   if (!res.ok) {
     const errorText = await res.text()
-    throw new Error(errorText || 'Upload failed')
+    throw new Error(errorText || "L'import du fichier a échoué")
   }
 
   return res.json()
@@ -36,7 +36,7 @@ export const listKnowledgeFiles = async (): Promise<KnowledgeFile[]> => {
   const res = await fetch('/api/files')
   if (!res.ok) {
     const errorText = await res.text()
-    throw new Error(errorText || 'Listing failed')
+    throw new Error(errorText || 'Impossible de récupérer la liste des fichiers')
   }
   const json = await res.json()
   return json.files || []

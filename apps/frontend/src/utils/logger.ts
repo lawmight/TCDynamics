@@ -52,18 +52,24 @@ class Logger {
 
   // Sanitize error objects to avoid logging sensitive data
   private sanitizeError(error: unknown): string {
+    let raw: string
     if (error instanceof Error) {
       const message = error.message
       // Include stack trace in non-production or when in debug mode
       if (!this.isProduction || this.level <= LogLevel.DEBUG) {
         const stack = error.stack
         if (stack) {
-          return `${message}\n${stack}`
+          raw = `${message}\n${stack}`
+        } else {
+          raw = message
         }
+      } else {
+        raw = message
       }
-      return message
+    } else {
+      raw = String(error)
     }
-    return String(error)
+    return this.sanitizeMessage(raw)
   }
 
   // Configurable list of sensitive keys that should be fully redacted
@@ -231,27 +237,29 @@ class Logger {
     }
   }
 
-  private sendToMonitoring(message: string, error?: unknown): void {
-    // Intégration avec un service de monitoring (ex: Sentry, LogRocket)
-    // Pour l'instant, on peut utiliser l'API de monitoring existante
-    try {
-      fetch('/api/logs', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          level: 'error',
-          message,
-          error: error instanceof Error ? error.stack : String(error),
-          timestamp: new Date().toISOString(),
-          url: window.location.href,
-          userAgent: navigator.userAgent,
-        }),
-      }).catch(() => {
-        // Silently fail if monitoring service is unavailable
-      })
-    } catch {
-      // Silently fail
+  private sendToMonitoring(_message: string, _error?: unknown): void {
+    const remoteLoggingEnabled = /^(1|true|yes|on)$/i.test(
+      import.meta.env.VITE_ENABLE_REMOTE_LOGGING ?? ''
+    )
+
+    if (!remoteLoggingEnabled) {
+      return
     }
+
+    void fetch('/api/logs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        level: 'error',
+        message: this.sanitizeMessage(_message),
+        error: _error ? this.sanitizeError(_error) : undefined,
+      }),
+      keepalive: true,
+    }).catch(() => {
+      // Logging must never create additional user-facing failures.
+    })
   }
 }
 

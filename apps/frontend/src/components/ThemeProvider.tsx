@@ -2,7 +2,20 @@ import { createContext, useContext, useEffect, useState } from 'react'
 
 import { getWithMigration, LS, setCached } from '@/utils/storageMigration'
 
-type Theme = 'light' | 'dark' | 'system'
+type Theme = 'light' | 'dark'
+
+function normalizeThemeFromStorage(stored: string | null | undefined): Theme {
+  if (stored === 'light' || stored === 'dark') return stored
+  if (stored === 'system') {
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light'
+    }
+    return 'dark'
+  }
+  return 'dark'
+}
 
 interface ThemeContextType {
   theme: Theme
@@ -13,13 +26,12 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 /**
- * ThemeProvider component for managing light/dark/system theme modes
+ * ThemeProvider component for managing light/dark theme modes
  *
  * Features:
- * - Supports three modes: 'light', 'dark', 'system'
+ * - Supports explicit 'light' and 'dark' only (no system-follow mode)
  * - Persists theme preference in localStorage
- * - Automatically detects system color scheme preference
- * - Listens for system preference changes
+ * - Migrates legacy stored value 'system' once to light or dark from OS preference
  * - Applies theme class to document root element
  *
  * @example
@@ -36,8 +48,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // Initialize theme from localStorage or default to 'dark'
   const [theme, setTheme] = useState<Theme>(() => {
     try {
-      const stored = getWithMigration(LS.THEME, 'theme') as Theme
-      return stored || 'dark'
+      const stored = getWithMigration(LS.THEME, 'theme') as string | null
+      return normalizeThemeFromStorage(stored)
     } catch {
       return 'dark'
     }
@@ -46,59 +58,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // Track the actual resolved theme (light or dark)
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('dark')
 
-  // Resolve theme and apply to document
+  // Apply theme to document and persist
   useEffect(() => {
     const root = window.document.documentElement
 
-    // Determine the actual theme to apply
-    let resolved: 'light' | 'dark' = 'dark'
-
-    if (theme === 'system') {
-      // Use system preference
-      resolved = window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light'
-    } else {
-      // Use explicit theme
-      resolved = theme
-    }
-
-    // Update state
-    setResolvedTheme(resolved)
-
-    // Apply to DOM
+    setResolvedTheme(theme)
     root.classList.remove('light', 'dark')
-    root.classList.add(resolved)
+    root.classList.add(theme)
 
-    // Persist to localStorage (cache updated for same-tab reads)
     try {
       setCached(LS.THEME, theme)
     } catch (error) {
       console.error('Failed to save theme preference:', error)
-    }
-  }, [theme])
-
-  // Listen for system preference changes (when theme is 'system')
-  useEffect(() => {
-    if (theme !== 'system') return
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-
-    const handleChange = () => {
-      const newResolved = mediaQuery.matches ? 'dark' : 'light'
-      setResolvedTheme(newResolved)
-
-      // Update DOM
-      const root = window.document.documentElement
-      root.classList.remove('light', 'dark')
-      root.classList.add(newResolved)
-    }
-
-    // Modern browsers support addEventListener
-    mediaQuery.addEventListener('change', handleChange)
-
-    return () => {
-      mediaQuery.removeEventListener('change', handleChange)
     }
   }, [theme])
 

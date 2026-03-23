@@ -9,7 +9,11 @@ import {
 import { CelebrationModal } from '@/components/app/CelebrationModal'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { EmptyState } from '@/components/ui/empty-state'
+import { ErrorState } from '@/components/ui/error-state'
 import { Input } from '@/components/ui/input'
+import { LoadingState } from '@/components/ui/loading-state'
+import { useAuth } from '@/hooks/useAuth'
 import { useMilestoneDetection } from '@/hooks/useMilestoneDetection'
 import { cn } from '@/lib/utils'
 import type { UserMilestoneState } from '@/utils/celebrations'
@@ -35,12 +39,16 @@ function formatFileSize(bytes: number): string {
 }
 
 const Files = () => {
+  const { getToken } = useAuth()
   const [files, setFiles] = useState<KnowledgeFile[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [messageType, setMessageType] = useState<'success' | 'error'>(
     'success'
+  )
+  const [errorSource, setErrorSource] = useState<'fetch' | 'upload' | null>(
+    null
   )
   const [hasUploadedFirst, setHasUploadedFirst] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -67,14 +75,19 @@ const Files = () => {
   const fetchFiles = useCallback(async () => {
     setIsLoading(true)
     setMessage(null)
+    setErrorSource(null)
     try {
       const data = await listKnowledgeFiles()
       setFiles(data)
+      setErrorSource(null)
     } catch (error) {
       const text =
-        error instanceof Error ? error.message : 'Failed to load files'
+        error instanceof Error
+          ? error.message
+          : 'Impossible de charger les fichiers'
       setMessage(text)
       setMessageType('error')
+      setErrorSource('fetch')
     } finally {
       setIsLoading(false)
     }
@@ -96,6 +109,7 @@ const Files = () => {
   const processUpload = async (file: globalThis.File) => {
     setUploading(true)
     setMessage(null)
+    setErrorSource(null)
     try {
       const base64 = await toBase64(file)
       await uploadKnowledgeFile({
@@ -104,15 +118,22 @@ const Files = () => {
         size: file.size,
         base64,
       })
-      await recordEvent('file_upload', { name: file.name, size: file.size })
+      await recordEvent(
+        'file_upload',
+        { name: file.name, size: file.size },
+        { getToken }
+      )
       await fetchFiles()
-      setMessage(`"${file.name}" uploaded and indexed successfully.`)
+      setMessage(`"${file.name}" a été importé et indexé avec succès.`)
       setMessageType('success')
+      setErrorSource(null)
       if (files.length === 0) setHasUploadedFirst(true)
     } catch (error) {
-      const text = error instanceof Error ? error.message : 'Upload failed'
+      const text =
+        error instanceof Error ? error.message : "L'import du fichier a échoué"
       setMessage(text)
       setMessageType('error')
+      setErrorSource('upload')
     } finally {
       setUploading(false)
     }
@@ -157,13 +178,14 @@ const Files = () => {
         />
       )}
 
-      <div className="mx-auto w-full max-w-6xl space-y-6">
+      <div className="mx-auto w-full max-w-5xl space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-xl font-semibold">Knowledge Base</h1>
+            <h1 className="text-2xl font-semibold">Base de connaissances</h1>
             <p className="text-muted-foreground text-sm">
-              Upload [REDACTED] for AI-powered semantic search and retrieval.
+              Importez vos documents pour alimenter la recherche sémantique et
+              les réponses de l'assistant.
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -179,11 +201,11 @@ const Files = () => {
                   isLoading && 'animate-spin'
                 )}
               />
-              Refresh
+              Actualiser
             </Button>
             <Button size="sm" onClick={() => fileInputRef.current?.click()}>
               <Upload className="mr-1.5 size-3.5" />
-              Upload
+              Importer
             </Button>
             <input
               ref={fileInputRef}
@@ -191,7 +213,7 @@ const Files = () => {
               className="hidden"
               accept=".pdf,.txt,.doc,.docx"
               onChange={e => void handleUpload(e)}
-              aria-label="Upload a document"
+              aria-label="Importer un document"
             />
           </div>
         </div>
@@ -222,11 +244,11 @@ const Files = () => {
           <div className="text-center">
             <p className="text-sm font-medium">
               {uploading
-                ? 'Uploading and indexing...'
-                : 'Drag & drop a file here'}
+                ? 'Import et indexation en cours...'
+                : 'Glissez-déposez un fichier ici'}
             </p>
             <p className="text-muted-foreground mt-1 text-xs">
-              PDF, TXT, DOCX supported &middot; Max 10 MB
+              PDF, TXT et DOCX pris en charge &middot; 10 Mo max
             </p>
           </div>
           {!uploading && (
@@ -235,24 +257,26 @@ const Files = () => {
               size="sm"
               onClick={() => fileInputRef.current?.click()}
             >
-              Browse files
+              Parcourir les fichiers
             </Button>
           )}
         </div>
 
         {/* Status message */}
-        {message && (
-          <div
-            className={cn(
-              'rounded-lg px-4 py-2.5 text-sm',
-              messageType === 'success'
-                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                : 'bg-destructive/10 text-destructive'
-            )}
-          >
+        {message && messageType === 'success' ? (
+          <div className="rounded-lg bg-success/10 px-4 py-2.5 text-sm text-success">
             {message}
           </div>
-        )}
+        ) : null}
+        {message && messageType === 'error' ? (
+          <ErrorState
+            variant="inline"
+            message={message}
+            onRetry={
+              errorSource === 'fetch' ? () => void fetchFiles() : undefined
+            }
+          />
+        ) : null}
 
         {/* File list */}
         <Card className="border-border overflow-hidden">
@@ -272,7 +296,7 @@ const Files = () => {
                 <Input
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  placeholder="Search files..."
+                  placeholder="Rechercher un fichier..."
                   className="h-8 w-48 pl-8 text-xs"
                 />
               </div>
@@ -280,12 +304,11 @@ const Files = () => {
           </div>
 
           {isLoading ? (
-            <div className="flex items-center justify-center gap-2 p-8">
-              <Loader2 className="size-4 animate-spin" />
-              <span className="text-muted-foreground text-sm">
-                Loading files...
-              </span>
-            </div>
+            <LoadingState
+              variant="spinner"
+              label="Chargement des fichiers..."
+              className="min-h-[20vh]"
+            />
           ) : filteredFiles.length > 0 ? (
             <div className="divide-border divide-y">
               {filteredFiles.map(file => {
@@ -311,35 +334,46 @@ const Files = () => {
                         </p>
                       )}
                     </div>
-                    <span className="shrink-0 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                      Indexed
+                    <span className="bg-success/10 text-success shrink-0 rounded-full px-2.5 py-1 text-xs font-medium">
+                      Indexé
                     </span>
                   </div>
                 )
               })}
             </div>
           ) : files.length > 0 && searchQuery ? (
-            <div className="text-muted-foreground p-8 text-center text-sm">
-              No files match &quot;{searchQuery}&quot;
+            <div className="p-4">
+              <EmptyState
+                icon={<SearchIcon className="size-7" />}
+                title="Aucun résultat"
+                description={`Aucun fichier ne correspond à "${searchQuery}".`}
+                action={
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSearchQuery('')}
+                  >
+                    Réinitialiser la recherche
+                  </Button>
+                }
+              />
             </div>
           ) : (
-            <div className="flex flex-col items-center gap-3 p-12 text-center">
-              <div className="bg-muted flex size-12 items-center justify-center rounded-2xl">
-                <FileText className="text-muted-foreground size-6" />
-              </div>
-              <div>
-                <p className="text-sm font-medium">No [REDACTED] yet</p>
-                <p className="text-muted-foreground mt-1 text-xs">
-                  Upload your first PDF or TXT to enable retrieval in chat.
-                </p>
-              </div>
-              <Button
-                size="sm"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <Upload className="mr-1.5 size-3.5" />
-                Upload your first file
-              </Button>
+            <div className="p-4">
+              <EmptyState
+                icon={<FileText className="size-7" />}
+                title="Aucun document indexé"
+                description="Importez votre premier PDF, TXT ou DOCX pour activer la recherche et la récupération dans le chat."
+                action={
+                  <Button
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Upload className="mr-1.5 size-3.5" />
+                    Importer votre premier fichier
+                  </Button>
+                }
+              />
             </div>
           )}
         </Card>

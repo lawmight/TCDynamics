@@ -3,7 +3,8 @@ import { verifyClerkAuth } from './_lib/auth.js'
 import { saveConversation } from './_lib/mongodb-db.js'
 import { User } from './_lib/models/User.js'
 import { connectToDatabase } from './_lib/mongodb.js'
-import { getClientIp, parseJsonBody } from './_lib/request-guards.js'
+import logger from './_lib/logger.js'
+import { applyRateLimit, getClientIp, parseJsonBody } from './_lib/request-guards.js'
 import { withSentry } from './_lib/sentry.js'
 import { validateImageUrl } from './_lib/validate-url.js'
 
@@ -25,10 +26,12 @@ export const config = {
 // ---------- Configuration & Guards ----------
 const ALLOW_VERCEL_CHAT = process.env.ALLOW_VERCEL_CHAT === 'true'
 const INTERNAL_CHAT_TOKEN = process.env.INTERNAL_CHAT_TOKEN
+const DEFAULT_ALLOWED_ORIGIN = 'https://tcdynamics.fr'
 const ALLOWED_ORIGIN =
   process.env.ALLOWED_ORIGIN ||
   process.env.FRONTEND_URL ||
-  'https://tcdynamics.fr'
+  process.env.VITE_FRONTEND_URL ||
+  DEFAULT_ALLOWED_ORIGIN
 const ENABLE_CLIENT_IP_LOGGING = process.env.ENABLE_CLIENT_IP_LOGGING === 'true'
 const IP_HASH_SALT = process.env.IP_HASH_SALT || ''
 const MAX_MESSAGE_LENGTH = Math.max(
@@ -36,10 +39,7 @@ const MAX_MESSAGE_LENGTH = Math.max(
   Number(process.env.MAX_MESSAGE_LENGTH) || 2000
 )
 const MAX_TOKENS = Math.max(1, Number(process.env.MAX_TOKENS) || 512)
-const MAX_REQUESTS_PER_WINDOW = 5
-const RATE_LIMIT_WINDOW_MS = 60_000
-// Simple in-memory rate limiter; replace with a persistent store (e.g., Vercel KV / Upstash Redis) in production to share state across invocations
-const rateLimitStore = new Map()
+const OPENROUTER_RATE_LIMIT = { limit: 5, windowMs: 60_000, scope: 'openrouter-chat' }
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
 const OPENROUTER_APP_TITLE = process.env.OPENROUTER_APP_TITLE || 'WorkFlowAI'
@@ -52,44 +52,56 @@ function getQueryValue(value) {
   return value
 }
 
-function isRateLimited(key) {
-  const now = Date.now()
-  const cutoff = now - RATE_LIMIT_WINDOW_MS
-  const existingHistory = rateLimitStore.get(key) || []
-  const filteredHistory = existingHistory.filter(ts => ts > cutoff)
-
-  // Compute whether adding this request would exceed the limit
-  const wouldExceedLimit = filteredHistory.length >= MAX_REQUESTS_PER_WINDOW
-
-  if (wouldExceedLimit) {
-    // Request is rate-limited: update store with filtered history (evict old entries)
-    // but do NOT add the current timestamp
-    rateLimitStore.set(key, filteredHistory)
-    return true
+function normalizeOrigin(value) {
+  if (!value || typeof value !== 'string') return null
+  try {
+    return new URL(value).origin
+  } catch {
+    return null
   }
-
-  // Request is allowed: add current timestamp and persist
-  const updatedHistory = [...filteredHistory, now]
-  rateLimitStore.set(key, updatedHistory)
-  return false
 }
 
-function isOriginAllowed(req) {
-  const origin = req.headers.origin || req.headers.referer
-  if (!origin) return false
+function getAllowedOrigins() {
+  return new Set(
+    [
+      DEFAULT_ALLOWED_ORIGIN,
+      process.env.ALLOWED_ORIGIN,
+      process.env.FRONTEND_URL,
+      process.env.VITE_FRONTEND_URL,
+    ]
+      .flatMap(value => (typeof value === 'string' ? value.split(',') : []))
+      .map(value => normalizeOrigin(value.trim()))
+      .filter(Boolean)
+  )
+}
+
+const ALLOWED_ORIGINS = getAllowedOrigins()
+
+function isLocalDevelopmentOrigin(origin) {
+  if (process.env.NODE_ENV === 'production') return false
   try {
-    return new URL(origin).origin === new URL(ALLOWED_ORIGIN).origin
+    const { hostname } = new URL(origin)
+    return hostname === 'localhost' || hostname === '127.0.0.1'
   } catch {
     return false
   }
 }
 
+function isOriginAllowed(req) {
+  const origin = req.headers.origin || req.headers.referer
+  if (!origin) return false
+  const normalizedOrigin = normalizeOrigin(origin)
+  if (!normalizedOrigin) return false
+  return (
+    ALLOWED_ORIGINS.has(normalizedOrigin) ||
+    isLocalDevelopmentOrigin(normalizedOrigin)
+  )
+}
+
 function hashClientIp(clientIp) {
   if (!ENABLE_CLIENT_IP_LOGGING) return null
   if (!IP_HASH_SALT || !clientIp || clientIp === 'unknown') {
-    console.warn(
-      'IP logging enabled but IP_HASH_SALT or client IP missing; skipping IP storage'
-    )
+    logger.warn('IP logging enabled but IP_HASH_SALT or client IP missing; skipping IP storage')
     return null
   }
   return crypto
@@ -123,6 +135,29 @@ async function parseBody(req, maxBytes) {
   }
 }
 
+function getLatestUserMessage(body) {
+  if (typeof body?.message === 'string' && body.message.trim()) {
+    return body.message
+  }
+
+  if (!Array.isArray(body?.messages)) {
+    return null
+  }
+
+  for (let index = body.messages.length - 1; index >= 0; index -= 1) {
+    const message = body.messages[index]
+    if (
+      message?.role === 'user' &&
+      typeof message.content === 'string' &&
+      message.content.trim()
+    ) {
+      return message.content
+    }
+  }
+
+  return null
+}
+
 async function handleOpenRouterChat(req, res, body, clerkId) {
   if (!ALLOW_VERCEL_CHAT) {
     return res.status(403).json({
@@ -135,22 +170,31 @@ async function handleOpenRouterChat(req, res, body, clerkId) {
   }
 
   if (INTERNAL_CHAT_TOKEN) {
-    const provided =
-      req.headers['x-internal-token'] ||
-      (req.headers.authorization || '').replace('Bearer ', '')
-    if (provided !== INTERNAL_CHAT_TOKEN) {
+    const providedHeader = req.headers['x-internal-token']
+    const providedInternalToken = Array.isArray(providedHeader)
+      ? providedHeader[0]
+      : providedHeader
+    if (
+      typeof providedInternalToken !== 'string' ||
+      providedInternalToken !== INTERNAL_CHAT_TOKEN
+    ) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
   }
 
-  const clientIp = getClientIp(req)
-  if (isRateLimited(clientIp)) {
+  const rateResult = await applyRateLimit(req, OPENROUTER_RATE_LIMIT)
+  if (!rateResult.allowed) {
+    if (rateResult.retryAfter) {
+      res.setHeader('Retry-After', rateResult.retryAfter.toString())
+    }
     return res.status(429).json({
       error: 'Rate limit exceeded. Please slow down.',
+      retryAfterSeconds: rateResult.retryAfter,
     })
   }
 
-  const { message, sessionId, userEmail, maxTokens } = body || {}
+  const { sessionId, userEmail, maxTokens } = body || {}
+  const message = getLatestUserMessage(body)
   const conversationId =
     sessionId || `chat_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
 
@@ -165,7 +209,14 @@ async function handleOpenRouterChat(req, res, body, clerkId) {
 
   const apiKey = process.env.OPENROUTER_API_KEY
   if (!apiKey) {
-    return res.status(503).json({ error: 'Service IA non configuré' })
+    const setupHint =
+      process.env.NODE_ENV !== 'production'
+        ? "Definissez OPENROUTER_API_KEY dans votre environnement de dev (.env.local) puis redemarrez `npm run dev`."
+        : undefined
+
+    return res
+      .status(503)
+      .json({ error: 'Service IA non configuré', message: setupHint })
   }
 
   const cappedMaxTokens =
@@ -207,7 +258,7 @@ async function handleOpenRouterChat(req, res, body, clerkId) {
     "Désolé, je n'ai pas pu générer une réponse."
   const tokensUsed = data.usage?.total_tokens || 0
   const actualModel = data.model || openRouterModel
-  const clientIpHash = hashClientIp(clientIp)
+  const clientIpHash = hashClientIp(getClientIp(req))
 
   try {
     const metadata = {
@@ -226,17 +277,18 @@ async function handleOpenRouterChat(req, res, body, clerkId) {
       sessionId: conversationId,
       userMessage: message,
       aiResponse,
-      userEmail: userEmail || null,
+      userEmail: typeof userEmail === 'string' ? userEmail : null,
       metadata,
       clerkId,
     })
   } catch (logError) {
-    console.warn('Conversation log failed', logError)
+    logger.warn('Conversation log failed', logError)
   }
 
   return res.status(200).json({
     success: true,
     response: aiResponse,
+    message: aiResponse,
     conversationId,
   })
 }
@@ -340,11 +392,20 @@ async function handler(req, res) {
       .json({ error: bodyResult.error.message })
   }
   const body = bodyResult || {}
+  const clerkSecretKey =
+    process.env.CLERK_SECRET_KEY || process.env.CLERK_API_KEY
+  if (!clerkSecretKey) {
+    return res.status(503).json({ error: 'Service auth non configuré' })
+  }
   const { userId: clerkId, error: authError } = await verifyClerkAuth(
     req.headers.authorization
   )
   if (authError || !clerkId) {
-    return res.status(401).json({ error: 'Unauthorized' })
+    const errorMessage =
+      process.env.NODE_ENV !== 'production' && authError
+        ? authError
+        : 'Unauthorized'
+    return res.status(401).json({ error: errorMessage })
   }
 
   try {
@@ -360,7 +421,7 @@ async function handler(req, res) {
       validActions: ['chat', 'vision'],
     })
   } catch (error) {
-    console.error('AI error:', error)
+    logger.error('AI error', error)
     return res.status(500).json({
       error: 'AI request failed',
       message: error instanceof Error ? error.message : 'Unknown error',

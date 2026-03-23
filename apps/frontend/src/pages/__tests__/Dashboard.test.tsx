@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 
 import Dashboard from '../Dashboard'
@@ -14,6 +15,13 @@ vi.mock('@/api/metrics', () => ({
 }))
 
 describe('Dashboard page', () => {
+  const renderDashboard = () =>
+    render(
+      <MemoryRouter>
+        <Dashboard />
+      </MemoryRouter>
+    )
+
   it('shows guidance when no project is configured', () => {
     localStorage.removeItem('rum.projectId:v1')
     mockUseQuery.mockReturnValue({
@@ -22,9 +30,11 @@ describe('Dashboard page', () => {
       isError: false,
     })
 
-    render(<Dashboard />)
+    renderDashboard()
 
-    expect(screen.getByText(/No project configured/i)).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: /Aucun projet configuré/i })
+    ).toBeInTheDocument()
   })
 
   it('renders metrics cards when data is available', () => {
@@ -42,10 +52,10 @@ describe('Dashboard page', () => {
       isError: false,
     })
 
-    render(<Dashboard />)
+    renderDashboard()
 
     expect(
-      screen.getByRole('heading', { name: /Web Performance Dashboard/i })
+      screen.getByRole('heading', { name: /Tableau de bord performance/i })
     ).toBeInTheDocument()
     expect(screen.getByLabelText(/p75 LCP/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/p75 CLS/i)).toBeInTheDocument()

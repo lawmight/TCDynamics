@@ -125,32 +125,32 @@ const PerformanceMonitor = () => {
   if (!metrics || !isVisible) return null
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 rounded-lg bg-black/80 p-3 font-mono text-xs text-white">
+    <div className="bg-foreground/80 text-background fixed bottom-4 right-4 z-50 rounded-lg p-3 font-mono text-xs backdrop-blur-sm">
       <div className="mb-2 flex items-center justify-between">
-        <span className="font-bold">Performance Monitor</span>
+        <span className="font-bold">Moniteur de performance</span>
         <button
-          aria-label="Close performance monitor"
+          aria-label="Fermer le moniteur de performance"
           onClick={() => {
             setIsVisible(false)
             if (isBrowser) {
               localStorage.setItem(LS.SHOW_PERF_MONITOR, 'false')
             }
           }}
-          className="text-gray-400 hover:text-white"
+          className="text-background/70 focus-visible:ring-ring hover:text-background focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-foreground"
         >
           <span aria-hidden="true">×</span>
-          <span className="sr-only">Close</span>
+          <span className="sr-only">Fermer</span>
         </button>
       </div>
       <div className="space-y-1">
-        <div>Load: {metrics.loadTime}ms</div>
-        <div>Render: {metrics.renderTime}ms</div>
+        <div>Chargement: {metrics.loadTime}ms</div>
+        <div>Rendu: {metrics.renderTime}ms</div>
         {typeof metrics.memoryUsage === 'number' ? (
-          <div>Memory: {metrics.memoryUsage}MB</div>
+          <div>Mémoire: {metrics.memoryUsage}MB</div>
         ) : null}
       </div>
-      <div className="mt-2 text-xs text-gray-400">
-        Press Ctrl+Shift+P to toggle
+      <div className="text-background/70 mt-2 text-xs">
+        Ctrl+Shift+P pour afficher ou masquer
       </div>
     </div>
   )
