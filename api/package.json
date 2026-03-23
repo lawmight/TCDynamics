@@ -13,8 +13,8 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@clerk/backend": "^2.32.1",
-    "@polar-sh/sdk": "^0.46.5",
+    "@clerk/backend": "^2.33.1",
+    "@polar-sh/sdk": "^0.46.6",
     "@sentry/node": "9.47.1",
     "@tcd/shared-types": "*",
     "@tcd/shared-utils": "*",
