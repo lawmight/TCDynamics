@@ -37,11 +37,11 @@
     "build:api": "npm run build -w api",
     "build:frontend": "npm run build -w apps/frontend",
     "build:backend": "npm run build -w apps/backend",
-    "test": "npm run test -ws",
+    "test": "npm run test -ws --if-present",
     "test:frontend": "npm run test -w apps/frontend",
     "test:backend": "npm run test -w apps/backend",
     "test:functions": "echo \"Azure Functions archived - see apps/functions-archive/\"",
-    "test:e2e": "cd tests/e2e && npm run test",
+    "test:e2e": "npm run test:e2e -w apps/frontend",
     "test-this": "node tools/scripts/test-this.js",
     "test:watch": "cd apps/frontend && npm run test",
     "test:ui": "cd apps/frontend && npm run test:ui",
@@ -81,6 +81,7 @@
     "google-auth-library": "^9.14.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.52.0",
     "dotenv-cli": "^11.0.0",
     "turbo": "^2.8.20",
     "vercel": "^50.34.2",

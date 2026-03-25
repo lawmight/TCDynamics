@@ -894,6 +894,7 @@ const Contact = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <form
+                  data-testid="general-contact-form"
                   className="space-y-4"
                   aria-label="Formulaire de contact"
                   noValidate
@@ -1240,6 +1241,7 @@ const Contact = () => {
                   />
 
                   <Button
+                    data-testid="general-contact-submit"
                     type="submit"
                     className="w-full"
                     variant="outline"
