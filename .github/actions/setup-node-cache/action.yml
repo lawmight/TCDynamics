@@ -19,9 +19,7 @@ runs:
   using: 'composite'
   steps:
     - name: Setup Node.js
-      # Using v4 for compatibility, update to v5 when stable
-      # Update periodically: https://github.com/actions/setup-node/releases
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v5
       with:
         node-version: ${{ inputs.node-version }}
         cache: 'npm'
