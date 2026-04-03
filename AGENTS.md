@@ -65,8 +65,13 @@ To verify MongoDB connectivity independently: `cd api && node --input-type=modul
 - When the user names a specific OpenRouter model slug or route for in-app AI, use that exact value (for example `openrouter/free`) instead of a different OpenRouter default.
 - For authenticated `/app` and related product UI, large layout or design revamps are acceptable when moving toward coherent, industry-standard patterns.
 - Requests phrased like “start the local host” mean run the documented dev command and report the live local URL, including when the default Vite port is unavailable on the host OS.
+- For commit-and-push flows that start on the default branch, create a new branch whose name begins with `cursor/` and push there unless the user explicitly allows direct commits to `main`.
 
 ## Learned Workspace Facts
 
 - On Windows, `netsh interface ipv4 show excludedportrange protocol=tcp` often lists ranges that include **2991–3090**; binding Vite to **3000** can fail with `EACCES`, so this repo often uses another dev port (for example **3100**) in `apps/frontend/vite.config.ts`, with `/api` proxied to the local Vercel dev port configured there (currently **3201** with root `npm run dev`).
 - Server-side chat goes through OpenRouter (`api/ai.js`); without `OPENROUTER_API_KEY` the API responds as IA not configured and the chat UI shows an error. Integration notes live under `docs/integrations/` (including model routes such as `openrouter/free` where relevant).
+- GitHub Actions Quality Gate runs `npm audit --audit-level=high` in `api/`; that step can fail while Vercel deployment status still shows success.
+- The `api` workspace uses only the monorepo root `package-lock.json` (no separate `api/package-lock.json`); fixing npm audit for `api/` usually means updating the root lockfile.
+- BMAD and vendor AI export directories at the repo root (`_bmad/`, `_bmad-output/`, `.agent/`, `.augment/`, and the other paths listed under “AI agent configs” in `.gitignore`) are intentionally ignored and are not part of the committed tree.
+- Keep `.husky/commit-msg` on LF line endings; CRLF can break commitlint by appending `\r` to the config path.
