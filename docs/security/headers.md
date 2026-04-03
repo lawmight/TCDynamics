@@ -83,11 +83,6 @@ script-src 'self' 'sha256-B0YeSIgQkU25t8JsAxqLZDvivwg+N1UjPV6BiObAslw=' https://
 - Added CSP hash for theme initialization script
 - Added `https://challenges.cloudflare.com` for Turnstile CAPTCHA
 
-##### vercel.json.dev (Development)
-- Created separate dev configuration with relaxed CSP
-- Includes `'unsafe-inline'` and `'unsafe-eval'` for development convenience
-- Allows localhost connections for local development
-
 ##### staticwebapp.config.json (Azure Static Web Apps)
 - Updated to match production CSP settings
 - Removed unsafe tokens
@@ -124,10 +119,9 @@ The `Captcha` component dynamically loads the Turnstile script:
 - Hash-based validation for inline scripts
 - Explicit third-party domain allowlist
 
-#### Development (vercel.json.dev)
-- Relaxed CSP with `'unsafe-inline'` and `'unsafe-eval'`
-- Allows localhost connections
-- Easier debugging and hot-reload support
+#### Development
+- Vite dev server does not enforce CSP headers, so development is unrestricted
+- Localhost connections work without allowlist configuration
 
 ---
 
@@ -285,7 +279,6 @@ If `credentialless` still causes issues:
 ## Files Changed
 
 - `vercel.json` - Updated CSP and COEP headers
-- `vercel.json.dev` - Development CSP configuration
 - `staticwebapp.config.json` - Azure Static Web Apps CSP configuration
 - `apps/frontend/public/scripts/theme-init.js` - Theme initialization script
 - `apps/frontend/public/scripts/facebook-sdk.js` - Facebook SDK script
