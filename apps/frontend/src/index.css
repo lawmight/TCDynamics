@@ -677,6 +677,11 @@ main#main .overflow-y-auto.has-overflow::-webkit-scrollbar-thumb {
   pointer-events: none;
 }
 
+/* Hide when footer is in view (home page) — overrides lg display below */
+.section-indicators.section-indicators--hidden {
+  display: none !important;
+}
+
 .section-indicators--desktop {
   position: fixed;
   right: 1.25rem;
