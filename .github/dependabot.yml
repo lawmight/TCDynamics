@@ -58,9 +58,30 @@ updates:
       - 'ci/cd'
       - 'auto-update'
 
-  # Docker dependencies
+  # Docker dependencies (backend image)
   - package-ecosystem: 'docker'
-    directory: '/'
+    directory: '/apps/backend'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+      timezone: 'UTC'
+    open-pull-requests-limit: 5
+    reviewers:
+      - 'Tomco'
+    assignees:
+      - 'Tomco'
+    commit-message:
+      prefix: 'chore'
+      include: 'scope'
+    labels:
+      - 'docker'
+      - 'infrastructure'
+      - 'auto-update'
+
+  # Docker dependencies (frontend image)
+  - package-ecosystem: 'docker'
+    directory: '/docker'
     schedule:
       interval: 'weekly'
       day: 'monday'
