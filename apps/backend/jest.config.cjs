@@ -50,6 +50,8 @@ module.exports = {
     '!src/**/__tests__/**',
     '!src/server.js',
   ],
+  // Use V8 native coverage to avoid Babel Istanbul transform issues in CI.
+  coverageProvider: 'v8',
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   coverageThreshold: {
