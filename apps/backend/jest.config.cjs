@@ -1,5 +1,7 @@
 module.exports = {
   testEnvironment: 'node',
+  // Use V8-native instrumentation to avoid Babel coverage plugin regressions.
+  coverageProvider: 'v8',
   // Restrict Jest to only search within this backend directory
   roots: ['<rootDir>/src'],
   // Only match test files within this backend directory
