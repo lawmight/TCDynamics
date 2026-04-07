@@ -50,6 +50,7 @@ module.exports = {
     '!src/**/__tests__/**',
     '!src/server.js',
   ],
+  coverageProvider: 'v8',
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   coverageThreshold: {
