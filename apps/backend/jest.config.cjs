@@ -1,5 +1,6 @@
 module.exports = {
   testEnvironment: 'node',
+  coverageProvider: 'v8',
   // Restrict Jest to only search within this backend directory
   roots: ['<rootDir>/src'],
   // Only match test files within this backend directory
