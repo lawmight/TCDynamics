@@ -50,6 +50,8 @@ module.exports = {
     '!src/**/__tests__/**',
     '!src/server.js',
   ],
+  // Keep coverage collection independent from Babel instrumentation.
+  coverageProvider: 'v8',
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   coverageThreshold: {
