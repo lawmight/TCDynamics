@@ -9,7 +9,10 @@ import Users from '~icons/lucide/users'
 
 const Footer = () => {
   return (
-    <footer className="border-t border-border/40 bg-background py-12">
+    <footer
+      id="site-footer"
+      className="border-t border-border/40 bg-background py-12"
+    >
       <h2 className="sr-only">Pied de page du site</h2>
       <div className="container mx-auto px-4">
         {/* Top Row: Trust Signals */}

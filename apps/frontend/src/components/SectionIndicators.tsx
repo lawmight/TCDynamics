@@ -1,3 +1,7 @@
+import { useEffect, useState } from 'react'
+
+import { cn } from '@/lib/utils'
+
 /** Default label mapping for section IDs */
 const DEFAULT_LABELS: Record<string, string> = {
   hero: 'Présentation',
@@ -23,11 +27,38 @@ interface SectionIndicatorsProps {
  * - Click scrolls to section via scrollIntoView
  * - Full accessibility: aria-label, aria-current, keyboard navigation
  */
+/**
+ * Hide fixed dots when the site footer scrolls into view so they never cover
+ * footer content (e.g. Mentions column on the home page).
+ */
+function useHideIndicatorsForFooter(): boolean {
+  const [hide, setHide] = useState(false)
+
+  useEffect(() => {
+    const footer = document.getElementById('site-footer')
+    if (!footer) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setHide(entry.isIntersecting)
+      },
+      { root: null, rootMargin: '0px', threshold: 0 },
+    )
+
+    observer.observe(footer)
+    return () => observer.disconnect()
+  }, [])
+
+  return hide
+}
+
 const SectionIndicators = ({
   activeId,
   sectionIds,
   labels = DEFAULT_LABELS,
 }: SectionIndicatorsProps) => {
+  const hideNearFooter = useHideIndicatorsForFooter()
+
   const indicators = sectionIds.map(id => ({
     id,
     label: labels[id] || id,
@@ -45,7 +76,10 @@ const SectionIndicators = ({
       {/* Desktop indicators - right side */}
       <nav
         aria-label="Navigation des sections"
-        className="section-indicators section-indicators--desktop"
+        className={cn(
+          'section-indicators section-indicators--desktop',
+          hideNearFooter && 'section-indicators--hidden',
+        )}
       >
         <ul>
           {indicators.map(({ id, label }) => (
@@ -96,7 +130,10 @@ const SectionIndicators = ({
       {/* Mobile indicators - bottom center */}
       <nav
         aria-label="Navigation des sections"
-        className="section-indicators section-indicators--mobile"
+        className={cn(
+          'section-indicators section-indicators--mobile',
+          hideNearFooter && 'section-indicators--hidden',
+        )}
       >
         <ul>
           {indicators.map(({ id, label }) => (
