@@ -58,9 +58,9 @@ jobs:
         run: |
           npm ci
           npm run build:packages
-          npm run lint -ws
-          npm run type-check -ws
-          npm run test -ws --if-present
+          npm run lint
+          npm run type-check
+          npm run test
 
       - name: Commit and push (only if verify passed)
         if: success()

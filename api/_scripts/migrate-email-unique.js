@@ -2,7 +2,7 @@
  * Email Unique Index Migration Script
  * Zero-downtime migration to create unique email index with case-insensitive collation
  *
- * Usage: node api/scripts/migrate-email-unique.js
+ * Usage: node api/_scripts/migrate-email-unique.js
  */
 
 import mongoose from 'mongoose'
@@ -32,7 +32,7 @@ async function migrateEmailUnique() {
     console.error(
       `\n❌ Cannot proceed: Found ${duplicates.length} duplicate email groups.`
     )
-    console.error('Run first: node api/scripts/find-duplicate-emails.js')
+    console.error('Run first: node api/_scripts/find-duplicate-emails.js')
     await mongoose.connection.close()
     process.exit(1)
   }
@@ -94,7 +94,7 @@ async function migrateEmailUnique() {
       console.error(
         '   ❌ Failed: Duplicate emails detected during index creation'
       )
-      console.error('   Run: node api/scripts/find-duplicate-emails.js')
+      console.error('   Run: node api/_scripts/find-duplicate-emails.js')
       await mongoose.connection.close()
       process.exit(1)
     }

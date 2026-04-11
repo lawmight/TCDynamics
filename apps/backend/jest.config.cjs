@@ -1,5 +1,8 @@
 module.exports = {
   testEnvironment: 'node',
+  // Native V8 coverage avoids babel-plugin-istanbul, which breaks when hoisted to `glob@10`
+  // (test-exclude expects callback-style glob from v7).
+  coverageProvider: 'v8',
   // Restrict Jest to only search within this backend directory
   roots: ['<rootDir>/src'],
   // Only match test files within this backend directory

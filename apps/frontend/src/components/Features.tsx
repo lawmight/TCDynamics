@@ -141,8 +141,7 @@ const Features = () => {
             françaises.
             <span className="text-primary-glow">
               {' '}
-              WorkFlowAI - Des workflows visuels pour gagner du temps chaque
-              jour.
+              Des workflows visuels pour gagner du temps chaque jour.
             </span>
           </motion.p>
         </div>

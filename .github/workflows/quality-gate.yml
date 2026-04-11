@@ -8,11 +8,17 @@ on:
     branches: [main]
     paths:
       - 'apps/frontend/**'
+      - 'apps/backend/**'
+      - 'api/**'
+      - 'packages/**'
       - '.github/workflows/quality-gate.yml'
   push:
     branches: [main]
     paths:
       - 'apps/frontend/**'
+      - 'apps/backend/**'
+      - 'api/**'
+      - 'packages/**'
       - '.github/workflows/quality-gate.yml'
   workflow_call:
     inputs:
@@ -92,23 +98,36 @@ jobs:
           skip-root: false
           skip-api: false
 
+      - name: Build shared packages
+        id: build-packages
+        if: ${{ inputs.skip_lint != 'true' && github.event.inputs.skip_lint != 'true' }}
+        run: npm run build:packages
+
       - name: Type Check
         id: type-check
         if: ${{ inputs.skip_lint != 'true' && github.event.inputs.skip_lint != 'true' }}
-        working-directory: ./apps/frontend
         run: npm run type-check
 
       - name: Lint
         id: lint
         if: ${{ inputs.skip_lint != 'true' && github.event.inputs.skip_lint != 'true' }}
-        run: |
-          cd apps/frontend && node ../../node_modules/eslint/bin/eslint.js . --ext ts,tsx --report-unused-disable-directives --max-warnings 150
+        run: npm run lint
 
       - name: Unit Tests
         id: test-run
         if: ${{ inputs.skip_tests != 'true' && github.event.inputs.skip_tests != 'true' }}
         working-directory: ./apps/frontend
         run: npm run test:coverage
+
+      - name: API Tests
+        id: api-tests
+        if: ${{ inputs.skip_tests != 'true' && github.event.inputs.skip_tests != 'true' }}
+        run: npm run test -w api
+
+      - name: Backend Tests
+        id: backend-tests
+        if: ${{ inputs.skip_tests != 'true' && github.event.inputs.skip_tests != 'true' }}
+        run: npm run test:backend
 
       - name: Verify Coverage Directory
         id: verify-coverage
@@ -253,9 +272,12 @@ jobs:
           echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Steps Status" >> $GITHUB_STEP_SUMMARY
+          echo "- Build shared packages: ${{ steps.build-packages.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
           echo "- Type Check: ${{ steps.type-check.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
           echo "- Lint: ${{ steps.lint.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
           echo "- Unit Tests: ${{ steps.test-run.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- API Tests: ${{ steps.api-tests.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Backend Tests: ${{ steps.backend-tests.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
           echo "- Health Endpoint Check: ${{ steps.health-check.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
           echo "- Coverage Check: ${{ steps.coverage-check.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
           echo "- Build Check: ${{ steps.build-check.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY

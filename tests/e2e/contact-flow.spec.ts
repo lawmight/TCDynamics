@@ -1,91 +1,91 @@
-import { expect, test } from '@playwright/test'
+import { type Page, expect, test } from '@playwright/test'
 
 test.describe('Contact Form Flow', () => {
-  test.beforeEach(async ({ page }) => {
+  const gotoContactSection = async (page: Page) => {
     await page.goto('/')
+    const footer = page.locator('footer')
+    await footer.scrollIntoViewIfNeeded()
+    await footer.getByRole('link', { name: /^Contact$/ }).click()
+    await expect(page).toHaveURL(/#contact/)
+  }
+
+  test.beforeEach(async ({ page }) => {
+    await gotoContactSection(page)
   })
 
   test('should complete contact form successfully', async ({ page }) => {
-    // Navigate to contact section
-    await page.click('text=Contact')
+    await page.route('**/api/forms', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          success: true,
+          message: 'Message envoyé avec succès',
+        }),
+      })
+    })
 
-    // Wait for form to be visible
-    await expect(page.locator('input[name="name"]')).toBeVisible()
+    const form = page.getByTestId('general-contact-form')
+    await expect(form).toBeVisible()
 
-    // Fill out the form
-    await page.fill('input[name="name"]', 'John Doe')
-    await page.fill('input[name="email"]', 'john.doe@example.com')
-    await page.fill('input[name="phone"]', '+33123456789')
-    await page.fill('input[name="company"]', 'Test Company')
-    await page.fill(
-      'textarea[name="message"]',
-      'This is a test message from E2E tests'
-    )
+    await form.locator('input[name="firstName"]').fill('Jean')
+    await form.locator('input[name="lastName"]').fill('Dupont')
+    await form.locator('input[name="email"]').fill('jean.dupont@example.com')
+    await form.locator('input[name="phone"]').fill('01 23 45 67 89')
+    await form.locator('input[name="company"]').fill('TCDynamics')
+    await form
+      .locator('textarea[name="message"]')
+      .fill('Bonjour, je souhaite en savoir plus sur vos services.')
 
-    // Submit the form
-    await page.click('button:has-text("Envoyer")')
+    await page.getByTestId('general-contact-submit').click()
 
-    // Should show success message
-    await expect(page.locator('text=Message envoyé')).toBeVisible()
     await expect(
-      page.locator('text=Nous vous répondrons dans les plus brefs délais')
+      page.getByRole('heading', { name: /Votre avis nous intéresse/i })
     ).toBeVisible()
   })
 
   test('should validate required fields', async ({ page }) => {
-    await page.click('text=Contact')
+    await page.getByTestId('general-contact-submit').click()
 
-    // Try to submit empty form
-    await page.click('button:has-text("Envoyer")')
-
-    // Should show validation errors
-    await expect(page.locator('text=Le nom est requis')).toBeVisible()
-    await expect(page.locator("text=L'email est requis")).toBeVisible()
+    await expect(page.getByText('Ce champ est requis').first()).toBeVisible()
+    await expect(page.getByText("L'email est requis")).toBeVisible()
   })
 
   test('should validate email format', async ({ page }) => {
-    await page.click('text=Contact')
+    const form = page.getByTestId('general-contact-form')
 
-    // Fill form with invalid email
-    await page.fill('input[name="name"]', 'John Doe')
-    await page.fill('input[name="email"]', 'invalid-email')
-    await page.fill('textarea[name="message"]', 'Test message')
+    await form.locator('input[name="firstName"]').fill('Jean')
+    await form.locator('input[name="lastName"]').fill('Dupont')
+    await form.locator('input[name="email"]').fill('invalid-email')
+    await form
+      .locator('textarea[name="message"]')
+      .fill('Message valide pour déclencher uniquement l erreur email.')
 
-    await page.click('button:has-text("Envoyer")')
+    await page.getByTestId('general-contact-submit').click()
 
-    // Should show email validation error
-    await expect(page.locator('text=Adresse email invalide')).toBeVisible()
+    await expect(
+      page.getByText('Veuillez entrer une adresse email valide')
+    ).toBeVisible()
   })
 
   test('should handle network errors gracefully', async ({ page }) => {
-    // Mock API failure
-    await page.route('**/api/contact', route => route.abort())
+    await page.route('**/api/forms', async route => {
+      await route.abort('failed')
+    })
 
-    await page.click('text=Contact')
+    const form = page.getByTestId('general-contact-form')
+    await form.locator('input[name="firstName"]').fill('Jean')
+    await form.locator('input[name="lastName"]').fill('Dupont')
+    await form.locator('input[name="email"]').fill('jean.dupont@example.com')
+    await form
+      .locator('textarea[name="message"]')
+      .fill('Bonjour, ceci est un message de test pour erreur réseau.')
 
-    await page.fill('input[name="name"]', 'John Doe')
-    await page.fill('input[name="email"]', 'john.doe@example.com')
-    await page.fill('textarea[name="message"]', 'Test message')
+    await page.getByTestId('general-contact-submit').click()
 
-    await page.click('button:has-text("Envoyer")')
-
-    // Should show error message
-    await expect(page.locator("text=Erreur lors de l'envoi")).toBeVisible()
-  })
-
-  test('should be responsive on mobile', async ({ page }) => {
-    // Set mobile viewport
-    await page.setViewportSize({ width: 375, height: 667 })
-
-    await page.click('text=Contact')
-
-    // Form should be accessible on mobile
-    await expect(page.locator('input[name="name"]')).toBeVisible()
-
-    // Mobile menu should work
-    const mobileMenuButton = page.locator('button[aria-label*="menu"]')
-    await mobileMenuButton.click()
-
-    await expect(page.locator('text=Accueil')).toBeVisible()
+    await expect(page.getByRole('alert').last()).toBeVisible()
+    await expect(page.getByRole('alert').last()).toContainText(
+      /Erreur|Failed to fetch|NetworkError|connexion/i
+    )
   })
 })

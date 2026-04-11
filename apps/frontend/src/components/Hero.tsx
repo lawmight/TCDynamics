@@ -181,8 +181,7 @@ const Hero = () => {
                 <span className="text-gradient">Gagnez 10 h par semaine</span>
               </h1>
               <p className="text-lg font-light tracking-wide text-muted-foreground">
-                WorkFlowAI - L'automatisation intelligente de vos processus
-                métier
+                L'automatisation intelligente de vos processus métier
               </p>
             </motion.div>
 

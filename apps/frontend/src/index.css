@@ -740,15 +740,20 @@ main#main .overflow-y-auto.has-overflow::-webkit-scrollbar-thumb {
 .section-indicators--mobile {
   position: fixed;
   bottom: 5rem;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
   display: none;
   pointer-events: auto;
+  /* Edge-to-edge strip so flex can center the pill (ul) without translate hacks */
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
 }
 
 .section-indicators--mobile ul {
   display: flex;
   flex-direction: row;
+  align-items: center;
   gap: 0.5rem;
   list-style: none;
   margin: 0;
@@ -761,6 +766,14 @@ main#main .overflow-y-auto.has-overflow::-webkit-scrollbar-thumb {
   width: max-content;
   max-width: calc(100vw - 2rem);
   box-sizing: border-box;
+}
+
+.section-indicators--mobile ul li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
 }
 
 .section-indicators--mobile button {
@@ -811,7 +824,7 @@ main#main .overflow-y-auto.has-overflow::-webkit-scrollbar-thumb {
   }
 
   .section-indicators--mobile {
-    display: block !important;
+    display: flex !important;
   }
 }
 
