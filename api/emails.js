@@ -21,11 +21,11 @@ import { connectToDatabase } from './_lib/mongodb.js'
 import { ensureString, sanitizeMongoInput } from './_lib/sanitize-mongo.js'
 
 // Import templates
-import tipsTemplate from './emails/templates/advanced-tips.js'
-import feedbackTemplate from './emails/templates/feedback-request.js'
-import firstValueTemplate from './emails/templates/first-value.js'
-import reminderTemplate from './emails/templates/onboarding-reminder.js'
-import welcomeTemplate from './emails/templates/welcome.js'
+import tipsTemplate from './_lib/emails/templates/advanced-tips.js'
+import feedbackTemplate from './_lib/emails/templates/feedback-request.js'
+import firstValueTemplate from './_lib/emails/templates/first-value.js'
+import reminderTemplate from './_lib/emails/templates/onboarding-reminder.js'
+import welcomeTemplate from './_lib/emails/templates/welcome.js'
 
 // Template registry
 const TEMPLATES = {

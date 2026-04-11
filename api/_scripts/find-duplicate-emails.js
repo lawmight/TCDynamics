@@ -2,7 +2,7 @@
  * Find Duplicate Emails Script
  * Pre-flight check before creating unique email index
  *
- * Usage: node api/scripts/find-duplicate-emails.js
+ * Usage: node api/_scripts/find-duplicate-emails.js
  */
 
 import mongoose from 'mongoose'

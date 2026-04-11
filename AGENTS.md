@@ -71,6 +71,7 @@ To verify MongoDB connectivity independently: `cd api && node --input-type=modul
 
 ## Learned Workspace Facts
 
+- On a **Vercel Hobby** project, production deployments allow at most **12 serverless functions**. Extra files under `api/` that Vercel treats as routes (for example root-level `jest.config.js` or `eslint.config.js` next to handlers) can push the count over the limit; keep tooling configs in private/underscore segments (e.g. `api/_config/`) or outside `api/` so only real HTTP handlers count.
 - On Windows, `netsh interface ipv4 show excludedportrange protocol=tcp` often lists ranges that include **2991–3090**; binding Vite to **3000** can fail with `EACCES`, so this repo often uses another dev port (for example **3100**) in `apps/frontend/vite.config.ts`, with `/api` proxied to the local Vercel dev port configured there (currently **3201** with root `npm run dev`).
 - Server-side chat goes through OpenRouter (`api/ai.js`); without `OPENROUTER_API_KEY` the API responds as IA not configured and the chat UI shows an error. Integration notes live under `docs/integrations/` (including model routes such as `openrouter/free` where relevant).
 - `@polar-sh/sdk` is pinned to exact **0.46.5** in `api/package.json` and `apps/frontend/package.json`; after any version change, run `npm install` at the repo root so the root `package-lock.json` stays aligned (workspace lockfile entries have drifted from the declared version before).

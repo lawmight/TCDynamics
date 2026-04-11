@@ -6,9 +6,9 @@
   "scripts": {
     "build": "echo 'API functions deployed via Vercel - no build needed'",
     "dev": "echo 'API functions run via Vercel dev'",
-    "lint": "eslint .",
+    "lint": "eslint --config _config/eslint.config.js .",
     "type-check": "echo 'API type checking handled by root TypeScript'",
-    "test": "npx --node-options=--experimental-vm-modules jest --config jest.config.js --passWithNoTests"
+    "test": "npx --node-options=--experimental-vm-modules jest --config _config/jest.config.js --passWithNoTests"
   },
   "private": true,
   "type": "module",

@@ -15,8 +15,8 @@
 # Exclude test/config files from being detected as functions
 
 api/**/jest.config.js
-api/**/_.test.js
-api/\*\*/_.spec.js
+api/**/*.test.js
+api/**/*.spec.js
 
 # NOTE: Do NOT exclude `api/_lib/**` from uploads.
 
@@ -34,10 +34,9 @@ api/\*\*/_.spec.js
 
 #
 
-# Exclude templates and scripts from uploads (not needed at runtime for deployed functions)
+# Exclude local-only maintenance scripts from uploads (not needed at runtime for deployed functions)
 
-api/emails/templates/**
-api/scripts/**
+api/_scripts/**
 
 # Also exclude backend and other non-production directories
 

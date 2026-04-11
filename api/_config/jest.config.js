@@ -1,4 +1,5 @@
 export default {
+  rootDir: '..',
   testEnvironment: 'node',
   roots: ['<rootDir>/_lib/__tests__'],
   testMatch: ['**/*.test.js'],

@@ -2,7 +2,7 @@
  * Rollback Email Unique Index Script
  * Removes unique email index and optionally recreates non-unique index
  *
- * Usage: node api/scripts/rollback-email-unique.js
+ * Usage: node api/_scripts/rollback-email-unique.js
  */
 
 import mongoose from 'mongoose'

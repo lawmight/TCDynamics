@@ -118,25 +118,25 @@ The scripts directory contains utility scripts for deployment, monitoring, devel
 
 ### 5. API and Database Scripts
 
-#### `api/scripts/migrate-email-unique.js`
+#### `api/_scripts/migrate-email-unique.js`
 **Purpose**: MongoDB migration to add unique email constraint
-**Usage**: `node api/scripts/migrate-email-unique.js`
+**Usage**: `node api/_scripts/migrate-email-unique.js`
 **Features**:
 - Checks for duplicate emails before migration
 - Creates unique index on email field
 - Handles migration safely with rollback capability
 
-#### `api/scripts/rollback-email-unique.js`
+#### `api/_scripts/rollback-email-unique.js`
 **Purpose**: Rollback email unique constraint migration
-**Usage**: `node api/scripts/rollback-email-unique.js`
+**Usage**: `node api/_scripts/rollback-email-unique.js`
 **Features**:
 - Removes unique email constraint
 - Useful if migration causes issues
 - Provides rollback confirmation
 
-#### `api/scripts/find-duplicate-emails.js`
+#### `api/_scripts/find-duplicate-emails.js`
 **Purpose**: Find duplicate email addresses in database
-**Usage**: `node api/scripts/find-duplicate-emails.js`
+**Usage**: `node api/_scripts/find-duplicate-emails.js`
 **Features**:
 - Identifies duplicate email entries
 - Provides count and list of duplicates
@@ -228,13 +228,13 @@ MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database
 ### Database Operations
 ```bash
 # Check for duplicate emails
-node api/scripts/find-duplicate-emails.js
+node api/_scripts/find-duplicate-emails.js
 
 # Apply email unique constraint
-node api/scripts/migrate-email-unique.js
+node api/_scripts/migrate-email-unique.js
 
 # Rollback if needed
-node api/scripts/rollback-email-unique.js
+node api/_scripts/rollback-email-unique.js
 ```
 
 ### MongoDB Access
