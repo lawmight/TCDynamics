@@ -42,7 +42,7 @@ const MAX_TOKENS = Math.max(1, Number(process.env.MAX_TOKENS) || 512)
 const OPENROUTER_RATE_LIMIT = { limit: 5, windowMs: 60_000, scope: 'openrouter-chat' }
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
-const OPENROUTER_APP_TITLE = process.env.OPENROUTER_APP_TITLE || 'WorkFlowAI'
+const OPENROUTER_APP_TITLE = process.env.OPENROUTER_APP_TITLE || 'TCDynamics'
 
 const CHAT_MAX_BODY_BYTES = 10 * 1024 // 10KB for chat messages
 const VISION_MAX_BODY_BYTES = 256 * 1024 // 256KB for image URL requests
@@ -239,7 +239,7 @@ async function handleOpenRouterChat(req, res, body, clerkId) {
         {
           role: 'system',
           content:
-            'Tu es WorkFlowAI, assistant IA pour TCDynamics (PME FR). Réponds en français, professionnel et concis.',
+            "Tu es l'assistant IA de TCDynamics (PME FR). Réponds en français, professionnel et concis.",
         },
         { role: 'user', content: message.trim() },
       ],

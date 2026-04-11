@@ -6,14 +6,17 @@
   "scripts": {
     "build": "echo 'API functions deployed via Vercel - no build needed'",
     "dev": "echo 'API functions run via Vercel dev'",
-    "lint": "echo 'API linting handled by root ESLint'",
+    "lint": "eslint .",
     "type-check": "echo 'API type checking handled by root TypeScript'",
     "test": "npx --node-options=--experimental-vm-modules jest --config jest.config.js --passWithNoTests"
   },
   "private": true,
   "type": "module",
   "devDependencies": {
+    "@eslint/js": "^9.39.4",
     "@jest/globals": "^30.3.0",
+    "eslint": "^9.39.4",
+    "globals": "^16.5.0",
     "jest": "^30.3.0"
   },
   "dependencies": {
@@ -25,7 +28,6 @@
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.37.0",
     "bcryptjs": "^2.4.3",
-    "google-auth-library": "^9.14.1",
     "isomorphic-dompurify": "^2.36.0",
     "lru-cache": "^11.2.7",
     "mongodb": "^7.1.0",

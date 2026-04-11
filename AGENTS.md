@@ -32,12 +32,14 @@ cd packages/shared-types && npx tsc --build && cd ../shared-utils && npx tsc --b
 
 ### Lint / Test / Build Commands
 
-Standard commands documented in `README.md`. Quick reference:
-- **Lint**: `npm run lint` (all), `npm run lint:frontend`, `npm run lint:backend`
-- **Test**: `npm run test:frontend -- --run` (vitest, 418 tests), `npm run test:backend` (jest, 108 tests)
-- **Type-check**: `npm run type-check:frontend`
-- **Build**: `npm run build:frontend`
+Standard commands documented in `README.md`. Root scripts use **Turborepo** (`turbo run`) for `lint`, `type-check`, `build`, and `test` so task order and caching follow the workspace graph (shared packages run before dependents). Quick reference:
+- **Lint**: `npm run lint` (monorepo via Turbo), `npm run lint:frontend`, `npm run lint:backend`, `npm run lint:api`
+- **Test**: `npm run test` (Turbo; workspaces without a `test` script are skipped), `npm run test:frontend -- --run`, `npm run test:backend`
+- **Type-check**: `npm run type-check` (Turbo), `npm run type-check:frontend`
+- **Build**: `npm run build` (Turbo), `npm run build:frontend`
 - **Dev**: `npm run dev` (frontend + API), `npm run dev:frontend` (frontend only)
+
+The `_bmad/` directory is an embedded BMAD workflow kit for Cursor; it is not part of the runtime app.
 
 ### Environment Variables
 

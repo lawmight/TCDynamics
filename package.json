@@ -12,10 +12,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-repo/tcdynamics"
+    "url": "https://github.com/lawmight/TCDynamics.git"
   },
   "bugs": {
-    "url": "https://github.com/your-repo/tcdynamics/issues"
+    "url": "https://github.com/lawmight/TCDynamics/issues"
   },
   "private": true,
   "packageManager": "npm@10.9.3",
@@ -32,18 +32,18 @@
     "dev:backend": "npm run dev -w apps/backend",
     "dev:vercel": "cross-env ALLOW_VERCEL_CHAT=true NODE_OPTIONS=\"--max-http-header-size=65536 --max-old-space-size=4096\" dotenv -e .env -e .env.local -e apps/frontend/.env -e apps/frontend/.env.local -- vercel dev --local-config vercel.api.dev.json --listen 3201 --yes",
     "dev:functions": "echo \"Azure Functions archived - see apps/functions-archive/\"",
-    "build": "npm run build -ws",
+    "build": "turbo run build",
     "build:packages": "npm run build -w packages/shared-types && npm run build -w packages/shared-utils",
     "build:api": "npm run build -w api",
     "build:frontend": "npm run build -w apps/frontend",
     "build:backend": "npm run build -w apps/backend",
-    "test": "npm run test -ws --if-present",
+    "test": "turbo run test",
     "test:frontend": "npm run test -w apps/frontend",
     "test:backend": "npm run test -w apps/backend",
     "test:functions": "echo \"Azure Functions archived - see apps/functions-archive/\"",
     "test:e2e": "npm run test:e2e -w apps/frontend",
     "test-this": "node tools/scripts/test-this.js",
-    "test:watch": "cd apps/frontend && npm run test",
+    "test:watch": "npm run test -w apps/frontend -- --watch",
     "test:ui": "cd apps/frontend && npm run test:ui",
     "fix": "node tools/scripts/fix-current.js",
     "fix:frontend": "cd apps/frontend && node ../../tools/scripts/fix-current.js",
@@ -52,14 +52,14 @@
     "quick-check:frontend": "cd apps/frontend && node ../../tools/scripts/quick-check.js",
     "quick-check:backend": "cd apps/backend && node ../../tools/scripts/quick-check.js",
     "audit": "npm audit",
-    "lint": "npm run lint -ws",
+    "lint": "turbo run lint",
     "lint:api": "npm run lint -w api",
     "lint:frontend": "npm run lint -w apps/frontend",
     "lint:backend": "npm run lint -w apps/backend",
     "format": "npm run format -ws",
     "format:frontend": "npm run format -w apps/frontend",
     "format:backend": "npm run format -w apps/backend",
-    "type-check": "npm run type-check -ws",
+    "type-check": "turbo run type-check",
     "type-check:frontend": "npm run type-check -w apps/frontend",
     "type-check:backend": "npm run type-check -w apps/backend",
     "clean": "rimraf node_modules apps/frontend/node_modules apps/backend/node_modules apps/frontend/dist",
@@ -76,9 +76,6 @@
     "deploy:vercel:frontend": "powershell -ExecutionPolicy Bypass -File ./scripts/deploy-vercel-frontend-only.ps1",
     "ship": "powershell -ExecutionPolicy Bypass -File ./scripts/ship.ps1",
     "preview": "powershell -ExecutionPolicy Bypass -File ./scripts/ship.ps1 -Message \"chore: preview deployment\""
-  },
-  "dependencies": {
-    "google-auth-library": "^9.14.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.52.0",

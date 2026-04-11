@@ -200,7 +200,8 @@ const handler = async (req, res) => {
           return res.status(statusCode).json(response)
         }
 
-        // Remove control characters
+        // Remove ASCII control characters (intentional — eslint no-control-regex)
+        // eslint-disable-next-line no-control-regex -- strip C0 controls and DEL
         const sanitizedName = trimmedName.replace(/[\x00-\x1F\x7F]/g, '')
         if (sanitizedName !== trimmedName) {
           const { statusCode, response } = createErrorResponse(

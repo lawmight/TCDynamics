@@ -98,17 +98,20 @@ jobs:
           skip-root: false
           skip-api: false
 
+      - name: Build shared packages
+        id: build-packages
+        if: ${{ inputs.skip_lint != 'true' && github.event.inputs.skip_lint != 'true' }}
+        run: npm run build:packages
+
       - name: Type Check
         id: type-check
         if: ${{ inputs.skip_lint != 'true' && github.event.inputs.skip_lint != 'true' }}
-        working-directory: ./apps/frontend
         run: npm run type-check
 
       - name: Lint
         id: lint
         if: ${{ inputs.skip_lint != 'true' && github.event.inputs.skip_lint != 'true' }}
-        run: |
-          cd apps/frontend && node ../../node_modules/eslint/bin/eslint.js . --ext ts,tsx --report-unused-disable-directives --max-warnings 150
+        run: npm run lint
 
       - name: Unit Tests
         id: test-run
@@ -269,6 +272,7 @@ jobs:
           echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Steps Status" >> $GITHUB_STEP_SUMMARY
+          echo "- Build shared packages: ${{ steps.build-packages.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
           echo "- Type Check: ${{ steps.type-check.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
           echo "- Lint: ${{ steps.lint.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
           echo "- Unit Tests: ${{ steps.test-run.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY

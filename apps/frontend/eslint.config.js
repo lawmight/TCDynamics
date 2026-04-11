@@ -22,7 +22,8 @@ export default [
       'playwright-report/**',
       '*.js', // Ignore root-level .js files
       'api.old/**', // Ignore legacy API folder
-      'api/**', // Ignore copied API directory (copied during deployment workflow)
+      // Deploy workflow copies serverless handlers into apps/frontend/api — not src/api.
+      'api/**',
       'scripts/**', // Ignore Node.js build scripts
       'plugins/**', // Ignore Vite plugins
     ],
@@ -176,28 +177,6 @@ export default [
     rules: {
       '@typescript-eslint/no-explicit-any': 'warn', // Allow 'as any' in tests for mocking
       'no-undef': 'off', // TypeScript handles this - prevents false positives with types
-    },
-  },
-  {
-    // Override for API serverless functions (JavaScript)
-    files: ['api/**/*.js'],
-    languageOptions: {
-      globals: {
-        ...globals.node,
-        require: 'readonly',
-        module: 'readonly',
-        exports: 'readonly',
-        console: 'readonly',
-        process: 'readonly',
-        Buffer: 'readonly',
-        fetch: 'readonly',
-        URL: 'readonly',
-        __dirname: 'readonly',
-        __filename: 'readonly',
-      },
-    },
-    rules: {
-      'no-console': 'off', // Allow console in API functions
     },
   },
   {
